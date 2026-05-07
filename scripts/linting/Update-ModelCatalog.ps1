@@ -75,7 +75,7 @@ function Get-RemoteYaml {
         [string]$Url
     )
 
-    $response = Invoke-WebRequest -Uri $Url -UseBasicParsing -ErrorAction Stop
+    $response = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 30 -ErrorAction Stop
     return ConvertFrom-Yaml -Yaml $response.Content -AllDocuments
 }
 
