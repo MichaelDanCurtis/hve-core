@@ -994,7 +994,7 @@ def test_token_store_session_serializes_writes(
     barrier = threading.Barrier(2)
     inside_holder = {"count": 0, "max": 0}
     inside_lock = threading.Lock()
-    errors: list[BaseException] = []
+    errors: list[Exception] = []
 
     def _worker(name: str) -> None:
         try:
@@ -1027,7 +1027,7 @@ def test_token_store_session_serializes_writes(
                 commit(new_envelope)
                 with inside_lock:
                     inside_holder["count"] -= 1
-        except BaseException as exc:  # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001
             errors.append(exc)
 
     t1 = threading.Thread(target=_worker, args=("alpha",))

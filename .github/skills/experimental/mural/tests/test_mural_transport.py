@@ -724,7 +724,7 @@ def test_concurrent_401_responses_trigger_single_refresh(
     n_threads = 4
     barrier = threading.Barrier(n_threads)
     results: list[Any] = [None] * n_threads
-    errors: list[BaseException | None] = [None] * n_threads
+    errors: list[Exception | None] = [None] * n_threads
 
     def _worker(index: int) -> None:
         try:
@@ -738,7 +738,7 @@ def test_concurrent_401_responses_trigger_single_refresh(
                 _sleep=lambda _s: None,
                 _bucket=_fresh_bucket(mural_module),
             )
-        except BaseException as exc:  # noqa: BLE001 - propagated via assertion
+        except Exception as exc:  # noqa: BLE001 - propagated via assertion
             errors[index] = exc
 
     threads = [threading.Thread(target=_worker, args=(i,)) for i in range(n_threads)]
@@ -792,7 +792,7 @@ def test_concurrent_proactive_refreshes_coalesce(
     n_threads = 4
     barrier = threading.Barrier(n_threads)
     results: list[Any] = [None] * n_threads
-    errors: list[BaseException | None] = [None] * n_threads
+    errors: list[Exception | None] = [None] * n_threads
 
     def _worker(index: int) -> None:
         try:
@@ -806,7 +806,7 @@ def test_concurrent_proactive_refreshes_coalesce(
                 _sleep=lambda _s: None,
                 _bucket=_fresh_bucket(mural_module),
             )
-        except BaseException as exc:  # noqa: BLE001 - propagated via assertion
+        except Exception as exc:  # noqa: BLE001 - propagated via assertion
             errors[index] = exc
 
     threads = [threading.Thread(target=_worker, args=(i,)) for i in range(n_threads)]
