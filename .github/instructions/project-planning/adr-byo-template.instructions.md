@@ -1,11 +1,11 @@
 ---
-description: 'BYO ADR template contract: 2-layer config resolution, .adr-config.yml schema, template frontmatter contract, and adopt-template lifecycle for the ADR Planner - Brought to you by microsoft/hve-core'
+description: 'BYO ADR template contract: 2-layer config resolution, .adr-config.yml schema, template frontmatter contract, and adopt-template lifecycle for the ADR Creator - Brought to you by microsoft/hve-core'
 applyTo: '**/.copilot-tracking/adr-plans/**, **/docs/planning/adrs/**/.adr-config.yml, **/docs/planning/adrs/**'
 ---
 
 # ADR Bring-Your-Own-Template Contract
 
-The ADR Planner supports user-supplied (BYO) decision-record templates through the `adopt-template` entry mode. This contract defines how configuration resolves, what fields a project config and a BYO template must declare, and how the `adopt-template` lifecycle ingests, normalizes, and governs a non-default template.
+The ADR Creator supports user-supplied (BYO) decision-record templates through the `adopt-template` entry mode. This contract defines how configuration resolves, what fields a project config and a BYO template must declare, and how the `adopt-template` lifecycle ingests, normalizes, and governs a non-default template.
 
 Scope: applies to ADR planning sessions under `.copilot-tracking/adr-plans/`, the committed config at `docs/planning/adrs/.adr-config.yml`, and rendered ADRs under `docs/planning/adrs/`.
 
@@ -13,7 +13,7 @@ Scope: applies to ADR planning sessions under `.copilot-tracking/adr-plans/`, th
 
 Configuration resolves in exactly two layers. Higher-priority layers fully override lower-priority layers on a per-field basis. There is no per-session override and no gitignored override layer.
 
-1. Layer 1 (highest priority): committed per-project config at `docs/planning/adrs/.adr-config.yml`. This file is checked in and shared across the team. It is the source of truth for everything the ADR Planner needs to know about a project.
+1. Layer 1 (highest priority): committed per-project config at `docs/planning/adrs/.adr-config.yml`. This file is checked in and shared across the team. It is the source of truth for everything the ADR Creator needs to know about a project.
 2. Layer 2 (fallback): workspace defaults baked into the `adr-author` skill's starter templates. These defaults ship with the skill and provide values when the per-project config omits a field that has a documented default.
 
 > [!IMPORTANT]
@@ -83,7 +83,7 @@ The starter templates ship inside the `adr-author` skill bundle. The legacy temp
 | `y-statement`       | Skill: `templates/y-statement.md`                   | Y-Statement six-slot template (context, facing, decided for, achieve, accepting, contrast).                                                          |
 | Workspace fallback  | `docs/templates/adr-template-solutions.md`          | Legacy solutions-analysis template retained for repositories that already reference it.                                                              |
 
-Frontmatter overlay `templates/madr-v4-frontmatter-overlay.md` adds ADR Planner workflow fields (`asrTriggers`, lineage links) to the verbatim MADR v4 frontmatter without modifying the upstream template body.
+Frontmatter overlay `templates/madr-v4-frontmatter-overlay.md` adds ADR Creator workflow fields (`asrTriggers`, lineage links) to the verbatim MADR v4 frontmatter without modifying the upstream template body.
 
 ## `adopt-template` Lifecycle (GP-08)
 

@@ -79,7 +79,7 @@ Expected hash : $($expected.Hash)
 Actual hash   : $($current.Hash)
 Expected files: $($expected.LoadedFiles | ForEach-Object { "$($_.Path) ($($_.Bytes))" } | Sort-Object | Join-String -Separator '; ')
 Actual files  : $($current.LoadedFiles | ForEach-Object { "$($_.Path) ($($_.Bytes))" } | Sort-Object | Join-String -Separator '; ')
-If the change is intentional, recapture baseline.json (see scripts/agents/activation-harness/README.md).
+If the change is intentional, recapture baseline.json by running 'npm run test:activation:baseline' (see scripts/agents/activation-harness/README.md).
 "@
     }
 

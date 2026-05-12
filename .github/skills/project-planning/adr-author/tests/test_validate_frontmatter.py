@@ -4,7 +4,7 @@
 """Tests for the ADR frontmatter and body validator.
 
 Covers MADR v4 schema rules from ``adr-standards.instructions.md`` plus the
-extensions defined in the v2 ADR Planner plan: ``proposed_date``/``accepted_date``,
+extensions defined in the v2 ADR Creator plan: ``proposed_date``/``accepted_date``,
 ``affected_components``, ``effort``, ``success_criteria``, single-parent
 supersession, and required body sections.
 """

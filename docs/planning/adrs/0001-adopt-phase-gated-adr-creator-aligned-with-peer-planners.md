@@ -1,7 +1,7 @@
 ---
 id: "0001"
-title: "Adopt phase-gated ADR Planner aligned with peer planners"
-description: "Adopt a phase-gated ADR Planner agent and supporting skills/instructions that align ADR authoring with peer planners (BRD, PRD, RPI) under MADR v4.0.0 plus hve-core extensions for IDs, lineage, and ASR triggers."
+title: "Adopt phase-gated ADR Creator aligned with peer planners"
+description: "Adopt a phase-gated ADR Creator agent and supporting skills/instructions that align ADR authoring with peer planners (BRD, PRD, RPI) under MADR v4.0.0 plus hve-core extensions for IDs, lineage, and ASR triggers."
 author: "HVE Core Maintainers"
 ms.date: "2026-05-08"
 ms.topic: "reference"
@@ -60,10 +60,10 @@ success_criteria:
   - metric: "peer-planner-parity"
     target: "100% of six-step protocol, state.json, and Govern autonomy-tier features present"
     measurement_window: "at adoption + 1 quarter"
-    source: ".github/agents/adr-planner.md vs peer planner agents"
+    source: ".github/agents/project-planning/adr-creation.agent.md vs peer planner agents"
   - metric: "madr-verbatim-fidelity"
     target: "0 diffs against upstream MADR v4.0.0 CC0 text in pinned blocks"
-    measurement_window: "every PR touching adr-planner instructions"
+    measurement_window: "every PR touching ADR Creator instructions"
     source: "scripts/linting/check_madr_verbatim.py (or equivalent test suite)"
   - metric: "adr-consistency-validator-coverage"
     target: "nine ADR-CONSISTENCY rules enforced with full Pester coverage of pass and fail fixtures"
@@ -89,7 +89,7 @@ machine, a persisted `state.json`, a six-step per-turn protocol, and a
 Govern-phase autonomy-tier prompt. Architecture Decision Record authoring
 needed a comparable agent so contributors and downstream extension consumers
 could capture decisions in a standards-aligned way without inventing a new
-workflow per repository. How should the ADR Planner be shaped so it (a)
+workflow per repository. How should the ADR Creator be shaped so it (a)
 matches peer-planner ergonomics, (b) preserves verbatim upstream MADR v4.0.0
 (CC0) and Y-Statement text, (c) supports both interactive authoring and
 inbound handoff from other planners, and (d) lets projects bring their own
@@ -112,7 +112,7 @@ ADR templates without forking the agent?
 
 ## Considered Options
 
-* Option A: Adopt three-phase ADR Planner with `capture`/`from-planner-handoff`/`adopt-template` entry modes and per-Govern autonomy tiers.
+* Option A: Adopt three-phase ADR Creator with `capture`/`from-planner-handoff`/`adopt-template` entry modes and per-Govern autonomy tiers.
 * Option B: Single-prompt, single-template ADR generator (one `.prompt.md` that emits a MADR v4 ADR in one shot).
 * Option C: Per-template specialized agents (separate agents for MADR v4, Y-Statement, and adopt-template, with no shared identity).
 * Option D: Defer entirely; let peer planners (Security, RAI, SSSC) emit ADR-shaped artifacts inline with no central authority.
@@ -130,7 +130,7 @@ ADR templates without forking the agent?
 | Testability (validators + fuzz)      | Yes      | No       | Yes      | Partial  |
 | Cross-language validator integration | Yes      | No       | Partial  | Partial  |
 
-Chosen option: **"Option A: Adopt three-phase ADR Planner with `capture`/`from-planner-handoff`/`adopt-template` entry modes and per-Govern autonomy tiers"**,
+Chosen option: **"Option A: Adopt three-phase ADR Creator with `capture`/`from-planner-handoff`/`adopt-template` entry modes and per-Govern autonomy tiers"**,
 because it is the only option that satisfies all eight decision drivers and all Frame-phase constraints.
 Option B fails peer-planner consistency, thin-orchestrator maintainability, testability, and cross-language validator integration outright.
 Option C breaks peer-planner location convention and the load-before-act coaching contract.
@@ -138,7 +138,7 @@ Option D presents false initial consistency that diverges quickly because the AD
 
 ### Consequences
 
-* Good, because peer-planner pattern reuse: contributors who already know Security/RAI/SSSC planners can read the ADR Planner with no new mental model.
+* Good, because peer-planner pattern reuse: contributors who already know Security/RAI/SSSC planners can read the ADR Creator with no new mental model.
 * Good, because MADR v4 and Y-Statement text live in a single source of truth (`adr-standards.instructions.md`); standards updates touch one file.
 * Good, because the lineage allocator (`scripts/update_lineage.py`) is the only writer of `last_decision_id`, so cross-project supersession is structurally impossible (HARD-FAIL rule).
 * Good, because the BYO `adopt-template` mode lets downstream consumers bring existing ADR conventions without forking the agent.
@@ -152,7 +152,7 @@ Option D presents false initial consistency that diverges quickly because the AD
 * Bad, because the initial surface area is higher than alternatives: four instruction files, one skill, multiple scripts, multiple templates. New contributors must learn the dispatch tables before editing.
 * Bad, because two validator implementations of the same JSON Schema must stay behavior-aligned; a schema change requires regression coverage on both the Python and PowerShell sides.
 * Bad, because Govern is the only writer of ADR files; users cannot quickly draft an ADR file without going through Frame and Decide. Friction for trivial decisions is mitigated but not eliminated by the `y-statement` template.
-* Bad, because peer-planner pattern alignment must be preserved over time: if Security/RAI/SSSC change their identity contracts, the ADR Planner must follow.
+* Bad, because peer-planner pattern alignment must be preserved over time: if Security/RAI/SSSC change their identity contracts, the ADR Creator must follow.
 * Bad, because three entry modes increase test surface (`capture`, `from-planner-handoff`, and `adopt-template` each need integration coverage).
 * Bad, because closed enums (status, ASR triggers) require an ADR-revision process to extend; this is intentional but is a real cost when a legitimate new value appears.
 * Neutral, because the autonomy-tier prompt fires only at Govern entry; Frame and Decide always run interactively. Users wanting fully unattended drafting cannot get it for those phases, by design.
@@ -166,7 +166,7 @@ Compliance with this decision is confirmed by four mechanisms:
 1. Static validation: `npm run lint:all` runs frontmatter, schema, applyTo-glob, and copyright checks across the agent body, four instruction files, the skill, templates, and scripts.
 2. Skill test suite: `npm run test:py -- adr-author` runs the 40-test pytest suite covering Frame/Decide/Govern phase contracts, lineage allocation, supersession atomicity, and frontmatter validation.
 3. Plugin generation: `npm run plugin:generate` regenerates the `project-planning` plugin from `collections/project-planning.collection.yml`; drift between the agent body and the collection manifest fails this step.
-4. Self-validation: this ADR itself was produced by the ADR Planner under `entryMode: capture`, `outputTemplate: madr-v4`, `diagramFormat: mermaid`, and `autonomyTier: full`, exercising every Frame and Decide gate plus the Govern allocator and frontmatter validator end-to-end.
+4. Self-validation: this ADR itself was produced by the ADR Creator under `entryMode: capture`, `outputTemplate: madr-v4`, `diagramFormat: mermaid`, and `autonomyTier: full`, exercising every Frame and Decide gate plus the Govern allocator and frontmatter validator end-to-end.
 
 ## Pros and Cons of the Options
 
@@ -244,7 +244,7 @@ flowchart LR
 ## Risks and Mitigations
 
 * Risk: high initial surface area (four instruction files, one skill, multiple scripts and templates) raises onboarding cost. Mitigation: agent body acts as a thin dispatch table linking to each instruction file, and the skill `SKILL.md` is anchored per phase so contributors load only what they need.
-* Risk: peer-planner identity-contract drift breaks parity. Mitigation: shared reviewers cover Security, RAI, SSSC, and ADR planners; static checks compare six-step protocol and Govern autonomy-tier shapes across agents.
+* Risk: peer-planner identity-contract drift breaks parity. Mitigation: shared reviewers cover Security, RAI, SSSC, and ADR Creator workflows; static checks compare six-step protocol and Govern autonomy-tier shapes across agents.
 * Risk: upstream MADR v4 evolves and verbatim blocks fall out of date. Mitigation: pinned CC0 text lives in a single instruction file and is covered by a verbatim-fidelity test that fails on any diff.
 * Risk: closed enums (status, ASR triggers) reject legitimate new values. Mitigation: extension requires a superseding ADR; friction is intentional and the path is documented in `adr-standards.instructions.md`.
 * Risk: `adopt-template` mode imports a malformed template and corrupts a project's ADR space. Mitigation: normalize step rejects templates that fail schema validation before any file is written; `.adr-config.yml` is committed and reviewable.

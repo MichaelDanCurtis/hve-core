@@ -1,11 +1,11 @@
 ---
-description: 'Embedded ADR standards: MADR v4.0.0 template (CC0), Y-Statement formula, status taxonomy, naming rules, ASR trigger schema, and Microsoft-attributed paraphrases for ADR Planner sessions - Brought to you by microsoft/hve-core'
+description: 'Embedded ADR standards: MADR v4.0.0 template (CC0), Y-Statement formula, status taxonomy, naming rules, ASR trigger schema, and Microsoft-attributed paraphrases for ADR Creator sessions - Brought to you by microsoft/hve-core'
 applyTo: '**/.copilot-tracking/adr-plans/**, **/docs/planning/adrs/**'
 ---
 
 # ADR Standards Reference
 
-This file is the standards anchor for the ADR Planner agent. It embeds the MADR v4.0.0 template (CC0-1.0), the Y-Statement six-slot formula (Zimmermann/Zdun), the canonical status taxonomy with legal transitions, the file-naming rule, and the ASR (Architecturally Significant Requirement) trigger schema. Microsoft-authored guidance is paraphrased under CC-BY 4.0 with explicit change indication. Other sources (Nygard 2011, IEEE 42010:2022, arc42 §9, joelparkerhenderson) are cite-only to prevent CC-BY-SA contamination. Standards lookups outside this embedded set are delegated to the Researcher Subagent at runtime.
+This file is the standards anchor for the ADR Creator agent. It embeds the MADR v4.0.0 template (CC0-1.0), the Y-Statement six-slot formula (Zimmermann/Zdun), the canonical status taxonomy with legal transitions, the file-naming rule, and the ASR (Architecturally Significant Requirement) trigger schema. Microsoft-authored guidance is paraphrased under CC-BY 4.0 with explicit change indication. Other sources (Nygard 2011, IEEE 42010:2022, arc42 §9, joelparkerhenderson) are cite-only to prevent CC-BY-SA contamination. Standards lookups outside this embedded set are delegated to the Researcher Subagent at runtime.
 
 ## MADR v4.0.0 Verbatim Template
 
@@ -117,7 +117,7 @@ Y-Statements are produced when `state.json.outputTemplate` is set to `y-statemen
 
 ## Status Taxonomy
 
-Six canonical statuses apply to all ADRs authored by the ADR Planner:
+Six canonical statuses apply to all ADRs authored by the ADR Creator:
 
 | Status       | Semantics                                                                                                       |
 |--------------|-----------------------------------------------------------------------------------------------------------------|
@@ -203,7 +203,7 @@ Output-template applicability:
 
 ## Azure Well-Architected Framework: Maintain an ADR
 
-> Attribution: paraphrased from `MicrosoftDocs/well-architected`, "Maintain an Architecture Decision Record" guidance. Original work licensed under CC-BY 4.0. Modified from original — content has been condensed, restructured for the ADR Planner workflow, and aligned with the MADR v4.0.0 template embedded above.
+> Attribution: paraphrased from `MicrosoftDocs/well-architected`, "Maintain an Architecture Decision Record" guidance. Original work licensed under CC-BY 4.0. Modified from original — content has been condensed, restructured for the ADR Creator workflow, and aligned with the MADR v4.0.0 template embedded above.
 
 Paraphrased guidance:
 
@@ -217,7 +217,7 @@ Paraphrased guidance:
 
 ## microsoft/code-with-engineering-playbook: ADRs
 
-> Attribution: paraphrased from `microsoft/code-with-engineering-playbook`, ADR section. Original work licensed under CC-BY 4.0. Modified from original — content has been condensed and adapted for the ADR Planner workflow conventions.
+> Attribution: paraphrased from `microsoft/code-with-engineering-playbook`, ADR section. Original work licensed under CC-BY 4.0. Modified from original — content has been condensed and adapted for the ADR Creator workflow conventions.
 
 Paraphrased guidance:
 

@@ -1,11 +1,11 @@
 ---
-description: 'ADR Planner Govern-phase handoff protocol: compact summary template, peer-agent routing heuristics, and dual-format (ADO + GitHub) work item templates - Brought to you by microsoft/hve-core'
+description: 'ADR Creator Govern-phase handoff protocol: compact summary template, peer-agent routing heuristics, and dual-format (ADO + GitHub) work item templates - Brought to you by microsoft/hve-core'
 applyTo: '**/.copilot-tracking/adr-plans/**, **/docs/planning/adrs/**'
 ---
 
-# ADR Planner Govern-Phase Handoff
+# ADR Creator Govern-Phase Handoff
 
-Instructions for the ADR Planner Govern-phase exit. After an architectural decision reaches `accepted` (or `proposed` with explicit handoff intent), the agent emits a compact summary, evaluates trigger heuristics for downstream peers, generates dual-format work items for any opted-in backlog systems, and records each handoff event in session state.
+Instructions for the ADR Creator Govern-phase exit. After an architectural decision reaches `accepted` (or `proposed` with explicit handoff intent), the agent emits a compact summary, evaluates trigger heuristics for downstream peers, generates dual-format work items for any opted-in backlog systems, and records each handoff event in session state.
 
 ## Govern-Phase Protocol
 
@@ -23,10 +23,10 @@ Instructions for the ADR Planner Govern-phase exit. After an architectural decis
 
 The selected tier governs every external write and handoff in the Govern phase. Frame and Decide are unaffected and always run with full coaching cadence.
 
-| Tier      | Govern-Phase Behavior                                                                                                                            |
-|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| `manual`  | Present each generated artifact (compact summary, work item bodies, peer excerpts) and pause; require explicit user approval per artifact before writing externally or appending to `state.handoffs[]`. |
-| `partial` | Generate all Govern artifacts in a single batch, present the bundle for review, and require one batch approval before writing externally and appending to `state.handoffs[]`. Default tier.            |
+| Tier      | Govern-Phase Behavior                                                                                                                                                                                     |
+|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `manual`  | Present each generated artifact (compact summary, work item bodies, peer excerpts) and pause; require explicit user approval per artifact before writing externally or appending to `state.handoffs[]`.   |
+| `partial` | Generate all Govern artifacts in a single batch, present the bundle for review, and require one batch approval before writing externally and appending to `state.handoffs[]`. Default tier.               |
 | `full`    | Generate and write all Govern artifacts and append `state.handoffs[]` records without per-artifact approval. Still respect every disclaimer and gate, and emit the final Handoff Summary unconditionally. |
 
 If any gate fails (missing disclaimer, missing target system, missing required ADR field), downgrade to `partial` for that gate, surface the failure, and proceed only after the user resolves it.
@@ -69,13 +69,13 @@ Populate `Follow-up Triggers Detected` directly from the Handoff Peers table eva
 
 ## Handoff Peers
 
-| Peer             | Trigger heuristic                                                                          | Artifact handed over                                  |
-|------------------|--------------------------------------------------------------------------------------------|-------------------------------------------------------|
-| RPI Task Planner | Decision creates implementable engineering work                                            | ADR ID + compact summary + work item stubs            |
-| Security Planner | Decision affects threat model, attack surface, or trust boundary                           | ADR ID + compact summary + STRIDE-relevant excerpt    |
-| RAI Planner      | Decision affects AI/ML behavior, training data, model selection, or user-facing AI surface | ADR ID + compact summary + RAI-relevant excerpt       |
-| ADO backlog      | User opted for ADO work items                                                              | Dual-format `WI-ADR-{NNN}` template (see below)       |
-| GitHub backlog   | User opted for GitHub Issues                                                               | Dual-format `{{ADR-TEMP-N}}` template (see below)     |
+| Peer             | Trigger heuristic                                                                          | Artifact handed over                               |
+|------------------|--------------------------------------------------------------------------------------------|----------------------------------------------------|
+| RPI Task Planner | Decision creates implementable engineering work                                            | ADR ID + compact summary + work item stubs         |
+| Security Planner | Decision affects threat model, attack surface, or trust boundary                           | ADR ID + compact summary + STRIDE-relevant excerpt |
+| RAI Planner      | Decision affects AI/ML behavior, training data, model selection, or user-facing AI surface | ADR ID + compact summary + RAI-relevant excerpt    |
+| ADO backlog      | User opted for ADO work items                                                              | Dual-format `WI-ADR-{NNN}` template (see below)    |
+| GitHub backlog   | User opted for GitHub Issues                                                               | Dual-format `{{ADR-TEMP-N}}` template (see below)  |
 
 A single ADR may fire any combination of these peers. Always evaluate all rows; do not stop at the first match.
 
@@ -258,20 +258,20 @@ After all handoffs complete, present a summary covering peers fired, work items 
 
 ### Peers Fired
 
-| Peer             | Triggered? | Artifact Reference   |
-|------------------|------------|----------------------|
-| RPI Task Planner | {Yes/No}   | {path or "n/a"}      |
-| Security Planner | {Yes/No}   | {path or "n/a"}      |
-| RAI Planner      | {Yes/No}   | {path or "n/a"}      |
-| ADO backlog      | {Yes/No}   | {WI IDs or "n/a"}    |
+| Peer             | Triggered? | Artifact Reference    |
+|------------------|------------|-----------------------|
+| RPI Task Planner | {Yes/No}   | {path or "n/a"}       |
+| Security Planner | {Yes/No}   | {path or "n/a"}       |
+| RAI Planner      | {Yes/No}   | {path or "n/a"}       |
+| ADO backlog      | {Yes/No}   | {WI IDs or "n/a"}     |
 | GitHub backlog   | {Yes/No}   | {issue refs or "n/a"} |
 
 ### Work Items Generated
 
-| ID / Ref        | System | Title                 | Tags / Labels   |
-|-----------------|--------|-----------------------|-----------------|
-| WI-ADR-{NNN}    | ADO    | {title}               | adr:{NNNN}, ... |
-| {{ADR-TEMP-N}}  | GitHub | {title}               | adr:{NNNN}, ... |
+| ID / Ref       | System | Title   | Tags / Labels   |
+|----------------|--------|---------|-----------------|
+| WI-ADR-{NNN}   | ADO    | {title} | adr:{NNNN}, ... |
+| {{ADR-TEMP-N}} | GitHub | {title} | adr:{NNNN}, ... |
 
 ### Outstanding Decisions
 

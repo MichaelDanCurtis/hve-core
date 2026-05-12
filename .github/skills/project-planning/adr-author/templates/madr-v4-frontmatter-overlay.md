@@ -1,10 +1,10 @@
 <!--
-hve-core ADR Planner — MADR v4 frontmatter overlay
+hve-core ADR Creator - MADR v4 frontmatter overlay
 ====================================================
 The upstream MADR v4.0.0 template (`madr-v4.md`) is preserved byte-identical
 under CC0-1.0 per GP-17 and therefore cannot carry hve-core extension fields
 in its own frontmatter. This overlay defines the additional fields the ADR
-Planner injects when rendering an ADR. Merge this overlay on top of the
+Creator injects when rendering an ADR. Merge this overlay on top of the
 upstream MADR frontmatter (do not replace MADR's own keys).
 
 Validation: the merged frontmatter is validated by

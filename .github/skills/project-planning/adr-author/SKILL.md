@@ -7,7 +7,7 @@ description: Authoring skill for Architecture Decision Records (ADRs) supporting
 
 ## Overview
 
-This skill encodes the per-phase authoring conventions for Architecture Decision Records consumed by the ADR Planner agent. It supports three entry modes and two output templates and converges all of them at the Govern phase, where the final ADR file is written and lineage is updated atomically.
+This skill encodes the per-phase authoring conventions for Architecture Decision Records consumed by the ADR Creator agent. It supports three entry modes and two output templates and converges all of them at the Govern phase, where the final ADR file is written and lineage is updated atomically.
 
 Entry modes (`state.entryMode`):
 
@@ -163,7 +163,7 @@ All scripts treat their working directory as untrusted input and reject paths th
 
 ## Mandatory Load Directives
 
-The ADR Planner agent enforces a phase→section load contract per `adr-identity.instructions.md`. Each phase MUST load its section of this skill before executing phase work, and MUST append the section anchor to `state.phaseSkillsLoaded`:
+The ADR Creator agent enforces a phase→section load contract per `adr-identity.instructions.md`. Each phase MUST load its section of this skill before executing phase work, and MUST append the section anchor to `state.phaseSkillsLoaded`:
 
 | Phase  | Section anchor | Required `phaseSkillsLoaded` entry |
 | ------ | -------------- | ---------------------------------- |

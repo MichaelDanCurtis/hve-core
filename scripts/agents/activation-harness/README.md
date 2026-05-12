@@ -59,9 +59,30 @@ Get-AgentActivationFingerprint `
     -ScenarioName 'CleanWorkspace'
 ```
 
+## Regenerating `baseline.json`
+
+After an intentional change to the agent or to any instruction file it loads, the Pester suite fails until `baseline.json` is recaptured. Use the scripted regenerator rather than hand-editing the file:
+
+```powershell
+# Drift check (no writes; exit 1 when out of date — suitable for CI gating)
+npm run test:activation:baseline:check
+
+# Recapture the baseline with byte-identical formatting
+npm run test:activation:baseline
+```
+
+Workflow:
+
+1. Make the intentional change to the agent or instruction files.
+2. Run `npm run test:activation` and confirm the failure is the expected drift (not a budget regression).
+3. Run `npm run test:activation:baseline` to rewrite `baseline.json`.
+4. Re-run `npm run test:activation` to confirm the suite passes against the new baseline.
+5. Commit the baseline update alongside the originating agent or instruction change.
+
 ## Files
 
 * `Get-AgentActivationFingerprint.psm1`: public module exposing the single fingerprint function.
+* `Update-AgentActivationBaseline.ps1`: regenerates `baseline.json` deterministically; supports `-DryRun` for CI drift gating.
 * `baseline.json`: pre-refactor reference fingerprints across all four scenarios for `@adr-creation`.
 * `README.md`: this document.
 
