@@ -128,7 +128,7 @@ If `targetSystem` is unset at Govern exit, ask the user which backlog system(s) 
 
 ## Disclaimer Integration
 
-Every work item body and every peer-handoff artifact MUST include the standard disclaimer block. Reference the canonical text at `.github/instructions/shared/disclaimer-language.instructions.md` and use the section that matches the planner identity. When an `ADR Planning` section is present in that shared file, use it; otherwise use the generic AI-assistance note shown in the templates below and link to the shared file.
+Every work item body and every peer-handoff artifact MUST include the standard disclaimer block. Reference the canonical text at `../shared/disclaimer-language.instructions.md` and use the section that matches the planner identity. When an `ADR Planning` section is present in that shared file, use it; otherwise use the generic AI-assistance note shown in the templates below and link to the shared file.
 
 Before displaying any disclaimer to the user, record the timestamp:
 
@@ -168,7 +168,7 @@ HTML description template:
     <li>{criterion 2}</li>
   </ul>
   <blockquote>
-  <p><strong>Disclaimer</strong> — This work item was generated with assistance from AI based on an architectural decision record. Review and validate before use. See the shared disclaimer text in <code>.github/instructions/shared/disclaimer-language.instructions.md</code>.</p>
+  <p><strong>Disclaimer</strong> — This work item was generated with assistance from AI based on an architectural decision record. Review and validate before use. See the shared disclaimer text in <code>../shared/disclaimer-language.instructions.md</code>.</p>
   <ul><li><input type="checkbox" disabled /> Reviewed and validated by a qualified human reviewer</li></ul>
   </blockquote>
 </div>
@@ -215,7 +215,7 @@ Markdown body template:
 * [ ] {criterion 1}
 * [ ] {criterion 2}
 
-> **Disclaimer** — This issue was generated with assistance from AI based on an architectural decision record. Review and validate before use. See the shared disclaimer text in [`.github/instructions/shared/disclaimer-language.instructions.md`](../../.github/instructions/shared/disclaimer-language.instructions.md).
+> **Disclaimer** — This issue was generated with assistance from AI based on an architectural decision record. Review and validate before use. See the shared disclaimer text in [`../shared/disclaimer-language.instructions.md`](../shared/disclaimer-language.instructions.md).
 > - [ ] Reviewed and validated by a qualified human reviewer
 ```
 
@@ -281,7 +281,7 @@ After all handoffs complete, present a summary covering peers fired, work items 
 
 {recommended follow-up actions, including who to notify}
 
-> **Disclaimer** — See `.github/instructions/shared/disclaimer-language.instructions.md`. All ADR-derived work items must be reviewed by a qualified human before execution.
+> **Disclaimer** — See `../shared/disclaimer-language.instructions.md`. All ADR-derived work items must be reviewed by a qualified human before execution.
 ```
 
 Log every generation event (create, skip, defer) and the reason for any skip.

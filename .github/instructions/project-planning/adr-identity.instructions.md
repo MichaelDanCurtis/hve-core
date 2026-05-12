@@ -105,7 +105,7 @@ Steps 1-6 below are internal reasoning. Never surface step labels (READ, VALIDAT
 1. **READ**: Load `state.json` from the active project slug directory.
 2. **VALIDATE**: Confirm state integrity. Check required fields exist and contain valid values. Verify `phaseSkillsLoaded` includes the section anchor for the current phase before executing phase work.
 3. **DETERMINE**: Identify current phase, entry mode, output template, `userPreferences.autonomyTier`, and next actions from state fields.
-4. **EXECUTE**: Perform phase work. Ask coaching questions, evaluate user responses, and update the ADR draft. If the required phase skill section is not yet recorded in `phaseSkillsLoaded`, load it via `read_file` against `.github/skills/project-planning/adr-author/SKILL.md` and append the section anchor to `phaseSkillsLoaded` before continuing.
+4. **EXECUTE**: Perform phase work. Ask coaching questions, evaluate user responses, and update the ADR draft. If the required phase skill section is not yet recorded in `phaseSkillsLoaded`, load it via `read_file` against `../../skills/project-planning/adr-author/SKILL.md` and append the section anchor to `phaseSkillsLoaded` before continuing.
 5. **UPDATE**: Update in-memory state with results from execution. Refresh `lastUpdatedAt` to the current ISO 8601 timestamp.
 6. **WRITE**: Persist updated `state.json` to disk.
 
@@ -238,9 +238,9 @@ On first invocation, after the bootstrap prompt confirms `entryMode`, `projectSl
 
 Each phase requires the corresponding section of the `adr-author` skill to be loaded before EXECUTE runs. The VALIDATE step enforces this contract by checking `phaseSkillsLoaded`.
 
-* **Frame**: MUST `read_file` `.github/skills/project-planning/adr-author/SKILL.md` and target the `#frame` section before executing Frame phase work. Append `adr-author/SKILL.md#frame` to `phaseSkillsLoaded`.
-* **Decide**: MUST `read_file` `.github/skills/project-planning/adr-author/SKILL.md` and target the `#decide` section before executing Decide phase work. Append `adr-author/SKILL.md#decide` to `phaseSkillsLoaded`.
-* **Govern**: MUST `read_file` `.github/skills/project-planning/adr-author/SKILL.md` and target the `#govern` section before executing Govern phase work. Append `adr-author/SKILL.md#govern` to `phaseSkillsLoaded`.
+* **Frame**: MUST `read_file` `../../skills/project-planning/adr-author/SKILL.md` and target the `#frame` section before executing Frame phase work. Append `adr-author/SKILL.md#frame` to `phaseSkillsLoaded`.
+* **Decide**: MUST `read_file` `../../skills/project-planning/adr-author/SKILL.md` and target the `#decide` section before executing Decide phase work. Append `adr-author/SKILL.md#decide` to `phaseSkillsLoaded`.
+* **Govern**: MUST `read_file` `../../skills/project-planning/adr-author/SKILL.md` and target the `#govern` section before executing Govern phase work. Append `adr-author/SKILL.md#govern` to `phaseSkillsLoaded`.
 
 A phase whose required section is absent from `phaseSkillsLoaded` is treated as not-yet-prepared. The agent must perform the load before continuing, even if the section was loaded in a prior session whose state was lost.
 

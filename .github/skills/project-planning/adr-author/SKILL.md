@@ -171,8 +171,8 @@ The ADR Creator agent enforces a phase→section load contract per `adr-identity
 | Decide | `#decide`      | `adr-author#decide`                |
 | Govern | `#govern`      | `adr-author#govern`                |
 
-The agent loads sections via `read_file` against `.github/skills/project-planning/adr-author/SKILL.md` and records the entry in `state.phaseSkillsLoaded` before any phase work executes. Re-entering a previously loaded phase does not require reloading; the agent checks `phaseSkillsLoaded` first.
+The agent loads sections via `read_file` against this skill file and records the entry in `state.phaseSkillsLoaded` before any phase work executes. Re-entering a previously loaded phase does not require reloading; the agent checks `phaseSkillsLoaded` first.
 
 ---
 
-*🤖 Crafted with precision by ✨Copilot following brilliant human instruction, then carefully refined by our team of discerning human reviewers.*
+> Brought to you by microsoft/hve-core
