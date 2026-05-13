@@ -1,6 +1,15 @@
 ---
 name: ADR Creator
-description: 'ADR Creator: phase-gated creator producing standards-aligned Architecture Decision Records (Frame, Decide, Govern), with state recovery, Researcher Subagent delegation, and dual-format backlog handoff. Brought to you by microsoft/hve-core.'
+description: 'ADR Creator: phase-gated creator producing standards-aligned Architecture Decision Records (Frame, Decide, Govern), with state recovery, Researcher Subagent delegation, and dual-format backlog handoff - Brought to you by microsoft/hve-core'
+agents:
+  - Researcher Subagent
+handoffs:
+  - label: "Task Planner"
+    agent: Task Planner
+  - label: "RAI Planner"
+    agent: RAI Planner
+  - label: "Security Planner"
+    agent: Security Planner
 tools:
   - read
   - edit/createFile
@@ -11,8 +20,6 @@ tools:
   - search
   - web
   - agent
-agents:
-  - Researcher Subagent
 ---
 
 # ADR Creator

@@ -1,32 +1,32 @@
 {
   "CleanWorkspace": {
     "ScenarioName": "CleanWorkspace",
-    "AgentBytes": 10121,
-    "ColdStartBytes": 38442,
+    "AgentBytes": 10096,
+    "ColdStartBytes": 38409,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
-        "Bytes": 10121
+        "Bytes": 10096
       },
       {
         "Path": ".github/instructions/project-planning/adr-identity.instructions.md",
-        "Bytes": 24140
+        "Bytes": 24132
       },
       {
         "Path": ".github/instructions/shared/disclaimer-language.instructions.md",
         "Bytes": 4181
       }
     ],
-    "Hash": "4e14b3539907aa379c5dca9155977d99d31c30235b3fb1d90e35ecbbeacff0b2"
+    "Hash": "9fd83b5a9113bfa50d1e8bd4cc24808331bfc038194468c96d8bdf5e11e12ad8"
   },
   "SteadyState": {
     "ScenarioName": "SteadyState",
-    "AgentBytes": 10121,
-    "ColdStartBytes": 78805,
+    "AgentBytes": 10096,
+    "ColdStartBytes": 78676,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
-        "Bytes": 10121
+        "Bytes": 10096
       },
       {
         "Path": ".github/instructions/project-planning/adr-byo-template.instructions.md",
@@ -34,11 +34,11 @@
       },
       {
         "Path": ".github/instructions/project-planning/adr-handoff.instructions.md",
-        "Bytes": 15431
+        "Bytes": 15335
       },
       {
         "Path": ".github/instructions/project-planning/adr-identity.instructions.md",
-        "Bytes": 24140
+        "Bytes": 24132
       },
       {
         "Path": ".github/instructions/project-planning/adr-standards.instructions.md",
@@ -49,16 +49,16 @@
         "Bytes": 4181
       }
     ],
-    "Hash": "28531c15e30e07a6d80ef258435b9fd7f18199de6057e4abd28f5421efcdc274"
+    "Hash": "3fef52a32ab46a77cb80282312824681faa4acdcf5f3cf754de6b288e6de8d86"
   },
   "GovernEntry": {
     "ScenarioName": "GovernEntry",
-    "AgentBytes": 10121,
-    "ColdStartBytes": 92202,
+    "AgentBytes": 10096,
+    "ColdStartBytes": 92075,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
-        "Bytes": 10121
+        "Bytes": 10096
       },
       {
         "Path": ".github/instructions/project-planning/adr-byo-template.instructions.md",
@@ -66,11 +66,11 @@
       },
       {
         "Path": ".github/instructions/project-planning/adr-handoff.instructions.md",
-        "Bytes": 15431
+        "Bytes": 15335
       },
       {
         "Path": ".github/instructions/project-planning/adr-identity.instructions.md",
-        "Bytes": 24140
+        "Bytes": 24132
       },
       {
         "Path": ".github/instructions/project-planning/adr-standards.instructions.md",
@@ -82,19 +82,19 @@
       },
       {
         "Path": ".github/skills/project-planning/adr-author/SKILL.md",
-        "Bytes": 13397
+        "Bytes": 13399
       }
     ],
-    "Hash": "cb0af6e13e7caaa853016edf1187e0674f6d6e88c41acec89a44b8bee9bada24"
+    "Hash": "7bd541c549dedb6d707d544d296e29dab22d6d877ac665f26e896f7c9d8a4532"
   },
   "AdoptTemplate": {
     "ScenarioName": "AdoptTemplate",
-    "AgentBytes": 10121,
-    "ColdStartBytes": 100216,
+    "AgentBytes": 10096,
+    "ColdStartBytes": 100089,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
-        "Bytes": 10121
+        "Bytes": 10096
       },
       {
         "Path": ".github/instructions/project-planning/adr-byo-template.instructions.md",
@@ -102,11 +102,11 @@
       },
       {
         "Path": ".github/instructions/project-planning/adr-handoff.instructions.md",
-        "Bytes": 15431
+        "Bytes": 15335
       },
       {
         "Path": ".github/instructions/project-planning/adr-identity.instructions.md",
-        "Bytes": 24140
+        "Bytes": 24132
       },
       {
         "Path": ".github/instructions/project-planning/adr-standards.instructions.md",
@@ -122,9 +122,9 @@
       },
       {
         "Path": ".github/skills/project-planning/adr-author/SKILL.md",
-        "Bytes": 13397
+        "Bytes": 13399
       }
     ],
-    "Hash": "0ed9493749a87ec56bbd19d1326ed4305968d74ded69d571f98f212ef56aa785"
+    "Hash": "3d1cc536b4c312dcf9c7be318c9a84effc529f5a0035248115dacbf5c70f4404"
   }
 }
