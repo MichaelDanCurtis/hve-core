@@ -349,7 +349,10 @@ def _validate_redirect_uri(uri: str) -> str:
     """
     if not isinstance(uri, str) or not uri:
         raise MuralSecurityError("redirect_uri override is empty")
-    parsed = urllib.parse.urlsplit(uri)
+    try:
+        parsed = urllib.parse.urlsplit(uri)
+    except ValueError as exc:
+        raise MuralSecurityError(f"redirect_uri is invalid: {exc}") from exc
     if parsed.scheme != "http":
         raise MuralSecurityError(
             f"redirect_uri scheme must be http (got {parsed.scheme!r})"

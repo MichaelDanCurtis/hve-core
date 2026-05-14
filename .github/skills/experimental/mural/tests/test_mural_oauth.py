@@ -751,6 +751,12 @@ def test_validate_redirect_uri_rejects_ipv6_loopback(mural_module: Any) -> None:
         mural_module._validate_redirect_uri("http://[::1]:8765/callback")
 
 
+def test_validate_redirect_uri_rejects_malformed_ipv6_host(mural_module: Any) -> None:
+    """Malformed IPv6 hosts are invalid overrides, not parser crashes."""
+    with pytest.raises(mural_module.MuralSecurityError):
+        mural_module._validate_redirect_uri("http://[::1:8765/callback")
+
+
 def test_start_loopback_server_eaddrinuse_raises_mural_error(
     mural_module: Any,
 ) -> None:
