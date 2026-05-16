@@ -16,6 +16,8 @@
     silently skips .github/** and other dot-prefixed paths on Windows. This
     wrapper bypasses that bug by passing an explicit file list to the library.
 
+    File discovery includes tracked Markdown files only.
+
 .PARAMETER Check
     Check only; exit with non-zero status if any tables would be reformatted.
 
@@ -35,33 +37,45 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$script:MarkdownTableFormatterExitCode = 0
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..' '..')).Path
-$emitVerbose = $VerbosePreference -ne 'SilentlyContinue'
+#region Functions
+function Invoke-MarkdownTableFormatter {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [switch]$Check
+    )
 
-Push-Location $repoRoot
-try {
-    $gitOutput = & git ls-files -z --cached --others --exclude-standard -- '*.md'
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error 'git ls-files failed; not running inside a git checkout?'
-        exit 2
-    }
+    $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..' '..')).Path
+    $emitVerbose = $VerbosePreference -ne 'SilentlyContinue'
+    $script:MarkdownTableFormatterExitCode = 0
 
-    $files = if ($gitOutput) { $gitOutput -split "`0" | Where-Object { $_ } } else { @() }
-    if ($files.Count -eq 0) {
-        Write-Output 'No markdown files found.'
-        exit 0
-    }
-
-    if ($emitVerbose) {
-        [System.Console]::Error.WriteLine("Formatting $($files.Count) markdown file(s).")
-    }
-
-    $tempList = New-TemporaryFile
+    Push-Location $repoRoot
     try {
-        Set-Content -Path $tempList.FullName -Value $files -Encoding utf8
+        $gitOutput = & git ls-files -z --cached -- '*.md'
+        if ($LASTEXITCODE -ne 0) {
+            [System.Console]::Error.WriteLine('git ls-files failed; not running inside a git checkout?')
+            $script:MarkdownTableFormatterExitCode = 2
+            return
+        }
 
-        $nodeScript = @'
+        $files = if ($gitOutput) { $gitOutput -split "`0" | Where-Object { $_ } } else { @() }
+        if ($files.Count -eq 0) {
+            Write-Output 'No markdown files found.'
+            $script:MarkdownTableFormatterExitCode = 0
+            return
+        }
+
+        if ($emitVerbose) {
+            [System.Console]::Error.WriteLine("Formatting $($files.Count) markdown file(s).")
+        }
+
+        $tempList = New-TemporaryFile
+        try {
+            Set-Content -Path $tempList.FullName -Value $files -Encoding utf8
+
+            $nodeScript = @'
 import { readFileSync } from 'node:fs';
 import pkg from 'markdown-table-formatter/lib/markdown-table-formatter.js';
 const { MarkdownTableFormatter } = pkg;
@@ -80,20 +94,38 @@ for (const updated of result.updates) {
 process.exit(result.status);
 '@
 
-        $env:MTF_FILE_LIST = $tempList.FullName
-        $env:MTF_CHECK = $(if ($Check) { '1' } else { '0' })
-        $env:MTF_VERBOSE = $(if ($emitVerbose) { '1' } else { '0' })
+            $env:MTF_FILE_LIST = $tempList.FullName
+            $env:MTF_CHECK = $(if ($Check) { '1' } else { '0' })
+            $env:MTF_VERBOSE = $(if ($emitVerbose) { '1' } else { '0' })
 
-        & node --input-type=module -e $nodeScript
-        $exitCode = $LASTEXITCODE
+            & node --input-type=module -e $nodeScript
+            $script:MarkdownTableFormatterExitCode = $LASTEXITCODE
+            return
+        }
+        finally {
+            Remove-Item -Path $tempList.FullName -ErrorAction SilentlyContinue
+            Remove-Item Env:MTF_FILE_LIST, Env:MTF_CHECK, Env:MTF_VERBOSE -ErrorAction SilentlyContinue
+        }
     }
     finally {
-        Remove-Item -Path $tempList.FullName -ErrorAction SilentlyContinue
-        Remove-Item Env:MTF_FILE_LIST, Env:MTF_CHECK, Env:MTF_VERBOSE -ErrorAction SilentlyContinue
+        Pop-Location
     }
+}
+#endregion
 
-    exit $exitCode
+#region Main
+if ($MyInvocation.InvocationName -ne '.') {
+    try {
+        Invoke-MarkdownTableFormatter -Check:$Check
+        $exitCode = $script:MarkdownTableFormatterExitCode
+        if ($null -eq $exitCode) {
+            $exitCode = 0
+        }
+        exit $exitCode
+    }
+    catch {
+        Write-Error -ErrorAction Continue "Format-MarkdownTables failed: $($_.Exception.Message)"
+        exit 1
+    }
 }
-finally {
-    Pop-Location
-}
+#endregion

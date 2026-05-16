@@ -20,7 +20,9 @@
     "nextActions",
     "userPreferences",
     "ssscEnabled",
-    "signingRequested"
+    "signingRequested",
+    "signingManifestPath",
+    "disclaimerShownAt"
   ],
   "properties": {
     "projectSlug": {

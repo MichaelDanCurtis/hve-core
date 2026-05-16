@@ -2,13 +2,30 @@
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: MIT
 
-BeforeAll {
+function script:Initialize-FormatterTestPaths {
+    if ($script:RealScript -and $script:RepoRoot -and $script:RealNodeModules) {
+        $script:SkipFormatterTests = -not (Test-Path $script:RealNodeModules)
+        return
+    }
+
     $script:RealScript = (Resolve-Path (Join-Path $PSScriptRoot '../../linting/Format-MarkdownTables.ps1')).Path
     $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
     $script:RealNodeModules = Join-Path $script:RepoRoot 'node_modules'
+    $script:SkipFormatterTests = -not (Test-Path $script:RealNodeModules)
+}
 
-    if (-not (Test-Path $script:RealNodeModules)) {
-        throw "Cannot run Format-MarkdownTables tests: node_modules missing at $script:RealNodeModules. Run 'npm install' first."
+Initialize-FormatterTestPaths
+
+function script:Initialize-FormatterTestRoot {
+    Initialize-FormatterTestPaths
+
+    if ($script:MainTestRoot) {
+        return
+    }
+
+    if ($script:SkipFormatterTests) {
+        Write-Warning "Skipping Format-MarkdownTables tests: node_modules missing at $script:RealNodeModules. Run 'npm install' first."
+        return
     }
 
     $tempBase = [System.IO.Path]::GetTempPath()
@@ -28,92 +45,125 @@ BeforeAll {
             New-Item -ItemType SymbolicLink -Path $script:MainNodeModulesLink -Target $script:RealNodeModules | Out-Null
         }
     }
+}
 
-    function script:New-FixtureRepo {
-        param(
-            [Parameter(Mandatory)] [string] $Name,
-            [switch] $InitGit
-        )
+function script:New-FixtureRepo {
+    param(
+        [Parameter(Mandatory)] [string] $Name,
+        [switch] $InitGit
+    )
 
-        $fixtureRoot = Join-Path $script:MainTestRoot $Name
-        $linting = Join-Path $fixtureRoot 'scripts/linting'
-        New-Item -ItemType Directory -Path $linting -Force | Out-Null
-        Copy-Item -Path $script:RealScript -Destination (Join-Path $linting 'Format-MarkdownTables.ps1') -Force
+    Initialize-FormatterTestRoot
+    if (-not $script:MainTestRoot) {
+        throw "Format-MarkdownTables fixture root was not initialized. node_modules path: $script:RealNodeModules"
+    }
 
-        if ($InitGit) {
-            Push-Location $fixtureRoot
-            try {
-                & git init --quiet 2>&1 | Out-Null
-                & git config user.email 'test@example.com' 2>&1 | Out-Null
-                & git config user.name 'Test' 2>&1 | Out-Null
-                & git config core.autocrlf false 2>&1 | Out-Null
-                & git config core.safecrlf false 2>&1 | Out-Null
-            }
-            finally {
-                Pop-Location
-            }
+    $fixtureRoot = Join-Path $script:MainTestRoot $Name
+    $linting = Join-Path $fixtureRoot 'scripts/linting'
+    New-Item -ItemType Directory -Path $linting -Force | Out-Null
+    Initialize-FormatterTestPaths
+    Copy-Item -Path $script:RealScript -Destination (Join-Path $linting 'Format-MarkdownTables.ps1') -Force
+
+    if ($InitGit) {
+        Push-Location $fixtureRoot
+        try {
+            & git init --quiet 2>&1 | Out-Null
+            & git config user.email 'test@example.com' 2>&1 | Out-Null
+            & git config user.name 'Test' 2>&1 | Out-Null
+            & git config core.autocrlf false 2>&1 | Out-Null
+            & git config core.safecrlf false 2>&1 | Out-Null
         }
+        finally {
+            Pop-Location
+        }
+    }
 
-        # .gitignore (in addition to in-repo init) so git ls-files --others
-        # --exclude-standard skips the junctioned node_modules tree and the
-        # captured stdout/stderr files.
-        $gitignore = @'
+    # Keep generated process captures and the dependency junction out of
+    # fixture repositories.
+    $gitignore = @'
 node_modules/
 _stdout.txt
 _stderr.txt
 '@
-        Set-Content -Path (Join-Path $fixtureRoot '.gitignore') -Value $gitignore -Encoding utf8
+    Set-Content -Path (Join-Path $fixtureRoot '.gitignore') -Value $gitignore -Encoding utf8
 
-        return $fixtureRoot
+    return $fixtureRoot
+}
+
+function script:Add-TrackedFixtureFile {
+    param(
+        [Parameter(Mandatory)] [string] $FixtureRoot,
+        [Parameter(Mandatory)] [string] $RelativePath,
+        [Parameter(Mandatory)] [string] $Content
+    )
+
+    $targetPath = Join-Path $FixtureRoot $RelativePath
+    $targetDirectory = Split-Path -Path $targetPath -Parent
+    if (-not (Test-Path $targetDirectory)) {
+        New-Item -ItemType Directory -Path $targetDirectory -Force | Out-Null
     }
 
-    function script:Invoke-SutInFixture {
-        param(
-            [Parameter(Mandatory)] [string] $FixtureRoot,
-            [switch] $Check,
-            [switch] $WithVerbose
-        )
+    Set-Content -Path $targetPath -Value $Content -NoNewline
 
-        $sutPath = Join-Path $FixtureRoot 'scripts/linting/Format-MarkdownTables.ps1'
-        $stdoutPath = Join-Path $FixtureRoot '_stdout.txt'
-        $stderrPath = Join-Path $FixtureRoot '_stderr.txt'
-
-        $argList = @('-NoProfile', '-File', $sutPath)
-        if ($Check) { $argList += '-Check' }
-        if ($WithVerbose) { $argList += '-Verbose' }
-
-        $proc = Start-Process -FilePath 'pwsh' `
-            -ArgumentList $argList `
-            -WorkingDirectory $FixtureRoot `
-            -RedirectStandardOutput $stdoutPath `
-            -RedirectStandardError $stderrPath `
-            -Wait -PassThru -NoNewWindow
-
-        # Belt-and-suspenders: ensure the process has fully exited and OS file
-        # buffers have flushed before we read. Tiny stdout payloads under the
-        # Pester runspace can race the file-handle close.
-        $proc.WaitForExit()
-        $stdoutBytes = if (Test-Path $stdoutPath) { (Get-Item $stdoutPath).Length } else { -1 }
-        $stderrBytes = if (Test-Path $stderrPath) { (Get-Item $stderrPath).Length } else { -1 }
-        if ($stdoutBytes -eq 0 -and $proc.ExitCode -eq 0) {
-            Start-Sleep -Milliseconds 100
-            $stdoutBytes = (Get-Item $stdoutPath).Length
-        }
-
-        $stdout = if ($stdoutBytes -gt 0) { [System.IO.File]::ReadAllText($stdoutPath) } else { '' }
-        $stderr = if ($stderrBytes -gt 0) { [System.IO.File]::ReadAllText($stderrPath) } else { '' }
-
-        return [pscustomobject]@{
-            ExitCode    = $proc.ExitCode
-            StdOut      = $stdout
-            StdErr      = $stderr
-            StdOutPath  = $stdoutPath
-            StdErrPath  = $stderrPath
-            StdOutBytes = $stdoutBytes
-            StdErrBytes = $stderrBytes
-        }
+    Push-Location $FixtureRoot
+    try {
+        & git add -- $RelativePath 2>&1 | Out-Null
+    }
+    finally {
+        Pop-Location
     }
 
+    return $targetPath
+}
+
+function script:Invoke-SutInFixture {
+    param(
+        [Parameter(Mandatory)] [string] $FixtureRoot,
+        [switch] $Check,
+        [switch] $WithVerbose
+    )
+
+    $sutPath = Join-Path $FixtureRoot 'scripts/linting/Format-MarkdownTables.ps1'
+    $stdoutPath = Join-Path $FixtureRoot '_stdout.txt'
+    $stderrPath = Join-Path $FixtureRoot '_stderr.txt'
+
+    $argList = @('-NoProfile', '-File', $sutPath)
+    if ($Check) { $argList += '-Check' }
+    if ($WithVerbose) { $argList += '-Verbose' }
+
+    $proc = Start-Process -FilePath 'pwsh' `
+        -ArgumentList $argList `
+        -WorkingDirectory $FixtureRoot `
+        -RedirectStandardOutput $stdoutPath `
+        -RedirectStandardError $stderrPath `
+        -Wait -PassThru -NoNewWindow
+
+    # Belt-and-suspenders: ensure the process has fully exited and OS file
+    # buffers have flushed before we read. Tiny stdout payloads under the
+    # Pester runspace can race the file-handle close.
+    $proc.WaitForExit()
+    $stdoutBytes = if (Test-Path $stdoutPath) { (Get-Item $stdoutPath).Length } else { -1 }
+    $stderrBytes = if (Test-Path $stderrPath) { (Get-Item $stderrPath).Length } else { -1 }
+    if ($stdoutBytes -eq 0 -and $proc.ExitCode -eq 0) {
+        Start-Sleep -Milliseconds 100
+        $stdoutBytes = (Get-Item $stdoutPath).Length
+    }
+
+    $stdout = if ($stdoutBytes -gt 0) { [System.IO.File]::ReadAllText($stdoutPath) } else { '' }
+    $stderr = if ($stderrBytes -gt 0) { [System.IO.File]::ReadAllText($stderrPath) } else { '' }
+
+    return [pscustomobject]@{
+        ExitCode    = $proc.ExitCode
+        StdOut      = $stdout
+        StdErr      = $stderr
+        StdOutPath  = $stdoutPath
+        StdErrPath  = $stderrPath
+        StdOutBytes = $stdoutBytes
+        StdErrBytes = $stderrBytes
+    }
+}
+
+function script:Initialize-FormatterTestContent {
     # Well-formatted table (each cell padded to column width, single space between pipes).
     $script:GoodTable = @'
 # Good
@@ -135,20 +185,25 @@ _stderr.txt
 '@
 }
 
-AfterAll {
-    if ($script:MainTestRoot -and (Test-Path $script:MainTestRoot)) {
-        # CRITICAL: the MainTestRoot/node_modules junction points at the real
-        # repo's node_modules. Remove it first via the directory-delete API
-        # (which deletes the link itself, not the target) so the subsequent
-        # recursive remove cannot follow it into real content.
-        if ($script:MainNodeModulesLink -and (Test-Path $script:MainNodeModulesLink)) {
-            try { [System.IO.Directory]::Delete($script:MainNodeModulesLink, $false) } catch { Write-Verbose "junction cleanup ignored: $_" }
-        }
-        Remove-Item -Path $script:MainTestRoot -Recurse -Force -ErrorAction SilentlyContinue
+# This suite launches subprocesses and fixture git repositories, but keeps the
+# Unit tag because the repository test runner excludes Integration by default.
+Describe 'Format-MarkdownTables' -Tag 'Unit' -Skip:$script:SkipFormatterTests {
+    BeforeAll {
+        Initialize-FormatterTestRoot
+        Initialize-FormatterTestContent
     }
-}
 
-Describe 'Format-MarkdownTables' -Tag 'Unit' {
+    AfterAll {
+        if ($script:MainTestRoot -and (Test-Path $script:MainTestRoot)) {
+            # The MainTestRoot/node_modules junction points at the real repo's
+            # node_modules. Delete the link before recursive cleanup so removal
+            # cannot follow it into real content.
+            if ($script:MainNodeModulesLink -and (Test-Path $script:MainNodeModulesLink)) {
+                try { [System.IO.Directory]::Delete($script:MainNodeModulesLink, $false) } catch { Write-Verbose "junction cleanup ignored: $_" }
+            }
+            Remove-Item -Path $script:MainTestRoot -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
 
     Context 'when no markdown files are tracked' {
         BeforeAll {
@@ -186,7 +241,7 @@ Describe 'Format-MarkdownTables' -Tag 'Unit' {
     Context 'when all markdown tables are already formatted' {
         BeforeAll {
             $script:Fixture = New-FixtureRepo -Name "good-$(Get-Random)" -InitGit
-            Set-Content -Path (Join-Path $script:Fixture 'README.md') -Value $script:GoodTable -NoNewline
+            $null = Add-TrackedFixtureFile -FixtureRoot $script:Fixture -RelativePath 'README.md' -Content $script:GoodTable
             $script:Result = Invoke-SutInFixture -FixtureRoot $script:Fixture
         }
 
@@ -203,8 +258,7 @@ Describe 'Format-MarkdownTables' -Tag 'Unit' {
     Context 'when markdown tables need reformatting' {
         BeforeEach {
             $script:Fixture = New-FixtureRepo -Name "bad-$(Get-Random)" -InitGit
-            $script:BadFile = Join-Path $script:Fixture 'README.md'
-            Set-Content -Path $script:BadFile -Value $script:BadTable -NoNewline
+            $script:BadFile = Add-TrackedFixtureFile -FixtureRoot $script:Fixture -RelativePath 'README.md' -Content $script:BadTable
         }
 
         It 'Exits non-zero in -Check mode' {
@@ -232,10 +286,7 @@ Describe 'Format-MarkdownTables' -Tag 'Unit' {
     Context 'when markdown files live under dot-prefixed directories' {
         BeforeEach {
             $script:Fixture = New-FixtureRepo -Name "dotpath-$(Get-Random)" -InitGit
-            $dotDir = Join-Path $script:Fixture '.github'
-            New-Item -ItemType Directory -Path $dotDir -Force | Out-Null
-            $script:DotFile = Join-Path $dotDir 'NOTES.md'
-            Set-Content -Path $script:DotFile -Value $script:BadTable -NoNewline
+            $script:DotFile = Add-TrackedFixtureFile -FixtureRoot $script:Fixture -RelativePath '.github/NOTES.md' -Content $script:BadTable
         }
 
         It 'Detects misformatted tables under .github (regression: glob v13 dot:false)' {
@@ -255,7 +306,7 @@ Describe 'Format-MarkdownTables' -Tag 'Unit' {
     Context 'when -Verbose is supplied' {
         BeforeAll {
             $script:Fixture = New-FixtureRepo -Name "verbose-$(Get-Random)" -InitGit
-            Set-Content -Path (Join-Path $script:Fixture 'README.md') -Value $script:GoodTable -NoNewline
+            $null = Add-TrackedFixtureFile -FixtureRoot $script:Fixture -RelativePath 'README.md' -Content $script:GoodTable
             $script:Result = Invoke-SutInFixture -FixtureRoot $script:Fixture -WithVerbose
         }
 

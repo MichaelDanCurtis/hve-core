@@ -150,9 +150,9 @@ Three tiers control how work items reach the target backlog system:
 
 * **Full autonomy**: Create work items directly via backlog manager. User pre-approves batch creation.
 * **Partial autonomy** (default): Present each batch of 5-10 items for user review before creation. User can modify, skip, or approve individual items.
-* **Manual**: Produce output file without invoking backlog tools. User imports items independently.
+* **Guided autonomy**: Produce output file without invoking backlog tools. User imports items independently.
 
-Ask the user which tier they prefer. Default to partial autonomy on first use.
+Ask the user which tier they prefer: guided, partial, or full. Default to partial autonomy on first use.
 
 ## Output
 

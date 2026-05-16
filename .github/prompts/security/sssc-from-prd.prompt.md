@@ -2,18 +2,12 @@
 description: >-
   Initiate supply chain security planning from existing PRD artifacts using the
   SSSC Planner agent in from-prd mode
-agent: sssc-planner
+agent: SSSC Planner
 ---
 
 # SSSC from PRD
 
 Activate the SSSC Planner in **from-prd mode** for project slug `${input:project-slug}`.
-
-## Startup
-
-Before any phase work, check `state.json` for `disclaimerShownAt`. If `disclaimerShownAt` is `null` or `state.json` does not yet exist, display the SSSC Planning CAUTION block from #file:../../instructions/shared/disclaimer-language.instructions.md verbatim and set `disclaimerShownAt` to the current ISO 8601 timestamp in `state.json`.
-
-After the disclaimer, announce the SSSC Planner standards baseline following the Disclaimer and Attribution Protocol in #file:../../instructions/security/sssc-identity.instructions.md: OpenSSF Scorecard, SLSA Build Levels, OpenSSF Best Practices Badge, Sigstore, and SBOM standards (CycloneDX, SPDX).
 
 ## Inputs
 
@@ -33,12 +27,7 @@ Scan the workspace for PRD artifacts and supporting context:
 
 * `.copilot-tracking/` for files matching `prd-*.md`, `*-prd.md`, or `product-definition*.md`. Exclude generic matches like `requirements.txt` or files outside product-scoping contexts.
 
-**Supporting context:**
-
-* `package.json`, `pyproject.toml`, `*.csproj`, `Cargo.toml`, `go.mod` — language and package manager inventory.
-* `.github/workflows/`, `.azure-pipelines/`, `Jenkinsfile`, `.gitlab-ci.yml` — CI/CD platform.
-* `.copilot-tracking/security-plans/`, `.copilot-tracking/rai-plans/` — sibling planner artifacts to cross-link.
-* `.copilot-tracking/sssc-plans/references/` — user-supplied evaluation standards or output format requirements.
+Also scan the shared supporting context sources defined in `sssc-identity.instructions.md`.
 
 Present pre-scan results as a checklist:
 
@@ -46,10 +35,6 @@ Present pre-scan results as a checklist:
 * ❌ Expected sources that were not found
 
 If zero PRD artifacts are found, fall back to capture mode and explain the switch.
-
-### Output Preferences
-
-Ask the user up front whether they have output preferences for backlog generation in Phase 5: dual-format ADO and GitHub work items (`both`), ADO-only (`ado`), or GitHub-only (`github`). Capture the answer in `state.json` under `userPreferences.targetSystem` (allowed values: `ado`, `github`, `both`) so later phases honor the choice without re-asking. When the user supplies a custom backlog template, store it under `.copilot-tracking/sssc-plans/references/` and still record the closest matching `targetSystem` value.
 
 ### Scope Extraction
 
@@ -75,5 +60,3 @@ Present the extracted scope as a checklist with markers:
 * ❓ Items that need clarification or are missing
 
 Then invite the user into a Phase 1 conversation with 3 to 5 facilitative clarifying questions targeting supply chain gaps not covered by the PRD, such as runner topology, signing strategy, SBOM tooling, and Best Practices Badge readiness. Use confirmation-and-refinement phrasing rather than directives.
-
-Also ask whether the user has evaluation standards, workflow inventories, or output format requirements to supply for storage in `.copilot-tracking/sssc-plans/references/`.
