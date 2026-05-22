@@ -315,43 +315,6 @@ Each step of the demo workflow showcases specific HVE Core tools and features.
 
 ## Demo Video Script Template
 
-The demo video script follows a fixed section structure. Each section includes narrator text (blockquoted) and visual stage directions (bracketed). The template reference is `references/demo-video-script-template.md`.
-
-### Script Structure
-
-| Section | Duration | Content |
-|---|---|---|
-| Video Details | — | Metadata table: title, subtitle, target duration, audience, tone |
-| Cold Open | 0:30 | Show the running prototype; narrate the persona's pain in their own words |
-| Section 1: The Problem | 1:30 | Walk through the persona brief on screen; highlight frustrations and the specific scenario |
-| Section 2: Design Thinking Coach | 2:30 | Show the DT artifacts directory; narrate key method outputs and coaching state |
-| Section 3: The Experiment Card | 1:00 | Open the experiment card; narrate hypothesis, success criteria, and failure criteria |
-| Section 4+: Prototype Demo | 4:00 | Screen-by-screen narration of the prototype; one section per major screen |
-| What You Just Saw | 1:30 | Recap the five HVE Core capabilities demonstrated |
-| Where to Start | 4:00 | Three entry points with live demo prompts for Task Researcher, RPI Agent, and DT Coach |
-| Closing | 0:30 | Summary statement and call to action |
-| Production Notes | — | Recording setup table: tool, browser, theme, font size, resolution, pre-recording steps |
-
-### Section Authoring Rules
-
-* Visual cues appear in `**[VISUAL: description]**` format before the narrator text they accompany.
-* Narrator text uses blockquote format (`>`) for spoken words.
-* Demo prompts (text the presenter types on screen) appear in a dedicated code block labeled with the prompt context.
-* Each prototype demo section covers one screen of the prototype. Name the section after the screen (for example, "Order Queue Demo" or "Dashboard Demo").
-* Timing annotations appear in parentheses in each section heading (for example, `## COLD OPEN (0:00 - 0:30)`).
-* The "Where to Start" section includes three subsections, one per agent, each with a typed prompt and narration of the agent's response.
-* Production Notes table includes at minimum: screen recording tool, browser, VS Code theme, font size, resolution, and any pre-recording reset steps (for example, clearing localStorage).
-
-### Content Derivation
-
-| Script Section | Source Artifact |
-|---|---|
-| Cold Open scene | Prototype `index.html` primary screen |
-| The Problem narration | Customer persona brief: frustrations, problem scenario, constraints |
-| DT Coach walkthrough | `.copilot-tracking/dt/{slug}/` artifact directory and coaching-state.md |
-| Experiment Card | `experiment-card.md` hypothesis and criteria |
-| Prototype Demo screens | Each `.html` file in the scaffold, walked through in workflow order |
-| What You Just Saw | Integration with HVE Core Tools table from this skill |
-| Where to Start | Standard three-agent intro: Task Researcher, RPI Agent, DT Coach |
+The demo video script follows a fixed section structure with narrator text (blockquoted) and visual stage directions (bracketed). See `references/demo-video-script-template.md` for the full template, section-by-section script structure, authoring rules, and content derivation guidance. Copy that file to the prototype directory as `demo-video-script.md` in Step 6 and fill in the placeholders.
 
 > Brought to you by microsoft/hve-core
