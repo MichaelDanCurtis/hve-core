@@ -50,7 +50,7 @@ safe-outputs:
 
 Review pull requests authored by Dependabot that bump dependency versions.
 Post a `COMMENT` review summarizing safety check results, or `REQUEST_CHANGES`
-when findings require human action. This workflow never approves PRs — humans
+when findings require human action. This workflow never approves PRs: humans
 remain the merge gate.
 
 ## Activation Guard
@@ -114,7 +114,7 @@ review body or inline comments.
 ## Review Output
 
 Submit a single review with the appropriate verdict (`COMMENT` or
-`REQUEST_CHANGES` — never `APPROVE`). Include:
+`REQUEST_CHANGES`, never `APPROVE`). Include:
 
 * A summary of dependencies updated with version ranges.
 * The bump classification (patch, minor, or major) for each dependency.
