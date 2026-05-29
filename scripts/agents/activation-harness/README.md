@@ -61,7 +61,7 @@ Get-AgentActivationFingerprint `
 
 ## Regenerating `baseline.json`
 
-After an intentional change to the agent or to any instruction file it loads, the Pester suite fails until `baseline.json` is recaptured. Use the scripted regenerator rather than hand-editing the file:
+After an intentional change to the agent, to any instruction file it loads, or to any skill file pulled into its load-set (for example an `adr-author` skill script or asset reached via `#file:`), the Pester suite fails until `baseline.json` is recaptured. Use the scripted regenerator rather than hand-editing the file:
 
 ```powershell
 # Drift check (no writes; exit 1 when out of date — suitable for CI gating)
@@ -71,9 +71,11 @@ npm run test:activation:baseline:check
 npm run test:activation:baseline
 ```
 
+> **PR guard:** Any change to ADR agent, instruction, or skill files that the harness loads invalidates `baseline.json`. Run `npm run test:activation:baseline` and commit the refreshed baseline in the same PR to avoid drift failures in CI.
+
 Workflow:
 
-1. Make the intentional change to the agent or instruction files.
+1. Make the intentional change to the agent, instruction, or skill files.
 2. Run `npm run test:activation` and confirm the failure is the expected drift (not a budget regression).
 3. Run `npm run test:activation:baseline` to rewrite `baseline.json`.
 4. Re-run `npm run test:activation` to confirm the suite passes against the new baseline.
