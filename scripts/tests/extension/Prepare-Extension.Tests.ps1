@@ -151,12 +151,14 @@ displayName: HVE Core
 description: All artifacts
 "@ | Set-Content -Path (Join-Path $collectionsDir 'hve-core.collection.yml')
 
-        # ado collection
+        # ado collection (includes per-channel description override for PreRelease)
         @"
 id: ado
 name: ADO Workflow
 displayName: HVE Core - ADO Workflow
 description: ADO workflow agents
+descriptions:
+  prerelease: 'Experimental: ADO workflow agents (preview)'
 "@ | Set-Content -Path (Join-Path $collectionsDir 'ado.collection.yml')
 
         # hve-core-all collection (no description to test fallback)
@@ -202,11 +204,11 @@ displayName: HVE Core - All
         }
     }
 
-    It 'Removes stale collection files not matching current collections' {
+    It 'Removes stale collection files not matching current collections when -Prune is specified' {
         $staleFile = Join-Path $script:tempDir 'extension/package.obsolete.json'
         '{}' | Set-Content -Path $staleFile
 
-        Invoke-ExtensionCollectionsGeneration -RepoRoot $script:tempDir
+        Invoke-ExtensionCollectionsGeneration -RepoRoot $script:tempDir -Prune
 
         Test-Path $staleFile | Should -BeFalse
     }
@@ -244,6 +246,77 @@ id: test
         { Invoke-ExtensionCollectionsGeneration -RepoRoot $emptyRoot } | Should -Throw '*No root collection files found*'
 
         Remove-Item -Path $emptyRoot -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    Context 'Prune Mode' {
+        BeforeEach {
+            $extDir = Join-Path $script:tempDir 'extension'
+            New-Item -ItemType Directory -Path $extDir -Force | Out-Null
+            $script:orphanPackagePath = Join-Path $extDir 'package.orphan.json'
+            $script:orphanReadmePath = Join-Path $extDir 'README.orphan.md'
+            '{}' | Set-Content -Path $script:orphanPackagePath
+            '# orphan readme' | Set-Content -Path $script:orphanReadmePath
+        }
+
+        AfterEach {
+            Remove-Item -Path $script:orphanPackagePath -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path $script:orphanReadmePath -Force -ErrorAction SilentlyContinue
+        }
+
+        It 'Removes orphan package.<id>.json and README.<id>.md when -Prune is specified' {
+            $null = Invoke-ExtensionCollectionsGeneration -RepoRoot $script:tempDir -Channel 'PreRelease' -Prune
+            Test-Path $script:orphanPackagePath | Should -BeFalse
+            Test-Path $script:orphanReadmePath | Should -BeFalse
+            Test-Path (Join-Path $script:tempDir 'extension/package.json') | Should -BeTrue
+            Test-Path (Join-Path $script:tempDir 'extension/package.ado.json') | Should -BeTrue
+        }
+
+        It 'Leaves orphan extension files intact when -Prune is omitted' {
+            $null = Invoke-ExtensionCollectionsGeneration -RepoRoot $script:tempDir -Channel 'PreRelease'
+            Test-Path $script:orphanPackagePath | Should -BeTrue
+            Test-Path $script:orphanReadmePath | Should -BeTrue
+        }
+    }
+
+    Context 'Collection Targeting' {
+        It 'pins extension/package.json to the targeted collection on PreRelease' {
+            $collectionPath = Join-Path $script:tempDir 'collections/ado.collection.yml'
+            $null = Invoke-ExtensionCollectionsGeneration -RepoRoot $script:tempDir -Channel 'PreRelease' -Collection $collectionPath
+
+            $pinnedPath = Join-Path $script:tempDir 'extension/package.json'
+            Test-Path $pinnedPath | Should -BeTrue
+            $pinned = Get-Content -Path $pinnedPath -Raw | ConvertFrom-Json
+            $pinned.name | Should -Be 'hve-ado'
+            $pinned.description | Should -Be 'Experimental: ADO workflow agents (preview)'
+
+            # The per-id file is still written so other matrix jobs would find it.
+            $perIdPath = Join-Path $script:tempDir 'extension/package.ado.json'
+            Test-Path $perIdPath | Should -BeTrue
+            $perId = Get-Content -Path $perIdPath -Raw | ConvertFrom-Json
+            $perId.description | Should -Be 'Experimental: ADO workflow agents (preview)'
+        }
+
+        It 'pins extension/package.json to the targeted collection on Stable' {
+            $collectionPath = Join-Path $script:tempDir 'collections/ado.collection.yml'
+            $null = Invoke-ExtensionCollectionsGeneration -RepoRoot $script:tempDir -Channel 'Stable' -Collection $collectionPath
+
+            $pinnedPath = Join-Path $script:tempDir 'extension/package.json'
+            $pinned = Get-Content -Path $pinnedPath -Raw | ConvertFrom-Json
+            $pinned.name | Should -Be 'hve-ado'
+            $pinned.description | Should -Be 'ADO workflow agents'
+            $pinned.description | Should -Not -Match '^Experimental:'
+        }
+
+        It 'omitting -Collection regenerates all per-id files (backward compatibility)' {
+            $null = Invoke-ExtensionCollectionsGeneration -RepoRoot $script:tempDir -Channel 'Stable'
+
+            $flagshipPath = Join-Path $script:tempDir 'extension/package.json'
+            $flagship = Get-Content -Path $flagshipPath -Raw | ConvertFrom-Json
+            $flagship.name | Should -Be 'hve-core'
+
+            Test-Path (Join-Path $script:tempDir 'extension/package.ado.json') | Should -BeTrue
+            Test-Path (Join-Path $script:tempDir 'extension/package.hve-core-all.json') | Should -BeTrue
+        }
     }
 }
 
@@ -731,9 +804,269 @@ Footer content preserved across runs.
             $secondMd | Should -BeExactly $firstMd
         }
     }
+
+    Context 'Effective-set maturity notice' {
+        It 'Emits no notice on Stable channel when experimental items are filtered out' {
+            $collection = @{
+                id          = 'notice-stable-filtered'
+                name        = 'Notice Stable Filtered'
+                description = 'Effective-set notice test'
+                maturity    = 'stable'
+                items       = @(
+                    @{ kind = 'agent'; path = '.github/agents/alpha.agent.md'; maturity = 'stable' },
+                    @{ kind = 'agent'; path = '.github/agents/zebra.agent.md'; maturity = 'experimental' }
+                )
+            }
+            $mdPath = Join-Path $script:tempDir 'notice-stable-filtered.collection.md'
+            'Body.' | Set-Content -Path $mdPath
+            $outPath = Join-Path $script:tempDir 'README.notice-stable-filtered.md'
+
+            New-CollectionReadme -Collection $collection -CollectionMdPath $mdPath -TemplatePath $script:templatePath -RepoRoot $script:tempDir -OutputPath $outPath -AllowedMaturities @('stable') -Channel 'Stable'
+
+            $content = Get-Content -Path $outPath -Raw
+            $content | Should -Not -Match 'Pre-Release with'
+            $content | Should -Not -Match 'Pre-Release build'
+        }
+
+        It 'Emits strong indemnification notice on PreRelease channel when bundle includes experimental items' {
+            $collection = @{
+                id          = 'notice-prerelease'
+                name        = 'Notice PreRelease'
+                description = 'Effective-set notice test'
+                maturity    = 'stable'
+                items       = @(
+                    @{ kind = 'agent'; path = '.github/agents/alpha.agent.md'; maturity = 'stable' },
+                    @{ kind = 'agent'; path = '.github/agents/zebra.agent.md'; maturity = 'experimental' }
+                )
+            }
+            $mdPath = Join-Path $script:tempDir 'notice-prerelease.collection.md'
+            'Body.' | Set-Content -Path $mdPath
+            $outPath = Join-Path $script:tempDir 'README.notice-prerelease.md'
+
+            New-CollectionReadme -Collection $collection -CollectionMdPath $mdPath -TemplatePath $script:templatePath -RepoRoot $script:tempDir -OutputPath $outPath -AllowedMaturities @('stable', 'preview', 'experimental') -Channel 'PreRelease'
+
+            $content = Get-Content -Path $outPath -Raw
+            $content | Should -Match 'Pre-Release with experimental content'
+            $content | Should -Match 'experimental assets that are subject to change'
+            $content | Should -Match 'as-is, without warranty of any kind'
+            $content | Should -Match 'microsoft/hve-core/issues'
+        }
+
+        It 'Emits preview-tier notice on PreRelease channel when bundle includes preview but not experimental items' {
+            $collection = @{
+                id          = 'notice-prerelease-preview'
+                name        = 'Notice PreRelease Preview'
+                description = 'Effective-set notice test'
+                maturity    = 'stable'
+                items       = @(
+                    @{ kind = 'agent'; path = '.github/agents/alpha.agent.md'; maturity = 'stable' },
+                    @{ kind = 'agent'; path = '.github/agents/zebra.agent.md'; maturity = 'preview' }
+                )
+            }
+            $mdPath = Join-Path $script:tempDir 'notice-prerelease-preview.collection.md'
+            'Body.' | Set-Content -Path $mdPath
+            $outPath = Join-Path $script:tempDir 'README.notice-prerelease-preview.md'
+
+            New-CollectionReadme -Collection $collection -CollectionMdPath $mdPath -TemplatePath $script:templatePath -RepoRoot $script:tempDir -OutputPath $outPath -AllowedMaturities @('stable', 'preview', 'experimental') -Channel 'PreRelease'
+
+            $content = Get-Content -Path $outPath -Raw
+            $content | Should -Match 'Pre-Release with preview content'
+            $content | Should -Not -Match 'experimental assets'
+        }
+
+        It 'Emits mild pre-release notice on PreRelease channel when all items are stable' {
+            $collection = @{
+                id          = 'notice-allstable'
+                name        = 'Notice All Stable'
+                description = 'Effective-set notice test'
+                maturity    = 'stable'
+                items       = @(
+                    @{ kind = 'agent'; path = '.github/agents/alpha.agent.md'; maturity = 'stable' },
+                    @{ kind = 'agent'; path = '.github/agents/zebra.agent.md'; maturity = 'stable' }
+                )
+            }
+            $mdPath = Join-Path $script:tempDir 'notice-allstable.collection.md'
+            'Body.' | Set-Content -Path $mdPath
+            $outPath = Join-Path $script:tempDir 'README.notice-allstable.md'
+
+            New-CollectionReadme -Collection $collection -CollectionMdPath $mdPath -TemplatePath $script:templatePath -RepoRoot $script:tempDir -OutputPath $outPath -AllowedMaturities @('stable', 'preview', 'experimental') -Channel 'PreRelease'
+
+            $content = Get-Content -Path $outPath -Raw
+            $content | Should -Match 'Pre-Release build'
+            $content | Should -Match 'early access and feedback'
+            $content | Should -Not -Match 'experimental assets'
+            $content | Should -Not -Match 'preview content'
+        }
+
+        It 'Emits existing experimental collection notice regardless of effective set' {
+            $collection = @{
+                id          = 'notice-experimental-coll'
+                name        = 'Notice Experimental Collection'
+                description = 'Effective-set notice test'
+                maturity    = 'experimental'
+                items       = @(
+                    @{ kind = 'agent'; path = '.github/agents/alpha.agent.md'; maturity = 'stable' }
+                )
+            }
+            $mdPath = Join-Path $script:tempDir 'notice-experimental-coll.collection.md'
+            'Body.' | Set-Content -Path $mdPath
+            $outPath = Join-Path $script:tempDir 'README.notice-experimental-coll.md'
+
+            New-CollectionReadme -Collection $collection -CollectionMdPath $mdPath -TemplatePath $script:templatePath -RepoRoot $script:tempDir -OutputPath $outPath -AllowedMaturities @('stable', 'preview', 'experimental') -Channel 'PreRelease'
+
+            $content = Get-Content -Path $outPath -Raw
+            $content | Should -Match 'Experimental'
+            $content | Should -Match 'experimental and available only in the Pre-Release channel'
+            $content | Should -Not -Match 'Pre-Release with experimental content'
+        }
+    }
+}
+
+Describe 'Resolve-CollectionDescription' {
+    It 'Returns collection description on Stable channel with no overrides' {
+        $collection = @{ description = 'Stable default' }
+        $result = Resolve-CollectionDescription -Collection $collection -Channel 'Stable' -DefaultDescription 'Fallback'
+        $result | Should -Be 'Stable default'
+    }
+
+    It 'Returns stable override on Stable channel when present' {
+        $collection = @{
+            description  = 'Default'
+            descriptions = @{ stable = 'Stable override'; prerelease = 'Pre override' }
+        }
+        $result = Resolve-CollectionDescription -Collection $collection -Channel 'Stable' -DefaultDescription 'Fallback'
+        $result | Should -Be 'Stable override'
+    }
+
+    It 'Returns prerelease override on PreRelease channel when present' {
+        $collection = @{
+            description  = 'Default'
+            descriptions = @{ stable = 'Stable override'; prerelease = 'Pre override' }
+        }
+        $result = Resolve-CollectionDescription -Collection $collection -Channel 'PreRelease' -DefaultDescription 'Fallback'
+        $result | Should -Be 'Pre override'
+    }
+
+    It 'Falls back to collection description on PreRelease channel when only stable override is present' {
+        $collection = @{
+            description  = 'Default'
+            descriptions = @{ stable = 'Stable override' }
+        }
+        $result = Resolve-CollectionDescription -Collection $collection -Channel 'PreRelease' -DefaultDescription 'Fallback'
+        $result | Should -Be 'Default'
+    }
+
+    It 'Treats whitespace-only override as absent and falls back to collection description' {
+        $collection = @{
+            description  = 'Default'
+            descriptions = @{ prerelease = '   ' }
+        }
+        $result = Resolve-CollectionDescription -Collection $collection -Channel 'PreRelease' -DefaultDescription 'Fallback'
+        $result | Should -Be 'Default'
+    }
+
+    It 'Returns DefaultDescription when collection lacks description and overrides' {
+        $collection = @{ id = 'no-desc' }
+        $result = Resolve-CollectionDescription -Collection $collection -Channel 'Stable' -DefaultDescription 'Fallback'
+        $result | Should -Be 'Fallback'
+    }
+}
+
+Describe 'Resolve-CollectionDisplayName' {
+    It 'Returns stable override on Stable channel when present' {
+        $collection = @{
+            displayName  = 'Manifest Display'
+            name         = 'fallback'
+            displayNames = @{ stable = 'Stable Display'; prerelease = 'Pre Display' }
+        }
+        $result = Resolve-CollectionDisplayName -Collection $collection -Channel 'Stable' -DefaultDisplayName 'Default'
+        $result | Should -Be 'Stable Display'
+    }
+
+    It 'Returns prerelease override on PreRelease channel when present' {
+        $collection = @{
+            displayName  = 'Manifest Display'
+            name         = 'fallback'
+            displayNames = @{ stable = 'Stable Display'; prerelease = 'Pre Display' }
+        }
+        $result = Resolve-CollectionDisplayName -Collection $collection -Channel 'PreRelease' -DefaultDisplayName 'Default'
+        $result | Should -Be 'Pre Display'
+    }
+
+    It 'Falls back to manifest displayName on PreRelease channel when only stable override present' {
+        $collection = @{
+            displayName  = 'Manifest Display'
+            name         = 'fallback'
+            displayNames = @{ stable = 'Stable Display' }
+        }
+        $result = Resolve-CollectionDisplayName -Collection $collection -Channel 'PreRelease' -DefaultDisplayName 'Default'
+        $result | Should -Be 'Manifest Display'
+    }
+
+    It 'Treats whitespace-only override as absent and falls back to manifest displayName' {
+        $collection = @{
+            displayName  = 'Manifest Display'
+            displayNames = @{ prerelease = '   ' }
+        }
+        $result = Resolve-CollectionDisplayName -Collection $collection -Channel 'PreRelease' -DefaultDisplayName 'Default'
+        $result | Should -Be 'Manifest Display'
+    }
+
+    It 'Returns DefaultDisplayName when collection lacks displayNames, displayName, and name' {
+        $collection = @{ id = 'no-name' }
+        $result = Resolve-CollectionDisplayName -Collection $collection -Channel 'Stable' -DefaultDisplayName 'Default'
+        $result | Should -Be 'Default'
+    }
 }
 
 #endregion Package Generation Function Tests
+
+Describe 'Per-collection description and displayName constraints' {
+    BeforeDiscovery {
+        Import-Module powershell-yaml -ErrorAction Stop
+        $repoRoot = (Get-Item "$PSScriptRoot/../../..").FullName
+        $collectionsDir = Join-Path $repoRoot 'collections'
+        $script:CollectionCases = @(
+            Get-ChildItem -Path $collectionsDir -Filter '*.collection.yml' -File |
+                Sort-Object Name |
+                ForEach-Object { @{ Name = $_.Name; Path = $_.FullName } }
+        )
+    }
+
+    It 'Collection <Name> satisfies marketplace length and distinctness constraints' -ForEach $CollectionCases {
+        $manifest = Get-Content -Path $Path -Raw | ConvertFrom-Yaml
+
+        $descriptions = $null
+        if ($manifest -and $manifest.ContainsKey('descriptions') -and $manifest.descriptions -is [hashtable]) {
+            $descriptions = [hashtable]$manifest.descriptions
+        }
+        $displayNames = $null
+        if ($manifest -and $manifest.ContainsKey('displayNames') -and $manifest.displayNames -is [hashtable]) {
+            $displayNames = [hashtable]$manifest.displayNames
+        }
+
+        if ($descriptions -and $descriptions.ContainsKey('stable')) {
+            ([string]$descriptions['stable']).Length | Should -BeLessOrEqual 200 -Because "descriptions.stable in $Name must fit the VS Code Marketplace 200-char limit"
+        }
+        if ($descriptions -and $descriptions.ContainsKey('prerelease')) {
+            ([string]$descriptions['prerelease']).Length | Should -BeLessOrEqual 200 -Because "descriptions.prerelease in $Name must fit the VS Code Marketplace 200-char limit"
+        }
+        if ($displayNames -and $displayNames.ContainsKey('stable')) {
+            ([string]$displayNames['stable']).Length | Should -BeLessOrEqual 80 -Because "displayNames.stable in $Name must fit a reasonable marketplace display length"
+        }
+        if ($displayNames -and $displayNames.ContainsKey('prerelease')) {
+            ([string]$displayNames['prerelease']).Length | Should -BeLessOrEqual 80 -Because "displayNames.prerelease in $Name must fit a reasonable marketplace display length"
+        }
+
+        if ($descriptions -and $descriptions.ContainsKey('stable') -and $descriptions.ContainsKey('prerelease')) {
+            $stable = [string]$descriptions['stable']
+            $prerelease = [string]$descriptions['prerelease']
+            if (-not [string]::IsNullOrWhiteSpace($stable) -and -not [string]::IsNullOrWhiteSpace($prerelease)) {
+                $stable | Should -Not -Be $prerelease -Because "descriptions.stable and descriptions.prerelease in $Name should differ to justify per-channel overrides"
+            }
+        }
+    }
+}
 
 Describe 'Get-AllowedMaturities' {
     It 'Returns only stable for Stable channel' {
@@ -1841,6 +2174,30 @@ description: Missing template
             $bakJson = Get-Content -Path $bakPath -Raw | ConvertFrom-Json
             $bakJson.name | Should -Be 'hve-core'
         }
+
+        It 'Resolves per-channel description into pinned package.json for non-default collection on PreRelease' {
+            $perChannelCollectionPath = Join-Path $script:collectionsDir 'perchannel.collection.yml'
+            @"
+id: perchannel
+name: hve-perchannel
+displayName: HVE Core - Per Channel
+description: Stable per-channel description
+descriptions:
+  prerelease: 'Experimental: Per-channel preview description'
+"@ | Set-Content -Path $perChannelCollectionPath
+
+            $result = Invoke-PrepareExtension `
+                -ExtensionDirectory $script:extDir `
+                -RepoRoot $script:tempDir `
+                -Channel 'PreRelease' `
+                -Collection $perChannelCollectionPath `
+                -DryRun
+
+            $result.Success | Should -BeTrue
+            $pinnedJson = Get-Content -Path (Join-Path $script:extDir 'package.json') -Raw | ConvertFrom-Json
+            $pinnedJson.name | Should -Be 'hve-perchannel'
+            $pinnedJson.description | Should -Be 'Experimental: Per-channel preview description'
+        }
     }
 
     Context 'Collection maturity gating' {
@@ -2025,6 +2382,42 @@ items:
                 -DryRun
 
             $result.Success | Should -BeTrue
+        }
+    }
+
+    Context 'Per-channel description pin' {
+        BeforeAll {
+            $script:pinCollectionPath = Join-Path $script:collectionsDir 'pin-target.collection.yml'
+            @"
+id: pin-target
+name: pin-target
+displayName: HVE Core - Pin Target
+description: Pin target stable description
+descriptions:
+  prerelease: 'Experimental: Pin target preview description'
+"@ | Set-Content -Path $script:pinCollectionPath
+        }
+
+        AfterEach {
+            $bakPath = Join-Path $script:extDir 'package.json.bak'
+            if (Test-Path $bakPath) {
+                Remove-Item -Path $bakPath -Force
+            }
+        }
+
+        It 'Pins extension/package.json description to the targeted PreRelease value' {
+            $result = Invoke-PrepareExtension `
+                -ExtensionDirectory $script:extDir `
+                -RepoRoot $script:tempDir `
+                -Channel 'PreRelease' `
+                -Collection $script:pinCollectionPath `
+                -DryRun:$false
+
+            $result.Success | Should -BeTrue
+
+            $pkgJson = Get-Content -Path (Join-Path $script:extDir 'package.json') -Raw | ConvertFrom-Json
+            $pkgJson.description | Should -Be 'Experimental: Pin target preview description'
+            $pkgJson.name | Should -Be 'hve-pin-target'
         }
     }
 }
@@ -2258,11 +2651,9 @@ handoffs:
         $result | Should -Contain 'string-target'
     }
 
-    It 'Warns but continues when handoff target file is missing' {
-        $result = Resolve-HandoffDependencies -SeedAgents @('missing-agent') -AgentsDir $script:agentsDir 3>&1
-        # The function emits a warning and returns the seed agent
-        $agentNames = @($result | Where-Object { $_ -is [string] })
-        $agentNames | Should -Contain 'missing-agent'
+    It 'Throws when handoff target file is missing' {
+        { Resolve-HandoffDependencies -SeedAgents @('missing-agent') -AgentsDir $script:agentsDir } |
+            Should -Throw '*Handoff target agent file not found: missing-agent*'
     }
 
     It 'Warns and continues when handoff YAML is malformed' {
@@ -2319,6 +2710,34 @@ handoffs:
     agent: Task Planner
 ---
 '@ | Set-Content -Path (Join-Path $script:agentsDir 'task-implementor.agent.md')
+
+        # Suffixed-name fixtures: target whose source name carries an '(exp)' suffix.
+        @'
+---
+name: Foo (exp)
+description: "Suffixed target"
+---
+'@ | Set-Content -Path (Join-Path $script:agentsDir 'foo.agent.md')
+
+        @'
+---
+name: Suffix Referrer
+description: "Agent referencing the suffixed target by suffixed name"
+handoffs:
+  - label: "To Foo"
+    agent: Foo (exp)
+---
+'@ | Set-Content -Path (Join-Path $script:agentsDir 'suffix-referrer.agent.md')
+
+        @'
+---
+name: Base Name Referrer
+description: "Agent referencing the suffixed target by base name (broken)"
+handoffs:
+  - label: "To Foo (broken)"
+    agent: Foo
+---
+'@ | Set-Content -Path (Join-Path $script:agentsDir 'base-name-referrer.agent.md')
     }
 
     AfterAll {
@@ -2335,6 +2754,17 @@ handoffs:
         $result = Resolve-HandoffDependencies -SeedAgents @('task-planner') -AgentsDir $script:agentsDir
         $result | Should -Contain 'task-planner'
         $result | Should -Contain 'task-implementor'
+    }
+
+    It 'Resolves a suffixed-name reference against a suffixed target' {
+        $result = Resolve-HandoffDependencies -SeedAgents @('suffix-referrer') -AgentsDir $script:agentsDir
+        $result | Should -Contain 'suffix-referrer'
+        $result | Should -Contain 'foo'
+    }
+
+    It 'Throws when reference base-name does not match suffixed target' {
+        { Resolve-HandoffDependencies -SeedAgents @('base-name-referrer') -AgentsDir $script:agentsDir } |
+            Should -Throw "*Reference uses base name; the target's source 'name:' is 'Foo (exp)'*"
     }
 }
 

@@ -52,7 +52,7 @@ jobs:
       - name: Check plugin freshness
         run: |
           npm run plugin:generate
-          if ! git diff --quiet plugins/; then
+          if ! git diff --quiet plugins/ .github/plugin/marketplace.json; then
             echo "::error::Plugins out of date. Run 'npm run plugin:generate' and commit."
             if [ "${{ inputs.soft-fail }}" != "true" ]; then
               exit 1

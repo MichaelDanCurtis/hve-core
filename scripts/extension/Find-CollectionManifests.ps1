@@ -32,11 +32,13 @@ function Find-CollectionManifestsCore {
         Discovers collection manifest files and builds a GitHub Actions matrix.
     .DESCRIPTION
         Reads *.collection.yml files from the specified directory, parses each with
-        ConvertFrom-Yaml, and filters by maturity against the release channel.
-        Deprecated collections are always excluded; experimental collections are
-        excluded for the Stable channel.
+        ConvertFrom-Yaml, and filters out collections whose maturity is deprecated
+        or removed. Per-item maturity gating (stable/preview/experimental) is
+        enforced downstream by Prepare-Extension via Get-AllowedMaturities;
+        collections themselves are not channel-gated as a whole.
     .PARAMETER Channel
-        Release channel controlling maturity filtering (default: Stable).
+        Release channel passed through for downstream consumers (default: Stable).
+        No longer used to filter experimental collections at discovery time.
     .PARAMETER CollectionsDir
         Directory containing *.collection.yml manifest files.
     #>
@@ -88,12 +90,9 @@ function Find-CollectionManifestsCore {
             continue
         }
 
-        # Skip experimental for Stable channel
-        if ($maturity -eq 'experimental' -and $channel -eq 'Stable') {
-            $skipped += [PSCustomObject]@{ Id = $id; Name = $name; Reason = 'experimental (Stable channel)' }
-            Write-Verbose "Skipping experimental collection for Stable channel: $name ($id)"
-            continue
-        }
+        # Per-item maturity gating (stable/preview/experimental) is enforced by
+        # Prepare-Extension via Get-AllowedMaturities; collections themselves are
+        # not channel-gated as a whole.
 
         $matrixItems += @{
             id       = $id

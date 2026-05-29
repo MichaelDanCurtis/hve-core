@@ -27,6 +27,11 @@
 .PARAMETER DryRun
     Optional. If specified, shows what would be done without making changes.
 
+.PARAMETER Prune
+    Optional. Removes generated `package.*.json` and `README.*.md` files in the
+    extension directory whose suffixes do not correspond to a known collection.
+    Without this switch, orphan generated files are left untouched.
+
 .EXAMPLE
     ./Prepare-Extension.ps1
     # Prepares stable channel using existing version from package.json
@@ -38,6 +43,11 @@
 .EXAMPLE
     ./Prepare-Extension.ps1 -ChangelogPath "./CHANGELOG.md"
     # Prepares with changelog
+
+.EXAMPLE
+    ./Prepare-Extension.ps1 -Prune
+    # Prepares and removes stale generated package/README files for collections
+    # that no longer exist
 
 .NOTES
     Dependencies: PowerShell-Yaml module
@@ -54,6 +64,9 @@ param(
 
     [Parameter(Mandatory = $false)]
     [switch]$DryRun,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$Prune,
 
     [Parameter(Mandatory = $false)]
     [string]$Collection = ""
@@ -101,6 +114,46 @@ function Get-CollectionDisplayName {
     }
 
     return $DefaultValue
+}
+
+function Resolve-CollectionDisplayName {
+    <#
+    .SYNOPSIS
+        Resolves a channel-specific collection display name.
+    .DESCRIPTION
+        Uses exact-channel display name overrides when present, then falls back
+        to the standard collection display name resolution rules.
+    .PARAMETER CollectionManifest
+        Parsed collection manifest hashtable.
+    .PARAMETER Channel
+        Release channel controlling which override key is considered.
+    .PARAMETER DefaultDisplayName
+        Fallback display name when the manifest provides no usable value.
+    .OUTPUTS
+        [string] Resolved collection display name.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$CollectionManifest,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Stable', 'PreRelease')]
+        [string]$Channel,
+
+        [Parameter(Mandatory = $true)]
+        [string]$DefaultDisplayName
+    )
+
+    $overrideKey = if ($Channel -eq 'PreRelease') { 'prerelease' } else { 'stable' }
+    if ($CollectionManifest.ContainsKey('displayNames') -and $CollectionManifest.displayNames -is [hashtable] -and
+        $CollectionManifest.displayNames.ContainsKey($overrideKey) -and
+        -not [string]::IsNullOrWhiteSpace([string]$CollectionManifest.displayNames[$overrideKey])) {
+        return [string]$CollectionManifest.displayNames[$overrideKey]
+    }
+
+    return Get-CollectionDisplayName -CollectionManifest $CollectionManifest -DefaultValue $DefaultDisplayName
 }
 
 function Copy-TemplateWithOverrides {
@@ -180,10 +233,15 @@ function Set-JsonFile {
 function Remove-StaleGeneratedFiles {
     <#
     .SYNOPSIS
-        Removes generated collection package files that are no longer expected.
+        Removes generated collection files that are no longer expected.
     .DESCRIPTION
-        Scans extension/ for package.*.json files and removes any not in the
-        expected set, keeping the directory clean of orphaned collection templates.
+        Scans extension/ for `package.*.json` and `README.*.md` files and
+        removes any not in the expected set, keeping the directory clean of
+        orphaned collection templates.
+
+        Only suffixed files (e.g. `package.foo.json`, `README.foo.md`) are
+        considered. The canonical `package.json` and `README.md` are skipped
+        unconditionally.
     .PARAMETER RepoRoot
         Repository root path.
     .PARAMETER ExpectedFiles
@@ -205,10 +263,13 @@ function Remove-StaleGeneratedFiles {
     }
 
     $extensionDir = Join-Path $RepoRoot 'extension'
-    Get-ChildItem -Path $extensionDir -Filter 'package.*.json' -File | ForEach-Object {
-        $fullPath = [System.IO.Path]::GetFullPath($_.FullName)
-        if (-not $expected.Contains($fullPath)) {
-            Remove-Item -Path $_.FullName -Force
+
+    foreach ($pattern in @('package.*.json', 'README.*.md')) {
+        Get-ChildItem -Path $extensionDir -Filter $pattern -File | ForEach-Object {
+            $fullPath = [System.IO.Path]::GetFullPath($_.FullName)
+            if (-not $expected.Contains($fullPath)) {
+                Remove-Item -Path $_.FullName -Force
+            }
         }
     }
 }
@@ -220,12 +281,23 @@ function Invoke-ExtensionCollectionsGeneration {
     .DESCRIPTION
         Reads the package template and each collections/*.collection.yml file,
         producing extension/package.json (for hve-core) and
-        extension/package.{id}.json for every other collection. Stale collection
-        files are removed.
+        extension/package.{id}.json for every other collection. When -Prune is
+        specified, orphan `package.<id>.json` and `README.<id>.md` files whose
+        suffix does not correspond to a known collection are also removed.
     .PARAMETER RepoRoot
         Repository root path containing collections/ and extension/templates/.
     .PARAMETER Channel
         Release channel controlling maturity filtering for README generation.
+    .PARAMETER Prune
+        When set, removes orphan generated `package.<id>.json` and
+        `README.<id>.md` files in extension/ whose suffixes do not correspond
+        to a current collection. Default behavior leaves orphan files intact.
+    .PARAMETER Collection
+        Optional path to a `*.collection.yml` manifest. When supplied, the
+        resolved per-id `package.<id>.json` is also written to
+        `extension/package.json` so downstream vsce packaging picks up the
+        channel-resolved description for the targeted collection. Empty
+        default preserves regenerate-everything behavior for local dev.
     .OUTPUTS
         [string[]] Array of generated file paths.
     #>
@@ -236,7 +308,11 @@ function Invoke-ExtensionCollectionsGeneration {
         [string]$RepoRoot,
 
         [ValidateSet('Stable', 'PreRelease')]
-        [string]$Channel = 'Stable'
+        [string]$Channel = 'Stable',
+
+        [switch]$Prune,
+
+        [string]$Collection = ""
     )
 
     $collectionsDir = Join-Path $RepoRoot 'collections'
@@ -264,19 +340,34 @@ function Invoke-ExtensionCollectionsGeneration {
     }
 
     $expectedFiles = @()
+    $pinnedPackageContent = $null
+
+    $targetCollectionId = $null
+    if (-not [string]::IsNullOrWhiteSpace($Collection)) {
+        try {
+            $targetManifest = Get-CollectionManifest -CollectionPath $Collection
+        }
+        catch {
+            throw "Failed to resolve -Collection '$Collection': $($_.Exception.Message)"
+        }
+        if ($targetManifest -isnot [hashtable] -or [string]::IsNullOrWhiteSpace([string]$targetManifest.id)) {
+            throw "Invalid collection manifest at '$Collection': missing id."
+        }
+        $targetCollectionId = ([string]$targetManifest.id).ToLowerInvariant()
+    }
 
     foreach ($collectionFile in $collectionFiles) {
-        $collection = Get-CollectionManifest -CollectionPath $collectionFile.FullName
-        if ($collection -isnot [hashtable]) {
+        $collectionManifest = Get-CollectionManifest -CollectionPath $collectionFile.FullName
+        if ($collectionManifest -isnot [hashtable]) {
             throw "Collection manifest must be a hashtable: $($collectionFile.FullName)"
         }
 
-        $collectionId = [string]$collection.id
+        $collectionId = [string]$collectionManifest.id
         if ([string]::IsNullOrWhiteSpace($collectionId)) {
             throw "Collection id is required: $($collectionFile.FullName)"
         }
 
-        $collectionDescription = if ($collection.ContainsKey('description')) { [string]$collection.description } else { [string]$packageTemplate.description }
+        $collectionDescription = Resolve-CollectionDescription -CollectionManifest $collectionManifest -Channel $Channel -DefaultDescription ([string]$packageTemplate.description)
 
         $extensionName = switch ($collectionId) {
             'hve-core'     { [string]$packageTemplate.name }
@@ -286,7 +377,7 @@ function Invoke-ExtensionCollectionsGeneration {
         $extensionDisplayName = switch ($collectionId) {
             'hve-core'     { [string]$packageTemplate.displayName }
             'hve-core-all' { 'HVE Core - All' }
-            default        { Get-CollectionDisplayName -CollectionManifest $collection -DefaultValue ([string]$packageTemplate.displayName) }
+            default        { Resolve-CollectionDisplayName -CollectionManifest $collectionManifest -Channel $Channel -DefaultDisplayName ([string]$packageTemplate.displayName) }
         }
 
         $packageTemplateOutput = Copy-TemplateWithOverrides -Template $packageTemplate -Overrides @{
@@ -303,15 +394,26 @@ function Invoke-ExtensionCollectionsGeneration {
 
         Set-JsonFile -Path $packagePath -Content $packageTemplateOutput
         $expectedFiles += $packagePath
+
+        if ($null -ne $targetCollectionId -and $collectionId.ToLowerInvariant() -eq $targetCollectionId) {
+            $pinnedPackageContent = $packageTemplateOutput
+            $pinnedPackagePath = Join-Path $RepoRoot 'extension/package.json'
+            if ($packagePath -ne $pinnedPackagePath) {
+                $expectedFiles += $pinnedPackagePath
+            }
+        }
     }
 
-    Remove-StaleGeneratedFiles -RepoRoot $RepoRoot -ExpectedFiles $expectedFiles
+    if ($null -ne $pinnedPackageContent) {
+        $pinnedPackagePath = Join-Path $RepoRoot 'extension/package.json'
+        Set-JsonFile -Path $pinnedPackagePath -Content $pinnedPackageContent
+    }
 
     # Generate README files for each collection
     $readmeTemplatePath = Join-Path $templatesDir 'README.template.md'
     foreach ($collectionFile in $collectionFiles) {
-        $collection = Get-CollectionManifest -CollectionPath $collectionFile.FullName
-        $collectionId = [string]$collection.id
+        $collectionManifest = Get-CollectionManifest -CollectionPath $collectionFile.FullName
+        $collectionId = [string]$collectionManifest.id
 
         $collectionMdPath = Join-Path $collectionsDir "$collectionId.collection.md"
         if (-not (Test-Path $collectionMdPath)) {
@@ -324,7 +426,12 @@ function Invoke-ExtensionCollectionsGeneration {
             default        { Join-Path $RepoRoot "extension/README.$collectionId.md" }
         }
 
-        New-CollectionReadme -Collection $collection -CollectionMdPath $collectionMdPath -TemplatePath $readmeTemplatePath -RepoRoot $RepoRoot -OutputPath $readmePath -AllowedMaturities $allowedMaturities
+        New-CollectionReadme -Collection $collectionManifest -CollectionMdPath $collectionMdPath -TemplatePath $readmeTemplatePath -RepoRoot $RepoRoot -OutputPath $readmePath -AllowedMaturities $allowedMaturities -Channel $Channel
+        $expectedFiles += $readmePath
+    }
+
+    if ($Prune) {
+        Remove-StaleGeneratedFiles -RepoRoot $RepoRoot -ExpectedFiles $expectedFiles
     }
 
     return $expectedFiles
@@ -374,6 +481,9 @@ function New-CollectionReadme {
         [Parameter(Mandatory = $true)]
         [string]$OutputPath,
 
+        [ValidateSet('Stable', 'PreRelease')]
+        [string]$Channel = 'Stable',
+
         [ValidateNotNullOrEmpty()]
         [string[]]$AllowedMaturities = @('stable')
     )
@@ -382,17 +492,13 @@ function New-CollectionReadme {
     $displayName = switch ($collectionId) {
         'hve-core'     { 'HVE Core' }
         'hve-core-all' { 'HVE Core - All' }
-        default        { Get-CollectionDisplayName -CollectionManifest $Collection -DefaultValue "HVE Core - $collectionId" }
+        default        { Resolve-CollectionDisplayName -CollectionManifest $Collection -Channel $Channel -DefaultDisplayName "HVE Core - $collectionId" }
     }
-    $description = if ($Collection.ContainsKey('description')) { [string]$Collection.description } else { '' }
+    $description = Resolve-CollectionDescription -CollectionManifest $Collection -Channel $Channel -DefaultDescription ''
 
     $collectionMaturity = if ($Collection.ContainsKey('maturity') -and -not [string]::IsNullOrWhiteSpace([string]$Collection.maturity)) {
         [string]$Collection.maturity
     } else { 'stable' }
-
-    $maturityNotice = if ($collectionMaturity -eq 'experimental') {
-        '> **⚠️ Experimental** — This collection is experimental and available only in the Pre-Release channel. Contents may change or be removed without notice.'
-    } else { '' }
 
     $bodyContent = Get-Content -Path $CollectionMdPath -Raw
     $parsed = Split-CollectionMdByMarkers -Content $bodyContent
@@ -411,6 +517,7 @@ function New-CollectionReadme {
     $prompts = @()
     $instructions = @()
     $skills = @()
+    $includedMaturities = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 
     if ($Collection.ContainsKey('items')) {
         foreach ($item in $Collection.items) {
@@ -421,6 +528,7 @@ function New-CollectionReadme {
             if ($AllowedMaturities -and $AllowedMaturities -notcontains $maturity) {
                 continue
             }
+            $null = $includedMaturities.Add($maturity)
             $kind = [string]$item.kind
             $path = [string]$item.path
             $artifactName = Get-CollectionArtifactKey -Kind $kind -Path $path
@@ -441,6 +549,20 @@ function New-CollectionReadme {
             }
         }
     }
+
+    $maturityNotice = if ($collectionMaturity -eq 'experimental') {
+        '> ⚠ **Experimental**: This collection is experimental and available only in the Pre-Release channel. Contents may change or be removed without notice.'
+    }
+    elseif ($Channel -eq 'PreRelease' -and $includedMaturities.Contains('experimental')) {
+        '> **Pre-Release with experimental content**: This build includes experimental assets that are subject to change and are provided as-is, without warranty of any kind. Share feedback or issues at https://github.com/microsoft/hve-core/issues.'
+    }
+    elseif ($Channel -eq 'PreRelease' -and $includedMaturities.Contains('preview')) {
+        '> **Pre-Release with preview content**: This build includes preview assets for early evaluation and feedback.'
+    }
+    elseif ($Channel -eq 'PreRelease') {
+        '> **Pre-Release build**: This build provides early access and feedback opportunities before stable release.'
+    }
+    else { '' }
 
     # Build markdown tables for each artifact kind
     $artifactSections = [System.Text.StringBuilder]::new()
@@ -464,11 +586,15 @@ function New-CollectionReadme {
     }
 
     # Write back updated artifact section into collection.md when markers are present.
-    # The hand-authored intro provides the `## Included Artifacts` H2 immediately
-    # before the BEGIN marker, so the generated block contains only the H3 tables.
+    # Keep the stable h2 outside the generated marker block so only volatile
+    # artifact inventory tables are replaced.
     if ($parsed.HasMarkers) {
         $generatedBlock = $artifactSections.ToString().TrimEnd()
-        $updatedCollectionMd = "$($parsed.Intro)`n`n$($CollectionMdBeginMarker)`n`n$generatedBlock`n`n$($CollectionMdEndMarker)"
+        $intro = $parsed.Intro.TrimEnd()
+        if ($intro -notmatch '(?m)^## Included Artifacts\s*$') {
+            $intro = "$intro`n`n## Included Artifacts"
+        }
+        $updatedCollectionMd = "$intro`n`n$($CollectionMdBeginMarker)`n`n$generatedBlock`n`n$($CollectionMdEndMarker)"
         if (-not [string]::IsNullOrWhiteSpace($parsed.Footer)) {
             $updatedCollectionMd += "`n`n$($parsed.Footer.TrimEnd())"
         }
@@ -721,11 +847,20 @@ function Resolve-HandoffDependencies {
     # Build index: map display names and file stems to agent file objects.
     # Handoff targets use display names from frontmatter (e.g., "RPI Agent")
     # while seed agents and collection keys use file stems (e.g., "rpi-agent").
+    # Track canonical names per file so case-insensitive hashtable collisions
+    # do not silently resolve a base-name reference to a suffixed target.
     $agentIndex = @{}
+    $agentCanonicalNames = @{}
     $allAgentFiles = Get-ChildItem -Path $AgentsDir -Filter "*.agent.md" -Recurse -File
     foreach ($af in $allAgentFiles) {
         $stem = $af.BaseName -replace '\.agent$', ''
-        $agentIndex[$stem] = $af
+        # Ordinal (case-sensitive) so that 'Foo' does not match a canonical 'foo'
+        # via case-folding; that mismatch needs to trigger suffix detection.
+        $canonical = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+        [void]$canonical.Add($stem)
+        if (-not $agentIndex.ContainsKey($stem)) {
+            $agentIndex[$stem] = $af
+        }
 
         $fc = Get-Content -Path $af.FullName -Raw
         if ($fc -match '(?s)^---\s*\r?\n(.*?)\r?\n---') {
@@ -733,6 +868,7 @@ function Resolve-HandoffDependencies {
             try {
                 $meta = ConvertFrom-Yaml -Yaml $yml
                 if ($meta.ContainsKey('name') -and $meta.name -is [string] -and $meta.name -ne '') {
+                    [void]$canonical.Add($meta.name)
                     if (-not $agentIndex.ContainsKey($meta.name)) {
                         $agentIndex[$meta.name] = $af
                     }
@@ -742,6 +878,7 @@ function Resolve-HandoffDependencies {
                 Write-Verbose "Skipping display name index for $($af.Name): $_"
             }
         }
+        $agentCanonicalNames[$af.FullName] = $canonical
     }
 
     $visited = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
@@ -757,9 +894,35 @@ function Resolve-HandoffDependencies {
         $current = $queue.Dequeue()
         $agentFile = $agentIndex[$current]
 
+        # Hashtable lookup is case-insensitive; verify the matched file actually
+        # advertises $current as one of its canonical names so a base-name reference
+        # cannot accidentally resolve to a suffixed-name file via casing collisions.
+        if ($agentFile) {
+            $canonical = $agentCanonicalNames[$agentFile.FullName]
+            if (-not ($canonical -and $canonical.Contains($current))) {
+                $agentFile = $null
+            }
+        }
+
         if (-not $agentFile) {
-            Write-Warning "Handoff target agent file not found: $current"
-            continue
+            # Detect base-name references whose suffixed target is registered (e.g. 'Foo' -> 'Foo (exp)').
+            # Suffix shape mirrors Get-AgentMaturityNameSuffix joined with the documented leading space.
+            $suffixedCandidate = $null
+            foreach ($maturity in @('experimental', 'preview')) {
+                $suffix = Get-AgentMaturityNameSuffix -Maturity $maturity
+                if ([string]::IsNullOrEmpty($suffix)) { continue }
+                $candidate = "$current $suffix"
+                if ($agentIndex.ContainsKey($candidate)) {
+                    $suffixedCandidate = $candidate
+                    break
+                }
+            }
+
+            if ($suffixedCandidate) {
+                throw "Reference uses base name; the target's source 'name:' is '$suffixedCandidate'. Update the reference to match. Handoff target agent file not found: $current"
+            }
+
+            throw "Handoff target agent file not found: $current"
         }
 
         # Normalize visited entry to file stem for consistent collection filtering
@@ -1488,6 +1651,9 @@ function Invoke-PrepareExtension {
         Optional path to changelog file to include.
     .PARAMETER DryRun
         When specified, shows what would be done without making changes.
+    .PARAMETER Collection
+        Optional collection identifier (e.g., 'ado', 'hve-core') used to pin
+        per-channel package.json metadata for the targeted collection.
     .OUTPUTS
         Hashtable with Success, Version, AgentCount, PromptCount,
         InstructionCount, SkillCount, and ErrorMessage properties.
@@ -1525,7 +1691,7 @@ function Invoke-PrepareExtension {
     # This ensures extension/package.json and extension/package.*.json exist
     # with the correct version from the template before any reads occur.
     try {
-        $generated = Invoke-ExtensionCollectionsGeneration -RepoRoot $RepoRoot -Channel $Channel
+        $generated = Invoke-ExtensionCollectionsGeneration -RepoRoot $RepoRoot -Channel $Channel -Prune:$Prune
         Write-Host "Generated $($generated.Count) collection package file(s)" -ForegroundColor Green
     }
     catch {

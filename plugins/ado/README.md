@@ -1,11 +1,15 @@
 <!-- markdownlint-disable-file -->
 # Azure DevOps Integration
 
-Azure DevOps work item management, build monitoring, and pull request creation
+Experimental: Azure DevOps work item management, build monitoring, and pull request creation. May change. Feedback: github.com/microsoft/hve-core/issues
 
 ## Overview
 
 Manage Azure DevOps work items, monitor builds, create pull requests, and convert requirements documents into structured work item hierarchies - all from within VS Code.
+
+## Channel distribution
+
+Plugins (the `plugins/<id>/` committed tree and the `.github/plugin/marketplace.json` entry) ship the PreRelease description text only. The `.vsix` extension package ships either Stable or PreRelease text depending on which channel was packaged. `descriptions.prerelease` is required for any collection that ships a plugin.
 
 ## Included Artifacts
 
