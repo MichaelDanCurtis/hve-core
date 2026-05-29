@@ -35,6 +35,11 @@ from typing import Any
 
 import yaml
 
+try:
+    from ._utils import has_traversal_segments, safe_resolve
+except ImportError:  # executed directly as ``python update_lineage.py``
+    from _utils import has_traversal_segments, safe_resolve
+
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 EXIT_ERROR = 2
@@ -58,28 +63,6 @@ def _safe_slug(slug: str) -> str:
     if not SLUG_RE.match(slug):
         raise ValueError(f"invalid project slug '{slug}': must match {SLUG_RE.pattern}")
     return slug
-
-
-def _safe_resolve(path: Path, allow_roots: list[Path]) -> Path:
-    """Resolve ``path`` ensuring it stays under one of ``allow_roots``.
-
-    Rejects any input containing ``..`` segments before resolution to
-    prevent traversal even when an allow-root is permissive.
-    """
-    if ".." in path.parts:
-        raise ValueError(f"path '{path}' contains traversal segments")
-    resolved = path.expanduser().resolve()
-    for root in allow_roots:
-        try:
-            root_resolved = root.expanduser().resolve()
-        except OSError:
-            continue
-        try:
-            if resolved.is_relative_to(root_resolved):
-                return resolved
-        except ValueError:
-            continue
-    raise ValueError(f"path '{path}' escapes allow-roots {[str(r) for r in allow_roots]}")
 
 
 def _load_yaml_config(path: Path) -> dict[str, Any]:
@@ -136,7 +119,9 @@ def _id_from_filename(path: Path) -> str:
 def allocate(project_dir: Path, slug: str) -> str:
     """Allocate the next NNNN id for ``slug``; mutate ``.adr-config.yml``."""
     _safe_slug(slug)
-    project_dir = _safe_resolve(project_dir, [project_dir.expanduser().resolve()])
+    if has_traversal_segments(project_dir):
+        raise ValueError(f"project dir '{project_dir}' contains traversal segments")
+    project_dir = project_dir.expanduser().resolve()
     cfg_path = project_dir / CONFIG_FILENAME
     if not cfg_path.is_file():
         raise FileNotFoundError(f"{CONFIG_FILENAME} not found in project dir '{project_dir}'")
@@ -164,10 +149,19 @@ def allocate(project_dir: Path, slug: str) -> str:
     return new_id
 
 
-def supersede(superseded: Path, superseder: Path) -> None:
-    """Atomically mark ``superseded`` as replaced by ``superseder``."""
-    superseded = superseded.expanduser().resolve()
-    superseder = superseder.expanduser().resolve()
+def supersede(superseded: Path, superseder: Path, allow_roots: list[Path] | None = None) -> None:
+    """Atomically mark ``superseded`` as replaced by ``superseder``.
+
+    Both paths are containment-checked against ``allow_roots``; when omitted,
+    each ADR's own parent directory is used so traversal segments are still
+    rejected while preserving the default in-project usage.
+    """
+    roots = allow_roots or [
+        superseded.parent.expanduser().resolve(),
+        superseder.parent.expanduser().resolve(),
+    ]
+    superseded = safe_resolve(superseded, roots)
+    superseder = safe_resolve(superseder, roots)
 
     if superseded == superseder:
         raise ValueError("superseded and superseder must be different files")
@@ -262,6 +256,14 @@ def create_parser() -> argparse.ArgumentParser:
         type=Path,
         help="Path to the ADR doing the superseding (newer).",
     )
+    p_sup.add_argument(
+        "--allow-root",
+        action="append",
+        type=Path,
+        default=[],
+        dest="allow_root",
+        help="Additional directory under which the ADR paths are allowed to live.",
+    )
 
     return parser
 
@@ -274,7 +276,8 @@ def main(argv: list[str] | None = None) -> int:
             print(allocate(args.project_dir, args.slug))
             return EXIT_SUCCESS
         if args.command == "supersede":
-            supersede(args.superseded, args.superseder)
+            allow_roots = [p.expanduser().resolve() for p in args.allow_root] or None
+            supersede(args.superseded, args.superseder, allow_roots)
             return EXIT_SUCCESS
     except PermissionError as exc:
         print(f"update_lineage: {exc}", file=sys.stderr)

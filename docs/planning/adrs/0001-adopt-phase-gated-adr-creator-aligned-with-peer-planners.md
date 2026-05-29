@@ -64,7 +64,7 @@ success_criteria:
   - metric: "madr-verbatim-fidelity"
     target: "0 diffs against upstream MADR v4.0.0 CC0 text in pinned blocks"
     measurement_window: "every PR touching ADR Creator instructions"
-    source: "scripts/linting/check_madr_verbatim.py (or equivalent test suite)"
+    source: ".github/skills/project-planning/adr-author/templates/madr-v4.md (verbatim CC0 block) reviewed against upstream MADR v4.0.0; attribution in references/standards-excerpts.md"
   - metric: "adr-consistency-validator-coverage"
     target: "nine ADR-CONSISTENCY rules enforced with full Pester coverage of pass and fail fixtures"
     measurement_window: "every PR touching docs/planning/adrs/** or scripts/linting/Modules/AdrConsistency.psm1"

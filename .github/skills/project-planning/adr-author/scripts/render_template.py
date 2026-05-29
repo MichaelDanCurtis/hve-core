@@ -23,32 +23,17 @@ import re
 import sys
 from pathlib import Path
 
+try:
+    from ._utils import safe_resolve
+except ImportError:  # executed directly as ``python render_template.py``
+    from _utils import safe_resolve
+
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 EXIT_ERROR = 2
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 PLACEHOLDER_RE = re.compile(r"\{([A-Za-z0-9_.-]+)\}")
-
-
-def _safe_resolve(path: Path, allow_roots: list[Path]) -> Path:
-    """Resolve ``path`` and ensure it lives under one of ``allow_roots``.
-
-    Path-traversal guard: reject raw paths that contain ``..`` segments.
-    Otherwise resolve and require the result to live under one of the
-    permitted roots.
-    """
-    normalized = str(path).replace("\\", "/")
-    if ".." in path.parts or ".." in normalized.split("/"):
-        raise ValueError(f"path '{path}' contains traversal segments")
-    resolved = path.expanduser().resolve()
-    for root in allow_roots:
-        try:
-            if resolved.is_relative_to(root):
-                return resolved
-        except ValueError:
-            continue
-    raise ValueError(f"path '{path}' resolves outside permitted roots: " + ", ".join(str(r) for r in allow_roots))
 
 
 def render(template_text: str, fields: dict[str, str]) -> str:
@@ -118,7 +103,7 @@ def main(argv: list[str] | None = None) -> int:
     except OSError:
         # Path resolution failed (missing file, permission denied, symlink loop).
         # Fall back to SKILL_ROOT plus explicitly provided --allow-root entries;
-        # _safe_resolve below will reject anything outside that allow-list.
+        # safe_resolve below will reject anything outside that allow-list.
         pass
     allow_roots = [
         *auto_allow,
@@ -133,8 +118,8 @@ def main(argv: list[str] | None = None) -> int:
             normalized = str(raw).replace("\\", "/")
             if ".." in raw.parts or ".." in normalized.split("/"):
                 raise ValueError(f"path '{raw}' contains traversal segments")
-        template_path = _safe_resolve(args.template, allow_roots)
-        out_parent = _safe_resolve(args.output.parent, allow_roots)
+        template_path = safe_resolve(args.template, allow_roots)
+        out_parent = safe_resolve(args.output.parent, allow_roots)
         out_path = (out_parent / args.output.name).resolve()
         if not out_path.is_relative_to(out_parent):
             raise ValueError(f"output path '{args.output}' escapes its parent")

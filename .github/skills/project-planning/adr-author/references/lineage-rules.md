@@ -18,10 +18,10 @@ The five rules below govern supersession and lineage for ADRs authored by the `a
 
 ## 1. Field Shape
 
-`supersedes` is an array of zero or more ADR identifiers (for example, `["ADR-0007", "ADR-0011"]`). `superseded-by` is a scalar string or `null` (for example, `"ADR-0042"` or `null`). The validator rejects array values for `superseded-by`.
+`supersedes` is a scalar four-digit ADR identifier string (for example, `"0007"`) or `null`. `superseded-by` is likewise a scalar string or `null` (for example, `"0042"` or `null`). The validator rejects array values for either field, enforcing single-parent supersession (see Rule 2).
 
-- Valid: `superseded-by: null`, `superseded-by: "ADR-0042"`.
-- Invalid (counter-example): `superseded-by: ["ADR-0042", "ADR-0043"]` — rejected because supersession is single-parent (see Rule 2).
+- Valid: `superseded-by: null`, `superseded-by: "0042"`, `supersedes: "0007"`.
+- Invalid (counter-example): `superseded-by: ["0042", "0043"]` — rejected because supersession is single-parent (see Rule 2).
 
 ## 2. Single-Parent Supersession
 
@@ -55,7 +55,7 @@ Both ADR files MUST be modified in the same Govern phase invocation. `scripts/up
 
 The validator emits one of the following five error categories when a lineage rule is violated. Each maps one-to-one with the rule above.
 
-1. `LINEAGE_FIELD_SHAPE` — `superseded-by` is not a scalar string or `null`, or `supersedes` is not an array.
+1. `LINEAGE_FIELD_SHAPE` — `superseded-by` or `supersedes` is not a scalar string or `null`.
 2. `LINEAGE_MULTIPLE_PARENTS` — an ADR already has a non-null `superseded-by` and a second supersession is attempted against it.
 3. `LINEAGE_BAD_STATUS_TRANSITION` — successor or predecessor ends in a status other than the permitted (`accepted`/`proposed`, `superseded`) combination.
 4. `LINEAGE_ATOMIC_VIOLATION` — exactly one of the two affected ADR files was modified in the Govern invocation; both must be present in the change set.

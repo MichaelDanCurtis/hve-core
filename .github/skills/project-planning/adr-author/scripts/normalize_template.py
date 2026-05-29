@@ -28,6 +28,11 @@ import re
 import sys
 from pathlib import Path
 
+try:
+    from ._utils import has_traversal_segments, safe_resolve
+except ImportError:  # executed directly as ``python normalize_template.py``
+    from _utils import has_traversal_segments, safe_resolve
+
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 EXIT_ERROR = 2
@@ -98,7 +103,7 @@ date: "{{date}}"
 deciders: []
 consulted: []
 informed: []
-supersedes: []
+supersedes: null
 superseded-by: null
 related: []
 asr_triggers: []
@@ -130,36 +135,6 @@ asr_triggers: []
 
 {{more_information}}
 """
-
-
-def _has_traversal_segments(path: Path) -> bool:
-    """Return True if ``path`` contains ``..`` segments separated by ``/`` or ``\\``.
-
-    Cross-platform: on Linux ``Path("..\\..\\evil")`` parses as a single
-    filename, so checking only ``path.parts`` misses backslash-separated
-    traversals. This helper normalizes both separators before splitting.
-    """
-    normalized = str(path).replace("\\", "/")
-    return ".." in path.parts or ".." in normalized.split("/")
-
-
-def _safe_resolve(path: Path, allow_roots: list[Path]) -> Path:
-    """Resolve ``path`` and ensure it lives under one of ``allow_roots``.
-
-    Path-traversal guard: reject raw paths that contain ``..`` segments.
-    Otherwise resolve and require the result to live under one of the
-    permitted roots.
-    """
-    if _has_traversal_segments(path):
-        raise ValueError(f"path '{path}' contains traversal segments")
-    resolved = path.expanduser().resolve()
-    for root in allow_roots:
-        try:
-            if resolved.is_relative_to(root):
-                return resolved
-        except ValueError:
-            continue
-    raise ValueError(f"path '{path}' resolves outside permitted roots: " + ", ".join(str(r) for r in allow_roots))
 
 
 def find_missing_anchors(text: str) -> list[str]:
@@ -215,7 +190,7 @@ def main(argv: list[str] | None = None) -> int:
     except OSError:
         # Path resolution failed (missing file, permission denied, symlink loop).
         # Fall back to SKILL_ROOT plus explicitly provided --allow-root entries;
-        # _safe_resolve below will reject anything outside that allow-list.
+        # safe_resolve below will reject anything outside that allow-list.
         pass
     allow_roots = [
         *auto_allow,
@@ -227,10 +202,10 @@ def main(argv: list[str] | None = None) -> int:
         # parse as a single filename whose ``.parent`` is ``.``, so checking
         # only the decomposed parent/name lets them slip through.
         for raw in (args.input, args.output):
-            if _has_traversal_segments(raw):
+            if has_traversal_segments(raw):
                 raise ValueError(f"path '{raw}' contains traversal segments")
-        in_path = _safe_resolve(args.input, allow_roots)
-        out_parent = _safe_resolve(args.output.parent, allow_roots)
+        in_path = safe_resolve(args.input, allow_roots)
+        out_parent = safe_resolve(args.output.parent, allow_roots)
         out_path = (out_parent / args.output.name).resolve()
         if not out_path.is_relative_to(out_parent):
             raise ValueError(f"output path '{args.output}' escapes its parent")

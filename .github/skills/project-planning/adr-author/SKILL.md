@@ -93,7 +93,7 @@ Govern uses the autonomy and disclaimer banners required by `adr-identity.instru
 
 Brief enumeration. Full normative text and edge cases live in `references/lineage-rules.md`.
 
-1. `supersedes` is an array; `superseded-by` is a scalar string or `null`.
+1. `supersedes` and `superseded-by` are each a scalar string or `null`.
 2. Single-parent supersession — a given ADR has at most one `superseded-by`.
 3. Status transition — the superseding ADR's `status` becomes `accepted`; the superseded ADR's `status` becomes `superseded`.
 4. Lineage updates are atomic — both ADR files MUST be updated in the same Govern phase.

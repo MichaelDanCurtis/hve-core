@@ -94,6 +94,26 @@ class TestUpdateLineageAllocate:
         assert "last_decision_id: '0005'" in config_text
 
 
+class TestUpdateLineageAllocatePathSafety:
+    def test_given_project_dir_with_traversal_when_allocate_then_rejected(
+        self, tmp_skill_root: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        # Arrange
+        project_dir = _project(tmp_skill_root, last_id=0)
+        traversal_dir = project_dir / ".." / project_dir.name
+        config_before = (project_dir / ".adr-config.yml").read_text(encoding="utf-8")
+
+        # Act
+        exit_code = _invoke(
+            ["allocate", "--project-dir", str(traversal_dir), "--slug", "demo"],
+            capsys,
+        )
+
+        # Assert — guard refuses and leaves config untouched.
+        assert exit_code != 0
+        assert (project_dir / ".adr-config.yml").read_text(encoding="utf-8") == config_before
+
+
 class TestUpdateLineageSupersede:
     def test_given_valid_supersession_when_invoked_then_atomic_update(
         self, tmp_skill_root: Path, capsys: pytest.CaptureFixture[str]
@@ -126,6 +146,94 @@ class TestUpdateLineageSupersede:
         assert "status: superseded" in old_text
 
 
+class TestUpdateLineageSupersedePathSafety:
+    def test_given_allow_root_containing_adrs_when_supersede_then_succeeds(
+        self, tmp_skill_root: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        # Arrange — override default parent-based roots with an enclosing root.
+        project_dir = _project(tmp_skill_root, last_id=2)
+        old = project_dir / "0001-old-decision.md"
+        new = project_dir / "0002-new-decision.md"
+        old.write_text(_SUPERSEDED_FRONTMATTER, encoding="utf-8")
+        new.write_text(_SUPERSEDER_FRONTMATTER, encoding="utf-8")
+
+        # Act
+        exit_code = _invoke(
+            [
+                "supersede",
+                "--superseded",
+                str(old),
+                "--superseder",
+                str(new),
+                "--allow-root",
+                str(tmp_skill_root),
+            ],
+            capsys,
+        )
+
+        # Assert
+        assert exit_code == 0, capsys.readouterr().err
+        assert "status: superseded" in old.read_text(encoding="utf-8")
+
+    def test_given_allow_root_excluding_adrs_when_supersede_then_rejected(
+        self, tmp_skill_root: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        # Arrange — allow-root points away from where the ADRs live.
+        project_dir = _project(tmp_skill_root, last_id=2)
+        old = project_dir / "0001-old-decision.md"
+        new = project_dir / "0002-new-decision.md"
+        old.write_text(_SUPERSEDED_FRONTMATTER, encoding="utf-8")
+        new.write_text(_SUPERSEDER_FRONTMATTER, encoding="utf-8")
+        unrelated_root = tmp_skill_root / "schemas"
+        old_before = old.read_text(encoding="utf-8")
+
+        # Act
+        exit_code = _invoke(
+            [
+                "supersede",
+                "--superseded",
+                str(old),
+                "--superseder",
+                str(new),
+                "--allow-root",
+                str(unrelated_root),
+            ],
+            capsys,
+        )
+
+        # Assert — containment refused; files untouched.
+        assert exit_code != 0
+        assert old.read_text(encoding="utf-8") == old_before
+
+    def test_given_superseded_path_with_traversal_when_supersede_then_rejected(
+        self, tmp_skill_root: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        # Arrange
+        project_dir = _project(tmp_skill_root, last_id=2)
+        old = project_dir / "0001-old-decision.md"
+        new = project_dir / "0002-new-decision.md"
+        old.write_text(_SUPERSEDED_FRONTMATTER, encoding="utf-8")
+        new.write_text(_SUPERSEDER_FRONTMATTER, encoding="utf-8")
+        traversal_old = project_dir / ".." / project_dir.name / "0001-old-decision.md"
+        old_before = old.read_text(encoding="utf-8")
+
+        # Act
+        exit_code = _invoke(
+            [
+                "supersede",
+                "--superseded",
+                str(traversal_old),
+                "--superseder",
+                str(new),
+            ],
+            capsys,
+        )
+
+        # Assert
+        assert exit_code != 0
+        assert old.read_text(encoding="utf-8") == old_before
+
+
 class TestUpdateLineageGuardRails:
     def test_given_double_supersession_when_invoked_then_hard_fails_per_gp06(
         self, tmp_skill_root: Path, capsys: pytest.CaptureFixture[str]
@@ -154,7 +262,7 @@ class TestUpdateLineageGuardRails:
 
 class TestUpdateLineageRollback:
     def test_given_validation_failure_when_supersede_then_rolls_back(
-        self, tmp_skill_root: Path, mocker, capsys: pytest.CaptureFixture[str]
+        self, tmp_skill_root: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
     ) -> None:
         # Arrange
         project_dir = _project(tmp_skill_root, last_id=2)
@@ -166,12 +274,10 @@ class TestUpdateLineageRollback:
         new_before = new.read_text(encoding="utf-8")
 
         # Force validation to raise post-write so the script must roll back.
-        mocker.patch.object(
-            update_lineage,
-            "validate_lineage",
-            side_effect=RuntimeError("validation failed"),
-            create=True,
-        )
+        def _raise(*_args: object, **_kwargs: object) -> None:
+            raise RuntimeError("validation failed")
+
+        monkeypatch.setattr(update_lineage, "validate_lineage", _raise)
 
         # Act
         exit_code = _invoke(

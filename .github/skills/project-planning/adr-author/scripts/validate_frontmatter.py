@@ -29,6 +29,11 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+try:
+    from ._utils import safe_resolve
+except ImportError:  # executed directly as ``python validate_frontmatter.py``
+    from _utils import safe_resolve
+
 import yaml
 
 EXIT_SUCCESS = 0
@@ -73,20 +78,6 @@ CONTEXT_HEADER_RE = re.compile(r"^##\s+Context\s*$", re.MULTILINE)
 DECISION_HEADER_RE = re.compile(r"^##\s+(Decision Outcome|Decision)\s*$", re.MULTILINE)
 NEXT_H2_RE = re.compile(r"^##\s+\S", re.MULTILINE)
 MIN_CONTEXT_CITATIONS = 3
-
-
-def _safe_resolve(path: Path, allow_roots: list[Path]) -> Path:
-    """Resolve ``path`` ensuring it lives under one of ``allow_roots``."""
-    if ".." in path.parts:
-        raise ValueError(f"path '{path}' contains traversal segments and is rejected")
-    resolved = path.expanduser().resolve()
-    for root in allow_roots:
-        try:
-            if resolved.is_relative_to(root):
-                return resolved
-        except ValueError:
-            continue
-    raise ValueError(f"path '{path}' resolves outside permitted roots: " + ", ".join(str(r) for r in allow_roots))
 
 
 def _load_schema(schema_path: Path | None = None) -> dict[str, Any] | None:
@@ -413,7 +404,7 @@ def main(argv: list[str] | None = None) -> int:
     all_errors: list[str] = []
     for raw in args.paths:
         try:
-            resolved = _safe_resolve(raw, allow_roots)
+            resolved = safe_resolve(raw, allow_roots)
         except ValueError as exc:
             all_errors.append(f"validate_frontmatter: {exc}")
             continue

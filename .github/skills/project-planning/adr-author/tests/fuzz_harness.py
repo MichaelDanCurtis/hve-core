@@ -14,6 +14,7 @@ Targets:
 * ``validate_frontmatter``: parsing arbitrary YAML frontmatter blobs.
 * ``normalize_template``: extracting anchors from arbitrary markdown.
 * ``update_lineage``: validating arbitrary slug bytes.
+* ``_utils``: path-traversal detection and allow-root resolution.
 """
 
 from __future__ import annotations
@@ -73,10 +74,29 @@ def _fuzz_update_lineage_slug(data: bytes) -> None:
             validate_slug(data.decode("utf-8", errors="replace"))
 
 
+def _fuzz_utils(data: bytes) -> None:
+    """Feed arbitrary path bytes through the traversal guards."""
+    with suppress(Exception):
+        from scripts import _utils  # type: ignore[import-not-found]
+
+        candidate = Path(data.decode("utf-8", errors="replace"))
+
+        has_traversal = getattr(_utils, "has_traversal_segments", None)
+        if has_traversal is not None:
+            with suppress(ValueError, TypeError, OSError, UnicodeDecodeError):
+                has_traversal(candidate)
+
+        safe_resolve = getattr(_utils, "safe_resolve", None)
+        if safe_resolve is not None:
+            with suppress(ValueError, TypeError, OSError, UnicodeDecodeError):
+                safe_resolve(candidate, [_SKILL_ROOT])
+
+
 FUZZ_TARGETS = (
     _fuzz_validate_frontmatter,
     _fuzz_normalize_template,
     _fuzz_update_lineage_slug,
+    _fuzz_utils,
 )
 
 
