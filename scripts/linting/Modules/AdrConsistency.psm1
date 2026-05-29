@@ -13,11 +13,13 @@
 
 #region Module setup
 
-try {
-    Import-Module PowerShell-Yaml -ErrorAction Stop
-}
-catch {
-    throw "PowerShell-Yaml module (RequiredVersion 0.4.7) is required by AdrConsistency.psm1. Install via: Install-Module -Name PowerShell-Yaml -RequiredVersion 0.4.7 -Scope CurrentUser. Inner error: $($_.Exception.Message)"
+if (-not (Get-Module -Name PowerShell-Yaml)) {
+    try {
+        Import-Module PowerShell-Yaml -ErrorAction Stop
+    }
+    catch {
+        throw "PowerShell-Yaml module (RequiredVersion 0.4.7) is required by AdrConsistency.psm1. Install via: Install-Module -Name PowerShell-Yaml -RequiredVersion 0.4.7 -Scope CurrentUser. Inner error: $($_.Exception.Message)"
+    }
 }
 
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'AdrBodyParser.psm1') -Force
@@ -79,7 +81,8 @@ function Get-AdrFrontmatterAndBody {
     .PARAMETER Content
         Raw ADR file content.
     .OUTPUTS
-        [pscustomobject] with Frontmatter (parsed object or $null) and Body (string).
+        [pscustomobject] with Frontmatter (parsed object or $null), Body (string),
+        and BodyStartLine (1-based file line where the body begins).
     .EXAMPLE
         Get-AdrFrontmatterAndBody -Content (Get-Content adr.md -Raw)
     #>
@@ -92,9 +95,15 @@ function Get-AdrFrontmatterAndBody {
 
     $frontmatter = $null
     $body = $Content
+    $bodyStartLine = 1
     if ($Content -match '(?s)^---\s*\r?\n(.*?)\r?\n---\r?\n?(.*)$') {
         $yamlBlock = $Matches[1]
         $body = $Matches[2]
+        $preambleLength = $Content.Length - $body.Length
+        if ($preambleLength -gt 0) {
+            $preamble = $Content.Substring(0, $preambleLength)
+            $bodyStartLine = ([regex]::Matches($preamble, "`n")).Count + 1
+        }
         try {
             $frontmatter = ConvertFrom-Yaml -Yaml $yamlBlock
         }
@@ -104,9 +113,90 @@ function Get-AdrFrontmatterAndBody {
     }
 
     return [pscustomobject]@{
-        Frontmatter = $frontmatter
-        Body        = $body
+        Frontmatter   = $frontmatter
+        Body          = $body
+        BodyStartLine = $bodyStartLine
     }
+}
+
+function Get-AdrFileLine {
+    <#
+    .SYNOPSIS
+        Maps a character offset within body text to a 1-based file line number.
+    .PARAMETER Text
+        Body text the offset refers to.
+    .PARAMETER Offset
+        Zero-based character offset within Text.
+    .PARAMETER BodyStartLine
+        1-based file line where Text begins.
+    .OUTPUTS
+        [object] File line number, or $null when Offset is out of range.
+    #>
+    [CmdletBinding()]
+    [OutputType([object])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string]$Text,
+        [Parameter(Mandatory = $true)] [int]$Offset,
+        [int]$BodyStartLine = 1
+    )
+
+    if ($Offset -lt 0 -or $Offset -gt $Text.Length) { return $null }
+    $prefix = $Text.Substring(0, $Offset)
+    return $BodyStartLine + ([regex]::Matches($prefix, "`n")).Count
+}
+
+function Find-AdrTextLine {
+    <#
+    .SYNOPSIS
+        Resolves the file line of the first case-insensitive occurrence of a string.
+    .PARAMETER RawBody
+        Raw ADR body markdown.
+    .PARAMETER Search
+        Literal text to locate.
+    .PARAMETER BodyStartLine
+        1-based file line where RawBody begins.
+    .OUTPUTS
+        [object] File line number, or $null when not found.
+    #>
+    [CmdletBinding()]
+    [OutputType([object])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string]$RawBody,
+        [string]$Search,
+        [int]$BodyStartLine = 1
+    )
+
+    if ([string]::IsNullOrEmpty($Search)) { return $null }
+    $index = $RawBody.IndexOf($Search, [System.StringComparison]::OrdinalIgnoreCase)
+    if ($index -lt 0) { return $null }
+    return Get-AdrFileLine -Text $RawBody -Offset $index -BodyStartLine $BodyStartLine
+}
+
+function Find-AdrHeadingLine {
+    <#
+    .SYNOPSIS
+        Resolves the file line of an H2 or H3 heading by its text.
+    .PARAMETER RawBody
+        Raw ADR body markdown.
+    .PARAMETER Heading
+        Heading text without leading '#' markers.
+    .PARAMETER BodyStartLine
+        1-based file line where RawBody begins.
+    .OUTPUTS
+        [object] File line number, or $null when the heading is absent.
+    #>
+    [CmdletBinding()]
+    [OutputType([object])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string]$RawBody,
+        [Parameter(Mandatory = $true)] [string]$Heading,
+        [int]$BodyStartLine = 1
+    )
+
+    $escaped = [regex]::Escape($Heading)
+    $match = [regex]::Match($RawBody, '(?im)^\s*#{2,3}\s+' + $escaped + '\s*$')
+    if (-not $match.Success) { return $null }
+    return Get-AdrFileLine -Text $RawBody -Offset $match.Index -BodyStartLine $BodyStartLine
 }
 
 function Get-AdrRawH2Section {
@@ -425,7 +515,8 @@ function Test-StatePlaceholderResolved {
         [Parameter(Mandatory = $true)] $Frontmatter,
         [Parameter(Mandatory = $true)] $Body,
         [Parameter(Mandatory = $true)] [string]$FilePath,
-        [Parameter(Mandatory = $true)] [string]$RawBody
+        [Parameter(Mandatory = $true)] [string]$RawBody,
+        [int]$BodyStartLine = 1
     )
 
     $tokens = @()
@@ -438,8 +529,15 @@ function Test-StatePlaceholderResolved {
 
     if ($tokens.Count -eq 0) { return @() }
 
+    $offset = -1
+    if ($stateMatches.Count -gt 0) { $offset = $stateMatches[0].Index }
+    if ($autonomyMatches.Count -gt 0 -and ($offset -lt 0 -or $autonomyMatches[0].Index -lt $offset)) {
+        $offset = $autonomyMatches[0].Index
+    }
+    $line = if ($offset -ge 0) { Get-AdrFileLine -Text $RawBody -Offset $offset -BodyStartLine $BodyStartLine } else { $null }
+
     $unique = @($tokens | Select-Object -Unique)
-    return @(New-AdrViolation -RuleId 'ADR-CONSISTENCY-003' -FilePath $FilePath -Replacements @{
+    return @(New-AdrViolation -RuleId 'ADR-CONSISTENCY-003' -FilePath $FilePath -Line $line -Replacements @{
             tokens = Format-AdrList -Items $unique
         })
 }
@@ -472,7 +570,8 @@ function Test-PeerPlannerNames {
         [Parameter(Mandatory = $true)] $Frontmatter,
         [Parameter(Mandatory = $true)] $Body,
         [Parameter(Mandatory = $true)] [string]$FilePath,
-        [Parameter(Mandatory = $true)] [string]$RawBody
+        [Parameter(Mandatory = $true)] [string]$RawBody,
+        [int]$BodyStartLine = 1
     )
 
     $description = Get-AdrDescriptionText -Body $RawBody
@@ -497,7 +596,11 @@ function Test-PeerPlannerNames {
     if ($found.Count -eq 0) { return @() }
 
     $unique = @($found | Select-Object -Unique)
-    return @(New-AdrViolation -RuleId 'ADR-CONSISTENCY-004' -FilePath $FilePath -Replacements @{
+    $line = Find-AdrTextLine -RawBody $RawBody -Search $unique[0] -BodyStartLine $BodyStartLine
+    if ($null -eq $line) {
+        $line = Find-AdrHeadingLine -RawBody $RawBody -Heading 'Decision Drivers' -BodyStartLine $BodyStartLine
+    }
+    return @(New-AdrViolation -RuleId 'ADR-CONSISTENCY-004' -FilePath $FilePath -Line $line -Replacements @{
             labels = Format-AdrList -Items $unique
         })
 }
@@ -561,7 +664,9 @@ function Test-RisksConsequencesPairing {
     param(
         [Parameter(Mandatory = $true)] $Frontmatter,
         [Parameter(Mandatory = $true)] $Body,
-        [Parameter(Mandatory = $true)] [string]$FilePath
+        [Parameter(Mandatory = $true)] [string]$FilePath,
+        [string]$RawBody = '',
+        [int]$BodyStartLine = 1
     )
 
     $bad = @($Body.BadConsequences)
@@ -590,7 +695,14 @@ function Test-RisksConsequencesPairing {
 
     if ($unpaired.Count -eq 0) { return @() }
 
-    return @(New-AdrViolation -RuleId 'ADR-CONSISTENCY-006' -FilePath $FilePath -Replacements @{
+    $line = $null
+    if (-not [string]::IsNullOrEmpty($RawBody)) {
+        $line = Find-AdrTextLine -RawBody $RawBody -Search $unpaired[0] -BodyStartLine $BodyStartLine
+        if ($null -eq $line) {
+            $line = Find-AdrHeadingLine -RawBody $RawBody -Heading 'Consequences' -BodyStartLine $BodyStartLine
+        }
+    }
+    return @(New-AdrViolation -RuleId 'ADR-CONSISTENCY-006' -FilePath $FilePath -Line $line -Replacements @{
             unpaired = Format-AdrList -Items $unpaired
         })
 }
@@ -620,10 +732,13 @@ function Test-NumericClaimGeneralized {
         [Parameter(Mandatory = $true)] $Frontmatter,
         [Parameter(Mandatory = $true)] $Body,
         [Parameter(Mandatory = $true)] [string]$FilePath,
-        [Parameter(Mandatory = $true)] [string]$RawBody
+        [Parameter(Mandatory = $true)] [string]$RawBody,
+        [int]$BodyStartLine = 1
     )
 
-    $pattern = '\b(\d+(?:\.\d+)?)\s*(tests?|specs?|cases?|files?|lines?|hours?|days?|minutes?|seconds?|ms|users?|requests?|MB|GB|KB|%)\b'
+    # Negative lookbehind skips version strings (e.g. 'v7.0', 'Version 7.0', '-Version 7.0')
+    # so directives like '#Requires -Version 7.0' are not flagged as unverified numeric claims.
+    $pattern = '(?<!(?i:v|ver\.?\s*|version\s*|-version\s*))\b(\d+(?:\.\d+)?)\s*(tests?|specs?|cases?|files?|lines?|hours?|days?|minutes?|seconds?|ms|users?|requests?|MB|GB|KB|%)\b'
 
     $sections = @(
         @{ Name = 'Confirmation'; Text = ($Body.Confirmation) },
@@ -639,7 +754,8 @@ function Test-NumericClaimGeneralized {
         if ([string]::IsNullOrWhiteSpace($text)) { continue }
         foreach ($m in [regex]::Matches($text, $pattern)) {
             $claim = $m.Value
-            $violations += New-AdrViolation -RuleId 'ADR-CONSISTENCY-007' -FilePath $FilePath -Replacements @{
+            $line = Find-AdrTextLine -RawBody $RawBody -Search $claim -BodyStartLine $BodyStartLine
+            $violations += New-AdrViolation -RuleId 'ADR-CONSISTENCY-007' -FilePath $FilePath -Line $line -Replacements @{
                 claim   = $claim
                 section = $section.Name
             }
@@ -811,11 +927,11 @@ function Invoke-AdrConsistencyValidation {
     $violations = @()
     $violations += Test-AffectedComponentsMirror -Frontmatter $split.Frontmatter -Body $body -FilePath $Path
     $violations += Test-SuccessCriteriaSourceResolves -Frontmatter $split.Frontmatter -Body $body -FilePath $Path -RepoRoot $RepoRoot
-    $violations += Test-StatePlaceholderResolved -Frontmatter $split.Frontmatter -Body $body -FilePath $Path -RawBody $rawBody
-    $violations += Test-PeerPlannerNames -Frontmatter $split.Frontmatter -Body $body -FilePath $Path -RawBody $rawBody
+    $violations += Test-StatePlaceholderResolved -Frontmatter $split.Frontmatter -Body $body -FilePath $Path -RawBody $rawBody -BodyStartLine $split.BodyStartLine
+    $violations += Test-PeerPlannerNames -Frontmatter $split.Frontmatter -Body $body -FilePath $Path -RawBody $rawBody -BodyStartLine $split.BodyStartLine
     $violations += Test-DriversMatrixCardinality -Frontmatter $split.Frontmatter -Body $body -FilePath $Path
-    $violations += Test-RisksConsequencesPairing -Frontmatter $split.Frontmatter -Body $body -FilePath $Path
-    $violations += Test-NumericClaimGeneralized -Frontmatter $split.Frontmatter -Body $body -FilePath $Path -RawBody $rawBody
+    $violations += Test-RisksConsequencesPairing -Frontmatter $split.Frontmatter -Body $body -FilePath $Path -RawBody $rawBody -BodyStartLine $split.BodyStartLine
+    $violations += Test-NumericClaimGeneralized -Frontmatter $split.Frontmatter -Body $body -FilePath $Path -RawBody $rawBody -BodyStartLine $split.BodyStartLine
     $violations += Test-DriverTriggerMapComplete -Frontmatter $split.Frontmatter -Body $body -FilePath $Path
     $violations += Test-AffectedComponentsCited -Frontmatter $split.Frontmatter -Body $body -FilePath $Path
 
