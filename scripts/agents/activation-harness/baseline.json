@@ -54,7 +54,7 @@
   "GovernEntry": {
     "ScenarioName": "GovernEntry",
     "AgentBytes": 10096,
-    "ColdStartBytes": 92150,
+    "ColdStartBytes": 92147,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
@@ -82,15 +82,15 @@
       },
       {
         "Path": ".github/skills/project-planning/adr-author/SKILL.md",
-        "Bytes": 13399
+        "Bytes": 13396
       }
     ],
-    "Hash": "554e8b5884c9c40d5564bb2fdfc70baad24069f722e4f31b37a938a8c471ae83"
+    "Hash": "24970f60a8fa20ed7f3f97d6e51464420f8ee9ee1972d638c1304fa1ef30f84e"
   },
   "AdoptTemplate": {
     "ScenarioName": "AdoptTemplate",
     "AgentBytes": 10096,
-    "ColdStartBytes": 100164,
+    "ColdStartBytes": 99141,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
@@ -118,13 +118,13 @@
       },
       {
         "Path": ".github/skills/project-planning/adr-author/scripts/normalize_template.py",
-        "Bytes": 8014
+        "Bytes": 6994
       },
       {
         "Path": ".github/skills/project-planning/adr-author/SKILL.md",
-        "Bytes": 13399
+        "Bytes": 13396
       }
     ],
-    "Hash": "71770841c7f057f6c0aa4a6b633349d460a3990993d7acf8f2ad07ccf80e1609"
+    "Hash": "2293d95cd4862e6d8fabaa31ecaf5b303b2fc9826c8ea2faf04e205c7bc17d1c"
   }
 }
