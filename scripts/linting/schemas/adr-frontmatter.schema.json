@@ -227,10 +227,9 @@
               "compliance",
               "availability",
               "scalability",
-              "maintainability",
-              "evolvability"
+              "maintainability"
             ],
-            "description": "ASR trigger taxonomy (GP-07, 8-kind enum)."
+            "description": "ASR trigger taxonomy (GP-07, 7-kind enum)."
           },
           "evidence": {
             "type": "string",

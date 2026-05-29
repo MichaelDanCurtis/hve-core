@@ -15,23 +15,31 @@
 function Remove-AdrFencedCodeBlocks {
     <#
     .SYNOPSIS
-        Removes fenced code blocks from ADR body text.
+        Removes fenced code blocks and inline code spans from ADR body text.
     .DESCRIPTION
         Strips ``` and ~~~ delimited fenced code blocks line-by-line so downstream
         section parsers do not pick up bullets, headings, or path tokens that appear
         inside code samples. Fences are matched on the trimmed line start to tolerate
-        leading whitespace inside lists.
+        leading whitespace inside lists. Single-backtick inline code spans are also
+        removed so path-shaped tokens inside `code` do not leak into rule scans.
     .PARAMETER Text
         The raw ADR body text (frontmatter already stripped).
+    .PARAMETER PreserveInlineCode
+        When set, retains single-backtick inline code spans. Multi-line fenced
+        blocks are still stripped. Use this when the caller needs to detect
+        path-shaped tokens that authors place inside inline code.
     .OUTPUTS
-        The same text with fenced code-block lines removed.
+        The same text with fenced code-block lines (and optionally inline code
+        spans) removed.
     #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
-        [string]$Text
+        [string]$Text,
+
+        [switch]$PreserveInlineCode
     )
 
     if ([string]::IsNullOrEmpty($Text)) { return '' }
@@ -60,7 +68,11 @@ function Remove-AdrFencedCodeBlocks {
         }
     }
 
-    return $sb.ToString()
+    $result = $sb.ToString()
+    if (-not $PreserveInlineCode) {
+        $result = $result -replace '`[^`]*`', ''
+    }
+    return $result
 }
 
 function Get-AdrH2Section {
@@ -411,6 +423,7 @@ function Get-AdrBodySections {
     )
 
     $sanitized = Remove-AdrFencedCodeBlocks -Text $Text
+    $sanitizedKeepInline = Remove-AdrFencedCodeBlocks -Text $Text -PreserveInlineCode
 
     $affectedSection = Get-AdrH2Section -Text $sanitized -HeadingText 'Affected Components'
     $driversSection = Get-AdrH2Section -Text $sanitized -HeadingText 'Decision Drivers'
@@ -424,8 +437,15 @@ function Get-AdrBodySections {
     if ([string]::IsNullOrEmpty($confirmationSection)) {
         $confirmationSection = Get-AdrH3SectionInH2 -Text $sanitized -ParentH2 'Decision Outcome' -HeadingText 'Confirmation'
     }
-    $contextSection = Get-AdrH2Section -Text $sanitized -HeadingText 'Context'
-    $moreInfoSection = Get-AdrH2Section -Text $sanitized -HeadingText 'More Information'
+
+    # Path-token sections retain inline code spans so authors can cite affected
+    # components inside `backticks`, which is the idiomatic markdown form.
+    $contextSectionInline = Get-AdrH2Section -Text $sanitizedKeepInline -HeadingText 'Context'
+    $moreInfoSectionInline = Get-AdrH2Section -Text $sanitizedKeepInline -HeadingText 'More Information'
+    $confirmationSectionInline = Get-AdrH2Section -Text $sanitizedKeepInline -HeadingText 'Confirmation'
+    if ([string]::IsNullOrEmpty($confirmationSectionInline)) {
+        $confirmationSectionInline = Get-AdrH3SectionInH2 -Text $sanitizedKeepInline -ParentH2 'Decision Outcome' -HeadingText 'Confirmation'
+    }
 
     return [pscustomobject]@{
         AffectedComponents           = Get-AdrBulletItems -SectionText $affectedSection
@@ -434,12 +454,12 @@ function Get-AdrBodySections {
         BadConsequences              = Get-AdrBadConsequenceBullets -ConsequencesText $consequencesSection
         RisksAndMitigationsRisks     = Get-AdrTableRows -SectionText $risksSection
         Confirmation                 = $confirmationSection
-        ContextPathTokens            = Get-AdrPathTokens -SectionText $contextSection
-        MoreInformationPathTokens    = Get-AdrPathTokens -SectionText $moreInfoSection
-        ConfirmationPathTokens       = Get-AdrPathTokens -SectionText $confirmationSection
+        ContextPathTokens            = Get-AdrPathTokens -SectionText $contextSectionInline
+        MoreInformationPathTokens    = Get-AdrPathTokens -SectionText $moreInfoSectionInline
+        ConfirmationPathTokens       = Get-AdrPathTokens -SectionText $confirmationSectionInline
     }
 }
 
 #endregion Public API
 
-Export-ModuleMember -Function @('Get-AdrBodySections')
+Export-ModuleMember -Function @('Get-AdrBodySections', 'Remove-AdrFencedCodeBlocks')

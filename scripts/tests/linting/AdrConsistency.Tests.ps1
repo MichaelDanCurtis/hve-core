@@ -22,6 +22,7 @@ BeforeDiscovery {
 
 BeforeAll {
     Import-Module (Join-Path $PSScriptRoot '../../linting/Modules/AdrConsistency.psm1') -Force
+    Import-Module (Join-Path $PSScriptRoot '../../linting/Modules/AdrBodyParser.psm1') -Force
     Mock Write-Host {}
     $script:RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path
     $script:FixtureRoot = Join-Path $PSScriptRoot 'fixtures/adr-consistency'

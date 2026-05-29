@@ -54,7 +54,7 @@
       "scope": "body",
       "check": "numeric-claim-generalized",
       "message": "Specific numeric claim '{claim}' in {section} is unverified. Generalize the figure (e.g. 'a focused pytest suite') or cite a source that pins the value.",
-      "description": "Flags unverified specific numeric claims in Confirmation, Consequences, and More Information so authors generalize or cite them."
+      "description": "Flags unverified specific numeric claims in Confirmation, Consequences, and More Information so authors generalize or cite them. Version strings such as 'v7.0' or '-Version 7.0' are excluded to avoid false positives on tooling and runtime version references."
     },
     {
       "id": "ADR-CONSISTENCY-008",

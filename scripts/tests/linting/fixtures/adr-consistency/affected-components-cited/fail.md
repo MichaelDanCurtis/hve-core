@@ -6,8 +6,9 @@ affected_components:
   - scripts/linting/Modules/AdrConsistency.psm1
   - extra/uncited-component.ps1
 success_criteria:
-  - id: sc-1
-    description: Validator runs in CI
+  - metric: validator-runs-in-ci
+    target: zero failures per PR
+    measurement_window: per-PR
     source: README.md
 decisionMetadata:
   driverToTriggerMap:

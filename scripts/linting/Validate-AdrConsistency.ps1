@@ -25,12 +25,16 @@
     Treat 'warn'-severity violations as failures so the script exits non-zero
     when only warnings are present.
 .PARAMETER ChangedFilesOnly
-    Limit the scan to markdown files changed against -BaseBranch (uses git diff).
+    Limit the scan to markdown files under -Paths changed against -BaseBranch
+    (uses git diff).
 .PARAMETER BaseBranch
     Branch reference used by -ChangedFilesOnly to compute the changed-file set.
 .PARAMETER OutputPath
     File path where the JSON report is written. Parent directory is created if
     it does not exist.
+.PARAMETER SarifOutputPath
+    Optional file path where a SARIF 2.1.0 report is written. Parent directory
+    is created if it does not exist.
 .EXAMPLE
     pwsh ./scripts/linting/Validate-AdrConsistency.ps1
     Scans the default docs/planning/adrs/ tree and writes results to
@@ -61,7 +65,10 @@ param(
     [string]$BaseBranch = 'origin/main',
 
     [Parameter(Mandatory = $false)]
-    [string]$OutputPath = 'logs/adr-consistency-results.json'
+    [string]$OutputPath = 'logs/adr-consistency-results.json',
+
+    [Parameter(Mandatory = $false)]
+    [string]$SarifOutputPath = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -123,6 +130,22 @@ function Resolve-AdrFiles {
     $boundary = $repoRootAbsolute.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
 
     if ($ChangedFilesOnly) {
+        $scanRoots = New-Object System.Collections.Generic.List[object]
+        foreach ($path in $Paths) {
+            $fullPath = if ([System.IO.Path]::IsPathRooted($path)) { $path } else { Join-Path -Path $RepoRoot -ChildPath $path }
+            $absolutePath = [System.IO.Path]::GetFullPath($fullPath)
+            if (-not $absolutePath.StartsWith($boundary, [System.StringComparison]::OrdinalIgnoreCase)) {
+                Write-Warning "Skipping path outside repository root: $path"
+                continue
+            }
+            $normalizedRoot = $absolutePath.TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar)
+            $null = $scanRoots.Add([pscustomobject]@{
+                    Path     = $normalizedRoot
+                    Boundary = $normalizedRoot + [System.IO.Path]::DirectorySeparatorChar
+                    IsFile   = [System.IO.Path]::GetExtension($normalizedRoot) -eq '.md'
+                })
+        }
+
         $changed = Get-ChangedFilesFromGit -BaseBranch $BaseBranch -FileExtensions @('*.md')
         foreach ($file in $changed) {
             $full = if ([System.IO.Path]::IsPathRooted($file)) { $file } else { Join-Path -Path $RepoRoot -ChildPath $file }
@@ -130,6 +153,17 @@ function Resolve-AdrFiles {
             if (-not $absolute.StartsWith($boundary, [System.StringComparison]::OrdinalIgnoreCase)) {
                 Write-Warning "Skipping path outside repository root: $file"
                 continue
+            }
+            if ($scanRoots.Count -gt 0) {
+                $included = $false
+                foreach ($scanRoot in $scanRoots) {
+                    if (($scanRoot.IsFile -and $absolute -eq $scanRoot.Path) -or
+                        ((-not $scanRoot.IsFile) -and $absolute.StartsWith($scanRoot.Boundary, [System.StringComparison]::OrdinalIgnoreCase))) {
+                        $included = $true
+                        break
+                    }
+                }
+                if (-not $included) { continue }
             }
             if (Test-Path -LiteralPath $full) { $null = $resolved.Add($full) }
         }
@@ -167,7 +201,7 @@ function Resolve-AdrFiles {
     $filtered = New-Object System.Collections.Generic.List[string]
     foreach ($file in $resolved) {
         $rel = $file
-        if ($file.StartsWith($RepoRoot)) {
+        if ($file.StartsWith($RepoRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
             $rel = $file.Substring($RepoRoot.Length).TrimStart('\', '/').Replace('\', '/')
         }
         $excluded = $false
@@ -177,10 +211,132 @@ function Resolve-AdrFiles {
         }
         if (-not $excluded) { $null = $filtered.Add($file) }
     }
-    return $filtered.ToArray()
+    return , $filtered.ToArray()
+}
+
+function ConvertTo-AdrConsistencySarif {
+    <#
+    .SYNOPSIS
+        Converts ADR consistency violations to SARIF 2.1.0.
+    .DESCRIPTION
+        Builds a SARIF payload compatible with GitHub code scanning upload by
+        mapping ADR rule identifiers to SARIF rules and validator findings to
+        SARIF results with file and line locations.
+    .PARAMETER Violations
+        ADR consistency violations produced by Invoke-AdrConsistencyValidator.
+    .OUTPUTS
+        Ordered hashtable representing a SARIF 2.1.0 document.
+    #>
+    [CmdletBinding()]
+    [OutputType([object])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [pscustomobject[]]$Violations
+    )
+
+    $rulesById = [ordered]@{}
+    $results = New-Object System.Collections.Generic.List[object]
+
+    foreach ($violation in $Violations) {
+        $ruleId = if ($violation.ruleId) { [string]$violation.ruleId } else { 'ADR-CONSISTENCY' }
+        if (-not $rulesById.Contains($ruleId)) {
+            $rulesById[$ruleId] = [ordered]@{
+                id               = $ruleId
+                name             = $ruleId
+                shortDescription = [ordered]@{
+                    text = $ruleId
+                }
+            }
+        }
+
+        $level = 'note'
+        if ($violation.severity -eq 'error') {
+            $level = 'error'
+        }
+        elseif ($violation.severity -in @('warn', 'warning')) {
+            $level = 'warning'
+        }
+
+        $line = 1
+        if ($null -ne $violation.line) {
+            $parsedLine = 0
+            if ([int]::TryParse([string]$violation.line, [ref]$parsedLine) -and $parsedLine -gt 0) {
+                $line = $parsedLine
+            }
+        }
+
+        $null = $results.Add([ordered]@{
+                ruleId    = $ruleId
+                level     = $level
+                message   = [ordered]@{
+                    text = [string]$violation.message
+                }
+                locations = @(
+                    [ordered]@{
+                        physicalLocation = [ordered]@{
+                            artifactLocation = [ordered]@{
+                                uri = ([string]$violation.file).Replace('\', '/')
+                            }
+                            region           = [ordered]@{
+                                startLine = $line
+                            }
+                        }
+                    }
+                )
+            })
+    }
+
+    return [ordered]@{
+        version   = '2.1.0'
+        '$schema' = 'https://json.schemastore.org/sarif-2.1.0.json'
+        runs      = @(
+            [ordered]@{
+                tool    = [ordered]@{
+                    driver = [ordered]@{
+                        name           = 'ADR Consistency Validator'
+                        version        = '1.0.0'
+                        informationUri = 'https://github.com/microsoft/hve-core'
+                        rules          = [object[]]$rulesById.Values
+                    }
+                }
+                results = $results.ToArray()
+            }
+        )
+    }
 }
 
 function Invoke-AdrConsistencyValidator {
+    <#
+    .SYNOPSIS
+        Orchestrates ADR consistency validation across a resolved file set.
+    .DESCRIPTION
+        Resolves target ADR files via Resolve-AdrFiles, invokes the AdrConsistency
+        module rule registry on each file, aggregates violations, emits CI
+        annotations and a step summary when running in CI, writes a JSON report
+        to -OutputPath, and returns a report object whose ExitCode property
+        reflects error and (optionally) warning severity counts.
+    .PARAMETER Paths
+        Directory or file paths to scan recursively for ADR markdown.
+    .PARAMETER Files
+        Explicit set of files to validate; takes precedence over -Paths.
+    .PARAMETER ExcludePaths
+        Wildcard patterns (repo-relative) that exclude matching files.
+    .PARAMETER ChangedFilesOnly
+        Limit the scan to markdown files changed against -BaseBranch.
+    .PARAMETER BaseBranch
+        Branch reference used by -ChangedFilesOnly for the changed-file diff.
+    .PARAMETER OutputPath
+        Destination JSON report path; parent directory is created if missing.
+    .PARAMETER SarifOutputPath
+        Optional destination SARIF report path; parent directory is created if missing.
+    .PARAMETER WarningsAsErrors
+        Treat warn-severity violations as failures in the returned ExitCode.
+    .OUTPUTS
+        [pscustomobject] with summary, violations, and ExitCode properties.
+    .EXAMPLE
+        Invoke-AdrConsistencyValidator -Paths @('docs/planning/adrs/') -OutputPath 'logs/adr-consistency-results.json'
+    #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(
@@ -190,6 +346,7 @@ function Invoke-AdrConsistencyValidator {
         [switch]$ChangedFilesOnly,
         [string]$BaseBranch,
         [string]$OutputPath,
+        [string]$SarifOutputPath,
         [switch]$WarningsAsErrors
     )
 
@@ -202,7 +359,7 @@ function Invoke-AdrConsistencyValidator {
         $result = Invoke-AdrConsistencyValidation -Path $file -RepoRoot $repoRoot
         foreach ($v in $result.Violations) {
             $relFile = $v.file
-            if ($relFile.StartsWith($repoRoot)) {
+            if ($relFile.StartsWith($repoRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
                 $relFile = $relFile.Substring($repoRoot.Length).TrimStart('\', '/').Replace('\', '/')
             }
             $null = $allViolations.Add([pscustomobject]@{
@@ -250,6 +407,16 @@ function Invoke-AdrConsistencyValidator {
     }
     $report | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $OutputPath -Encoding UTF8
 
+    if ($SarifOutputPath) {
+        $sarifDir = Split-Path -Path $SarifOutputPath -Parent
+        if ($sarifDir -and -not (Test-Path -LiteralPath $sarifDir)) {
+            New-Item -ItemType Directory -Path $sarifDir -Force | Out-Null
+        }
+        ConvertTo-AdrConsistencySarif -Violations @($allViolations) |
+            ConvertTo-Json -Depth 20 |
+            Set-Content -LiteralPath $SarifOutputPath -Encoding UTF8
+    }
+
     if (Test-CIEnvironment) {
         $summaryMd = @(
             '## ADR Consistency Validation',
@@ -273,7 +440,7 @@ if ($MyInvocation.InvocationName -ne '.') {
     try {
         $result = Invoke-AdrConsistencyValidator -Paths $Paths -Files $Files -ExcludePaths $ExcludePaths `
             -ChangedFilesOnly:$ChangedFilesOnly -BaseBranch $BaseBranch -OutputPath $OutputPath `
-            -WarningsAsErrors:$WarningsAsErrors
+            -SarifOutputPath $SarifOutputPath -WarningsAsErrors:$WarningsAsErrors
         exit $result.ExitCode
     }
     catch {
