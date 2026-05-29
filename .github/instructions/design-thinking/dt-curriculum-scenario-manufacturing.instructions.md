@@ -1,8 +1,7 @@
 ---
-description: 'Manufacturing reference scenario for DT learning - factory floor improvement project used across all 9 curriculum modules'
+description: Manufacturing reference scenario for DT learning - factory floor improvement project used across all 9 curriculum modules
 applyTo: '**/.copilot-tracking/dt/**/curriculum-*'
 ---
-
 # Manufacturing Reference Learning Scenario
 
 ## Scenario Overview

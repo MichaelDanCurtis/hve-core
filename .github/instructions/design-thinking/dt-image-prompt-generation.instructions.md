@@ -1,8 +1,7 @@
 ---
 description: M365 Copilot image prompt generation techniques for Design Thinking Method 5 concept visualization with lo-fi enforcement
-applyTo: "**/.copilot-tracking/dt/**/method-05**/concepts.yml"
+applyTo: '**/.copilot-tracking/dt/**/method-05**/concepts.yml'
 ---
-
 # DT Image Prompt Generation
 
 ## Purpose and Scope

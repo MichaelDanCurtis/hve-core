@@ -1,8 +1,7 @@
 ---
-description: 'Healthcare industry context for DT coaching - vocabulary, constraints, empathy tools, and reference scenarios'
-applyTo: ''
+description: Healthcare industry context for DT coaching - vocabulary, constraints, empathy tools, and reference scenarios
+applyTo: ""
 ---
-
 # Healthcare Industry Context
 
 Load this file when the team identifies healthcare as their industry context. It provides healthcare-specific vocabulary, constraints, empathy tools, and a reference scenario that the coach weaves into method-specific guidance.

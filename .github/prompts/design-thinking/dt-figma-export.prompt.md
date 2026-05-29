@@ -1,17 +1,16 @@
 ---
-description: 'Export Design Thinking artifacts to a collaborative FigJam board or Figma Design file using the official Figma MCP server - Brought to you by microsoft/hve-core'
-agent: 'DT Coach'
-argument-hint: "project-slug=... [board-title=...] [method=latest] [output-type=figjam]"
+description: Export Design Thinking artifacts to a collaborative FigJam board or Figma Design file using the official Figma MCP server - Brought to you by microsoft/hve-core
+agent: DT Coach
+argument-hint: project-slug=... [board-title=...] [method=latest] [output-type=figjam]
 tools:
-  - read_file
-  - figma/whoami
-  - figma/create_new_file
-  - figma/use_figma
-  - figma/get_figjam
-  - figma/get_metadata
-  - figma/generate_diagram
+- read_file
+- figma/whoami
+- figma/create_new_file
+- figma/use_figma
+- figma/get_figjam
+- figma/get_metadata
+- figma/generate_diagram
 ---
-
 # DT Figma Export
 
 Export Design Thinking artifacts from `.copilot-tracking/dt/{project-slug}/` to a FigJam board or Figma Design file using the official `figma` MCP server.

@@ -2,7 +2,6 @@
 description: 'Method 1 Scope Conversations coaching knowledge for Design Thinking: frozen vs fluid assessment, stakeholder discovery, constraint patterns, and conversation navigation'
 applyTo: '**/.copilot-tracking/dt/**/method-01*'
 ---
-
 # DT Method 01: Scope Conversations
 
 Scope conversations transform initial customer requests into genuine understanding of business challenges. This method cannot be skipped. Without this foundation, engagements solve the wrong problems efficiently.

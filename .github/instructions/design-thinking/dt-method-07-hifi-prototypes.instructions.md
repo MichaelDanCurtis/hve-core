@@ -2,7 +2,6 @@
 description: 'Design Thinking Method 7: High-Fidelity Prototypes; technical translation, functional prototypes, and specifications'
 applyTo: '**/.copilot-tracking/dt/**/method-07*'
 ---
-
 # Design Thinking Method 7: High-Fidelity Prototypes
 
 These instructions guide coaches through Method 7 of the Design Thinking process, managing the transition from lo-fi constraint discoveries to technical implementation validation while maintaining appropriate fidelity levels and preventing over-engineering.

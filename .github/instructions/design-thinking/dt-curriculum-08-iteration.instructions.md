@@ -2,7 +2,6 @@
 description: 'DT Curriculum Module 8: User Testing - concepts, techniques, checks, and exercises'
 applyTo: '**/.copilot-tracking/dt/**/curriculum-08*'
 ---
-
 # DT Curriculum Module 8: User Testing
 
 User testing validates whether the technically feasible solution actually works for the people it serves. This Implementation Space method is the primary trigger for non-linear navigation — test results may require returning to earlier methods rather than proceeding forward. This module teaches learners how to design tests that reveal genuine usage patterns, ask questions that generate actionable insight, and make honest assessments about when findings require iteration.

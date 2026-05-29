@@ -1,8 +1,7 @@
 ---
-description: 'DT-to-RPI handoff contract defining exit points, artifact schemas, and per-agent input requirements for lateral transitions from Design Thinking to RPI workflow'
+description: DT-to-RPI handoff contract defining exit points, artifact schemas, and per-agent input requirements for lateral transitions from Design Thinking to RPI workflow
 applyTo: '**/.copilot-tracking/dt/**'
 ---
-
 # DT→RPI Handoff Contract
 
 Defines the formal contract for lateral handoffs from Design Thinking coaching into the RPI (Research → Plan → Implement) workflow. Use this guidance whenever a team graduates from a DT space boundary or explicitly requests implementation support.

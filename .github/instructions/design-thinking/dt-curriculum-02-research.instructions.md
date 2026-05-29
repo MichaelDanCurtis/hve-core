@@ -2,7 +2,6 @@
 description: 'DT Curriculum Module 2: Design Research - concepts, techniques, checks, and exercises'
 applyTo: '**/.copilot-tracking/dt/**/curriculum-02*'
 ---
-
 # DT Curriculum Module 2: Design Research
 
 Design research bridges stakeholder assumptions and user reality within the Problem Space. Where scope conversations collect secondhand accounts from decision makers, design research generates firsthand evidence from the people who experience the problem daily. This module teaches learners how to observe, interview, and validate in context.

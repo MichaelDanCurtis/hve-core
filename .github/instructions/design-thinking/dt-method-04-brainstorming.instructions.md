@@ -2,7 +2,6 @@
 description: 'Design Thinking Method 4: AI-assisted brainstorming with divergent ideation and convergent clustering for solution space entry'
 applyTo: '**/.copilot-tracking/dt/**/method-04*'
 ---
-
 # DT Method 04: Brainstorming
 
 AI-assisted divergent and convergent thinking generates diverse solution ideas and organizes them into high-value themes. Without brainstorming, teams jump to the first obvious solution without exploring alternatives. This method serves as the essential entry point to the Solution Space.

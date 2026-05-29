@@ -1,9 +1,8 @@
 ---
-description: 'Scrappy prototype building with fidelity enforcement for Design Thinking Method 6b - Brought to you by microsoft/hve-core'
+description: Scrappy prototype building with fidelity enforcement for Design Thinking Method 6b - Brought to you by microsoft/hve-core
 agent: dt-coach
-argument-hint: "project-slug=... [prototypeFormats=...]"
+argument-hint: project-slug=... [prototypeFormats=...]
 ---
-
 # Method 6: Low-Fidelity Prototypes - Building
 
 ## Inputs

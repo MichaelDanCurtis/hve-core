@@ -1,8 +1,7 @@
 ---
-description: 'Coaching state schema for Design Thinking session persistence, method progress tracking, and session recovery'
+description: Coaching state schema for Design Thinking session persistence, method progress tracking, and session recovery
 applyTo: '**/.copilot-tracking/dt/**/coaching-state.md'
 ---
-
 # DT Coaching State Protocol
 
 This instruction defines the coaching state schema, file conventions, and session management protocol for Design Thinking projects. The state file tracks method progress across sessions and enables the coach to resume seamlessly.

@@ -2,7 +2,6 @@
 description: 'DT Curriculum Module 9: Iteration at Scale - concepts, techniques, checks, and exercises'
 applyTo: '**/.copilot-tracking/dt/**/curriculum-09*'
 ---
-
 # DT Curriculum Module 9: Iteration at Scale
 
 Iteration at scale is the Implementation Space exit point and the beginning of continuous improvement. After deployment, the solution generates real usage data that reveals patterns no amount of pre-deployment testing could predict. This module teaches learners how production telemetry, feedback loops, and incremental enhancement replace the controlled testing of earlier methods with ongoing, data-driven refinement.

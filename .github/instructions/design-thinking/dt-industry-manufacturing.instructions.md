@@ -1,8 +1,7 @@
 ---
-description: 'Manufacturing industry context for DT coaching - vocabulary, constraints, empathy tools, and reference scenarios'
-applyTo: ''
+description: Manufacturing industry context for DT coaching - vocabulary, constraints, empathy tools, and reference scenarios
+applyTo: ""
 ---
-
 # Manufacturing Industry Context
 
 Load this file when the team identifies manufacturing as their industry context. It provides manufacturing-specific vocabulary, constraints, empathy tools, and a reference scenario that the coach weaves into method-specific guidance.

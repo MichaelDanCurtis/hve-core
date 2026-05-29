@@ -2,7 +2,6 @@
 description: 'Design Thinking Method 8: User Testing - evidence-based evaluation, test protocols, and non-linear iteration support'
 applyTo: '**/.copilot-tracking/dt/**/method-08*'
 ---
-
 # Design Thinking Method 8: User Testing
 
 These instructions guide coaches through Method 8 of the Design Thinking process, conducting structured user testing of hi-fi prototypes to gather evidence for refinement decisions while supporting non-linear iteration loops back to earlier methods when test findings invalidate core assumptions.

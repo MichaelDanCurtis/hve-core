@@ -2,7 +2,6 @@
 description: 'DT Curriculum Module 7: High-Fidelity Prototypes - concepts, techniques, checks, and exercises'
 applyTo: '**/.copilot-tracking/dt/**/curriculum-07*'
 ---
-
 # DT Curriculum Module 7: High-Fidelity Prototypes
 
 High-fidelity prototyping is the entry point to the Implementation Space. It bridges what users need (validated through Methods 1-6) and what can actually be built with available technology and resources. Where lo-fi prototypes tested whether an approach is desirable, hi-fi prototypes test whether it is technically feasible under real-world constraints. This module teaches learners how to validate implementation paths without committing to production-ready development.

@@ -1,9 +1,8 @@
 ---
-description: 'Stakeholder alignment and three-lens evaluation for Design Thinking Method 5c - Brought to you by microsoft/hve-core'
+description: Stakeholder alignment and three-lens evaluation for Design Thinking Method 5c - Brought to you by microsoft/hve-core
 agent: dt-coach
-argument-hint: "project-slug=... [stakeholderGroups=...]"
+argument-hint: project-slug=... [stakeholderGroups=...]
 ---
-
 # Method 5: User Concepts - Evaluation
 
 ## Inputs

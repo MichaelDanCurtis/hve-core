@@ -2,7 +2,6 @@
 description: 'Method 2 Design Research coaching knowledge: interview techniques, research planning, environmental observation, and insight extraction patterns'
 applyTo: '**/.copilot-tracking/dt/**/method-02*'
 ---
-
 # DT Method 02: Design Research
 
 Systematic discovery of end-user needs through direct engagement (interviews, observations, surveys) transforms abstract business problems into concrete user insights. Skipping this method results in building solutions that stakeholders want but users do not need.

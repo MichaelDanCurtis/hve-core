@@ -2,7 +2,6 @@
 description: 'DT Curriculum Module 1: Scope Conversations - concepts, techniques, checks, and exercises'
 applyTo: '**/.copilot-tracking/dt/**/curriculum-01*'
 ---
-
 # DT Curriculum Module 1: Scope Conversations
 
 Scope conversations are the entry point to the Problem Space. They exist to ensure teams understand the actual problem before pursuing solutions. This module teaches learners how to move from an initial request to a validated problem frame through structured stakeholder dialogue.

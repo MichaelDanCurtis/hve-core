@@ -1,9 +1,8 @@
 ---
-description: "Unified canonical deck workflow for opt-in offer, snapshot generation/refresh, and optional customer-card PowerPoint build - Brought to you by microsoft/hve-core"
-agent: "DT Coach"
-argument-hint: "[project-slug=...] [action=offer|build|run] [method-context=...] [trigger-context=...]"
+description: Unified canonical deck workflow for opt-in offer, snapshot generation/refresh, and optional customer-card PowerPoint build - Brought to you by microsoft/hve-core
+agent: DT Coach
+argument-hint: '[project-slug=...] [action=offer|build|run] [method-context=...] [trigger-context=...]'
 ---
-
 # DT Canonical Deck
 
 Single prompt that handles both canonical deck and customer-card build flows.

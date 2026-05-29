@@ -1,8 +1,7 @@
 ---
 description: 'Deep expertise for Method 7: High-Fidelity Prototypes; fidelity translation, architecture, and specification writing'
-applyTo: ''
+applyTo: ""
 ---
-
 # Method 7: Deep Expertise
 
 Advanced reference material for the DT coach when facing complex hi-fi prototyping questions. Load this file via `read_file` during Method 7 work requiring depth beyond the method-tier instruction file. Content is organized by hat affinity for fast lookup.

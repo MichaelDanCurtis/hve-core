@@ -2,7 +2,6 @@
 description: 'Deep expertise for Method 2: Design Research, covering advanced interview techniques, ethnographic observation, and evidence triangulation'
 applyTo: '**/.copilot-tracking/dt/**/method-02*'
 ---
-
 # DT Method 02 Deep: Advanced Design Research Techniques
 
 On-demand deep reference for Method 2. The coach loads this file when users encounter complex research scenarios requiring advanced interview techniques, ethnographic methods, evidence triangulation, or manufacturing-specific research patterns that exceed the method-tier guidance. The method-tier's Research Designer and Empathy Guide coaching hats provide foundational interview coaching and research planning; this file extends those hats with specialized protocols for complex research environments.

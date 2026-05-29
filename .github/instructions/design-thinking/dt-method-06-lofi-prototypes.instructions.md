@@ -2,7 +2,6 @@
 description: 'Design Thinking Method 6: Lo-fi prototyping techniques, scrappy enforcement, feedback planning, and constraint discovery for Solution Space exit'
 applyTo: '**/.copilot-tracking/dt/**/method-06*'
 ---
-
 # DT Method 06: Low-Fidelity Prototypes
 
 Method 6 makes concepts tangible through rapid, intentionally rough prototypes that test core assumptions before investment. Without lo-fi prototyping, teams invest heavily in building solutions before discovering fundamental constraints that cheap experiments would have revealed.

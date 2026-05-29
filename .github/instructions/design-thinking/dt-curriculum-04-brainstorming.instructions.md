@@ -2,7 +2,6 @@
 description: 'DT Curriculum Module 4: Brainstorming - concepts, techniques, checks, and exercises'
 applyTo: '**/.copilot-tracking/dt/**/curriculum-04*'
 ---
-
 # DT Curriculum Module 4: Brainstorming
 
 Brainstorming is the entry point to the Solution Space. After the Problem Space established what problems exist and for whom, brainstorming generates the widest possible range of approaches before evaluating any of them. This module teaches learners why strict phase separation and quantity-first thinking produce stronger solution portfolios than careful early filtering.

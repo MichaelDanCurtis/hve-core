@@ -1,9 +1,8 @@
 ---
-description: 'Assess DT project state and recommend next method with sequencing validation - Brought to you by microsoft/hve-core'
+description: Assess DT project state and recommend next method with sequencing validation - Brought to you by microsoft/hve-core
 agent: dt-coach
-argument-hint: "[project-slug=...]"
+argument-hint: '[project-slug=...]'
 ---
-
 # DT Method Next
 
 ## Inputs

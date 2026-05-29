@@ -1,10 +1,11 @@
 ---
-description: 'Solution Space exit handoff - compiles DT Methods 4-6 outputs into an RPI-ready artifact targeting Task Researcher'
-agent: 'agent'
-tools: ['read_file', 'create_file']
-argument-hint: "project-slug=..."
+description: Solution Space exit handoff - compiles DT Methods 4-6 outputs into an RPI-ready artifact targeting Task Researcher
+agent: agent
+tools:
+- read_file
+- create_file
+argument-hint: project-slug=...
 ---
-
 # Solution Space Exit Handoff
 
 Compile Design Thinking Methods 4-6 outputs into an RPI-ready handoff artifact targeting Task Researcher.

@@ -1,9 +1,8 @@
 ---
-description: 'Concept analysis and prototype approach design for Design Thinking Method 6a - Brought to you by microsoft/hve-core'
+description: Concept analysis and prototype approach design for Design Thinking Method 6a - Brought to you by microsoft/hve-core
 agent: dt-coach
-argument-hint: "project-slug=... [selectedConcepts=...]"
+argument-hint: project-slug=... [selectedConcepts=...]
 ---
-
 # Method 6: Low-Fidelity Prototypes - Planning
 
 ## Inputs

@@ -2,7 +2,6 @@
 description: 'Method 3 Input Synthesis coaching knowledge: pattern recognition, theme development, synthesis validation, and Problem-to-Solution Space transition readiness'
 applyTo: '**/.copilot-tracking/dt/**/method-03*'
 ---
-
 # DT Method 03: Input Synthesis
 
 Input synthesis aggregates research inputs (interviews, surveys, reports, observations) to find patterns, themes, and insights that form a complete picture of the problem. Without proper synthesis, teams move to brainstorming with fragmented understanding instead of unified problem clarity.

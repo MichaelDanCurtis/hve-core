@@ -2,7 +2,6 @@
 description: 'Design Thinking Method 5: User Concepts coaching with concept articulation, three-lens evaluation, and stakeholder alignment for Solution Space development'
 applyTo: '**/.copilot-tracking/dt/**/method-05*'
 ---
-
 # Design Thinking Method 5: User Concepts
 
 Transform brainstorming themes from Method 4 into structured, visualizable concepts through three-lens evaluation and stakeholder alignment. Method 5 bridges divergent ideation and tangible prototyping, ensuring concepts are desirable, feasible, and viable before investment in lo-fi prototypes.

@@ -1,8 +1,7 @@
 ---
 description: 'Deep expertise for Method 9: Iteration at Scale - change management, scaling, and adoption measurement'
-applyTo: ''
+applyTo: ""
 ---
-
 # DT Method 09 Deep: Advanced Iteration at Scale Techniques
 
 On-demand deep reference for Method 9. The coach loads this file when encountering complex organizational change management, advanced scaling challenges, adoption measurement systems, or manufacturing-specific deployment patterns that exceed the method-tier guidance.

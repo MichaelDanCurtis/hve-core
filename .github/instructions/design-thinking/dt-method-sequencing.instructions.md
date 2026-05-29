@@ -1,8 +1,7 @@
 ---
-description: 'Method transition rules, nine-method sequence, space boundaries, and non-linear iteration support for Design Thinking coaching'
+description: Method transition rules, nine-method sequence, space boundaries, and non-linear iteration support for Design Thinking coaching
 applyTo: '**/.copilot-tracking/dt/**'
 ---
-
 # DT Method Sequencing
 
 Navigate method transitions, space boundaries, and non-linear iteration across the nine Design Thinking methods.

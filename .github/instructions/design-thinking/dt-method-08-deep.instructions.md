@@ -1,8 +1,7 @@
 ---
 description: 'Deep expertise for Method 8: Test and Validate - advanced test design, small-sample analysis, iteration triggers, and bias mitigation'
-applyTo: ''
+applyTo: ""
 ---
-
 # DT Method 08 Deep: Advanced Testing and Validation Techniques
 
 On-demand deep reference for Method 8. The coach loads this file when a user encounters complex test design challenges, needs rigorous analysis techniques for small participant pools, faces difficult iteration decisions, or requires structured bias mitigation strategies that exceed the standard Method 8 coaching workflow.

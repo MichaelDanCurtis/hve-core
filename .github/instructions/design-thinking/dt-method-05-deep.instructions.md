@@ -1,8 +1,7 @@
 ---
 description: 'Deep expertise for Method 5: User Concepts, covering advanced D/F/V analysis, image prompt crafting, concept stress-testing, and portfolio management'
-applyTo: ''
+applyTo: ""
 ---
-
 # DT Method 05 Deep: Advanced User Concept Techniques
 
 On-demand deep reference for Method 5. The coach loads this file when users encounter complex concept evaluation requiring sophisticated D/F/V analysis beyond basic three-lens questions, need advanced guidance for M365 Copilot image prompt crafting, face multi-concept portfolio decisions, or require structured concept stress-testing techniques that exceed the method-tier guidance.

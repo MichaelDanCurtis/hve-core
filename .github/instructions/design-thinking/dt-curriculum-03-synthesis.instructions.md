@@ -2,7 +2,6 @@
 description: 'DT Curriculum Module 3: Synthesis - concepts, techniques, checks, and exercises'
 applyTo: '**/.copilot-tracking/dt/**/curriculum-03*'
 ---
-
 # DT Curriculum Module 3: Input Synthesis
 
 Input synthesis is the Problem Space exit point — the bridge between raw research data and actionable direction for the Solution Space. This module teaches learners how to transform scattered observations, interview notes, and field data into coherent themes that frame problems without prescribing solutions.

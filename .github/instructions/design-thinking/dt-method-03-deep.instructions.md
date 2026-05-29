@@ -1,8 +1,7 @@
 ---
 description: 'Deep expertise for Method 3: Input Synthesis - advanced affinity analysis, insight frameworks, and problem statement articulation'
-applyTo: ''
+applyTo: ""
 ---
-
 # DT Method 03 Deep: Advanced Input Synthesis Techniques
 
 On-demand deep reference for Method 3. The coach loads this file when a user encounters complex multi-source synthesis challenges, struggles to move from observations to genuine insights, needs structured scaffolding for HMW questions, or faces manufacturing-specific synthesis patterns that exceed the method-tier guidance.

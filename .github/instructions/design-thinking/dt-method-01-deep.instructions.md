@@ -1,8 +1,7 @@
 ---
 description: 'Deep expertise for Method 1: Scope Conversations, covering advanced stakeholder analysis, power dynamics, and scope negotiation'
-applyTo: ''
+applyTo: ""
 ---
-
 # DT Method 01 Deep: Advanced Scope Conversation Techniques
 
 On-demand deep reference for Method 1. The coach loads this file when a user encounters complex stakeholder ecosystems, organizational politics, multi-department scoping challenges, or manufacturing-specific scope patterns that exceed the method-tier guidance.

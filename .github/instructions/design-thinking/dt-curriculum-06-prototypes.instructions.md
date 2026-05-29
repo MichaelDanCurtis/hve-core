@@ -2,7 +2,6 @@
 description: 'DT Curriculum Module 6: Low-Fidelity Prototypes - concepts, techniques, checks, and exercises'
 applyTo: '**/.copilot-tracking/dt/**/curriculum-06*'
 ---
-
 # DT Curriculum Module 6: Low-Fidelity Prototypes
 
 Low-fidelity prototyping is the Solution Space exit point. It transforms validated concepts from Method 5 into physical or functional approximations that can be tested with real users in real environments.

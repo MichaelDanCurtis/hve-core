@@ -1,8 +1,7 @@
 ---
-description: 'Energy industry context for DT coaching - vocabulary, constraints, empathy tools, and reference scenarios'
-applyTo: ''
+description: Energy industry context for DT coaching - vocabulary, constraints, empathy tools, and reference scenarios
+applyTo: ""
 ---
-
 # Energy Industry Context
 
 Load this file when the team identifies energy as their industry context. It provides energy-sector vocabulary, constraints, empathy tools, and a reference scenario that the coach weaves into method-specific guidance.

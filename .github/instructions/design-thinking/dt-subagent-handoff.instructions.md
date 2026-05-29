@@ -2,7 +2,6 @@
 description: 'DT subagent handoff workflow: readiness assessment, artifact compilation, and handoff validation via subagent dispatch'
 applyTo: '**/.copilot-tracking/dt/**'
 ---
-
 # DT Subagent Handoff Workflow
 
 Defines how the DT coach dispatches subagents during handoff transitions at space boundaries. Mid-session research dispatch (quick queries during active coaching) is governed by the coach agent definition. This instruction governs the multi-step handoff workflow.

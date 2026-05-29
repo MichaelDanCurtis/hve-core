@@ -1,8 +1,7 @@
 ---
 description: 'Deep expertise for Method 6: Low-Fidelity Prototypes; advanced paper prototyping, service blueprinting, and experience prototyping'
-applyTo: ''
+applyTo: ""
 ---
-
 # DT Method 06 Deep: Advanced Low-Fidelity Prototyping Techniques
 
 On-demand deep reference for Method 6. The coach loads this file when a user encounters interactive or state-based prototyping challenges, needs to map multi-layer service interactions, wants to simulate full experiences through bodystorming or desktop walkthrough, requires structured feedback session designs beyond standard observation, or faces manufacturing-specific prototyping constraints that exceed the method-tier guidance.

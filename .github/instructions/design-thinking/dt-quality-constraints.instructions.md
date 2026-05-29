@@ -1,8 +1,7 @@
 ---
-description: 'Quality constraints, fidelity rules, and output standards for Design Thinking coaching across all nine methods'
+description: Quality constraints, fidelity rules, and output standards for Design Thinking coaching across all nine methods
 applyTo: '**/.copilot-tracking/dt/**'
 ---
-
 # DT Quality Constraints
 
 These constraints govern artifact quality expectations throughout the Design Thinking process. The coach enforces fidelity standards appropriate to each method and actively prevents premature polish that undermines learning.

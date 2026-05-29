@@ -1,8 +1,7 @@
 ---
-description: "Opt-in canonical deck and customer-card workflow for DT coaching"
-applyTo: "**/.copilot-tracking/dt/**"
+description: Opt-in canonical deck and customer-card workflow for DT coaching
+applyTo: '**/.copilot-tracking/dt/**'
 ---
-
 # DT Canonical Deck Instructions
 
 Use this workflow only when the team explicitly opts in to canonical deck support.

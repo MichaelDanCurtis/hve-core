@@ -2,7 +2,6 @@
 description: 'DT Curriculum Module 5: User Concepts - concepts, techniques, checks, and exercises'
 applyTo: '**/.copilot-tracking/dt/**/curriculum-05*'
 ---
-
 # DT Curriculum Module 5: User Concepts
 
 User concepts translate brainstorming themes into visual representations that stakeholders can react to. This module sits in the middle of the Solution Space — it takes abstract solution themes from Method 4 and makes them concrete enough for feedback while staying rough enough to invite honest critique. The key insight is that concepts exist to transfer ideas from the team's head to stakeholders' heads, not to demonstrate design skill.

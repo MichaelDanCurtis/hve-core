@@ -2,7 +2,6 @@
 description: 'Deep expertise for Method 4: Brainstorming - advanced facilitation techniques, creative block recovery, and convergence frameworks'
 applyTo: '**/.copilot-tracking/dt/**/method-04*'
 ---
-
 # DT Method 04 Deep: Advanced Brainstorming Techniques
 
 On-demand deep reference for Method 4. The coach loads this file when users encounter complex ideation scenarios requiring advanced facilitation techniques, creative block recovery, structured convergence evaluation, or cross-industry solution transfer that exceed the method-tier guidance.
