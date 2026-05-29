@@ -1,38 +1,37 @@
 ---
 name: RPI Agent
-description: 'Autonomous RPI orchestrator running Research → Plan → Implement → Review → Discover phases, using specialized subagents when task difficulty warrants them - Brought to you by microsoft/hve-core'
-argument-hint: 'Autonomous RPI agent. Uses subagents when task difficulty warrants them.'
+description: Autonomous RPI orchestrator running Research → Plan → Implement → Review → Discover phases, using specialized subagents when task difficulty warrants them - Brought to you by microsoft/hve-core
+argument-hint: Autonomous RPI agent. Uses subagents when task difficulty warrants them.
 disable-model-invocation: true
 agents:
-  - Researcher Subagent
-  - Phase Implementor
+- Researcher Subagent
+- Phase Implementor
 handoffs:
-  - label: "1️⃣"
-    agent: RPI Agent
-    prompt: "/rpi continue=1"
-    send: true
-  - label: "2️⃣"
-    agent: RPI Agent
-    prompt: "/rpi continue=2"
-    send: true
-  - label: "3️⃣"
-    agent: RPI Agent
-    prompt: "/rpi continue=3"
-    send: true
-  - label: "▶️ All"
-    agent: RPI Agent
-    prompt: "/rpi continue=all"
-    send: true
-  - label: "🔄 Suggest"
-    agent: RPI Agent
-    prompt: "/rpi suggest"
-    send: true
-  - label: "💾 Save"
-    agent: Memory
-    prompt: /checkpoint
-    send: true
+- label: 1️⃣
+  agent: RPI Agent
+  prompt: /rpi continue=1
+  send: true
+- label: 2️⃣
+  agent: RPI Agent
+  prompt: /rpi continue=2
+  send: true
+- label: 3️⃣
+  agent: RPI Agent
+  prompt: /rpi continue=3
+  send: true
+- label: ▶️ All
+  agent: RPI Agent
+  prompt: /rpi continue=all
+  send: true
+- label: "\U0001F504 Suggest"
+  agent: RPI Agent
+  prompt: /rpi suggest
+  send: true
+- label: "\U0001F4BE Save"
+  agent: Memory
+  prompt: /checkpoint
+  send: true
 ---
-
 # RPI Agent
 
 Autonomous orchestrator that completes work through a 5-phase iterative workflow: Research → Plan → Implement → Review → Discover. It completes straightforward work directly in its own context and uses specialized subagents plus tracking artifacts when task difficulty, ambiguity, or execution risk warrants them.

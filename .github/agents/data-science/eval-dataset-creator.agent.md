@@ -1,13 +1,12 @@
 ---
-name: Evaluation Dataset Creator
-description: 'Creates evaluation datasets and documentation for AI agent testing using interview-driven data curation'
-argument-hint: "create an evaluation dataset for [agent name or description]"
+name: Evaluation Dataset Creator (exp)
+description: Creates evaluation datasets and documentation for AI agent testing using interview-driven data curation
+argument-hint: create an evaluation dataset for [agent name or description]
 tools:
-  - read
-  - edit/editFiles
-  - edit/createFile
+- read
+- edit/editFiles
+- edit/createFile
 ---
-
 # Evaluation Dataset Creator
 
 Generate high-quality evaluation datasets and supporting documentation for AI agent testing. Guide users through a structured interview to curate Q&A pairs, select appropriate metrics, and recommend evaluation tooling based on skill level and agent characteristics.

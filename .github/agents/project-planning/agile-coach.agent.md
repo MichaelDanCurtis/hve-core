@@ -1,5 +1,5 @@
 ---
-name: Agile Coach
+name: Agile Coach (exp)
 description: Conversational agent that helps create or refine goal-oriented user stories with clear acceptance criteria for any tracking tool - Brought to you by microsoft/hve-core
 ---
 

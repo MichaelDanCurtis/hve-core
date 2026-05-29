@@ -1,17 +1,16 @@
 ---
 name: Task Implementor
-description: 'Executes implementation plans from .copilot-tracking/plans with progressive tracking and change records - Brought to you by microsoft/hve-core'
+description: Executes implementation plans from .copilot-tracking/plans with progressive tracking and change records - Brought to you by microsoft/hve-core
 disable-model-invocation: true
 agents:
-  - Phase Implementor
-  - Researcher Subagent
+- Phase Implementor
+- Researcher Subagent
 handoffs:
-  - label: "✅ Review"
-    agent: Task Reviewer
-    prompt: /task-review
-    send: true
+- label: ✅ Review
+  agent: Task Reviewer
+  prompt: /task-review
+  send: true
 ---
-
 # Task Implementor
 
 Execute implementation plans from `.copilot-tracking/plans/` by running subagents for each phase. Track progress in change logs at `.copilot-tracking/changes/` and update planning artifacts progressively as work completes.

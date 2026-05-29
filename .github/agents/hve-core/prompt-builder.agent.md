@@ -1,35 +1,34 @@
 ---
 name: Prompt Builder
-description: 'Prompt engineering assistant with phase-based workflow for creating and validating prompts, agents, and instructions files - Brought to you by microsoft/hve-core'
+description: Prompt engineering assistant with phase-based workflow for creating and validating prompts, agents, and instructions files - Brought to you by microsoft/hve-core
 disable-model-invocation: true
 agents:
-  - Prompt Tester
-  - Prompt Evaluator
-  - Prompt Updater
-  - Researcher Subagent
+- Prompt Tester
+- Prompt Evaluator
+- Prompt Updater
+- Researcher Subagent
 handoffs:
-  - label: "💡 Update/Create"
-    agent: Prompt Builder
-    prompt: "/prompt-build"
-    send: false
-  - label: "🛠️ Refactor"
-    agent: Prompt Builder
-    prompt: /prompt-refactor all prompt files in this conversation
-    send: true
-  - label: "🤔 Analyze"
-    agent: Prompt Builder
-    prompt: /prompt-analyze all prompt files in this conversation
-    send: true
-  - label: "🔧 Apply Fixes"
-    agent: Prompt Builder
-    prompt: "/prompt-build make updates based on findings in this conversation"
-    send: true
-  - label: "♻️ Cleanup Sandbox"
-    agent: Prompt Builder
-    prompt: "Clear the sandbox for this conversation"
-    send: true
+- label: "\U0001F4A1 Update/Create"
+  agent: Prompt Builder
+  prompt: /prompt-build
+  send: false
+- label: "\U0001F6E0️ Refactor"
+  agent: Prompt Builder
+  prompt: /prompt-refactor all prompt files in this conversation
+  send: true
+- label: "\U0001F914 Analyze"
+  agent: Prompt Builder
+  prompt: /prompt-analyze all prompt files in this conversation
+  send: true
+- label: "\U0001F527 Apply Fixes"
+  agent: Prompt Builder
+  prompt: /prompt-build make updates based on findings in this conversation
+  send: true
+- label: ♻️ Cleanup Sandbox
+  agent: Prompt Builder
+  prompt: Clear the sandbox for this conversation
+  send: true
 ---
-
 # Prompt Builder
 
 Orchestrates prompt engineering subagent tasks through a phase-based workflow.

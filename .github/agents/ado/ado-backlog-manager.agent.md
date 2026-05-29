@@ -1,67 +1,66 @@
 ---
 name: ADO Backlog Manager
-description: "Orchestrator agent for Azure DevOps backlog management workflows including triage, discovery, sprint planning, PRD-to-work-item conversion, and execution - Brought to you by microsoft/hve-core"
+description: Orchestrator agent for Azure DevOps backlog management workflows including triage, discovery, sprint planning, PRD-to-work-item conversion, and execution - Brought to you by microsoft/hve-core
 disable-model-invocation: true
 tools:
-  - ado/search_workitem
-  - ado/wit_get_work_item
-  - ado/wit_get_work_items_batch_by_ids
-  - ado/wit_my_work_items
-  - ado/wit_get_work_items_for_iteration
-  - ado/wit_list_backlog_work_items
-  - ado/wit_list_backlogs
-  - ado/work_list_team_iterations
-  - ado/wit_get_query_results_by_id
-  - ado/wit_create_work_item
-  - ado/wit_add_child_work_items
-  - ado/wit_update_work_item
-  - ado/wit_update_work_items_batch
-  - ado/wit_work_items_link
-  - ado/wit_add_artifact_link
-  - ado/wit_list_work_item_comments
-  - ado/wit_add_work_item_comment
-  - ado/wit_list_work_item_revisions
-  - ado/core_get_identity_ids
-  - search
-  - read
-  - edit/createFile
-  - edit/createDirectory
-  - edit/editFiles
-  - web
-  - agent
+- ado/search_workitem
+- ado/wit_get_work_item
+- ado/wit_get_work_items_batch_by_ids
+- ado/wit_my_work_items
+- ado/wit_get_work_items_for_iteration
+- ado/wit_list_backlog_work_items
+- ado/wit_list_backlogs
+- ado/work_list_team_iterations
+- ado/wit_get_query_results_by_id
+- ado/wit_create_work_item
+- ado/wit_add_child_work_items
+- ado/wit_update_work_item
+- ado/wit_update_work_items_batch
+- ado/wit_work_items_link
+- ado/wit_add_artifact_link
+- ado/wit_list_work_item_comments
+- ado/wit_add_work_item_comment
+- ado/wit_list_work_item_revisions
+- ado/core_get_identity_ids
+- search
+- read
+- edit/createFile
+- edit/createDirectory
+- edit/editFiles
+- web
+- agent
 handoffs:
-  - label: "Discover"
-    agent: ADO Backlog Manager
-    prompt: /ado-discover-work-items
-  - label: "Triage"
-    agent: ADO Backlog Manager
-    prompt: /ado-triage-work-items
-  - label: "Sprint"
-    agent: ADO Backlog Manager
-    prompt: /ado-sprint-plan
-  - label: "Execute"
-    agent: ADO Backlog Manager
-    prompt: /ado-update-wit-items
-  - label: "Add"
-    agent: ADO Backlog Manager
-    prompt: /ado-add-work-item
-  - label: "Plan"
-    agent: ADO Backlog Manager
-    prompt: /ado-process-my-work-items-for-task-planning
-  - label: "PRD"
-    agent: AzDO PRD to WIT
-    prompt: Analyze the current PRD inputs and plan Azure DevOps work item hierarchies.
-  - label: "Build"
-    agent: ADO Backlog Manager
-    prompt: /ado-get-build-info
-  - label: "PR"
-    agent: ADO Backlog Manager
-    prompt: /ado-create-pull-request
-  - label: "Save"
-    agent: Memory
-    prompt: /checkpoint
+- label: Discover
+  agent: ADO Backlog Manager
+  prompt: /ado-discover-work-items
+- label: Triage
+  agent: ADO Backlog Manager
+  prompt: /ado-triage-work-items
+- label: Sprint
+  agent: ADO Backlog Manager
+  prompt: /ado-sprint-plan
+- label: Execute
+  agent: ADO Backlog Manager
+  prompt: /ado-update-wit-items
+- label: Add
+  agent: ADO Backlog Manager
+  prompt: /ado-add-work-item
+- label: Plan
+  agent: ADO Backlog Manager
+  prompt: /ado-process-my-work-items-for-task-planning
+- label: PRD
+  agent: AzDO PRD to WIT
+  prompt: Analyze the current PRD inputs and plan Azure DevOps work item hierarchies.
+- label: Build
+  agent: ADO Backlog Manager
+  prompt: /ado-get-build-info
+- label: PR
+  agent: ADO Backlog Manager
+  prompt: /ado-create-pull-request
+- label: Save
+  agent: Memory
+  prompt: /checkpoint
 ---
-
 # ADO Backlog Manager
 
 Central orchestrator for Azure DevOps backlog management that classifies incoming requests, dispatches them to the appropriate workflow, and consolidates results into actionable summaries. Nine workflow types cover the full lifecycle of backlog operations: triage, discovery, PRD planning, sprint planning, execution, single work item creation, task planning, build information, and pull request creation.

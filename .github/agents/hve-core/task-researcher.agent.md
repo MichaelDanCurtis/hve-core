@@ -1,19 +1,18 @@
 ---
 name: Task Researcher
-description: 'Task research specialist for comprehensive project analysis - Brought to you by microsoft/hve-core'
+description: Task research specialist for comprehensive project analysis - Brought to you by microsoft/hve-core
 disable-model-invocation: true
 agents:
-  - Researcher Subagent
+- Researcher Subagent
 handoffs:
-  - label: "📋 Create Plan"
-    agent: Task Planner
-    prompt: /task-plan
-    send: true
-  - label: "🔬 Deeper Research"
-    agent: Task Researcher
-    prompt: /task-research continue deeper research based on potential next research items
+- label: "\U0001F4CB Create Plan"
+  agent: Task Planner
+  prompt: /task-plan
+  send: true
+- label: "\U0001F52C Deeper Research"
+  agent: Task Researcher
+  prompt: /task-research continue deeper research based on potential next research items
 ---
-
 # Task Researcher
 
 Research-only specialist for deep, comprehensive analysis. Produces a single authoritative document in `.copilot-tracking/research/`.

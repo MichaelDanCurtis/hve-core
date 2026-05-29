@@ -1,23 +1,28 @@
 ---
-name: Task Challenger
+name: Task Challenger (exp)
 description: 'Adversarial questioning agent that interrogates implementations with What/Why/How questions: no suggestions, no hints, no leading - Brought to you by microsoft/hve-core'
 disable-model-invocation: true
-tools: [read, search, edit/createFile, edit/editFiles, execute/runInTerminal, execute/getTerminalOutput]
+tools:
+- read
+- search
+- edit/createFile
+- edit/editFiles
+- execute/runInTerminal
+- execute/getTerminalOutput
 handoffs:
-  - label: "🔬 Research Questions"
-    agent: Task Researcher
-    prompt: "/task-research Find and read the most recent challenge tracking document in .copilot-tracking/challenges/ (most recent by date prefix) for the Q&A log and unresolved items: these define the research scope."
-    send: true
-  - label: "📋 Revise Plan"
-    agent: Task Planner
-    prompt: "/task-plan Find and read the most recent challenge tracking document in .copilot-tracking/challenges/ (most recent by date prefix) for challenge findings and unresolved items before planning."
-    send: true
-  - label: "⚡ Implement Changes"
-    agent: Task Implementor
-    prompt: "/task-implement Address the immediate changes identified through the challenge session. Find and read the most recent challenge tracking document in .copilot-tracking/challenges/ (most recent by date prefix) for findings."
-    send: true
+- label: "\U0001F52C Research Questions"
+  agent: Task Researcher
+  prompt: '/task-research Find and read the most recent challenge tracking document in .copilot-tracking/challenges/ (most recent by date prefix) for the Q&A log and unresolved items: these define the research scope.'
+  send: true
+- label: "\U0001F4CB Revise Plan"
+  agent: Task Planner
+  prompt: /task-plan Find and read the most recent challenge tracking document in .copilot-tracking/challenges/ (most recent by date prefix) for challenge findings and unresolved items before planning.
+  send: true
+- label: ⚡ Implement Changes
+  agent: Task Implementor
+  prompt: /task-implement Address the immediate changes identified through the challenge session. Find and read the most recent challenge tracking document in .copilot-tracking/challenges/ (most recent by date prefix) for findings.
+  send: true
 ---
-
 # Task Challenger
 
 Adversarial questioning agent that challenges completed implementations by reading all `.copilot-tracking/` artifacts cold, without inheriting the context of decisions already made, and interrogating every decision, boundary, and assumption through open-ended What/Why/How questions.

@@ -1,21 +1,20 @@
 ---
 name: Memory
-description: "Conversation memory persistence for session continuity - Brought to you by microsoft/hve-core"
+description: Conversation memory persistence for session continuity - Brought to you by microsoft/hve-core
 handoffs:
-  - label: "🗑️ Clear"
-    agent: RPI Agent
-    prompt: "/clear"
-    send: true
-  - label: "🚀 Continue with RPI"
-    agent: RPI Agent
-    prompt: "/rpi suggest"
-    send: true
-  - label: "🚀 Continue with Backlog"
-    agent: GitHub Backlog Manager
-    prompt: "/github-suggest"
-    send: true
+- label: "\U0001F5D1️ Clear"
+  agent: RPI Agent
+  prompt: /clear
+  send: true
+- label: "\U0001F680 Continue with RPI"
+  agent: RPI Agent
+  prompt: /rpi suggest
+  send: true
+- label: "\U0001F680 Continue with Backlog"
+  agent: GitHub Backlog Manager
+  prompt: /github-suggest
+  send: true
 ---
-
 # Memory Agent
 
 Persist conversation context to memory files for session continuity. Supports detecting existing memory state, saving new memories, and continuing from previous sessions.

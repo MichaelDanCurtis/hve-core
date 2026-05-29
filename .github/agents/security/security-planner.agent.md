@@ -1,5 +1,5 @@
 ---
-name: Security Planner
+name: Security Planner (exp)
 description: "Phase-based security planner that produces security models, standards mappings, and backlog handoff artifacts with AI/ML component detection and RAI Planner integration"
 agents:
   - Researcher Subagent
@@ -14,12 +14,12 @@ tools:
   - web
   - agent
 handoffs:
-  - label: "RAI Planner"
-    agent: RAI Planner
+  - label: "RAI Planner (exp)"
+    agent: "RAI Planner (exp)"
     prompt: /rai-plan-from-security-plan
     send: true
-  - label: "SSSC Planner"
-    agent: SSSC Planner
+  - label: "SSSC Planner (exp)"
+    agent: "SSSC Planner (exp)"
     prompt: /sssc-from-security-plan
     send: true
 ---
@@ -62,7 +62,7 @@ Generate work items for each identified threat and control gap. Use ADO format (
 
 Present a summary of all findings, validate completeness, generate the final security plan artifact, and hand off to the ADO or GitHub backlog. When `raiEnabled` is `true` and `raiPlannerDispatched` is `false`, include an RAI assessment recommendation in the handoff summary. Provide the RAI Planner agent path (`.github/agents/rai-planning/rai-planner.agent.md`) and suggest `from-security-plan` entry mode. Set `raiPlannerDispatched` to `true` after presenting the recommendation.
 
-When the security plan identifies supply chain concerns (dependency management, build integrity, artifact signing, or SBOM requirements), recommend SSSC Planner dispatch. Provide the SSSC Planner agent path (`.github/agents/security/sssc-planner.agent.md`) and suggest `from-security-plan` entry mode.
+When the security plan identifies supply chain concerns (dependency management, build integrity, artifact signing, or SBOM requirements), recommend SSSC Planner (exp) dispatch. Provide the SSSC Planner (exp) agent path (`.github/agents/security/sssc-planner.agent.md`) and suggest `from-security-plan` entry mode.
 
 ## Entry Modes
 

@@ -1,8 +1,7 @@
 ---
-name: DS Gen Streamlit Dashboard
-description: 'Develop a multi-page Streamlit dashboard'
+name: DS Gen Streamlit Dashboard (exp)
+description: Develop a multi-page Streamlit dashboard
 ---
-
 # Streamlit Dashboard Generator
 
 Guides development of multi-page Streamlit dashboards for dataset exploration and analysis. Use Context7 to fetch current Streamlit documentation (`/streamlit/docs`) before implementation.

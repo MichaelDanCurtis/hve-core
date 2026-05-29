@@ -1,8 +1,7 @@
 ---
-name: DS Gen Jupyter Notebook
-description: 'Create structured exploratory data analysis Jupyter notebooks from available data sources and generated data dictionaries'
+name: DS Gen Jupyter Notebook (exp)
+description: Create structured exploratory data analysis Jupyter notebooks from available data sources and generated data dictionaries
 ---
-
 # Jupyter Notebook Generator
 
 Generate reusable, modular EDA notebooks with parameterized data loading, interactive visualizations, and interpretive markdown placeholders. Notebooks follow a standard section layout and reference (not duplicate) existing data dictionaries.

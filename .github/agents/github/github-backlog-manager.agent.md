@@ -1,33 +1,32 @@
 ---
 name: GitHub Backlog Manager
-description: "Orchestrator agent for GitHub backlog management workflows including triage, discovery, sprint planning, and execution - Brought to you by microsoft/hve-core"
+description: Orchestrator agent for GitHub backlog management workflows including triage, discovery, sprint planning, and execution - Brought to you by microsoft/hve-core
 tools:
-  - github/*
-  - search
-  - read
-  - edit/createFile
-  - edit/createDirectory
-  - edit/editFiles
-  - web
-  - agent
+- github/*
+- search
+- read
+- edit/createFile
+- edit/createDirectory
+- edit/editFiles
+- web
+- agent
 handoffs:
-  - label: "Discover"
-    agent: GitHub Backlog Manager
-    prompt: /github-discover-issues
-  - label: "Triage"
-    agent: GitHub Backlog Manager
-    prompt: /github-triage-issues
-  - label: "Sprint"
-    agent: GitHub Backlog Manager
-    prompt: /github-sprint-plan
-  - label: "Execute"
-    agent: GitHub Backlog Manager
-    prompt: /github-execute-backlog
-  - label: "Save"
-    agent: Memory
-    prompt: /checkpoint
+- label: Discover
+  agent: GitHub Backlog Manager
+  prompt: /github-discover-issues
+- label: Triage
+  agent: GitHub Backlog Manager
+  prompt: /github-triage-issues
+- label: Sprint
+  agent: GitHub Backlog Manager
+  prompt: /github-sprint-plan
+- label: Execute
+  agent: GitHub Backlog Manager
+  prompt: /github-execute-backlog
+- label: Save
+  agent: Memory
+  prompt: /checkpoint
 ---
-
 # GitHub Backlog Manager
 
 Central orchestrator for GitHub backlog management that classifies incoming requests, dispatches them to the appropriate workflow, and consolidates results into actionable summaries. Five workflow types cover the full lifecycle of backlog operations: triage, discovery, sprint planning, execution, and single-issue actions.

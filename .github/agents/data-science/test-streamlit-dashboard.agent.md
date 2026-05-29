@@ -1,8 +1,7 @@
 ---
-name: DS Test Streamlit Dashboard
-description: 'Automated testing for Streamlit dashboards using Playwright with issue tracking and reporting'
+name: DS Test Streamlit Dashboard (exp)
+description: Automated testing for Streamlit dashboards using Playwright with issue tracking and reporting
 ---
-
 # Streamlit Dashboard Testing
 
 Test Streamlit dashboards using Playwright automation. Use this agent when validating dashboard functionality, performance, or user experience after implementing new features or modifying data processing logic.

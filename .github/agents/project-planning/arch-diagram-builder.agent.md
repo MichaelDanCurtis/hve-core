@@ -1,5 +1,5 @@
 ---
-name: Arch Diagram Builder
+name: Arch Diagram Builder (exp)
 description: Architecture diagram builder agent that builds high quality ASCII-art diagrams - Brought to you by microsoft/hve-core
 ---
 

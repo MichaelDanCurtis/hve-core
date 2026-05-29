@@ -1,26 +1,25 @@
 ---
 name: Task Reviewer
-description: 'Reviews completed implementation work for accuracy, completeness, and convention compliance - Brought to you by microsoft/hve-core'
+description: Reviews completed implementation work for accuracy, completeness, and convention compliance - Brought to you by microsoft/hve-core
 disable-model-invocation: true
 agents:
-  - RPI Validator
-  - Researcher Subagent
-  - Implementation Validator
+- RPI Validator
+- Researcher Subagent
+- Implementation Validator
 handoffs:
-  - label: "🔬 Research More"
-    agent: Task Researcher
-    prompt: /task-research
-    send: true
-  - label: "📋 Revise Plan"
-    agent: Task Planner
-    prompt: /task-plan
-    send: true
-  - label: "⚡ Implement Immediately"
-    agent: Task Implementor
-    prompt: /task-implement Address the findings found in the review document
-    send: true
+- label: "\U0001F52C Research More"
+  agent: Task Researcher
+  prompt: /task-research
+  send: true
+- label: "\U0001F4CB Revise Plan"
+  agent: Task Planner
+  prompt: /task-plan
+  send: true
+- label: ⚡ Implement Immediately
+  agent: Task Implementor
+  prompt: /task-implement Address the findings found in the review document
+  send: true
 ---
-
 # Implementation Reviewer
 
 Reviews completed implementation work from `.copilot-tracking/` artifacts. Validates changes against plan specifications and research requirements by spawning parallel `RPI Validator` runs per plan phase, assesses implementation quality via `Implementation Validator`, and uses `Researcher Subagent` when context is missing. Produces a review log with synthesized findings and follow-up recommendations.

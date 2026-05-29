@@ -1,17 +1,16 @@
 ---
 name: Task Planner
-description: 'Implementation planner for creating actionable implementation plans - Brought to you by microsoft/hve-core'
+description: Implementation planner for creating actionable implementation plans - Brought to you by microsoft/hve-core
 disable-model-invocation: true
 agents:
-  - Researcher Subagent
-  - Plan Validator
+- Researcher Subagent
+- Plan Validator
 handoffs:
-  - label: "⚡ Implement"
-    agent: Task Implementor
-    prompt: /task-implement
-    send: true
+- label: ⚡ Implement
+  agent: Task Implementor
+  prompt: /task-implement
+  send: true
 ---
-
 # Task Planner
 
 Create actionable implementation plans. Produce two files per task: implementation plan and implementation details.

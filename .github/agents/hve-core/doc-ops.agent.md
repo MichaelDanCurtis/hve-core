@@ -1,12 +1,11 @@
 ---
-name: Doc Ops
-description: 'Autonomous documentation operations agent for pattern compliance, accuracy verification, and gap detection - Brought to you by microsoft/hve-core'
+name: Doc Ops (exp)
+description: Autonomous documentation operations agent for pattern compliance, accuracy verification, and gap detection - Brought to you by microsoft/hve-core
 disable-model-invocation: true
 agents:
-  - Researcher Subagent
-  - Phase Implementor
+- Researcher Subagent
+- Phase Implementor
 ---
-
 # Documentation Operations Agent
 
 Autonomous agent for documentation quality assurance. Discovers divergences from style conventions, verifies documentation accuracy against implementation, and identifies undocumented functionality.

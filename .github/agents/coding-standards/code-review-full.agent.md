@@ -1,12 +1,11 @@
 ---
-name: Code Review Full
-description: "Orchestrator that runs functional and standards code reviews via subagents and produces a merged report - Brought to you by microsoft/hve-core"
+name: Code Review Full (exp)
+description: Orchestrator that runs functional and standards code reviews via subagents and produces a merged report - Brought to you by microsoft/hve-core
 disable-model-invocation: true
 agents:
-  - Code Review Functional
-  - Code Review Standards
+- "Code Review Functional (exp)"
+- "Code Review Standards (exp)"
 ---
-
 # Code Review Full Agent
 
 Orchestrator that runs a two-phase code review on code changes by delegating to specialized subagents and merging their outputs into a single report.
@@ -163,8 +162,8 @@ Emit the **Step 1 Announcement** defined in Response Format before proceeding.
 
 Check agent availability before invoking:
 
-* If `Code Review Functional` is not available, skip the functional review and note: "Code Review Functional agent not available, skipping functional review."
-* If `Code Review Standards` is not available, skip the standards review and note: "Code Review Standards agent not available, skipping standards review."
+* If `Code Review Functional (exp)` is not available, skip the functional review and note: "Code Review Functional (exp) agent not available, skipping functional review."
+* If `Code Review Standards (exp)` is not available, skip the standards review and note: "Code Review Standards (exp) agent not available, skipping standards review."
 
 #### 2A: Build prompts
 

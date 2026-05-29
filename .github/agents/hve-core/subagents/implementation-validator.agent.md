@@ -1,15 +1,14 @@
 ---
 name: Implementation Validator
-description: 'Validates implementation quality against architectural requirements, design principles, and code standards with severity-graded findings - Brought to you by microsoft/hve-core'
+description: Validates implementation quality against architectural requirements, design principles, and code standards with severity-graded findings - Brought to you by microsoft/hve-core
 user-invocable: false
 tools:
-  - read
-  - search
+- read
+- search
 model:
-  - Claude Haiku 4.5 (copilot)
-  - GPT-5.4 mini (copilot)
+- Claude Haiku 4.5 (copilot)
+- GPT-5.4 mini (copilot)
 ---
-
 # Implementation Validator
 
 Validates implementation quality against architectural requirements, design principles, and code standards with severity-graded findings.

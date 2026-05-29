@@ -1,9 +1,9 @@
 ---
-name: System Architecture Reviewer
+name: System Architecture Reviewer (exp)
 description: 'System architecture reviewer for design trade-offs, ADR creation, and well-architected alignment - Brought to you by microsoft/hve-core'
 handoffs:
   - label: "📐 Create ADR"
-    agent: ADR Creation
+    agent: "ADR Creation (exp)"
     prompt: "Create an ADR based on the architecture review findings"
     send: true
   - label: "📋 Create Plan"
@@ -145,7 +145,7 @@ ADR creation criteria: document decisions when they involve:
 
 Save ADRs under `docs/decisions/` using ISO date-prefixed filenames (`YYYY-MM-DD-short-title.md`). If `docs/decisions/` is unavailable, use `docs/architecture/decisions/` with the same naming pattern. Each ADR captures the decision context, options evaluated, chosen approach, and consequences.
 
-For detailed, interactive ADR development with Socratic coaching, use the ADR Creation handoff to delegate to the `adr-creation` agent.
+For detailed, interactive ADR development with Socratic coaching, use the ADR Creation (exp) handoff to delegate to the `adr-creation` agent.
 
 ### Step 6: Identify Escalation Points
 
