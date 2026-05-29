@@ -145,16 +145,24 @@ function New-PluginManifestContent {
 
     .DESCRIPTION
     Creates a hashtable representing the plugin manifest with name,
-    description, version, and component path declarations. When explicit
-    path arrays are provided, uses them so the CLI discovers artifacts
-    in nested subdirectories. When omitted, falls back to convention
-    defaults for lightweight marketplace entries.
+    description, version, and component path declarations. The description
+    is resolved from the collection manifest via Resolve-CollectionDescription
+    using the active release channel so plugin.json carries channel-specific
+    text. When explicit path arrays are provided, uses them so the CLI
+    discovers artifacts in nested subdirectories. When omitted, falls back
+    to convention defaults for lightweight marketplace entries.
 
     .PARAMETER CollectionId
     The collection identifier used as the plugin name.
 
-    .PARAMETER Description
-    A short description of the plugin.
+    .PARAMETER Collection
+    Collection manifest hashtable passed to Resolve-CollectionDescription.
+    Must contain a 'description' key and may contain a 'descriptions' map
+    with 'stable' and 'prerelease' overrides.
+
+    .PARAMETER Channel
+    Release channel ('Stable' or 'PreRelease') used to pick the description
+    override. Defaults to 'PreRelease' to match the pipeline default.
 
     .PARAMETER Version
     Semantic version string from the repository package.json.
@@ -179,7 +187,11 @@ function New-PluginManifestContent {
         [string]$CollectionId,
 
         [Parameter(Mandatory = $true)]
-        [string]$Description,
+        [hashtable]$Collection,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Stable', 'PreRelease')]
+        [string]$Channel = 'PreRelease',
 
         [Parameter(Mandatory = $true)]
         [string]$Version,
@@ -197,9 +209,14 @@ function New-PluginManifestContent {
         [string[]]$SkillPaths
     )
 
+    $resolvedDescription = Resolve-CollectionDescription `
+        -CollectionManifest $Collection `
+        -Channel $Channel `
+        -DefaultDescription ''
+
     $manifest = [ordered]@{
         name        = $CollectionId
-        description = $Description
+        description = $resolvedDescription
         version     = $Version
     }
 
@@ -247,6 +264,11 @@ function New-PluginReadmeContent {
         Optional markdown content from the collection .md file. Injected as
         an Overview section between the description and the Install section.
 
+    .PARAMETER Channel
+        Release channel ('Stable' or 'PreRelease') used to resolve the
+        description via Resolve-CollectionDescription. Defaults to
+        'PreRelease' to match the pipeline default.
+
     .OUTPUTS
     [string] Complete README markdown content.
     #>
@@ -268,14 +290,23 @@ function New-PluginReadmeContent {
         [Parameter(Mandatory = $false)]
         [AllowNull()]
         [AllowEmptyString()]
-        [string]$CollectionContent
+        [string]$CollectionContent,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Stable', 'PreRelease')]
+        [string]$Channel = 'PreRelease'
     )
+
+    $resolvedDescription = Resolve-CollectionDescription `
+        -CollectionManifest $Collection `
+        -Channel $Channel `
+        -DefaultDescription ''
 
     $sb = [System.Text.StringBuilder]::new()
     [void]$sb.AppendLine('<!-- markdownlint-disable-file -->')
     [void]$sb.AppendLine("# $($Collection.name)")
     [void]$sb.AppendLine()
-    [void]$sb.AppendLine($Collection.description)
+    [void]$sb.AppendLine($resolvedDescription)
 
     # Inject maturity notice when collection is not stable
     $effectiveMaturity = if ([string]::IsNullOrWhiteSpace($Maturity)) { 'stable' } else { $Maturity }
@@ -298,6 +329,10 @@ function New-PluginReadmeContent {
     # Strip the leading H1 since the title is already emitted above.
     if (-not [string]::IsNullOrWhiteSpace($CollectionContent)) {
         $overviewText = $CollectionContent -replace '(?m)\A#\s+[^\r\n]+\r?\n\r?\n', ''
+        $overviewText = $overviewText -replace '(?s)(<!-- BEGIN AUTO-GENERATED ARTIFACTS -->\s*)##\s+Included Artifacts\s*', "## Included Artifacts`n`n`${1}"
+        if ($overviewText -notmatch '(?m)^##\s+Included Artifacts\s*$') {
+            $overviewText = $overviewText -replace '(?s)(<!-- BEGIN AUTO-GENERATED ARTIFACTS -->\s*)(?=###\s)', "## Included Artifacts`n`n`${1}"
+        }
         $overviewText = $overviewText.TrimEnd()
 
         if (-not [string]::IsNullOrWhiteSpace($overviewText)) {
@@ -439,13 +474,20 @@ function Write-MarketplaceManifest {
     .DESCRIPTION
     Assembles plugin metadata from generated collections and writes the
     marketplace manifest to .github/plugin/marketplace.json. Creates the
-    directory when it does not exist.
+    directory when it does not exist. Per-entry descriptions are resolved
+    via the shared Resolve-CollectionDescription helper using the active
+    release channel.
 
     .PARAMETER RepoRoot
     Absolute path to the repository root directory.
 
     .PARAMETER Collections
     Array of collection manifest hashtables with id and description.
+
+    .PARAMETER Channel
+    Release channel ('Stable' or 'PreRelease') propagated to
+    New-PluginManifestContent so each entry carries the channel-resolved
+    description. Defaults to 'PreRelease'.
 
     .PARAMETER DryRun
     When specified, logs the action without writing to disk.
@@ -461,6 +503,10 @@ function Write-MarketplaceManifest {
         [array]$Collections,
 
         [Parameter(Mandatory = $false)]
+        [ValidateSet('Stable', 'PreRelease')]
+        [string]$Channel = 'PreRelease',
+
+        [Parameter(Mandatory = $false)]
         [switch]$DryRun
     )
 
@@ -471,7 +517,8 @@ function Write-MarketplaceManifest {
     foreach ($collection in ($Collections | Sort-Object { $_.id })) {
         $plugins += New-PluginManifestContent `
             -CollectionId $collection.id `
-            -Description $collection.description `
+            -Collection $collection `
+            -Channel $Channel `
             -Version $packageJson.version
     }
 
@@ -652,6 +699,13 @@ function Write-PluginDirectory {
         Optional collection-level maturity string. Forwarded to
         New-PluginReadmeContent for maturity notice injection.
 
+    .PARAMETER Channel
+        Release channel ('Stable' or 'PreRelease') forwarded to
+        New-PluginManifestContent and New-PluginReadmeContent so the
+        generated plugin.json and README pick up the channel-specific
+        description override from the collection manifest. Defaults to
+        'PreRelease' to match the pipeline default.
+
     .PARAMETER DryRun
     When specified, logs actions without creating files or directories.
 
@@ -681,6 +735,10 @@ function Write-PluginDirectory {
         [AllowNull()]
         [AllowEmptyString()]
         [string]$Maturity,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Stable', 'PreRelease')]
+        [string]$Channel = 'PreRelease',
 
         [Parameter(Mandatory = $false)]
         [switch]$DryRun,
@@ -833,7 +891,8 @@ function Write-PluginDirectory {
     $manifestPath = Join-Path -Path $manifestDir -ChildPath 'plugin.json'
     $manifest = New-PluginManifestContent `
         -CollectionId $collectionId `
-        -Description $Collection.description `
+        -Collection $Collection `
+        -Channel $Channel `
         -Version $Version `
         -AgentPaths @($agentDirs) `
         -CommandPaths @($commandDirs) `
@@ -857,7 +916,7 @@ function Write-PluginDirectory {
     $collectionContent = if (Test-Path -Path $collectionMdPath) {
         Get-Content -Path $collectionMdPath -Raw
     } else { $null }
-    $readmeContent = New-PluginReadmeContent -Collection $Collection -Items $readmeItems -Maturity $Maturity -CollectionContent $collectionContent
+    $readmeContent = New-PluginReadmeContent -Collection $Collection -Items $readmeItems -Maturity $Maturity -CollectionContent $collectionContent -Channel $Channel
     [void]$generatedFiles.Add($readmePath)
 
     if ($DryRun) {

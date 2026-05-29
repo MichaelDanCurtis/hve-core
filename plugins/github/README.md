@@ -1,11 +1,15 @@
 <!-- markdownlint-disable-file -->
 # GitHub Backlog Management
 
-GitHub issue discovery, triage, sprint planning, and backlog execution agents and prompts
+Experimental: GitHub issue discovery, triage, sprint planning, and backlog execution agents and prompts. AS-IS. Feedback: github.com/microsoft/hve-core/issues
 
 ## Overview
 
 Manage GitHub issue backlogs with agents for discovery, triage, sprint planning, and execution. This collection brings structured backlog management workflows directly into VS Code.
+
+## Channel distribution
+
+Plugins (the `plugins/<id>/` committed tree and the `.github/plugin/marketplace.json` entry) ship the PreRelease description text only. The `.vsix` extension package ships either Stable or PreRelease text depending on which channel was packaged. `descriptions.prerelease` is required for any collection that ships a plugin.
 
 ## Included Artifacts
 

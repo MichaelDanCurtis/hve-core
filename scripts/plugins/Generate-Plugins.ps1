@@ -24,6 +24,11 @@
 .PARAMETER DryRun
     Optional. Shows what would be done without making changes.
 
+.PARAMETER Prune
+    Optional. Removes orphan plugin directories under plugins/ whose names do
+    not correspond to a loaded collection. Without this switch, orphan plugin
+    directories are left untouched.
+
 .PARAMETER Channel
     Optional. Release channel controlling eligible item maturities.
     Stable includes only stable items. PreRelease includes stable, preview,
@@ -40,6 +45,10 @@
 .EXAMPLE
     ./Generate-Plugins.ps1 -DryRun
     # Shows what would be generated without making changes
+
+.EXAMPLE
+    ./Generate-Plugins.ps1 -Prune
+    # Generates all plugins and removes orphan plugin directories
 
 .EXAMPLE
     ./Generate-Plugins.ps1 -Channel Stable
@@ -59,6 +68,9 @@ param(
 
     [Parameter(Mandatory = $false)]
     [switch]$DryRun,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$Prune,
 
     [Parameter(Mandatory = $false)]
     [ValidateSet('Stable', 'PreRelease')]
@@ -170,6 +182,11 @@ function Invoke-PluginGeneration {
     .PARAMETER DryRun
         When specified, logs actions without creating files or directories.
 
+    .PARAMETER Prune
+        When specified, removes plugin directories under plugins/ whose names
+        do not correspond to a loaded collection ID. Without this switch,
+        orphan plugin directories are left untouched.
+
     .PARAMETER Channel
         Release channel controlling item maturity eligibility.
 
@@ -192,6 +209,9 @@ function Invoke-PluginGeneration {
 
         [Parameter(Mandatory = $false)]
         [switch]$DryRun,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Prune,
 
         [Parameter(Mandatory = $false)]
         [ValidateSet('Stable', 'PreRelease')]
@@ -220,6 +240,11 @@ function Invoke-PluginGeneration {
         Write-Warning 'No collection manifests found in collections/'
         return New-GenerateResult -Success $true -PluginCount 0
     }
+
+    # Capture the unfiltered collection ID set for orphan-directory pruning so
+    # -Prune respects all known collections even when -CollectionIds filters the
+    # generation pass to a subset.
+    $allCollectionIds = @($allCollections | ForEach-Object { [string]$_.id })
 
     # Filter to requested IDs when provided
     if ($CollectionIds -and $CollectionIds.Count -gt 0) {
@@ -272,6 +297,7 @@ function Invoke-PluginGeneration {
             -RepoRoot $RepoRoot `
             -Version $repoVersion `
             -Maturity $collectionMaturity `
+            -Channel $Channel `
             -DryRun:$DryRun `
             -SymlinkCapable:$symlinkCapable
 
@@ -373,7 +399,11 @@ function Invoke-PluginGeneration {
                     }
 
                     $generatedBlock = $artifactSections.ToString().TrimEnd()
-                    $updatedCollectionMd = "$($parsed.Intro)`n`n$($CollectionMdBeginMarker)`n`n$generatedBlock`n`n$($CollectionMdEndMarker)"
+                    $intro = $parsed.Intro.TrimEnd()
+                    if ($intro -notmatch '(?m)^##\s+Included Artifacts\s*$') {
+                        $intro = "$intro`n`n## Included Artifacts"
+                    }
+                    $updatedCollectionMd = "$intro`n`n$($CollectionMdBeginMarker)`n`n$generatedBlock`n`n$($CollectionMdEndMarker)"
                     if (-not [string]::IsNullOrWhiteSpace($parsed.Footer)) {
                         $updatedCollectionMd += "`n`n$($parsed.Footer.TrimEnd())"
                     }
@@ -394,10 +424,32 @@ function Invoke-PluginGeneration {
         Write-Host "  $id ($itemCount items)" -ForegroundColor Green
     }
 
+    # Optionally remove orphan plugin directories whose names do not correspond
+    # to any loaded collection. Uses the unfiltered collection ID set so a
+    # -CollectionIds-restricted run cannot accidentally delete unrelated
+    # plugins.
+    if ($Prune -and (Test-Path -LiteralPath $pluginsDir)) {
+        $liveIds = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+        foreach ($id in $allCollectionIds) {
+            $null = $liveIds.Add($id)
+        }
+        foreach ($entry in Get-ChildItem -LiteralPath $pluginsDir -Directory -Force) {
+            if ($liveIds.Contains($entry.Name)) { continue }
+            if ($DryRun) {
+                Write-Host "  [DRY RUN] Would remove orphan plugin directory: $($entry.FullName)" -ForegroundColor Yellow
+            }
+            else {
+                Remove-Item -LiteralPath $entry.FullName -Recurse -Force -ErrorAction Stop
+                Write-Verbose "Removed orphan plugin directory: $($entry.FullName)"
+            }
+        }
+    }
+
     # Generate marketplace.json from all collections
     Write-MarketplaceManifest `
         -RepoRoot $RepoRoot `
         -Collections $allCollections `
+        -Channel $Channel `
         -DryRun:$DryRun
 
     # Fix git index modes for text stubs on non-symlink systems so Linux
@@ -440,6 +492,10 @@ function Start-PluginGeneration {
     .PARAMETER DryRun
         Forwarded dry-run switch.
 
+    .PARAMETER Prune
+        Forwarded prune switch. Removes orphan plugin directories not
+        corresponding to any loaded collection.
+
     .PARAMETER Channel
         Forwarded channel parameter.
 
@@ -460,6 +516,9 @@ function Start-PluginGeneration {
 
         [Parameter(Mandatory = $false)]
         [switch]$DryRun,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Prune,
 
         [Parameter(Mandatory = $false)]
         [ValidateSet('Stable', 'PreRelease')]
@@ -491,6 +550,7 @@ function Start-PluginGeneration {
             -CollectionIds $CollectionIds `
             -Refresh:$effectiveRefresh `
             -DryRun:$DryRun `
+            -Prune:$Prune `
             -Channel $Channel
 
         if (-not $result.Success) {
@@ -516,6 +576,7 @@ if ($MyInvocation.InvocationName -ne '.') {
         -CollectionIds $CollectionIds `
         -Refresh:$Refresh `
         -DryRun:$DryRun `
+        -Prune:$Prune `
         -Channel $Channel)
 }
 #endregion

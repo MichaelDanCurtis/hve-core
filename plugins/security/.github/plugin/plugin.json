@@ -1,6 +1,6 @@
 {
   "name": "security",
-  "description": "Security review, planning, incident response, risk assessment, and vulnerability analysis",
+  "description": "Experimental: Security review, planning, incident response, risk assessment, and vulnerability analysis. AS-IS. Feedback: github.com/microsoft/hve-core/issues",
   "version": "3.3.101",
   "agents": [
     "agents/hve-core/subagents/",

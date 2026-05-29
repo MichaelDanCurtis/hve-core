@@ -1,15 +1,17 @@
 <!-- markdownlint-disable-file -->
 # Design Thinking
 
-Design Thinking coaching identity, quality constraints, and methodology instructions for AI-enhanced design thinking across nine methods
-
-> **🔍 Preview** — This collection is in preview. Core features are complete and functional but refinements may follow.
+Experimental: Design Thinking coaching identity and methodology across nine methods. Available only via pre-release channel. Breaking changes possible. Feedback: github.com/microsoft/hve-core/issues
 
 ## Overview
 
 Coaching identity, quality constraints, and methodology instructions for AI-enhanced design thinking across nine methods. The collection supports the HVE Design Thinking pyramid structure spanning Problem, Solution, and Implementation spaces.
 
 > Preview: Core features are complete and functional. Suitable for adoption with the understanding that refinements may follow.
+
+## Channel distribution
+
+Plugins (the `plugins/<id>/` committed tree and the `.github/plugin/marketplace.json` entry) ship the PreRelease description text only. The `.vsix` extension package ships either Stable or PreRelease text depending on which channel was packaged. `descriptions.prerelease` is required for any collection that ships a plugin.
 
 ## Included Artifacts
 

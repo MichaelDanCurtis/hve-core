@@ -8,9 +8,9 @@
     Tests for collection manifest discovery and matrix building:
     - Empty collections directory returns empty matrix
     - Single stable collection returns one matrix item
-    - Deprecated collections are always skipped
-    - Experimental collections skipped for Stable channel
-    - Experimental collections included for Preview channel
+    - Deprecated and removed collections are always skipped
+    - Experimental collections are included for all channels (per-item maturity
+      gating is enforced downstream by Prepare-Extension)
     - Multiple collections produce correct matrix JSON
     - Skipped collections tracked in Skipped property
     - Missing name falls back to id
@@ -149,7 +149,7 @@ maturity: removed
         }
     }
 
-    Context 'Experimental skipped for Stable channel' {
+    Context 'Experimental included for Stable channel' {
         BeforeEach {
             $script:TempDir = Join-Path ([System.IO.Path]::GetTempPath()) "pester-$([Guid]::NewGuid().ToString('N').Substring(0,8))"
             New-Item -ItemType Directory -Path $script:TempDir -Force | Out-Null
@@ -165,15 +165,15 @@ maturity: experimental
             Remove-Item -Path $script:TempDir -Recurse -Force -ErrorAction SilentlyContinue
         }
 
-        It 'Excludes experimental from Stable channel matrix' {
+        It 'Includes experimental in Stable channel matrix (per-item gating happens downstream)' {
             $result = Find-CollectionManifestsCore -Channel 'Stable' -CollectionsDir $script:TempDir
-            $result.MatrixItems | Should -HaveCount 0
+            $result.MatrixItems | Should -HaveCount 1
+            $result.MatrixItems[0].id | Should -Be 'exp-collection'
         }
 
-        It 'Tracks experimental in Skipped with reason' {
+        It 'Does not track experimental in Skipped' {
             $result = Find-CollectionManifestsCore -Channel 'Stable' -CollectionsDir $script:TempDir
-            $result.Skipped | Should -HaveCount 1
-            $result.Skipped[0].Reason | Should -BeLike '*experimental*'
+            $result.Skipped | Should -HaveCount 0
         }
     }
 
@@ -273,11 +273,10 @@ maturity: experimental
             Remove-Item -Path $script:TempDir -Recurse -Force -ErrorAction SilentlyContinue
         }
 
-        It 'Tracks all skipped collections' {
+        It 'Tracks only deprecated/removed collections as skipped' {
             $result = Find-CollectionManifestsCore -Channel 'Stable' -CollectionsDir $script:TempDir
-            $result.Skipped | Should -HaveCount 2
+            $result.Skipped | Should -HaveCount 1
             $result.Skipped.Id | Should -Contain 'dep-one'
-            $result.Skipped.Id | Should -Contain 'exp-one'
         }
 
         It 'Includes correct reason for deprecated' {
@@ -286,10 +285,11 @@ maturity: experimental
             $depSkip.Reason | Should -Be 'deprecated'
         }
 
-        It 'Includes correct reason for experimental' {
+        It 'Does not skip experimental on Stable channel' {
             $result = Find-CollectionManifestsCore -Channel 'Stable' -CollectionsDir $script:TempDir
             $expSkip = $result.Skipped | Where-Object { $_.Id -eq 'exp-one' }
-            $expSkip.Reason | Should -BeLike '*experimental*'
+            $expSkip | Should -BeNullOrEmpty
+            $result.MatrixItems.id | Should -Contain 'exp-one'
         }
     }
 
