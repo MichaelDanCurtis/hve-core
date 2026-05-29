@@ -121,6 +121,253 @@ function Get-CollectionItemKey {
     return "$Kind|$ItemPath"
 }
 
+function Get-StrippedAgentName {
+    <#
+    .SYNOPSIS
+        Returns an agent name with any maturity picker suffix removed.
+
+    .DESCRIPTION
+        Strips a recognized maturity suffix produced by Get-AgentMaturityNameSuffix
+        (currently '(exp)' or '(pre)') from the end of an agent name and trims
+        trailing whitespace. Returns $null when no recognized suffix is present.
+
+    .PARAMETER AgentName
+        The agent name to inspect.
+
+    .OUTPUTS
+        [string] The name without its maturity suffix, or $null when no
+        suffix applies.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter()]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string]$AgentName
+    )
+
+    if ([string]::IsNullOrEmpty($AgentName)) {
+        return $null
+    }
+
+    foreach ($maturity in @('experimental', 'preview')) {
+        $suffix = Get-AgentMaturityNameSuffix -Maturity $maturity
+        if ([string]::IsNullOrEmpty($suffix)) {
+            continue
+        }
+        if ($AgentName.EndsWith($suffix, [System.StringComparison]::Ordinal)) {
+            $stripped = $AgentName.Substring(0, $AgentName.Length - $suffix.Length).TrimEnd()
+            if (-not [string]::IsNullOrEmpty($stripped)) {
+                return $stripped
+            }
+        }
+    }
+
+    return $null
+}
+
+function Find-AgentReferenceLineNumber {
+    <#
+    .SYNOPSIS
+        Locates the line number where an agent reference value appears.
+
+    .DESCRIPTION
+        Scans the raw lines of an agent file and returns the 1-based line
+        number where the supplied reference value appears in either the
+        agents: list ('- value' form) or a handoffs entry ('agent: value' form).
+        Returns 0 when no match is found.
+
+    .PARAMETER Lines
+        Raw file lines.
+
+    .PARAMETER Value
+        The reference string to locate.
+
+    .PARAMETER Section
+        Either 'agents' or 'handoffs' to pick the matching syntax.
+
+    .OUTPUTS
+        [int] 1-based line number, or 0 when not found.
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [AllowEmptyString()]
+        [string[]]$Lines,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Value,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('agents', 'handoffs')]
+        [string]$Section
+    )
+
+    $escaped = [regex]::Escape($Value)
+    $pattern = if ($Section -eq 'agents') {
+        "^\s*-\s*[`"']?$escaped[`"']?\s*$"
+    } else {
+        "^\s*agent\s*:\s*[`"']?$escaped[`"']?\s*$"
+    }
+
+    for ($i = 0; $i -lt $Lines.Count; $i++) {
+        if ($Lines[$i] -match $pattern) {
+            return $i + 1
+        }
+    }
+    return 0
+}
+
+function Test-AgentHandoffNameReferences {
+    <#
+    .SYNOPSIS
+        Validates that agents: and handoffs.agent: references resolve to a
+        registered agent name.
+
+    .DESCRIPTION
+        Scans .github/agents/**/*.agent.md to build an inventory of every
+        agent name: value, then iterates each file's agents: list and
+        handoffs.agent: values and emits an AgentHandoffNameMismatch
+        diagnostic for any reference that does not match a known name.
+        When a candidate exists whose stripped maturity suffix matches the
+        reference, the diagnostic includes a "Did you mean" suggestion.
+
+    .PARAMETER RepoRoot
+        Absolute path to the repository root directory.
+
+    .OUTPUTS
+        [hashtable[]] Diagnostics with Collection, Severity, ErrorType, and
+        Message keys. Returns an empty array when all references resolve.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$RepoRoot
+    )
+
+    $diagnostics = @()
+    $agentsDir = Join-Path -Path $RepoRoot -ChildPath '.github/agents'
+    if (-not (Test-Path -Path $agentsDir)) {
+        return ,$diagnostics
+    }
+
+    $agentFiles = Get-ChildItem -Path $agentsDir -Filter '*.agent.md' -File -Recurse
+    if ($agentFiles.Count -eq 0) {
+        return ,$diagnostics
+    }
+
+    $inventory = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    $fileData = [ordered]@{}
+
+    foreach ($file in $agentFiles) {
+        $relativePath = [System.IO.Path]::GetRelativePath($RepoRoot, $file.FullName) -replace '\\', '/'
+        if (Test-DeprecatedPath -Path $relativePath) {
+            continue
+        }
+
+        $content = Get-Content -Path $file.FullName -Raw
+        if ([string]::IsNullOrEmpty($content)) {
+            continue
+        }
+        if ($content -notmatch '(?s)^---\s*\r?\n(.*?)\r?\n---') {
+            continue
+        }
+
+        $yamlContent = $Matches[1] -replace '\r\n', "`n" -replace '\r', "`n"
+        $data = $null
+        try {
+            $data = ConvertFrom-Yaml -Yaml $yamlContent
+        } catch {
+            continue
+        }
+        if (-not $data) {
+            continue
+        }
+
+        if ($data.ContainsKey('name')) {
+            $rawName = $data.name
+            if ($null -ne $rawName -and -not [string]::IsNullOrWhiteSpace([string]$rawName)) {
+                [void]$inventory.Add([string]$rawName)
+            }
+        }
+
+        $agentRefs = @()
+        if ($data.ContainsKey('agents') -and $data.agents) {
+            foreach ($v in $data.agents) {
+                if ($v -is [string] -and -not [string]::IsNullOrWhiteSpace($v)) {
+                    $agentRefs += [string]$v
+                }
+            }
+        }
+
+        $handoffRefs = @()
+        if ($data.ContainsKey('handoffs') -and $data.handoffs) {
+            foreach ($h in $data.handoffs) {
+                if ($h -is [System.Collections.IDictionary] -and $h.ContainsKey('agent')) {
+                    $val = [string]$h.agent
+                    if (-not [string]::IsNullOrWhiteSpace($val)) {
+                        $handoffRefs += $val
+                    }
+                }
+            }
+        }
+
+        if ($agentRefs.Count -gt 0 -or $handoffRefs.Count -gt 0) {
+            $fileData[$relativePath] = @{
+                Lines       = ($content -split "`r?`n")
+                AgentRefs   = $agentRefs
+                HandoffRefs = $handoffRefs
+            }
+        }
+    }
+
+    foreach ($relativePath in ($fileData.Keys | Sort-Object)) {
+        $entry = $fileData[$relativePath]
+        $allRefs = @()
+        foreach ($r in $entry.AgentRefs)   { $allRefs += @{ Value = $r; Section = 'agents' } }
+        foreach ($r in $entry.HandoffRefs) { $allRefs += @{ Value = $r; Section = 'handoffs' } }
+
+        foreach ($ref in $allRefs) {
+            $value = $ref.Value
+            if ($inventory.Contains($value)) {
+                continue
+            }
+
+            $suggestion = $null
+            foreach ($candidate in $inventory) {
+                $stripped = Get-StrippedAgentName -AgentName $candidate
+                if ($null -ne $stripped -and $stripped -eq $value) {
+                    $suggestion = $candidate
+                    break
+                }
+            }
+
+            $lineNumber = Find-AgentReferenceLineNumber -Lines $entry.Lines -Value $value -Section $ref.Section
+            $location = if ($lineNumber -gt 0) { "${relativePath}:${lineNumber}" } else { $relativePath }
+
+            $message = "Reference '$value' in $location does not match any registered agent name."
+            if ($suggestion) {
+                $message += " Did you mean '$suggestion'?"
+            }
+
+            $diagnostics += @{
+                Collection = 'agent-references'
+                Severity   = 'Error'
+                ErrorType  = 'AgentHandoffNameMismatch'
+                Message    = $message
+            }
+        }
+    }
+
+    return ,$diagnostics
+}
+
 #endregion Validation Helpers
 
 #region Orchestration
@@ -206,6 +453,9 @@ function Invoke-CollectionValidation {
         'shared'        = $true
         'rai-planning'  = $true
         'accessibility' = $true
+        'jira'          = $true
+        'gitlab'        = $true
+        'installer'     = $true
     }
 
     foreach ($file in $collectionFiles) {
@@ -275,7 +525,24 @@ function Invoke-CollectionValidation {
             $seenIds[$id] = $file.Name
         }
 
+        # Prerelease description presence (warning)
+        $hasPrereleaseDescription = $false
+        if ($manifest.ContainsKey('descriptions') -and $manifest.descriptions) {
+            $descriptions = $manifest.descriptions
+            if ($descriptions -is [System.Collections.IDictionary] -and $descriptions.Contains('prerelease')) {
+                $prereleaseValue = [string]$descriptions['prerelease']
+                if (-not [string]::IsNullOrWhiteSpace($prereleaseValue)) {
+                    $hasPrereleaseDescription = $true
+                }
+            }
+        }
+        if (-not $hasPrereleaseDescription) {
+            Write-Host "  WARN $($file.Name): missing populated 'descriptions.prerelease'" -ForegroundColor Yellow
+            Add-ValidationResult -Collection $collectionLabel -ErrorType 'MissingPrereleaseDescription' -Message "missing populated 'descriptions.prerelease'" -Severity 'Warning'
+        }
+
         # Validate collection-level maturity if present
+        $collMaturity = $null
         if ($manifest.ContainsKey('maturity') -and -not [string]::IsNullOrWhiteSpace([string]$manifest.maturity)) {
             $collMaturity = [string]$manifest.maturity
             if ($allowedMaturities -notcontains $collMaturity) {
@@ -293,7 +560,17 @@ function Invoke-CollectionValidation {
             if ($item.ContainsKey('maturity')) {
                 $itemMaturity = [string]$item.maturity
             }
-            $effectiveMaturity = Resolve-CollectionItemMaturity -Maturity $itemMaturity
+            if ([string]::IsNullOrWhiteSpace($itemMaturity)) {
+                $fileErrors += @{ ErrorType = 'MissingExplicitMaturity'; Message = "item missing required 'maturity' field: $itemPath" }
+            }
+            $rawEffectiveMaturity = if (-not [string]::IsNullOrWhiteSpace($itemMaturity)) {
+                $itemMaturity
+            } elseif (-not [string]::IsNullOrWhiteSpace($collMaturity)) {
+                $collMaturity
+            } else {
+                $null
+            }
+            $effectiveMaturity = Resolve-CollectionItemMaturity -Maturity $rawEffectiveMaturity
 
             # Repo-specific path exclusion
             if (Test-HveCoreRepoRelativePath -Path $itemPath) {
@@ -318,6 +595,48 @@ function Invoke-CollectionValidation {
 
             if (-not [string]::IsNullOrWhiteSpace($itemMaturity) -and ($allowedMaturities -notcontains $itemMaturity)) {
                 $fileErrors += @{ ErrorType = 'InvalidMaturity'; Message = "invalid maturity '$itemMaturity' for item '$itemPath' (allowed: $($allowedMaturities -join ', '))" }
+            }
+
+            if ($kind -eq 'agent' -and $itemPath -like '*.agent.md' -and (Test-Path -Path $absolutePath)) {
+                $expectedSuffix = Get-AgentMaturityNameSuffix -Maturity $effectiveMaturity
+                $frontmatter = Get-ArtifactFrontmatter -FilePath $absolutePath
+                $agentName = $frontmatter.name
+                $mismatchMessage = $null
+
+                if ([string]::IsNullOrEmpty($agentName)) {
+                    if (-not [string]::IsNullOrEmpty($expectedSuffix)) {
+                        $mismatchMessage = "agent '$itemPath' source name is missing; must end with '$expectedSuffix' for effective maturity '$effectiveMaturity'"
+                    }
+                }
+                else {
+                    $hasExpStale = $agentName.EndsWith('(exp)', [System.StringComparison]::Ordinal)
+                    $hasPreStale = $agentName.EndsWith('(pre)', [System.StringComparison]::Ordinal)
+                    $hasFullExp = $agentName -match '\(Experimental\)\s*$'
+                    $hasFullPre = $agentName -match '\(Preview\)\s*$'
+                    $hasDoubleSuffix = ($agentName -match '\((exp|pre)\)\((exp|pre)\)\s*$')
+
+                    if ($hasDoubleSuffix) {
+                        $mismatchMessage = "agent '$itemPath' source name has stacked maturity suffixes; expected single '$expectedSuffix' for effective maturity '$effectiveMaturity'"
+                    }
+                    elseif ($hasFullExp -or $hasFullPre) {
+                        $obsolete = if ($hasFullExp) { '(Experimental)' } else { '(Preview)' }
+                        $expectedDisplay = if ([string]::IsNullOrEmpty($expectedSuffix)) { 'no suffix' } else { "'$expectedSuffix'" }
+                        $mismatchMessage = "agent '$itemPath' source name uses obsolete suffix '$obsolete'; expected $expectedDisplay for effective maturity '$effectiveMaturity'"
+                    }
+                    elseif (-not [string]::IsNullOrEmpty($expectedSuffix)) {
+                        if (-not $agentName.EndsWith($expectedSuffix, [System.StringComparison]::Ordinal)) {
+                            $mismatchMessage = "agent '$itemPath' source name must end with '$expectedSuffix' for effective maturity '$effectiveMaturity'"
+                        }
+                    }
+                    elseif ($hasExpStale -or $hasPreStale) {
+                        $stale = if ($hasExpStale) { '(exp)' } else { '(pre)' }
+                        $mismatchMessage = "agent '$itemPath' source name has stale suffix '$stale'; expected no suffix for effective maturity '$effectiveMaturity'"
+                    }
+                }
+
+                if ($mismatchMessage) {
+                    $fileErrors += @{ ErrorType = 'AgentMaturityLabelMismatch'; Message = $mismatchMessage }
+                }
             }
 
             # Check 2: intra-collection duplicate detection
@@ -435,10 +754,13 @@ function Invoke-CollectionValidation {
         # Maturity conflict: only when item appears in canonical AND at least one themed
         if ($canonicalMatches.Count -gt 0 -and $themedMatches.Count -gt 0) {
             $canonical = $canonicalMatches[0]
+            $maturityRank = @{ 'stable' = 0; 'preview' = 1; 'experimental' = 2; 'deprecated' = 3; 'removed' = 4 }
             foreach ($occurrence in $themedMatches) {
                 if ($occurrence.Maturity -ne $canonical.Maturity) {
-                    Write-Host "  FAIL maturity conflict for '$itemKey': canonical '$canonicalCollectionId'='$($canonical.Maturity)', '$($occurrence.CollectionId)'='$($occurrence.Maturity)'" -ForegroundColor Red
-                    Add-ValidationResult -Collection $occurrence.CollectionId -ErrorType 'MaturityConflict' -Message "maturity conflict for '$itemKey': canonical '$canonicalCollectionId'='$($canonical.Maturity)', '$($occurrence.CollectionId)'='$($occurrence.Maturity)'"
+                    $expected = if ($maturityRank[$canonical.Maturity] -ge $maturityRank[$occurrence.Maturity]) { $canonical.Maturity } else { $occurrence.Maturity }
+                    $msg = "maturity conflict for '$itemKey' in '$($occurrence.CollectionFile)': canonical '$canonicalCollectionId'='$($canonical.Maturity)', '$($occurrence.CollectionId)'='$($occurrence.Maturity)', expected='$expected'"
+                    Write-Host "  FAIL $msg" -ForegroundColor Red
+                    Add-ValidationResult -Collection $occurrence.CollectionId -ErrorType 'MaturityConflict' -Message $msg
                     $errorCount++
                 }
             }
@@ -471,6 +793,13 @@ function Invoke-CollectionValidation {
                 Add-ValidationResult -Collection $canonicalCollectionId -ErrorType 'CanonicalOnlyArtifact' -Message "'$diskKey' exists in '$canonicalCollectionId' but is not in any themed collection" -Severity 'Warning'
             }
         }
+    }
+
+    $handoffDiagnostics = Test-AgentHandoffNameReferences -RepoRoot $RepoRoot
+    foreach ($diag in $handoffDiagnostics) {
+        Write-Host "  FAIL $($diag.Message)" -ForegroundColor Red
+        Add-ValidationResult -Collection $diag.Collection -ErrorType $diag.ErrorType -Message $diag.Message -Severity $diag.Severity
+        $errorCount++
     }
 
     Write-Host ''

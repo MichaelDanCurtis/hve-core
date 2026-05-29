@@ -1,17 +1,20 @@
 ---
 title: Collection Scripts
-description: PowerShell tooling for validating collection manifests and shared collection helpers
+description: PowerShell tooling for validating the canonical collection manifest and generated collection outputs
 ---
 
-PowerShell tooling for validating collection manifests and shared collection
-helper functions used by both collection validation and plugin generation.
+PowerShell tooling for validating `collections/core-manifest.yml`, generating
+collection package manifests, and sharing collection helpers used by validation
+and plugin generation.
 
 ## Scripts
 
-| Script                         | npm Command                         | Description                                       |
-|--------------------------------|-------------------------------------|---------------------------------------------------|
-| Validate-Collections.ps1       | `npm run lint:collections-metadata` | Validate collection manifests                     |
-| Modules/CollectionHelpers.psm1 | (library)                           | YAML parsing, frontmatter, and collection helpers |
+| Script                           | npm Command                         | Description                                                  |
+|----------------------------------|-------------------------------------|--------------------------------------------------------------|
+| Validate-CoreManifest.ps1        | `npm run lint:collections-metadata` | Validate the canonical collection manifest source            |
+| Validate-Collections.ps1         | `npm run lint:collections-metadata` | Validate generated collection manifests                      |
+| Modules/CoreManifestHelpers.psm1 | (library)                           | Core manifest parsing, normalization, and generation helpers |
+| Modules/CollectionHelpers.psm1   | (library)                           | YAML parsing, frontmatter, and collection helpers            |
 
 ## Prerequisites
 
@@ -20,11 +23,16 @@ helper functions used by both collection validation and plugin generation.
 
 ## Adding a New Collection
 
-1. Create `collections/<id>.collection.yml` (see existing collections for
-   format)
-2. Run `npm run lint:collections-metadata` to check the manifest
-3. Run `npm run plugin:generate` to generate the plugin
-4. Commit both the collection and generated plugin
+1. Add the collection metadata to `collections/core-manifest.yml` under
+   `collections:`. Include the generated manifest path, display name,
+   description, tags, and item count.
+2. Assign artifacts to the collection in the canonical artifact maps such as
+   `agents:`, `prompts:`, `instructions:`, and `skills:`.
+3. Run `npm run lint:collections-metadata` to check the core manifest and
+   generated manifests.
+4. Run `npm run plugin:generate` to generate collection and plugin outputs.
+5. Commit the core manifest changes and the generated outputs required by the
+   repository workflow.
 
 <!-- markdownlint-disable MD036 -->
 *🤖 Crafted with precision by ✨Copilot following brilliant human instruction,

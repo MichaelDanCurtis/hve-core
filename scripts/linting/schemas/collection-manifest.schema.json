@@ -25,6 +25,24 @@
       "minLength": 1,
       "description": "Brief description of the collection purpose."
     },
+    "descriptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "stable": { "type": "string", "minLength": 1 },
+        "prerelease": { "type": "string", "minLength": 1 }
+      },
+      "description": "Optional per-channel description overrides. Falls back to 'description' when omitted."
+    },
+    "displayNames": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "stable": { "type": "string", "minLength": 1 },
+        "prerelease": { "type": "string", "minLength": 1 }
+      },
+      "description": "Optional per-channel display name overrides. Falls back to 'name' when omitted."
+    },
     "maturity": {
       "type": "string",
       "enum": [

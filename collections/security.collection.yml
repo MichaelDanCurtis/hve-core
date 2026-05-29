@@ -1,6 +1,8 @@
 id: security
 name: Security
 description: Security review, planning, incident response, risk assessment, and vulnerability analysis
+descriptions:
+  prerelease: 'Experimental: Security review, planning, incident response, risk assessment, and vulnerability analysis. AS-IS. Feedback: github.com/microsoft/hve-core/issues'
 notice: |
   > [!CAUTION]
   > The security agents and prompts in this collection are **assistive tools only**. They do not replace professional security tooling (SAST, DAST, SCA, penetration testing, compliance scanners) or qualified human review. All AI-generated security artifacts **must** be reviewed and validated by qualified security professionals before use. AI outputs may contain inaccuracies, miss critical threats, or produce recommendations that are incomplete or inappropriate for your environment.
@@ -28,21 +30,22 @@ items:
     maturity: experimental
   - path: .github/agents/hve-core/subagents/researcher-subagent.agent.md
     kind: agent
+    maturity: stable
   - path: .github/agents/security/security-reviewer.agent.md
     kind: agent
     maturity: experimental
   - path: .github/agents/security/subagents/codebase-profiler.agent.md
     kind: agent
-    maturity: experimental
+    maturity: stable
   - path: .github/agents/security/subagents/finding-deep-verifier.agent.md
     kind: agent
-    maturity: experimental
+    maturity: stable
   - path: .github/agents/security/subagents/report-generator.agent.md
     kind: agent
-    maturity: experimental
+    maturity: stable
   - path: .github/agents/security/subagents/skill-assessor.agent.md
     kind: agent
-    maturity: experimental
+    maturity: stable
   # Skills
   - path: .github/skills/security/owasp-top-10
     kind: skill
@@ -71,11 +74,9 @@ items:
   - path: .github/skills/security/security-reviewer-formats
     kind: skill
     maturity: experimental
-  - path: .github/skills/security/supply-chain-security
-    kind: skill
-    maturity: experimental
   - path: .github/skills/shared/pr-reference
     kind: skill
+    maturity: stable
   # Security Planner Prompts
   - path: .github/prompts/security/security-capture.prompt.md
     kind: prompt
@@ -141,7 +142,22 @@ items:
     kind: instruction
     maturity: experimental
   # SSSC Planner Instructions
-  - path: .github/instructions/security/sssc-planner.instructions.md
+  - path: .github/instructions/security/sssc-identity.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/security/sssc-assessment.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/security/sssc-standards.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/security/sssc-gap-analysis.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/security/sssc-backlog.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/security/sssc-handoff.instructions.md
     kind: instruction
     maturity: experimental
   # RAI Planner Instructions
@@ -167,22 +183,13 @@ items:
     kind: instruction
     maturity: experimental
   # Shared Instructions
-  - path: .github/instructions/shared/planner-identity-base.instructions.md
-    kind: instruction
-    maturity: experimental
   - path: .github/instructions/shared/coaching-patterns.instructions.md
     kind: instruction
   - path: .github/instructions/shared/disclaimer-language.instructions.md
     kind: instruction
+    maturity: stable
   - path: .github/instructions/shared/hve-core-location.instructions.md
     kind: instruction
-  # Telemetry
-  - path: .github/skills/shared/telemetry-foundations
-    kind: skill
-  - path: .github/skills/shared/backlog-templates
-    kind: skill
-    maturity: experimental
-  - path: .github/instructions/shared/telemetry-overlay.instructions.md
-    kind: instruction
+    maturity: stable
 display:
   ordering: manual
