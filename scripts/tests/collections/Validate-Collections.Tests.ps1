@@ -106,6 +106,7 @@ Describe 'Invoke-CollectionValidation - repo-specific path rejection' {
                 [ordered]@{
                     path = '.github/instructions/workflows.instructions.md'
                     kind = 'instruction'
+                    maturity = 'stable'
                 }
             )
         }
@@ -126,6 +127,7 @@ Describe 'Invoke-CollectionValidation - repo-specific path rejection' {
                 [ordered]@{
                     path = '.github/instructions/shared/hve-core-location.instructions.md'
                     kind = 'instruction'
+                    maturity = 'stable'
                 }
             )
         }
@@ -145,6 +147,7 @@ Describe 'Invoke-CollectionValidation - repo-specific path rejection' {
                 [ordered]@{
                     path = '.github/agents/internal.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -165,6 +168,7 @@ Describe 'Invoke-CollectionValidation - repo-specific path rejection' {
                 [ordered]@{
                     path = '.github/agents/hve-core/rpi-agent.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -206,11 +210,13 @@ Describe 'Invoke-CollectionValidation - collection-level maturity' {
                 [ordered]@{
                     path = '.github/agents/test/test.agent.md'
                     kind = 'agent'
+                    maturity = 'experimental'
                 }
             )
         }
         $yaml = ConvertTo-Yaml -Data $manifest
         Set-Content -Path (Join-Path $script:collectionsDir 'test-maturity-experimental.collection.yml') -Value $yaml
+        Set-Content -Path (Join-Path $script:repoRoot '.github/agents/test/test.agent.md') -Value "---`nname: Test(exp)`ndescription: test agent`n---"
 
         $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
         $result.Success | Should -BeTrue
@@ -226,11 +232,13 @@ Describe 'Invoke-CollectionValidation - collection-level maturity' {
                 [ordered]@{
                     path = '.github/agents/test/test.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
         $yaml = ConvertTo-Yaml -Data $manifest
         Set-Content -Path (Join-Path $script:collectionsDir 'test-maturity-stable.collection.yml') -Value $yaml
+        Set-Content -Path (Join-Path $script:repoRoot '.github/agents/test/test.agent.md') -Value "---`nname: Test`ndescription: test agent`n---"
 
         $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
         $result.Success | Should -BeTrue
@@ -246,11 +254,13 @@ Describe 'Invoke-CollectionValidation - collection-level maturity' {
                 [ordered]@{
                     path = '.github/agents/test/test.agent.md'
                     kind = 'agent'
+                    maturity = 'preview'
                 }
             )
         }
         $yaml = ConvertTo-Yaml -Data $manifest
         Set-Content -Path (Join-Path $script:collectionsDir 'test-maturity-preview.collection.yml') -Value $yaml
+        Set-Content -Path (Join-Path $script:repoRoot '.github/agents/test/test.agent.md') -Value "---`nname: Test(pre)`ndescription: test agent`n---"
 
         $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
         $result.Success | Should -BeTrue
@@ -266,11 +276,13 @@ Describe 'Invoke-CollectionValidation - collection-level maturity' {
                 [ordered]@{
                     path = '.github/agents/test/test.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
         $yaml = ConvertTo-Yaml -Data $manifest
         Set-Content -Path (Join-Path $script:collectionsDir 'test-maturity-deprecated.collection.yml') -Value $yaml
+        Set-Content -Path (Join-Path $script:repoRoot '.github/agents/test/test.agent.md') -Value "---`nname: Test`ndescription: test agent`n---"
 
         $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
         $result.Success | Should -BeTrue
@@ -286,6 +298,7 @@ Describe 'Invoke-CollectionValidation - collection-level maturity' {
                 [ordered]@{
                     path = '.github/agents/test/test.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -306,11 +319,13 @@ Describe 'Invoke-CollectionValidation - collection-level maturity' {
                 [ordered]@{
                     path = '.github/agents/test/test.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
         $yaml = ConvertTo-Yaml -Data $manifest
         Set-Content -Path (Join-Path $script:collectionsDir 'test-maturity-omitted.collection.yml') -Value $yaml
+        Set-Content -Path (Join-Path $script:repoRoot '.github/agents/test/test.agent.md') -Value "---`nname: Test`ndescription: test agent`n---"
 
         $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
         $result.Success | Should -BeTrue
@@ -368,6 +383,7 @@ Describe 'Invoke-CollectionValidation - collection-to-folder name consistency' {
                 [ordered]@{
                     path = '.github/agents/my-collection/match.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -393,6 +409,7 @@ Describe 'Invoke-CollectionValidation - collection-to-folder name consistency' {
                 [ordered]@{
                     path = '.github/agents/wrong-folder/mismatch.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -418,6 +435,7 @@ Describe 'Invoke-CollectionValidation - collection-to-folder name consistency' {
                 [ordered]@{
                     path = '.github/agents/hve-core/core.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -454,6 +472,7 @@ Describe 'Invoke-CollectionValidation - collection-to-folder name consistency' {
                 [ordered]@{
                     path = '.github/instructions/shared/shared.instructions.md'
                     kind = 'instruction'
+                    maturity = 'stable'
                 }
             )
         }
@@ -479,6 +498,7 @@ Describe 'Invoke-CollectionValidation - collection-to-folder name consistency' {
                 [ordered]@{
                     path = '.github/instructions/rai-planning/rai.instructions.md'
                     kind = 'instruction'
+                    maturity = 'stable'
                 }
             )
         }
@@ -504,22 +524,27 @@ Describe 'Invoke-CollectionValidation - collection-to-folder name consistency' {
                 [ordered]@{
                     path = '.github/agents/my-collection/match.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 },
                 [ordered]@{
                     path = '.github/agents/wrong-folder/mismatch.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 },
                 [ordered]@{
                     path = '.github/instructions/shared/shared.instructions.md'
                     kind = 'instruction'
+                    maturity = 'stable'
                 },
                 [ordered]@{
                     path = '.github/instructions/rai-planning/rai.instructions.md'
                     kind = 'instruction'
+                    maturity = 'stable'
                 },
                 [ordered]@{
                     path = '.github/agents/hve-core/core.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -546,6 +571,7 @@ Describe 'Invoke-CollectionValidation - collection-to-folder name consistency' {
                 [ordered]@{
                     path = '.github/agents/wrong-folder/mismatch.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -616,6 +642,7 @@ items:
                 [ordered]@{
                     path = '.github/agents/test/a.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -635,6 +662,7 @@ items:
                 [ordered]@{
                     path = '.github/agents/test/a.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -655,6 +683,7 @@ items:
                 [ordered]@{
                     path = '.github/agents/test/nonexistent.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -708,6 +737,7 @@ items:
                 [ordered]@{
                     path = '.github/instructions/test/test.instructions.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -727,6 +757,7 @@ items:
                 [ordered]@{
                     path = '.github/agents/test/a.agent.md'
                     kind = 'instruction'
+                    maturity = 'stable'
                 }
             )
         }
@@ -751,10 +782,12 @@ items:
                 [ordered]@{
                     path = '.github/agents/test/a.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 },
                 [ordered]@{
                     path = '.github/agents/other/a.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -776,6 +809,7 @@ items:
                 [ordered]@{
                     path = '.github/agents/test/a.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -787,6 +821,7 @@ items:
                 [ordered]@{
                     path = '.github/agents/test/a.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 }
             )
         }
@@ -798,10 +833,12 @@ items:
                 [ordered]@{
                     path = '.github/agents/test/b.agent.md'
                     kind = 'agent'
+                    maturity = 'stable'
                 },
                 [ordered]@{
                     path = '.github/instructions/test/test.instructions.md'
                     kind = 'instruction'
+                    maturity = 'stable'
                 }
             )
         }
@@ -851,6 +888,139 @@ items:
         $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
         $result.Success | Should -BeFalse
     }
+
+    It 'Detects inherited maturity conflict with canonical collection' {
+        $canonical = [ordered]@{
+            id          = 'hve-core-all'
+            name        = 'All'
+            description = 'Canonical collection'
+            items       = @(
+                [ordered]@{
+                    path     = '.github/agents/test/a.agent.md'
+                    kind     = 'agent'
+                    maturity = 'stable'
+                }
+            )
+        }
+        $other = [ordered]@{
+            id          = 'conflict-col'
+            name        = 'Conflict'
+            description = 'Conflicting maturity'
+            maturity    = 'experimental'
+            items       = @(
+                [ordered]@{
+                    path = '.github/agents/test/a.agent.md'
+                    kind = 'agent'
+                    maturity = 'stable'
+                }
+            )
+        }
+        $yaml1 = ConvertTo-Yaml -Data $canonical
+        $yaml2 = ConvertTo-Yaml -Data $other
+        Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value $yaml1
+        Set-Content -Path (Join-Path $script:collectionsDir 'conflict-col.collection.yml') -Value $yaml2
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+        $result.Success | Should -BeFalse
+    }
+
+    It 'Accepts inherited maturity when it matches canonical collection' {
+        $leakedDir = Join-Path $script:repoRoot '.github/agents/other'
+        if (Test-Path $leakedDir) { Remove-Item -Path $leakedDir -Recurse -Force }
+
+        $canonical = [ordered]@{
+            id          = 'hve-core-all'
+            name        = 'All'
+            description = 'Canonical collection'
+            items       = @(
+                [ordered]@{
+                    path     = '.github/agents/test/a.agent.md'
+                    kind     = 'agent'
+                    maturity = 'experimental'
+                },
+                [ordered]@{
+                    path = '.github/agents/test/b.agent.md'
+                    kind = 'agent'
+                    maturity = 'stable'
+                },
+                [ordered]@{
+                    path = '.github/instructions/test/test.instructions.md'
+                    kind = 'instruction'
+                    maturity = 'stable'
+                }
+            )
+        }
+        $other = [ordered]@{
+            id          = 'experimental-col'
+            name        = 'Experimental'
+            description = 'Experimental maturity'
+            maturity    = 'experimental'
+            items       = @(
+                [ordered]@{
+                    path = '.github/agents/test/a.agent.md'
+                    kind = 'agent'
+                    maturity = 'experimental'
+                }
+            )
+        }
+        $yaml1 = ConvertTo-Yaml -Data $canonical
+        $yaml2 = ConvertTo-Yaml -Data $other
+        Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value $yaml1
+        Set-Content -Path (Join-Path $script:collectionsDir 'experimental-col.collection.yml') -Value $yaml2
+        Set-Content -Path (Join-Path $script:repoRoot '.github/agents/test/a.agent.md') -Value "---`nname: A(exp)`ndescription: agent a`n---"
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+        $result.Success | Should -BeTrue
+    }
+
+    It 'Lets item maturity override collection maturity' {
+        $leakedDir = Join-Path $script:repoRoot '.github/agents/other'
+        if (Test-Path $leakedDir) { Remove-Item -Path $leakedDir -Recurse -Force }
+
+        $canonical = [ordered]@{
+            id          = 'hve-core-all'
+            name        = 'All'
+            description = 'Canonical collection'
+            items       = @(
+                [ordered]@{
+                    path     = '.github/agents/test/a.agent.md'
+                    kind     = 'agent'
+                    maturity = 'preview'
+                },
+                [ordered]@{
+                    path = '.github/agents/test/b.agent.md'
+                    kind = 'agent'
+                    maturity = 'stable'
+                },
+                [ordered]@{
+                    path = '.github/instructions/test/test.instructions.md'
+                    kind = 'instruction'
+                    maturity = 'stable'
+                }
+            )
+        }
+        $other = [ordered]@{
+            id          = 'override-col'
+            name        = 'Override'
+            description = 'Item maturity override'
+            maturity    = 'experimental'
+            items       = @(
+                [ordered]@{
+                    path     = '.github/agents/test/a.agent.md'
+                    kind     = 'agent'
+                    maturity = 'preview'
+                }
+            )
+        }
+        $yaml1 = ConvertTo-Yaml -Data $canonical
+        $yaml2 = ConvertTo-Yaml -Data $other
+        Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value $yaml1
+        Set-Content -Path (Join-Path $script:collectionsDir 'override-col.collection.yml') -Value $yaml2
+        Set-Content -Path (Join-Path $script:repoRoot '.github/agents/test/a.agent.md') -Value "---`nname: A(pre)`ndescription: agent a`n---"
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+        $result.Success | Should -BeTrue
+    }
 }
 
 Describe 'Invoke-CollectionValidation - new checks' {
@@ -889,14 +1059,14 @@ Describe 'Invoke-CollectionValidation - new checks' {
     It 'Warns but passes when .collection.md companion is missing' {
         $manifest = [ordered]@{
             id = 'no-companion'; name = 'No Companion'; description = 'Missing companion md'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'no-companion.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $canonical)
@@ -910,15 +1080,15 @@ Describe 'Invoke-CollectionValidation - new checks' {
     It 'Passes cleanly when .collection.md companion is present' {
         $manifest = [ordered]@{
             id = 'has-companion'; name = 'Has Companion'; description = 'With md'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'has-companion.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         Set-Content -Path (Join-Path $script:collectionsDir 'has-companion.collection.md') -Value '# Has Companion'
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $canonical)
@@ -934,8 +1104,8 @@ Describe 'Invoke-CollectionValidation - new checks' {
         $manifest = [ordered]@{
             id = 'intra-dup'; name = 'Intra Dup'; description = 'Dup item'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'intra-dup.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
@@ -953,16 +1123,16 @@ Describe 'Invoke-CollectionValidation - new checks' {
         $manifest = [ordered]@{
             id = 'distinct-items'; name = 'Distinct'; description = 'Distinct items'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/test2/b.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/test2/b.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/test2/b.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/test2/b.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'distinct-items.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
@@ -979,12 +1149,12 @@ Describe 'Invoke-CollectionValidation - new checks' {
     It 'Fails when a themed collection item is absent from hve-core-all' {
         $manifest = [ordered]@{
             id = 'themed-only'; name = 'Themed Only'; description = 'Item not in hve-core-all'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         # Canonical exists but does NOT include a.agent.md - only orphan - so Check 4 fires
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical - missing themed item'
-            items = @([ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'themed-only.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         Set-Content -Path (Join-Path $script:collectionsDir 'themed-only.collection.md') -Value '# Themed'
@@ -999,13 +1169,13 @@ Describe 'Invoke-CollectionValidation - new checks' {
     It 'Passes when all themed items are present in hve-core-all' {
         $themed = [ordered]@{
             id = 'themed-covered'; name = 'Themed Covered'; description = 'Covered by canonical'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'themed-covered.collection.yml') -Value (ConvertTo-Yaml -Data $themed)
@@ -1023,11 +1193,11 @@ Describe 'Invoke-CollectionValidation - new checks' {
         # manifest and canonical cover a.agent.md but NOT orphan/orphan.agent.md
         $manifest = [ordered]@{
             id = 'partial-coverage'; name = 'Partial'; description = 'Missing orphan'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical - missing orphan'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'partial-coverage.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         Set-Content -Path (Join-Path $script:collectionsDir 'partial-coverage.collection.md') -Value '# Partial'
@@ -1043,13 +1213,13 @@ Describe 'Invoke-CollectionValidation - new checks' {
         # Themed covers only a.agent.md; canonical covers both - orphan is canonical-only
         $themed = [ordered]@{
             id = 'themed-partial'; name = 'Themed Partial'; description = 'Missing orphan in themed'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical - covers orphan'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'themed-partial.collection.yml') -Value (ConvertTo-Yaml -Data $themed)
@@ -1086,7 +1256,7 @@ Describe 'Invoke-CollectionValidation - marker validation' -Tag 'Unit' {
     It 'Passes when collection.md has valid matched marker pairs' {
         $manifest = [ordered]@{
             id = 'valid-markers'; name = 'Valid Markers'; description = 'Matched markers'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'valid-markers.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         $mdContent = @"
@@ -1100,8 +1270,8 @@ Generated content.
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $canonical)
@@ -1115,7 +1285,7 @@ Generated content.
     It 'Warns but passes when begin marker exists without end marker' {
         $manifest = [ordered]@{
             id = 'begin-only'; name = 'Begin Only'; description = 'Missing end'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'begin-only.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         $mdContent = @"
@@ -1128,8 +1298,8 @@ Content without end marker.
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $canonical)
@@ -1143,7 +1313,7 @@ Content without end marker.
     It 'Warns but passes when end marker exists without begin marker' {
         $manifest = [ordered]@{
             id = 'end-only'; name = 'End Only'; description = 'Missing begin'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'end-only.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         $mdContent = @"
@@ -1156,8 +1326,8 @@ Content without begin marker.
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $canonical)
@@ -1171,15 +1341,15 @@ Content without begin marker.
     It 'Does not warn when collection.md has no markers (backward compat)' {
         $manifest = [ordered]@{
             id = 'no-markers'; name = 'No Markers'; description = 'Legacy no markers'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'no-markers.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         Set-Content -Path (Join-Path $script:collectionsDir 'no-markers.collection.md') -Value '# No Markers - legacy content without any markers'
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $canonical)
@@ -1193,7 +1363,7 @@ Content without begin marker.
     It 'Warns but passes when markers appear in wrong order' {
         $manifest = [ordered]@{
             id = 'reversed'; name = 'Reversed'; description = 'Wrong order'
-            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'reversed.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         $mdContent = @"
@@ -1207,8 +1377,8 @@ Content.
         $canonical = [ordered]@{
             id = 'hve-core-all'; name = 'All'; description = 'Canonical'
             items = @(
-                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' },
-                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent' }
+                [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' },
+                [ordered]@{ path = '.github/agents/orphan/orphan.agent.md'; kind = 'agent'; maturity = 'stable' }
             )
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $canonical)
@@ -1263,7 +1433,7 @@ items:
             id          = 'hve-core-all'
             name        = 'All'
             description = 'Canonical'
-            items       = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items       = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.md') -Value '# All'
@@ -1322,7 +1492,7 @@ items:
             id          = 'hve-core-all'
             name        = 'All'
             description = 'Canonical'
-            items       = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items       = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.md') -Value '# All'
@@ -1362,7 +1532,7 @@ items:
             id          = 'hve-core-all'
             name        = 'All'
             description = 'Canonical'
-            items       = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent' })
+            items       = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
         }
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
         Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.md') -Value '# All'
@@ -1371,5 +1541,429 @@ items:
 
         $result.Success | Should -BeTrue
         $result.Keys | Should -Contain 'Results'
+    }
+}
+
+Describe 'Invoke-CollectionValidation - MaturityConflict diagnostic' {
+    BeforeAll {
+        Import-Module PowerShell-Yaml -ErrorAction Stop
+
+        $script:repoRoot = Join-Path $TestDrive 'maturity-conflict-repo'
+        $script:collectionsDir = Join-Path $script:repoRoot 'collections'
+
+        $agentsDir = Join-Path $script:repoRoot '.github/agents/test'
+        New-Item -ItemType Directory -Path $agentsDir -Force | Out-Null
+        Set-Content -Path (Join-Path $agentsDir 'a.agent.md') -Value '---'
+    }
+
+    BeforeEach {
+        if (Test-Path $script:collectionsDir) {
+            Remove-Item -Path $script:collectionsDir -Recurse -Force
+        }
+        New-Item -ItemType Directory -Path $script:collectionsDir -Force | Out-Null
+    }
+
+    It 'Fires MaturityConflict when canonical and themed effective maturity differ' {
+        $canonical = [ordered]@{
+            id = 'hve-core-all'; name = 'All'; description = 'Canonical'
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'experimental' })
+        }
+        Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $canonical)
+        Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.md') -Value '# All'
+
+        $themed = [ordered]@{
+            id = 'themed-stable'; name = 'Themed'; description = 'Themed stable'
+            maturity = 'stable'
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
+        }
+        Set-Content -Path (Join-Path $script:collectionsDir 'themed-stable.collection.yml') -Value (ConvertTo-Yaml -Data $themed)
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        $result.Success | Should -BeFalse
+        $conflicts = @($result.Results | Where-Object { $_.ErrorType -eq 'MaturityConflict' })
+        $conflicts.Count | Should -BeGreaterOrEqual 1
+        $conflicts[0].Message | Should -Match 'expected'
+        $conflicts[0].Message | Should -Match 'themed-stable\.collection\.yml'
+    }
+
+    It 'Does not fire MaturityConflict when canonical and themed maturity align' {
+        $canonical = [ordered]@{
+            id = 'hve-core-all'; name = 'All'; description = 'Canonical'
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'experimental' })
+        }
+        Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $canonical)
+        Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.md') -Value '# All'
+
+        $themed = [ordered]@{
+            id = 'themed-exp'; name = 'Themed'; description = 'Themed exp'
+            maturity = 'experimental'
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'experimental' })
+        }
+        Set-Content -Path (Join-Path $script:collectionsDir 'themed-exp.collection.yml') -Value (ConvertTo-Yaml -Data $themed)
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'MaturityConflict' }).Count | Should -Be 0
+    }
+
+    It 'Item-level maturity overrides collection-level when computing effective maturity' {
+        $canonical = [ordered]@{
+            id = 'hve-core-all'; name = 'All'; description = 'Canonical'
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
+        }
+        Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.yml') -Value (ConvertTo-Yaml -Data $canonical)
+        Set-Content -Path (Join-Path $script:collectionsDir 'hve-core-all.collection.md') -Value '# All'
+
+        # Themed has collection-level experimental but item-level stable override
+        $themed = [ordered]@{
+            id = 'themed-override'; name = 'Themed'; description = 'Themed override'
+            maturity = 'experimental'
+            items = @([ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = 'stable' })
+        }
+        Set-Content -Path (Join-Path $script:collectionsDir 'themed-override.collection.yml') -Value (ConvertTo-Yaml -Data $themed)
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'MaturityConflict' }).Count | Should -Be 0
+    }
+}
+
+Describe 'Invoke-CollectionValidation - AgentMaturityLabelMismatch diagnostic' {
+    BeforeAll {
+        Import-Module PowerShell-Yaml -ErrorAction Stop
+
+        $script:repoRoot = Join-Path $TestDrive 'maturity-label-repo'
+        $script:collectionsDir = Join-Path $script:repoRoot 'collections'
+        $script:agentsDir = Join-Path $script:repoRoot '.github/agents/test'
+        New-Item -ItemType Directory -Path $script:agentsDir -Force | Out-Null
+
+        function script:Set-AgentFrontmatter {
+            param(
+                [Parameter(Mandatory)] [string]$Name,
+                [switch]$OmitName
+            )
+            $path = Join-Path $script:agentsDir 'a.agent.md'
+            if ($OmitName) {
+                Set-Content -Path $path -Value "---`ndescription: test agent`n---"
+            } else {
+                Set-Content -Path $path -Value "---`nname: $Name`ndescription: test agent`n---"
+            }
+        }
+
+        function script:Set-CollectionManifest {
+            param(
+                [Parameter(Mandatory)] [string]$Id,
+                [string]$Maturity,
+                [string]$ItemMaturity
+            )
+            $itemMat = if ($ItemMaturity) { $ItemMaturity } elseif ($Maturity) { $Maturity } else { 'stable' }
+            $item = [ordered]@{ path = '.github/agents/test/a.agent.md'; kind = 'agent'; maturity = $itemMat }
+            $manifest = [ordered]@{
+                id          = $Id
+                name        = 'Test'
+                description = 'maturity label test'
+                items       = @($item)
+            }
+            if ($Maturity) { $manifest['maturity'] = $Maturity }
+            $yaml = ConvertTo-Yaml -Data $manifest
+            Set-Content -Path (Join-Path $script:collectionsDir "$Id.collection.yml") -Value $yaml
+            Set-Content -Path (Join-Path $script:collectionsDir "$Id.collection.md") -Value "# $Id"
+        }
+    }
+
+    BeforeEach {
+        if (Test-Path $script:collectionsDir) {
+            Remove-Item -Path $script:collectionsDir -Recurse -Force
+        }
+        New-Item -ItemType Directory -Path $script:collectionsDir -Force | Out-Null
+    }
+
+    # --- Step 2.1 positive cases ---
+
+    It 'Fires AgentMaturityLabelMismatch for experimental agent missing (exp) suffix' {
+        Set-AgentFrontmatter -Name 'Test'
+        Set-CollectionManifest -Id 'exp-missing' -Maturity 'experimental'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        $mismatches = @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' })
+        $mismatches.Count | Should -BeGreaterOrEqual 1
+    }
+
+    It 'Does not fire AgentMaturityLabelMismatch for experimental agent with (exp) suffix' {
+        Set-AgentFrontmatter -Name 'Test(exp)'
+        Set-CollectionManifest -Id 'exp-ok' -Maturity 'experimental'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -Be 0
+    }
+
+    It 'Fires AgentMaturityLabelMismatch for preview agent missing (pre) suffix' {
+        Set-AgentFrontmatter -Name 'Test'
+        Set-CollectionManifest -Id 'pre-missing' -Maturity 'preview'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -BeGreaterOrEqual 1
+    }
+
+    It 'Does not fire AgentMaturityLabelMismatch for preview agent with (pre) suffix' {
+        Set-AgentFrontmatter -Name 'Test(pre)'
+        Set-CollectionManifest -Id 'pre-ok' -Maturity 'preview'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -Be 0
+    }
+
+    It 'Does not fire AgentMaturityLabelMismatch for stable agent without suffix' {
+        Set-AgentFrontmatter -Name 'Test'
+        Set-CollectionManifest -Id 'stable-ok' -Maturity 'stable'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -Be 0
+    }
+
+    It 'Item-level maturity overrides collection-level when validating suffix' {
+        # Collection is stable but item override is preview -> requires (pre) suffix
+        Set-AgentFrontmatter -Name 'Test(pre)'
+        Set-CollectionManifest -Id 'override-ok' -Maturity 'stable' -ItemMaturity 'preview'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -Be 0
+    }
+
+    # --- Step 2.2 negative cases ---
+
+    It 'Fires AgentMaturityLabelMismatch for experimental agent with wrong (pre) suffix' {
+        Set-AgentFrontmatter -Name 'Test(pre)'
+        Set-CollectionManifest -Id 'exp-wrong' -Maturity 'experimental'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -BeGreaterOrEqual 1
+    }
+
+    It 'Fires AgentMaturityLabelMismatch for preview agent with wrong (exp) suffix' {
+        Set-AgentFrontmatter -Name 'Test(exp)'
+        Set-CollectionManifest -Id 'pre-wrong' -Maturity 'preview'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -BeGreaterOrEqual 1
+    }
+
+    It 'Fires AgentMaturityLabelMismatch for experimental agent with obsolete (Experimental) full word' {
+        Set-AgentFrontmatter -Name 'Test(Experimental)'
+        Set-CollectionManifest -Id 'exp-fullword' -Maturity 'experimental'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -BeGreaterOrEqual 1
+    }
+
+    It 'Fires AgentMaturityLabelMismatch for preview agent with obsolete (Preview) full word' {
+        Set-AgentFrontmatter -Name 'Test(Preview)'
+        Set-CollectionManifest -Id 'pre-fullword' -Maturity 'preview'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -BeGreaterOrEqual 1
+    }
+
+    It 'Fires AgentMaturityLabelMismatch for stable agent with stale (exp) suffix' {
+        Set-AgentFrontmatter -Name 'Test(exp)'
+        Set-CollectionManifest -Id 'stable-stale-exp' -Maturity 'stable'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -BeGreaterOrEqual 1
+    }
+
+    It 'Fires AgentMaturityLabelMismatch for stable agent with stale (pre) suffix' {
+        Set-AgentFrontmatter -Name 'Test(pre)'
+        Set-CollectionManifest -Id 'stable-stale-pre' -Maturity 'stable'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -BeGreaterOrEqual 1
+    }
+
+    It 'Fires AgentMaturityLabelMismatch for agent name ending with stacked (exp)(pre)' {
+        Set-AgentFrontmatter -Name 'Test(exp)(pre)'
+        Set-CollectionManifest -Id 'stacked' -Maturity 'experimental'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -BeGreaterOrEqual 1
+    }
+
+    It 'Fires AgentMaturityLabelMismatch when name field is missing on non-stable agent' {
+        Set-AgentFrontmatter -OmitName -Name 'unused'
+        Set-CollectionManifest -Id 'missing-name' -Maturity 'experimental'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'AgentMaturityLabelMismatch' }).Count | Should -BeGreaterOrEqual 1
+    }
+}
+
+Describe 'Invoke-CollectionValidation - MissingExplicitMaturity diagnostic' {
+    BeforeAll {
+        Import-Module PowerShell-Yaml -ErrorAction Stop
+
+        $script:repoRoot = Join-Path $TestDrive 'missing-maturity-repo'
+        $script:collectionsDir = Join-Path $script:repoRoot 'collections'
+        $agentsDir = Join-Path $script:repoRoot '.github/agents/test'
+        New-Item -ItemType Directory -Path $agentsDir -Force | Out-Null
+        Set-Content -Path (Join-Path $agentsDir 'test.agent.md') -Value "---`nname: Test`ndescription: test agent`n---"
+    }
+
+    BeforeEach {
+        if (Test-Path $script:collectionsDir) {
+            Remove-Item -Path $script:collectionsDir -Recurse -Force
+        }
+        New-Item -ItemType Directory -Path $script:collectionsDir -Force | Out-Null
+    }
+
+    It 'Fires MissingExplicitMaturity when item omits maturity' {
+        $manifest = [ordered]@{
+            id          = 'test-missing-maturity'
+            name        = 'Test'
+            description = 'Tests missing item maturity'
+            maturity    = 'stable'
+            items       = @(
+                [ordered]@{
+                    path = '.github/agents/test/test.agent.md'
+                    kind = 'agent'
+                }
+            )
+        }
+        Set-Content -Path (Join-Path $script:collectionsDir 'test-missing-maturity.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'MissingExplicitMaturity' }).Count | Should -BeGreaterOrEqual 1
+        $result.Success | Should -BeFalse
+    }
+
+    It 'Does not fire MissingExplicitMaturity when item declares explicit maturity' {
+        $manifest = [ordered]@{
+            id          = 'test-has-maturity'
+            name        = 'Test'
+            description = 'Tests explicit item maturity'
+            maturity    = 'stable'
+            items       = @(
+                [ordered]@{
+                    path     = '.github/agents/test/test.agent.md'
+                    kind     = 'agent'
+                    maturity = 'stable'
+                }
+            )
+        }
+        Set-Content -Path (Join-Path $script:collectionsDir 'test-has-maturity.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'MissingExplicitMaturity' }).Count | Should -Be 0
+    }
+}
+
+Describe 'Invoke-CollectionValidation - MissingPrereleaseDescription diagnostic' {
+    BeforeAll {
+        Import-Module PowerShell-Yaml -ErrorAction Stop
+
+        $script:repoRoot = Join-Path $TestDrive 'missing-prerelease-desc-repo'
+        $script:collectionsDir = Join-Path $script:repoRoot 'collections'
+        $agentsDir = Join-Path $script:repoRoot '.github/agents/test'
+        New-Item -ItemType Directory -Path $agentsDir -Force | Out-Null
+        Set-Content -Path (Join-Path $agentsDir 'test.agent.md') -Value '---'
+    }
+
+    BeforeEach {
+        if (Test-Path $script:collectionsDir) {
+            Remove-Item -Path $script:collectionsDir -Recurse -Force
+        }
+        New-Item -ItemType Directory -Path $script:collectionsDir -Force | Out-Null
+    }
+
+    It 'Does not fire MissingPrereleaseDescription when descriptions.prerelease is populated' {
+        $manifest = [ordered]@{
+            id           = 'test-has-prerelease'
+            name         = 'Test'
+            description  = 'Tests prerelease description present'
+            maturity     = 'experimental'
+            descriptions = [ordered]@{
+                stable     = 'Stable description'
+                prerelease = 'Experimental: pre-release description'
+            }
+            items        = @(
+                [ordered]@{
+                    path     = '.github/agents/test/test.agent.md'
+                    kind     = 'agent'
+                    maturity = 'experimental'
+                }
+            )
+        }
+        Set-Content -Path (Join-Path $script:collectionsDir 'test-has-prerelease.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
+        Set-Content -Path (Join-Path $script:collectionsDir 'test-has-prerelease.collection.md') -Value '# Test'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'MissingPrereleaseDescription' }).Count | Should -Be 0
+    }
+
+    It 'Fires MissingPrereleaseDescription as a Warning when descriptions key is absent' {
+        $manifest = [ordered]@{
+            id          = 'test-missing-descriptions'
+            name        = 'Test'
+            description = 'Tests missing descriptions block'
+            maturity    = 'experimental'
+            items       = @(
+                [ordered]@{
+                    path     = '.github/agents/test/test.agent.md'
+                    kind     = 'agent'
+                    maturity = 'experimental'
+                }
+            )
+        }
+        Set-Content -Path (Join-Path $script:collectionsDir 'test-missing-descriptions.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
+        Set-Content -Path (Join-Path $script:collectionsDir 'test-missing-descriptions.collection.md') -Value '# Test'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        $warnings = @($result.Results | Where-Object { $_.ErrorType -eq 'MissingPrereleaseDescription' })
+        $warnings.Count | Should -BeGreaterOrEqual 1
+        $warnings[0].Severity | Should -Be 'Warning'
+    }
+
+    It 'Fires MissingPrereleaseDescription when descriptions.prerelease is whitespace-only' {
+        $manifest = [ordered]@{
+            id           = 'test-whitespace-prerelease'
+            name         = 'Test'
+            description  = 'Tests whitespace prerelease description'
+            maturity     = 'experimental'
+            descriptions = [ordered]@{
+                stable     = 'Stable description'
+                prerelease = '   '
+            }
+            items        = @(
+                [ordered]@{
+                    path     = '.github/agents/test/test.agent.md'
+                    kind     = 'agent'
+                    maturity = 'experimental'
+                }
+            )
+        }
+        Set-Content -Path (Join-Path $script:collectionsDir 'test-whitespace-prerelease.collection.yml') -Value (ConvertTo-Yaml -Data $manifest)
+        Set-Content -Path (Join-Path $script:collectionsDir 'test-whitespace-prerelease.collection.md') -Value '# Test'
+
+        $result = Invoke-CollectionValidation -RepoRoot $script:repoRoot
+
+        @($result.Results | Where-Object { $_.ErrorType -eq 'MissingPrereleaseDescription' }).Count | Should -BeGreaterOrEqual 1
     }
 }

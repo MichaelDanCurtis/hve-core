@@ -244,7 +244,7 @@ function Get-ArtifactFrontmatter {
 
     .DESCRIPTION
     Parses the YAML frontmatter block delimited by --- markers at the start
-    of a markdown file. Returns a hashtable with description.
+    of a markdown file. Returns a hashtable with description and name keys.
 
     .PARAMETER FilePath
     Path to the markdown file to parse.
@@ -253,7 +253,7 @@ function Get-ArtifactFrontmatter {
     Default description if none found in frontmatter.
 
     .OUTPUTS
-    [hashtable] With description key.
+    [hashtable] With description and name keys. The name value is $null when frontmatter omits it.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -267,6 +267,7 @@ function Get-ArtifactFrontmatter {
 
     $content = Get-Content -Path $FilePath -Raw
     $description = ''
+    $name = $null
 
     if ($content -match '(?s)^---\s*\r?\n(.*?)\r?\n---') {
         $yamlContent = $Matches[1] -replace '\r\n', "`n" -replace '\r', "`n"
@@ -274,6 +275,12 @@ function Get-ArtifactFrontmatter {
             $data = ConvertFrom-Yaml -Yaml $yamlContent
             if ($data.ContainsKey('description')) {
                 $description = $data.description
+            }
+            if ($data.ContainsKey('name')) {
+                $rawName = $data.name
+                if ($null -ne $rawName -and -not [string]::IsNullOrWhiteSpace([string]$rawName)) {
+                    $name = [string]$rawName
+                }
             }
         }
         catch {
@@ -283,6 +290,43 @@ function Get-ArtifactFrontmatter {
 
     return @{
         description = if ($description) { $description } else { $FallbackDescription }
+        name        = $name
+    }
+}
+
+function Get-AgentMaturityNameSuffix {
+    <#
+    .SYNOPSIS
+    Returns the picker-name suffix associated with an agent maturity value.
+
+    .DESCRIPTION
+    Maps maturity values to the source-embedded picker suffix. Experimental
+    maps to '(exp)', preview maps to '(pre)', and any other value (stable,
+    deprecated, removed, empty, or unknown) maps to an empty string.
+
+    .PARAMETER Maturity
+    The maturity value to translate.
+
+    .OUTPUTS
+    [string] The suffix to embed in the agent name, or '' when none applies.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter()]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string]$Maturity
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Maturity)) {
+        return ''
+    }
+
+    switch ($Maturity.ToLowerInvariant()) {
+        'experimental' { return '(exp)' }
+        'preview'      { return '(pre)' }
+        default        { return '' }
     }
 }
 
@@ -499,30 +543,62 @@ function Update-HveCoreAllCollection {
     # Exclude deprecated items by path (independent of maturity metadata)
     $allItems = @($allItems | Where-Object { -not (Test-DeprecatedPath -Path $_.path) })
 
-    # Filter deprecated based on existing collection item maturity metadata
+    # Capture existing aggregate maturities so deprecated/removed tombstones survive
+    # even when no source manifest still declares them. The aggregate's own stable/
+    # preview/experimental values are NOT preserved; aggregate maturity must always
+    # be recomputed from sources so cleared markers in source manifests propagate.
     $existingItemMaturities = @{}
     foreach ($existingItem in $existing.items) {
         $existingKey = "$($existingItem.kind)|$($existingItem.path)"
         $existingItemMaturities[$existingKey] = Resolve-CollectionItemMaturity -Maturity $existingItem.maturity
     }
 
-    # Propagate authoritative maturities from source collections so tombstones
-    # (maturity: removed) and deprecations declared in any source manifest
-    # carry into the aggregated hve-core-all collection. Strictest maturity
-    # wins: removed > deprecated > preview > stable.
-    $maturityRank = @{ 'stable' = 0; 'preview' = 1; 'deprecated' = 2; 'removed' = 3 }
+    # Compute strictest-wins maturity from source collections.
+    # Strictest maturity wins: removed > deprecated > experimental > preview > stable.
+    $maturityRank = @{ 'stable' = 0; 'preview' = 1; 'experimental' = 2; 'deprecated' = 3; 'removed' = 4 }
+    $sourceMaturities = @{}
     $collectionsDir = Join-Path -Path $RepoRoot -ChildPath 'collections'
     $sourceCollections = Get-ChildItem -Path $collectionsDir -Filter '*.collection.yml' -File -ErrorAction SilentlyContinue |
         Where-Object { $_.Name -ne 'hve-core-all.collection.yml' }
     foreach ($sourceFile in $sourceCollections) {
         $sourceManifest = Get-CollectionManifest -CollectionPath $sourceFile.FullName
         if ($null -eq $sourceManifest -or $null -eq $sourceManifest.items) { continue }
+        $collectionLevelMaturity = if (-not [string]::IsNullOrWhiteSpace([string]$sourceManifest.maturity)) {
+            Resolve-CollectionItemMaturity -Maturity ([string]$sourceManifest.maturity)
+        } else {
+            $null
+        }
         foreach ($sourceItem in $sourceManifest.items) {
             $sourceKey = "$($sourceItem.kind)|$($sourceItem.path)"
-            $sourceMaturity = Resolve-CollectionItemMaturity -Maturity $sourceItem.maturity
-            $currentMaturity = if ($existingItemMaturities.ContainsKey($sourceKey)) { $existingItemMaturities[$sourceKey] } else { 'stable' }
+            $itemRawMaturity = if (-not [string]::IsNullOrWhiteSpace([string]$sourceItem.maturity)) {
+                [string]$sourceItem.maturity
+            } else {
+                $null
+            }
+            $sourceMaturity = if ($null -ne $itemRawMaturity) {
+                Resolve-CollectionItemMaturity -Maturity $itemRawMaturity
+            } elseif ($null -ne $collectionLevelMaturity) {
+                $collectionLevelMaturity
+            } else {
+                'stable'
+            }
+            $currentMaturity = if ($sourceMaturities.ContainsKey($sourceKey)) { $sourceMaturities[$sourceKey] } else { 'stable' }
             if ($maturityRank[$sourceMaturity] -gt $maturityRank[$currentMaturity]) {
-                $existingItemMaturities[$sourceKey] = $sourceMaturity
+                $sourceMaturities[$sourceKey] = $sourceMaturity
+            }
+        }
+    }
+
+    # Authoritative map: source-derived values, with deprecated/removed tombstones
+    # from the existing aggregate preserved when sources no longer declare them.
+    foreach ($sourceKey in $sourceMaturities.Keys) {
+        $existingItemMaturities[$sourceKey] = $sourceMaturities[$sourceKey]
+    }
+    foreach ($existingKey in @($existingItemMaturities.Keys)) {
+        if (-not $sourceMaturities.ContainsKey($existingKey)) {
+            $tombstone = $existingItemMaturities[$existingKey]
+            if ($tombstone -notin @('deprecated', 'removed')) {
+                $existingItemMaturities[$existingKey] = 'stable'
             }
         }
     }
@@ -561,16 +637,18 @@ function Update-HveCoreAllCollection {
         { $_.kind }, `
         { $_.path }
 
-    # Build new items array as ordered hashtables for clean YAML output
+    # Build new items array as ordered hashtables for clean YAML output.
+    # Emit the maturity key only when it resolves to a non-stable value so the
+    # default tier stays implicit in the manifest.
     $newItems = @()
     foreach ($item in $sortedItems) {
         $newItem = [ordered]@{
             path = $item.path
             kind = $item.kind
         }
-
-        if ((Resolve-CollectionItemMaturity -Maturity $item.maturity) -ne 'stable') {
-            $newItem['maturity'] = $item.maturity
+        $resolvedMaturity = Resolve-CollectionItemMaturity -Maturity $item.maturity
+        if ($resolvedMaturity -ne 'stable') {
+            $newItem['maturity'] = $resolvedMaturity
         }
 
         $newItems += $newItem
@@ -608,10 +686,13 @@ function Update-HveCoreAllCollection {
             id          = $existing.id
             name        = $existing.name
             description = $existing.description
-            tags        = $existing.tags
-            items       = $newItems
-            display     = $displayOrdered
         }
+        if ($existing.ContainsKey('descriptions') -and $null -ne $existing.descriptions) {
+            $manifest['descriptions'] = $existing.descriptions
+        }
+        $manifest['tags'] = $existing.tags
+        $manifest['items'] = $newItems
+        $manifest['display'] = $displayOrdered
 
         $yaml = ConvertTo-Yaml -Data $manifest
         Set-ContentIfChanged -Path $collectionPath -Value $yaml | Out-Null
@@ -720,13 +801,60 @@ function Get-ArtifactDescription {
     return ''
 }
 
+function Resolve-CollectionDescription {
+    <#
+    .SYNOPSIS
+        Resolves a channel-specific collection description.
+    .DESCRIPTION
+        Uses exact-channel description overrides when present, then falls back to
+        the manifest description and finally the provided default description.
+    .PARAMETER CollectionManifest
+        Parsed collection manifest hashtable.
+    .PARAMETER Channel
+        Release channel controlling which override key is considered.
+    .PARAMETER DefaultDescription
+        Fallback description when the manifest provides no usable value.
+    .OUTPUTS
+        [string] Resolved collection description.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$CollectionManifest,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Stable', 'PreRelease')]
+        [string]$Channel,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string]$DefaultDescription
+    )
+
+    $overrideKey = if ($Channel -eq 'PreRelease') { 'prerelease' } else { 'stable' }
+    if ($CollectionManifest.ContainsKey('descriptions') -and $CollectionManifest.descriptions -is [hashtable] -and
+        $CollectionManifest.descriptions.ContainsKey($overrideKey) -and
+        -not [string]::IsNullOrWhiteSpace([string]$CollectionManifest.descriptions[$overrideKey])) {
+        return [string]$CollectionManifest.descriptions[$overrideKey]
+    }
+
+    if ($CollectionManifest.ContainsKey('description') -and -not [string]::IsNullOrWhiteSpace([string]$CollectionManifest.description)) {
+        return [string]$CollectionManifest.description
+    }
+
+    return $DefaultDescription
+}
+
 Export-ModuleMember -Function @(
+    'Get-AgentMaturityNameSuffix',
     'Get-AllCollections',
     'Get-ArtifactDescription',
     'Get-ArtifactFiles',
     'Get-ArtifactFrontmatter',
     'Get-CollectionArtifactKey',
     'Get-CollectionManifest',
+    'Resolve-CollectionDescription',
     'Resolve-CollectionItemMaturity',
     'Set-ContentIfChanged',
     'Split-CollectionMdByMarkers',

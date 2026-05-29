@@ -309,6 +309,51 @@ items:
 display:
   color: blue
 "@ | Set-Content -Path (Join-Path $collectionsDir 'hve-core-all.collection.yml')
+
+                @'
+# HVE Core All
+
+Body content for README outline tests.
+
+## Included Artifacts
+
+<!-- BEGIN AUTO-GENERATED ARTIFACTS -->
+
+### Chat Agents
+
+| Name | Description |
+|------|-------------|
+| **old-agent** | Old generated content. |
+
+<!-- END AUTO-GENERATED ARTIFACTS -->
+'@ | Set-Content -Path (Join-Path $collectionsDir 'hve-core-all.collection.md')
+
+    @"
+id: outline-col
+name: Outline Collection
+description: Outline test artifacts
+items:
+  - path: .github/agents/test.agent.md
+    kind: agent
+"@ | Set-Content -Path (Join-Path $collectionsDir 'outline-col.collection.yml')
+
+    @'
+# Outline Collection
+
+Body content for README outline tests.
+
+## Included Artifacts
+
+<!-- BEGIN AUTO-GENERATED ARTIFACTS -->
+
+### Chat Agents
+
+| Name | Description |
+|------|-------------|
+| **old-agent** | Old generated content. |
+
+<!-- END AUTO-GENERATED ARTIFACTS -->
+'@ | Set-Content -Path (Join-Path $collectionsDir 'outline-col.collection.md')
     }
 
     AfterAll {
@@ -336,6 +381,83 @@ display:
     It 'Generates README.md' {
         $readmePath = Join-Path $script:tempDir 'plugins/hve-core-all/README.md'
         Test-Path $readmePath | Should -BeTrue
+    }
+
+    It 'Preserves the Included Artifacts heading outside the generated artifact marker block' {
+        $collection = @{
+            id          = 'outline-col'
+            name        = 'Outline Collection'
+            description = 'Outline test artifacts'
+        }
+        $items = @(
+            @{
+                Kind        = 'agent'
+                Name        = 'test-agent'
+                Description = 'Test agent'
+            }
+        )
+        $collectionContent = @'
+# Outline Collection
+
+Body content for README outline tests.
+
+<!-- BEGIN AUTO-GENERATED ARTIFACTS -->
+
+### Chat Agents
+
+| Name | Description |
+|------|-------------|
+| **old-agent** | Old generated content. |
+
+<!-- END AUTO-GENERATED ARTIFACTS -->
+'@
+
+        $readmeContent = New-PluginReadmeContent -Collection $collection -Items $items -CollectionContent $collectionContent
+        $headingMatches = [regex]::Matches($readmeContent, '(?m)^#{1,6}\s+.+$') | ForEach-Object { $_.Value.TrimEnd() }
+
+        $headingMatches | Should -Contain '## Included Artifacts'
+        $includedIndex = [array]::IndexOf($headingMatches, '## Included Artifacts')
+        $chatAgentsIndex = [array]::IndexOf($headingMatches, '### Chat Agents')
+        $includedIndex | Should -BeGreaterOrEqual 0
+        $chatAgentsIndex | Should -BeGreaterThan $includedIndex
+        $readmeContent | Should -Match "(?s)## Included Artifacts\r?\n\r?\n<!-- BEGIN AUTO-GENERATED ARTIFACTS -->\r?\n\r?\n### Chat Agents"
+    }
+
+    It 'Moves an Included Artifacts heading out of the generated artifact marker block' {
+        $collection = @{
+            id          = 'outline-col'
+            name        = 'Outline Collection'
+            description = 'Outline test artifacts'
+        }
+        $items = @(
+            @{
+                Kind        = 'agent'
+                Name        = 'test-agent'
+                Description = 'Test agent'
+            }
+        )
+        $collectionContent = @'
+# Outline Collection
+
+Body content for README outline tests.
+
+<!-- BEGIN AUTO-GENERATED ARTIFACTS -->
+
+## Included Artifacts
+
+### Chat Agents
+
+| Name | Description |
+|------|-------------|
+| **old-agent** | Old generated content. |
+
+<!-- END AUTO-GENERATED ARTIFACTS -->
+'@
+
+        $readmeContent = New-PluginReadmeContent -Collection $collection -Items $items -CollectionContent $collectionContent
+
+        $readmeContent | Should -Match "(?s)## Included Artifacts\r?\n\r?\n<!-- BEGIN AUTO-GENERATED ARTIFACTS -->\r?\n\r?\n### Chat Agents"
+        $readmeContent | Should -Not -Match "(?s)<!-- BEGIN AUTO-GENERATED ARTIFACTS -->\r?\n\r?\n## Included Artifacts"
     }
 
     It 'Filters to specific collection IDs when provided' {
@@ -504,6 +626,41 @@ items:
             $dryRunMessages.Count | Should -BeGreaterOrEqual 1
             # File still exists after DryRun
             Test-Path (Join-Path $orphanDir 'persist.txt') | Should -BeTrue
+        }
+    }
+
+    Context 'Prune Mode' {
+        BeforeEach {
+            $script:orphanPluginDir = Join-Path $script:tempDir 'plugins/orphan-fixture'
+            New-Item -ItemType Directory -Path $script:orphanPluginDir -Force | Out-Null
+            'orphan plugin' | Set-Content -Path (Join-Path $script:orphanPluginDir 'README.md')
+        }
+
+        AfterEach {
+            if (Test-Path $script:orphanPluginDir) {
+                Remove-Item -Path $script:orphanPluginDir -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
+
+        It 'Removes orphan plugin directories when -Prune is specified' {
+            $result = Invoke-PluginGeneration -RepoRoot $script:tempDir -Refresh -Channel 'PreRelease' -Prune
+            $result.Success | Should -BeTrue
+            Test-Path $script:orphanPluginDir | Should -BeFalse
+            Test-Path (Join-Path $script:tempDir 'plugins/hve-core-all') | Should -BeTrue
+        }
+
+        It 'Leaves orphan plugin directories untouched when -Prune is omitted' {
+            $result = Invoke-PluginGeneration -RepoRoot $script:tempDir -Refresh -Channel 'PreRelease'
+            $result.Success | Should -BeTrue
+            Test-Path $script:orphanPluginDir | Should -BeTrue
+            Test-Path (Join-Path $script:orphanPluginDir 'README.md') | Should -BeTrue
+        }
+
+        It 'Logs DryRun message instead of removing when -Prune and -DryRun combined' {
+            $output = Invoke-PluginGeneration -RepoRoot $script:tempDir -Refresh -Channel 'PreRelease' -Prune -DryRun 6>&1
+            $dryRunMessages = @($output | Where-Object { "$_" -match 'DRY RUN.*Would remove orphan plugin' })
+            $dryRunMessages.Count | Should -BeGreaterOrEqual 1
+            Test-Path $script:orphanPluginDir | Should -BeTrue
         }
     }
 }
