@@ -654,7 +654,6 @@ See [official documentation](https://example.com) for details.
 
 * Starts with frontmatter (YAML between `---` delimiters)
 * Followed by markdown content
-* Includes attribution in frontmatter `description` field
 * Single newline at EOF
 
 ## RFC 2119 Directive Language
@@ -848,15 +847,13 @@ Jumping from H1 to H3 without an H2, breaking document hierarchy. Follow proper 
 
 ## Attribution Requirements
 
-All AI artifacts MUST include attribution as a suffix in the frontmatter `description` field:
+The frontmatter `description` field is a single concise sentence with no attribution suffix. Distribution attribution is added automatically where needed, so source artifacts omit it:
 
 ```yaml
-description: 'Tests prompt files in a sandbox environment - Brought to you by microsoft/hve-core'
+description: 'Tests prompt files in a sandbox environment'
 ```
 
-Format: `- Brought to you by organization/repository-name` appended to the description value.
-
-Skill files (`SKILL.md`) additionally include a blockquote attribution footer as the last line of body content:
+Skill files (`SKILL.md`) include a blockquote attribution footer as the last line of body content:
 
 ```markdown
 > Brought to you by microsoft/hve-core
