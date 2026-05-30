@@ -63,9 +63,9 @@ copilot plugin install experimental@hve-core
 
 ## Commands
 
-| Command       | Description                                                                                 |
-|---------------|---------------------------------------------------------------------------------------------|
-| cspell-config | Creates or updates the project cspell configuration with project-specific words and ignores |
+| Command       | Description                                                                      |
+|---------------|----------------------------------------------------------------------------------|
+| cspell-config | Create or update the project cspell configuration with project words and ignores |
 
 ## Instructions
 

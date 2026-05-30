@@ -106,24 +106,24 @@ copilot plugin install hve-core@hve-core
 
 ## Commands
 
-| Command            | Description                                                                                                                  |
-|--------------------|------------------------------------------------------------------------------------------------------------------------------|
-| rpi                | Autonomous Research-Plan-Implement-Review-Discover workflow for completing tasks - Brought to you by microsoft/hve-core      |
-| task-research      | Initiates research for implementation planning based on user requirements - Brought to you by microsoft/hve-core             |
-| task-plan          | Initiates implementation planning based on user context or research documents - Brought to you by microsoft/hve-core         |
-| task-implement     | Locates and executes implementation plans using Task Implementor - Brought to you by microsoft/hve-core                      |
-| task-review        | Initiates implementation review based on user context or automatic artifact discovery - Brought to you by microsoft/hve-core |
-| task-challenge     | Adversarial What/Why/How interrogation of completed implementation artifacts - Brought to you by microsoft/hve-core          |
-| checkpoint         | Save or restore conversation context using memory files - Brought to you by microsoft/hve-core                               |
-| doc-ops-update     | Invoke doc-ops agent for documentation quality assurance and updates                                                         |
-| git-commit-message | Generates a commit message following the commit-message.instructions.md rules based on all changes in the branch             |
-| git-commit         | Stages all changes, generates a conventional commit message, shows it to the user, and commits using only git add/commit     |
-| git-merge          | Coordinate Git merge, rebase, and rebase --onto workflows with consistent conflict handling.                                 |
-| git-setup          | Interactive, verification-first Git configuration assistant (non-destructive)                                                |
-| pull-request       | Generates pull request descriptions from branch diffs - Brought to you by microsoft/hve-core                                 |
-| prompt-analyze     | Evaluates prompt engineering artifacts against quality criteria and reports findings - Brought to you by microsoft/hve-core  |
-| prompt-build       | Build or improve prompt engineering artifacts following quality criteria - Brought to you by microsoft/hve-core              |
-| prompt-refactor    | Refactors and cleans up prompt engineering artifacts through iterative improvement - Brought to you by microsoft/hve-core    |
+| Command            | Description                                                                        |
+|--------------------|------------------------------------------------------------------------------------|
+| rpi                | Autonomous Research-Plan-Implement-Review-Discover workflow for completing tasks   |
+| task-research      | Initiate research for implementation planning from user requirements               |
+| task-plan          | Initiate implementation planning from user context or research documents           |
+| task-implement     | Locate and execute implementation plans using Task Implementor                     |
+| task-review        | Initiate implementation review from user context or artifact discovery             |
+| task-challenge     | Adversarial What/Why/How interrogation of completed implementation artifacts       |
+| checkpoint         | Save or restore conversation context using memory files                            |
+| doc-ops-update     | Run the doc-ops agent for documentation quality assurance and updates              |
+| git-commit-message | Generate a conventional commit message from all branch changes                     |
+| git-commit         | Stage all changes, generate a conventional commit message, and commit              |
+| git-merge          | Coordinate Git merge, rebase, and rebase --onto workflows with conflict handling   |
+| git-setup          | Interactive, verification-first Git configuration assistant (non-destructive)      |
+| pull-request       | Generate pull request descriptions from branch diffs                               |
+| prompt-analyze     | Evaluate prompt engineering artifacts against quality criteria and report findings |
+| prompt-build       | Build or improve prompt engineering artifacts following quality criteria           |
+| prompt-refactor    | Refactor and clean up prompt engineering artifacts through iterative improvement   |
 
 ## Instructions
 

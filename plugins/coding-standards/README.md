@@ -71,10 +71,10 @@ copilot plugin install coding-standards@hve-core
 
 ## Commands
 
-| Command                | Description                                                                                                                               |
-|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| code-review-functional | Pre-PR branch diff review for functional correctness, error handling, edge cases, and testing gaps - Brought to you by microsoft/hve-core |
-| code-review-full       | Run both functional and standards code reviews on the current branch in a single pass - Brought to you by microsoft/hve-core              |
+| Command                | Description                                                                                        |
+|------------------------|----------------------------------------------------------------------------------------------------|
+| code-review-functional | Pre-PR branch diff review for functional correctness, error handling, edge cases, and testing gaps |
+| code-review-full       | Run both functional and standards code reviews on the current branch in a single pass              |
 
 ## Instructions
 
