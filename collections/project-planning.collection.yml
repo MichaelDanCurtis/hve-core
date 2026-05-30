@@ -46,6 +46,9 @@ items:
   - path: .github/agents/security/sssc-planner.agent.md
     kind: agent
     maturity: experimental
+  - path: .github/agents/accessibility/accessibility-planner.agent.md
+    kind: agent
+    maturity: experimental
   # Subagents
   - path: .github/agents/hve-core/subagents/researcher-subagent.agent.md
     kind: agent

@@ -1,10 +1,6 @@
 ---
 name: SSSC Planner
-description: >-
-  Guides users through a six-phase assessment of their repository's supply chain
-  security posture against OpenSSF Scorecard, SLSA, Sigstore, and SBOM standards,
-  producing a prioritized backlog referencing reusable workflows from hve-core
-  and microsoft/physical-ai-toolchain.
+description: "Six-phase supply-chain posture assessment against OpenSSF Scorecard, SLSA, Sigstore, and SBOM, producing a prioritized backlog."
 agents:
   - Researcher Subagent
 handoffs:
