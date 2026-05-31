@@ -3,6 +3,8 @@ name: telemetry-foundations
 description: 'Declarative OpenTelemetry-aligned telemetry vocabulary and instrumentation conventions for traces, metrics, logs, and PII handling - Brought to you by microsoft/hve-core'
 ---
 
+# Telemetry Foundations
+
 ## Overview
 
 A shared vocabulary for observability across HVE Core agents. This skill describes *what* telemetry data exists and *how it is named*, not which SDK or vendor to use. Agents producing planning artifacts (ADRs, PRDs, security/RAI plans, code-review reports) and agents producing user-facing application code reference this skill so that downstream pipelines (traces, metrics, logs) speak a consistent OpenTelemetry-aligned language.
