@@ -262,5 +262,3 @@ def test_logger_format_string_redacts_exception_repr_at_runtime(
             mural_module._redact(repr(exc)),
         )
     assert SECRET_VALUE not in caplog.text
-
-

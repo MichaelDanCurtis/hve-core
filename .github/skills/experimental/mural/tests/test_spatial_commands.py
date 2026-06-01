@@ -935,5 +935,3 @@ def test_area_probe_verdict_occluded_recommends_operator_escalation(
     assert "destroy and recreate" in rec
     assert "hand-tune (x, y) offsets" in rec
     assert "mural-seeding-patterns.instructions.md" in rec
-
-

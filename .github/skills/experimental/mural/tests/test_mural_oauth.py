@@ -594,9 +594,7 @@ def test_run_login_defaults_to_hardened_loopback_server(
         captured["server_factory"] = server_factory
         raise _Stop
 
-    monkeypatch.setattr(
-        mural_module._oauth, "_start_loopback_server", _capture_start
-    )
+    monkeypatch.setattr(mural_module._oauth, "_start_loopback_server", _capture_start)
 
     with pytest.raises(_Stop):
         mural_module._run_login(
