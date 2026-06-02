@@ -266,7 +266,10 @@ def _validate_asset_url(url: str) -> None:
     """
     if not isinstance(url, str) or not url:
         raise MuralSecurityError("asset upload url is empty")
-    parsed = urllib.parse.urlsplit(url)
+    try:
+        parsed = urllib.parse.urlsplit(url)
+    except ValueError as exc:
+        raise MuralSecurityError(f"asset upload url is malformed: {exc}") from exc
     if parsed.scheme != "https":
         raise MuralSecurityError(
             f"asset upload url must be https, got {parsed.scheme!r}"
