@@ -25,11 +25,10 @@ tags:
   - "ci"
   - "vally"
 affected_components:
-  - "evals/"
+  - "evals/README.md"
   - ".vally.yaml"
-  - "scripts/evals/"
-  - "scripts/evals/moderation/"
-  - ".github/skills/hve-core/vally-tests/"
+  - "scripts/evals/moderation/moderate.py"
+  - ".github/skills/hve-core/vally-tests/SKILL.md"
   - ".github/agents/hve-core/subagents/vally-test-author.agent.md"
   - ".github/agents/content-policy-citation.agent.md"
   - ".github/workflows/evals-agent-matrix.yml"
@@ -330,11 +329,10 @@ No data migration is required: removing the framework leaves the underlying AI c
 
 ## Affected Components
 
-* evals/
+* evals/README.md
 * .vally.yaml
-* scripts/evals/
-* scripts/evals/moderation/
-* .github/skills/hve-core/vally-tests/
+* scripts/evals/moderation/moderate.py
+* .github/skills/hve-core/vally-tests/SKILL.md
 * .github/agents/hve-core/subagents/vally-test-author.agent.md
 * .github/agents/content-policy-citation.agent.md
 * .github/workflows/evals-agent-matrix.yml
@@ -345,9 +343,8 @@ No data migration is required: removing the framework leaves the underlying AI c
 * Session state: `.copilot-tracking/adr-plans/agent-evaluation-framework/state.json`
 * Suite architecture: `evals/README.md` and the `evals/` suite tree
 * Central config: `./.vally.yaml`
-* Orchestration: `scripts/evals/` (PowerShell and Python)
-* Moderation pipeline: `scripts/evals/moderation/`
-* Authoring skill: `.github/skills/hve-core/vally-tests/`
+* Orchestration and moderation: `scripts/evals/moderation/moderate.py` (PowerShell and Python)
+* Authoring skill: `.github/skills/hve-core/vally-tests/SKILL.md`
 * Test-author subagent: `.github/agents/hve-core/subagents/vally-test-author.agent.md`
 * Content-policy agent: `.github/agents/content-policy-citation.agent.md`
 * Evaluation matrix workflow: `.github/workflows/evals-agent-matrix.yml`
