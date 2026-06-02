@@ -413,7 +413,6 @@ Any folder named `experimental` under any artifact type (agents, prompts, instru
   "chat.instructionsFilesLocations": {
     "<PREFIX>/.github/instructions/ado": true,
     "<PREFIX>/.github/instructions/coding-standards": true,
-    "<PREFIX>/.github/instructions/design-thinking": true,
     "<PREFIX>/.github/instructions/github": true,
     "<PREFIX>/.github/instructions/hve-core": true,
     "<PREFIX>/.github/instructions/shared": true
@@ -502,7 +501,6 @@ Add to devcontainer.json:
         "chat.instructionsFilesLocations": {
           "/workspaces/hve-core/.github/instructions/ado": true,
           "/workspaces/hve-core/.github/instructions/coding-standards": true,
-          "/workspaces/hve-core/.github/instructions/design-thinking": true,
           "/workspaces/hve-core/.github/instructions/github": true,
           "/workspaces/hve-core/.github/instructions/hve-core": true,
           "/workspaces/hve-core/.github/instructions/shared": true
