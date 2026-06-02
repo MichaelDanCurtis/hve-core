@@ -8,11 +8,19 @@ Runs as an Atheris coverage-guided fuzz target when executed directly.
 
 from __future__ import annotations
 
+import os
 import sys
+import tempfile
 from contextlib import suppress
 
 import mural
 import pytest
+
+# The Atheris/libFuzzer subprocess can run with ``HOME`` unset, which makes
+# ``pathlib.Path.home()`` raise ``RuntimeError`` and crashes credential-path
+# resolution targets. Provide a deterministic fallback so the home-directory
+# branch is exercised instead of aborting the run.
+os.environ.setdefault("HOME", tempfile.gettempdir())
 
 try:
     import atheris
