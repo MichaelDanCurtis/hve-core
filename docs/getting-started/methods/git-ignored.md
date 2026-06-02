@@ -115,7 +115,6 @@ Create or update `.vscode/settings.json`:
   "chat.instructionsFilesLocations": {
     ".hve-core/.github/instructions/ado": true,
     ".hve-core/.github/instructions/coding-standards": true,
-    ".hve-core/.github/instructions/design-thinking": true,
     ".hve-core/.github/instructions/github": true,
     ".hve-core/.github/instructions/hve-core": true,
     ".hve-core/.github/instructions/shared": true
@@ -179,7 +178,6 @@ Add to `.devcontainer/devcontainer.json` so HVE Core is cloned on container crea
         "chat.instructionsFilesLocations": {
           ".hve-core/.github/instructions/ado": true,
           ".hve-core/.github/instructions/coding-standards": true,
-          ".hve-core/.github/instructions/design-thinking": true,
           ".hve-core/.github/instructions/github": true,
           ".hve-core/.github/instructions/hve-core": true,
           ".hve-core/.github/instructions/shared": true

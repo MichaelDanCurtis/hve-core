@@ -176,7 +176,6 @@ After rebuild, update `.vscode/settings.json`:
   "chat.instructionsFilesLocations": {
     "/workspaces/hve-core/.github/instructions/ado": true,
     "/workspaces/hve-core/.github/instructions/coding-standards": true,
-    "/workspaces/hve-core/.github/instructions/design-thinking": true,
     "/workspaces/hve-core/.github/instructions/github": true,
     "/workspaces/hve-core/.github/instructions/hve-core": true,
     "/workspaces/hve-core/.github/instructions/shared": true
@@ -216,7 +215,6 @@ After rebuild, update `.vscode/settings.json`:
         "chat.instructionsFilesLocations": {
           "/workspaces/hve-core/.github/instructions/ado": true,
           "/workspaces/hve-core/.github/instructions/coding-standards": true,
-          "/workspaces/hve-core/.github/instructions/design-thinking": true,
           "/workspaces/hve-core/.github/instructions/github": true,
           "/workspaces/hve-core/.github/instructions/hve-core": true,
           "/workspaces/hve-core/.github/instructions/shared": true
@@ -278,7 +276,6 @@ ls /workspaces/hve-core/.github/agents
         "chat.instructionsFilesLocations": {
           "/workspaces/hve-core/.github/instructions/ado": true,
           "/workspaces/hve-core/.github/instructions/coding-standards": true,
-          "/workspaces/hve-core/.github/instructions/design-thinking": true,
           "/workspaces/hve-core/.github/instructions/github": true,
           "/workspaces/hve-core/.github/instructions/hve-core": true,
           "/workspaces/hve-core/.github/instructions/shared": true

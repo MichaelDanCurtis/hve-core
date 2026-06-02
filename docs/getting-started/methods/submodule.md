@@ -98,7 +98,6 @@ Create or update `.vscode/settings.json`:
   "chat.instructionsFilesLocations": {
     "lib/hve-core/.github/instructions/ado": true,
     "lib/hve-core/.github/instructions/coding-standards": true,
-    "lib/hve-core/.github/instructions/design-thinking": true,
     "lib/hve-core/.github/instructions/github": true,
     "lib/hve-core/.github/instructions/hve-core": true,
     "lib/hve-core/.github/instructions/shared": true,
