@@ -592,6 +592,44 @@ Old content to replace.
             $mdContent | Should -Not -Match 'Old content to replace'
         }
 
+        It 'Does not inject a duplicate Included Artifacts heading inside markers' {
+            $collection = @{
+                id          = 'no-dup-h2'
+                name        = 'No Duplicate H2'
+                description = 'Ensures intro H2 is not duplicated inside auto-generated block'
+                items       = @(
+                    @{ kind = 'agent'; path = '.github/agents/alpha.agent.md' }
+                )
+            }
+            $mdPath = Join-Path $script:tempDir 'no-dup-h2.collection.md'
+            @"
+# No Duplicate H2
+
+Intro paragraph.
+
+## Included Artifacts
+
+<!-- BEGIN AUTO-GENERATED ARTIFACTS -->
+
+Old generated content.
+
+<!-- END AUTO-GENERATED ARTIFACTS -->
+"@ | Set-Content -Path $mdPath -Encoding utf8NoBOM
+            $outPath = Join-Path $script:tempDir 'README.no-dup-h2.md'
+
+            New-CollectionReadme -Collection $collection -CollectionMdPath $mdPath -TemplatePath $script:templatePath -RepoRoot $script:tempDir -OutputPath $outPath
+
+            $mdContent = Get-Content -Path $mdPath -Raw
+            ([regex]::Matches($mdContent, '(?m)^##\s+Included Artifacts\s*$')).Count | Should -Be 1
+
+            $beginIndex = $mdContent.IndexOf('<!-- BEGIN AUTO-GENERATED ARTIFACTS -->')
+            $endIndex = $mdContent.IndexOf('<!-- END AUTO-GENERATED ARTIFACTS -->')
+            $beginIndex | Should -BeGreaterThan -1
+            $endIndex | Should -BeGreaterThan $beginIndex
+            $generatedSection = $mdContent.Substring($beginIndex, $endIndex - $beginIndex)
+            $generatedSection | Should -Not -Match '(?m)^##\s+Included Artifacts\s*$'
+        }
+
         It 'Works without markers for backward compatibility' {
             $collection = @{
                 id          = 'no-markers'
