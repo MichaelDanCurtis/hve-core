@@ -2971,46 +2971,46 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
                 level=logging.WARNING,
             )
 
-    migrated: list[str] = []
-    skipped_empty: list[str] = []
+    migrated_slots: list[str] = []
+    skipped_empty_slots: list[str] = []
     failures: dict[str, str] = {}
-    for key in _KNOWN_CREDENTIAL_KEYS:
+    for slot in _KNOWN_CREDENTIAL_KEYS:
         try:
-            value = source.get(service, key)
+            value = source.get(service, slot)
         except _KeyringUnavailable as exc:
-            failures[key] = f"source read failed: {exc}"
+            failures[slot] = f"source read failed: {exc}"
             continue
         if not value:
-            skipped_empty.append(key)
+            skipped_empty_slots.append(slot)
             continue
         try:
-            target.set(service, key, value)
+            target.set(service, slot, value)
         except (_KeyringUnavailable, OSError, RuntimeError) as exc:
-            failures[key] = f"target write failed: {exc}"
+            failures[slot] = f"target write failed: {exc}"
             continue
         try:
-            roundtrip = target.get(service, key)
+            roundtrip = target.get(service, slot)
         except _KeyringUnavailable as exc:
-            failures[key] = f"round-trip read failed: {exc}"
+            failures[slot] = f"round-trip read failed: {exc}"
             continue
         if roundtrip != value:
-            failures[key] = "round-trip mismatch (target value differs from source)"
+            failures[slot] = "round-trip mismatch (target value differs from source)"
             continue
-        migrated.append(key)
+        migrated_slots.append(slot)
 
     summary: dict[str, Any] = {
         "profile": profile,
         "direction": f"{source_name}->{target_name}",
         "source": source_name,
         "target": target_name,
-        "migrated_keys": migrated,
-        "skipped_empty_keys": skipped_empty,
+        "migrated": migrated_slots,
+        "skipped_empty": skipped_empty_slots,
         "failures": failures,
         "cleanup": False,
     }
 
     if failures:
-        summary["status"] = "partial" if migrated else "failed"
+        summary["status"] = "partial" if migrated_slots else "failed"
         if json_mode:
             print(json.dumps(summary, indent=2))
         else:
@@ -3019,14 +3019,14 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
                 f"{profile!r} encountered failures: {failures}",
                 level=logging.ERROR,
             )
-            if migrated:
+            if migrated_slots:
                 _emit(
-                    f"successfully migrated keys: {', '.join(migrated)}",
+                    f"successfully migrated slots: {', '.join(migrated_slots)}",
                     level=logging.INFO,
                 )
-        return EXIT_FAILURE if not migrated else EXIT_SUCCESS
+        return EXIT_FAILURE if not migrated_slots else EXIT_SUCCESS
 
-    if not migrated:
+    if not migrated_slots:
         summary["status"] = "no-op"
         if json_mode:
             print(json.dumps(summary, indent=2))
@@ -3091,17 +3091,17 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
                         level=logging.INFO,
                     )
                 return EXIT_SUCCESS
-        cleanup_removed: list[str] = []
+        cleanup_removed_slots: list[str] = []
         cleanup_errors: dict[str, str] = {}
-        for key in migrated:
+        for slot in migrated_slots:
             try:
-                source.delete(service, key)
+                source.delete(service, slot)
             except (_KeyringUnavailable, OSError, RuntimeError) as exc:
-                cleanup_errors[key] = str(exc)
+                cleanup_errors[slot] = str(exc)
                 continue
-            cleanup_removed.append(key)
+            cleanup_removed_slots.append(slot)
         summary["cleanup"] = True
-        summary["cleanup_removed_keys"] = cleanup_removed
+        summary["cleanup_removed"] = cleanup_removed_slots
         if cleanup_errors:
             summary["cleanup_errors"] = cleanup_errors
             summary["status"] = "migrated_cleanup_partial"
@@ -3110,15 +3110,15 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
         print(json.dumps(summary, indent=2))
     else:
         _emit(
-            f"migrated {len(migrated)} key(s) "
-            f"({', '.join(migrated)}) from {source_name} to {target_name} "
+            f"migrated {len(migrated_slots)} slot(s) "
+            f"({', '.join(migrated_slots)}) from {source_name} to {target_name} "
             f"for profile {profile!r}",
             level=logging.INFO,
         )
         if summary.get("cleanup"):
             _emit(
-                f"cleanup removed {len(summary.get('cleanup_removed_keys') or [])} "
-                f"key(s) from {source_name} backend",
+                f"cleanup removed {len(summary.get('cleanup_removed') or [])} "
+                f"slot(s) from {source_name} backend",
                 level=logging.INFO,
             )
     return EXIT_SUCCESS
