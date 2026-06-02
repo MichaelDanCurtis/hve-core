@@ -28,6 +28,20 @@ from ._exceptions import (
     MuralValidationError,
 )
 
+# Private (underscore-prefixed) globals defined here are consumed only by
+# sibling modules via explicit ``from ._validation import ...`` rather than
+# within this module. CodeQL's ``py/unused-global-variable`` query analyzes
+# each module in isolation and would otherwise flag them as unused. Listing
+# them in ``__all__`` marks them as this module's intended export surface.
+# The package never uses ``from ._validation import *``, so this has no runtime
+# effect on import behavior.
+__all__ = [
+    "_DEFAULT_PAGE_SIZE",
+    "_MAX_PAGE_SIZE",
+    "_IMAGE_CONTENT_TYPES",
+    "_area_cache",
+]
+
 _MURAL_ID_RE = re.compile(r"^[A-Za-z0-9]+\.[A-Za-z0-9-]+$")
 _AZURE_BLOB_HOST_SUFFIX = ".blob.core.windows.net"
 _DEFAULT_PAGE_SIZE = 100

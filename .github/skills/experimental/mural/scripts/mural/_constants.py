@@ -14,6 +14,27 @@ import os
 import re
 import threading
 
+# Private (underscore-prefixed) globals defined here are consumed only by
+# sibling modules via explicit ``from ._constants import ...`` rather than
+# within this module. CodeQL's ``py/unused-global-variable`` query analyzes
+# each module in isolation and would otherwise flag them as unused. Listing
+# them in ``__all__`` marks them as this module's intended export surface.
+# The package never uses ``from ._constants import *``, so this has no runtime
+# effect on import behavior.
+__all__ = [
+    "_KNOWN_CREDENTIAL_KEYS",
+    "_REFRESH_LOCK",
+    "_RESERVED_TAGS",
+    "_AUTHORED_BY_AI_TAG_TEXT",
+    "_RESERVED_TAG_PREFIXES",
+    "_TAG_MERGE_MAX_RETRIES",
+    "_TAG_MERGE_BACKOFF_MIN_MS",
+    "_TAG_MERGE_BACKOFF_MAX_MS",
+    "_LINE_RE",
+    "_PROFILE_NAME_RE",
+    "_PROFILE_REQUIRED_KEYS",
+]
+
 MURAL_BASE_URL_DEFAULT = "https://app.mural.co/api/public/v1"
 MURAL_AUTHORIZE_URL = "https://app.mural.co/api/public/v1/authorization/oauth2/"
 MURAL_TOKEN_URL = "https://app.mural.co/api/public/v1/authorization/oauth2/token"
