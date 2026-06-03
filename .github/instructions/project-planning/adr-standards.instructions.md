@@ -210,7 +210,7 @@ Paraphrased guidance:
 * Capture the architectural decision close to the time it is made, while context, drivers, and considered alternatives are still fresh; latency reduces fidelity.
 * Record the decision as an immutable artifact in the same repository as the system it governs so that history travels with the code.
 * Treat each ADR as version-controlled; do not edit accepted decisions to change their meaning. When circumstances change, supersede the prior decision with a new ADR that links back to the original.
-* Identify the decision-makers, consulted parties, and informed stakeholders explicitly so that accountability is unambiguous.
+* Identify the decision-makers, consulted parties, and informed stakeholders by role or name so that accountability is unambiguous.
 * Capture both the chosen option and the alternatives considered, with the reasoning that led to selection. Future maintainers benefit as much from understanding the discarded options as from the chosen one.
 * Surface tradeoffs, including the qualities sacrificed and the constraints accepted. Hidden tradeoffs become future surprises.
 * Keep the language plain and the scope tight; one decision per record makes downstream linkage and supersession tractable.
