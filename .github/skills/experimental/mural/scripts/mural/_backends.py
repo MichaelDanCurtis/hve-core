@@ -231,8 +231,8 @@ def resolve_backend(profile: str = "default") -> CredentialBackend:
         try:
             selected = KeyringBackend()
         except _KeyringUnavailable as exc:
-            if profile not in _state._seen_fallback_warn:
-                _state._seen_fallback_warn.add(profile)
+            if profile not in _state.seen_fallback_warn():
+                _state.seen_fallback_warn().add(profile)
                 _emit(
                     f"keyring backend unavailable for profile {profile!r} "
                     f"({exc}); falling back to file backend at {file_path}",

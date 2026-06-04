@@ -49,6 +49,18 @@ _IDEMPOTENCY_CACHE: "collections.OrderedDict[tuple[str, str], dict[str, Any]]" =
 )
 
 
+def seen_fallback_warn() -> set[str]:
+    return _seen_fallback_warn
+
+
+def seen_concurrent_warn() -> set[tuple[str, str]]:
+    return _seen_concurrent_warn
+
+
+def seen_relaxed_warn() -> set[str]:
+    return _seen_relaxed_warn
+
+
 def pending_confirmations() -> dict[str, dict[str, Any]]:
     return _PENDING_CONFIRMATIONS
 

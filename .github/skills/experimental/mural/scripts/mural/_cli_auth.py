@@ -373,7 +373,8 @@ def _cmd_auth_setup(args: argparse.Namespace) -> int:
     """Provision a new profile non-interactively from env or CLI args."""
     json_mode = bool(getattr(args, "json", False)) or _state._CLI_FORCE_JSON
     if not json_mode:
-        print(_OAUTH_SETUP_WALKTHROUGH)
+        redacted = _pkg()._redact(_OAUTH_SETUP_WALKTHROUGH)
+        print(redacted)
     _emit("mural auth setup", level=logging.INFO)
     try:
         profile_name = _validate_profile_name(
@@ -448,8 +449,8 @@ def _cmd_auth_setup(args: argparse.Namespace) -> int:
     if backend is not None:
         if isinstance(backend, _NullBackend):
             warn_key = f"setup-null:{profile_name}"
-            if warn_key not in _state._seen_fallback_warn:
-                _state._seen_fallback_warn.add(warn_key)
+            if warn_key not in _state.seen_fallback_warn():
+                _state.seen_fallback_warn().add(warn_key)
                 _emit(
                     "credential backend is 'env-only'; client_id was "
                     f"recorded in the token store at {path} only. Set "
@@ -467,8 +468,8 @@ def _cmd_auth_setup(args: argparse.Namespace) -> int:
                 )
             except (_KeyringUnavailable, OSError, RuntimeError) as exc:
                 warn_key = f"setup-write:{profile_name}:{backend.name}"
-                if warn_key not in _state._seen_fallback_warn:
-                    _state._seen_fallback_warn.add(warn_key)
+                if warn_key not in _state.seen_fallback_warn():
+                    _state.seen_fallback_warn().add(warn_key)
                     _emit(
                         f"failed to mirror client_id into backend "
                         f"{backend.name!r} for profile {profile_name!r}: "
@@ -1224,7 +1225,7 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
     # both backends already hold values so the operator understands the
     # migration may overwrite distinct copies.
     dedup_key = (profile, "migrate")
-    if dedup_key not in _state._seen_concurrent_warn:
+    if dedup_key not in _state.seen_concurrent_warn():
         try:
             keyring_has = keyring_backend is not None and any(
                 keyring_backend.get(service, k) for k in _KNOWN_CREDENTIAL_KEYS
@@ -1238,7 +1239,7 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
         except Exception:  # noqa: BLE001 - probe must never raise
             file_has = False
         if keyring_has and file_has:
-            _state._seen_concurrent_warn.add(dedup_key)
+            _state.seen_concurrent_warn().add(dedup_key)
             if not force:
                 _emit(
                     f"both keyring and file backends already populated for "

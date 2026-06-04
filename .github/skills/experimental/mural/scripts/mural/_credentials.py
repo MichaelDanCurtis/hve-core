@@ -168,8 +168,8 @@ def _check_credential_file_perms(
         return
     if environ.get(ENV_ENV_FILE_RELAXED) == "1":
         key = str(path)
-        if key not in _pkg()._state._seen_relaxed_warn:
-            _pkg()._state._seen_relaxed_warn.add(key)
+        if key not in _pkg()._state.seen_relaxed_warn():
+            _pkg()._state.seen_relaxed_warn().add(key)
             _pkg()._emit(
                 f"{ENV_ENV_FILE_RELAXED}=1 honored for {path}; this disables "
                 "mode-0600 enforcement (CI use only)",
@@ -251,7 +251,7 @@ def _maybe_warn_concurrent_state(
     backend.
     """
     dedup_key = (profile, selected.name)
-    if dedup_key in _pkg()._state._seen_concurrent_warn:
+    if dedup_key in _pkg()._state.seen_concurrent_warn():
         return
     keyring_populated = False
     file_populated = False
@@ -274,7 +274,7 @@ def _maybe_warn_concurrent_state(
     except Exception:  # noqa: BLE001 - probe must never raise
         file_populated = False
     if keyring_populated and file_populated:
-        _pkg()._state._seen_concurrent_warn.add(dedup_key)
+        _pkg()._state.seen_concurrent_warn().add(dedup_key)
         _pkg()._emit(
             f"both keyring and file backends populated for profile "
             f"{profile!r}; {selected.name} backend takes precedence "
