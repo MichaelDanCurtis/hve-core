@@ -1314,4 +1314,3 @@ def _add_resource_subcommands(sub: argparse._SubParsersAction) -> None:
     )
     _add_output_flags(v_poll)
     v_poll.set_defaults(func=_cmd_voting_poll)
-

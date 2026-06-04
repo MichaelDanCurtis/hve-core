@@ -155,9 +155,7 @@ def _emit_records(records: list[Any], args: argparse.Namespace) -> int:
     _apply_widget_text_coalesce(records)
     fields = _read_fields(args)
     fmt = (
-        "json"
-        if _state._CLI_FORCE_JSON
-        else (getattr(args, "format", None) or "json")
+        "json" if _state._CLI_FORCE_JSON else (getattr(args, "format", None) or "json")
     )
     print(_format_output(records, fields, fmt))
     return EXIT_SUCCESS
@@ -168,9 +166,7 @@ def _emit_record(record: Any, args: argparse.Namespace) -> int:
     _apply_widget_text_coalesce(record)
     fields = _read_fields(args)
     fmt = (
-        "json"
-        if _state._CLI_FORCE_JSON
-        else (getattr(args, "format", None) or "json")
+        "json" if _state._CLI_FORCE_JSON else (getattr(args, "format", None) or "json")
     )
     print(_format_output(record, fields, fmt))
     return EXIT_SUCCESS

@@ -1808,9 +1808,7 @@ def _cmd_template_create(args: argparse.Namespace) -> int:
 
 def _cmd_template_list(args: argparse.Namespace) -> int:
     return _pkg()._emit_record(
-        _pkg()._op_template_list(
-            {"workspace": getattr(args, "workspace", None)}
-        ),
+        _pkg()._op_template_list({"workspace": getattr(args, "workspace", None)}),
         args,
     )
 
@@ -1947,5 +1945,3 @@ def _cmd_mural_unarchive(args: argparse.Namespace) -> int:
 
 
 # --- Voting sessions ---------------------------------------------------------
-
-
