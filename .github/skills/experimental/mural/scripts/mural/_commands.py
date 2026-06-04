@@ -683,16 +683,16 @@ def _evaluate_containment_geometry(
             CONTAINMENT_VERDICT_GEOMETRY_MATCH,
             (
                 f"widget (x={x}, y={y}) is inside parent area "
-                f"(width={width}, height={height})"
+                + f"(width={width}, height={height})"
             ),
         )
     return (
         CONTAINMENT_VERDICT_GEOMETRY_MISMATCH,
         (
             f"widget (x={x}, y={y}) is outside parent area "
-            f"(width={width}, height={height}); parentId is correct but "
-            "the widget will render off-area — see geometry rules in "
-            "mural-seeding-patterns.instructions.md"
+            + f"(width={width}, height={height}); parentId is correct but "
+            + "the widget will render off-area — see geometry rules in "
+            + "mural-seeding-patterns.instructions.md"
         ),
     )
 

@@ -170,17 +170,17 @@ def _cmd_auth_login(args: argparse.Namespace) -> int:
                     f"  1. Process environment ({ENV_CLIENT_ID}, {ENV_CLIENT_SECRET})",
                     (
                         "  2. Active credential backend "
-                        "(MURAL_CREDENTIAL_BACKEND={auto|keyring|file|env-only})"
+                        + "(MURAL_CREDENTIAL_BACKEND={auto|keyring|file|env-only})"
                     ),
                     f"  3. Credential file: {cred_path}  (exists: {cred_exists})",
                     "",
                     (
                         "Run `mural auth bootstrap` to store Mural app"
-                        " credentials interactively,"
+                        + " credentials interactively,"
                     ),
                     (
                         f"or set {ENV_CLIENT_ID} and {ENV_CLIENT_SECRET} in your"
-                        " environment."
+                        + " environment."
                     ),
                 ]
             ),
@@ -359,12 +359,12 @@ _LOGOUT_TRANSPARENCY_LINES: tuple[str, ...] = (
     "Credentials have been cleared from this machine.",
     (
         "Your Mural OAuth tokens may remain active server-side until they "
-        "expire (access tokens have a documented 15-minute TTL; "
-        "refresh tokens persist longer and are not rotated on use)."
+        + "expire (access tokens have a documented 15-minute TTL; "
+        + "refresh tokens persist longer and are not rotated on use)."
     ),
     (
         "To fully revoke access, visit https://app.mural.co/me/apps and "
-        "remove this integration."
+        + "remove this integration."
     ),
 )
 
