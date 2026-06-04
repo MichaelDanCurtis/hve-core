@@ -642,14 +642,15 @@ def _cmd_auth_bootstrap(args: argparse.Namespace) -> int:
     # the operator learns immediately if the saved pair is rejected.
     if not getattr(args, "no_test", False):
         ok, message = _pkg()._probe_client_credentials(client_id, client_secret)
+        redacted = _pkg()._redact(message)
         if ok:
             _emit(
-                f"credential probe succeeded: {message}",
+                f"credential probe succeeded: {redacted}",
                 level=logging.INFO,
             )
         else:
             _emit(
-                f"{message}; your credentials were saved but Mural "
+                f"{redacted}; your credentials were saved but Mural "
                 "rejected them — try `mural auth bootstrap --no-test` "
                 "if you want to debug separately",
                 level=logging.ERROR,
@@ -1292,7 +1293,8 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
     if failures:
         summary["status"] = "partial" if migrated_slots else "failed"
         if json_mode:
-            print(json.dumps(summary, indent=2))
+            redacted = _pkg()._redact(json.dumps(summary, indent=2))
+            print(redacted)
         else:
             _emit(
                 f"migration {source_name}->{target_name} for profile "
@@ -1309,7 +1311,8 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
     if not migrated_slots:
         summary["status"] = "no-op"
         if json_mode:
-            print(json.dumps(summary, indent=2))
+            redacted = _pkg()._redact(json.dumps(summary, indent=2))
+            print(redacted)
         else:
             _emit(
                 f"no credentials to migrate for profile {profile!r} "
@@ -1327,7 +1330,8 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
                 "FileBackend cleanup requires --force (removes credential file)"
             )
             if json_mode:
-                print(json.dumps(summary, indent=2))
+                redacted = _pkg()._redact(json.dumps(summary, indent=2))
+                print(redacted)
             else:
                 _emit(
                     f"migration succeeded but --cleanup of file backend "
@@ -1342,7 +1346,8 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
                     "MURAL_NONINTERACTIVE=1 requires --yes for --cleanup"
                 )
                 if json_mode:
-                    print(json.dumps(summary, indent=2))
+                    redacted = _pkg()._redact(json.dumps(summary, indent=2))
+                    print(redacted)
                 else:
                     _emit(
                         "MURAL_NONINTERACTIVE=1 requires --yes to proceed "
@@ -1364,7 +1369,8 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
             if response not in {"y", "yes"}:
                 summary["status"] = "migrated_cleanup_declined"
                 if json_mode:
-                    print(json.dumps(summary, indent=2))
+                    redacted = _pkg()._redact(json.dumps(summary, indent=2))
+                    print(redacted)
                 else:
                     _emit(
                         "cleanup declined; source backend left intact",
@@ -1387,7 +1393,8 @@ def _cmd_auth_migrate(args: argparse.Namespace) -> int:
             summary["status"] = "migrated_cleanup_partial"
 
     if json_mode:
-        print(json.dumps(summary, indent=2))
+        redacted = _pkg()._redact(json.dumps(summary, indent=2))
+        print(redacted)
     else:
         _emit(
             f"migrated {len(migrated_slots)} slot(s) "

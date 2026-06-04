@@ -125,25 +125,25 @@ def _confirmation_register(
 ) -> str:
     """Register a preview and return its ``preview_id``."""
     preview_id = uuid.uuid4().hex
-    _state._PENDING_CONFIRMATIONS[preview_id] = {
+    _state.pending_confirmations()[preview_id] = {
         "tool": tool,
         "arguments": dict(arguments),
         "candidates": list(candidates),
-        "expires_at": time.time() + _state._CONFIRMATION_TTL_S,
+        "expires_at": time.time() + _state.confirmation_ttl_seconds(),
     }
     # Light cleanup of expired entries to bound the dict.
     now = time.time()
     expired = [
-        k for k, v in _state._PENDING_CONFIRMATIONS.items() if v["expires_at"] < now
+        k for k, v in _state.pending_confirmations().items() if v["expires_at"] < now
     ]
     for k in expired:
-        _state._PENDING_CONFIRMATIONS.pop(k, None)
+        _state.pending_confirmations().pop(k, None)
     return preview_id
 
 
 def _confirmation_consume(*, tool: str, confirmed_id: str) -> dict[str, Any]:
     """Return the registered preview for ``confirmed_id`` or raise."""
-    entry = _state._PENDING_CONFIRMATIONS.pop(confirmed_id, None)
+    entry = _state.pending_confirmations().pop(confirmed_id, None)
     if entry is None:
         raise MuralValidationError(
             "confirmation_id_mismatch: no pending preview for this id"
@@ -1875,7 +1875,7 @@ def _op_template_list(arguments: dict[str, Any]) -> Any:
         not isinstance(workspace, str) or not workspace.strip()
     ):
         raise MCPInvalidParamsError("workspace must be a non-empty string when set")
-    return {"templates": [dict(entry) for entry in _state._TEMPLATE_REGISTRY]}
+    return {"templates": [dict(entry) for entry in _state.template_registry()]}
 
 
 def _op_mural_poll(arguments: dict[str, Any]) -> Any:
@@ -1971,15 +1971,17 @@ def _op_layout_row(arguments: dict[str, Any]) -> Any:
 
 
 def _idempotency_get(name: str, key: str) -> dict[str, Any] | None:
-    payload = _state._IDEMPOTENCY_CACHE.get((name, key))
+    cache = _state.idempotency_cache()
+    payload = cache.get((name, key))
     if payload is None:
         return None
-    _state._IDEMPOTENCY_CACHE.move_to_end((name, key))
+    cache.move_to_end((name, key))
     return payload
 
 
 def _idempotency_put(name: str, key: str, payload: dict[str, Any]) -> None:
-    _state._IDEMPOTENCY_CACHE[(name, key)] = payload
-    _state._IDEMPOTENCY_CACHE.move_to_end((name, key))
-    while len(_state._IDEMPOTENCY_CACHE) > _state._IDEMPOTENCY_MAX:
-        _state._IDEMPOTENCY_CACHE.popitem(last=False)
+    cache = _state.idempotency_cache()
+    cache[(name, key)] = payload
+    cache.move_to_end((name, key))
+    while len(cache) > _state.idempotency_max():
+        cache.popitem(last=False)

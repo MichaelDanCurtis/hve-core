@@ -47,3 +47,23 @@ _IDEMPOTENCY_MAX = 128
 _IDEMPOTENCY_CACHE: "collections.OrderedDict[tuple[str, str], dict[str, Any]]" = (
     collections.OrderedDict()
 )
+
+
+def pending_confirmations() -> dict[str, dict[str, Any]]:
+    return _PENDING_CONFIRMATIONS
+
+
+def confirmation_ttl_seconds() -> float:
+    return _CONFIRMATION_TTL_S
+
+
+def template_registry() -> list[dict[str, str]]:
+    return _TEMPLATE_REGISTRY
+
+
+def idempotency_cache() -> "collections.OrderedDict[tuple[str, str], dict[str, Any]]":
+    return _IDEMPOTENCY_CACHE
+
+
+def idempotency_max() -> int:
+    return _IDEMPOTENCY_MAX
