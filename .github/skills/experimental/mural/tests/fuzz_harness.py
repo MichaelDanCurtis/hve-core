@@ -17,9 +17,11 @@ import mural
 import pytest
 
 # The Atheris/libFuzzer subprocess can run with ``HOME`` unset, which makes
-# ``pathlib.Path.home()`` raise ``RuntimeError`` and crashes credential-path
-# resolution targets. Provide a deterministic fallback so the home-directory
-# branch is exercised instead of aborting the run.
+# bare ``~`` expansion fall back to ``pathlib.Path.home()``. Provide a
+# deterministic fallback so the home-directory branch is exercised instead of
+# aborting the run. Note: ``~user`` forms (e.g. ``~unknownuser``) still raise
+# ``RuntimeError`` from ``expanduser`` regardless of ``HOME``; targets that feed
+# arbitrary paths to ``expanduser`` suppress that explicitly.
 os.environ.setdefault("HOME", tempfile.gettempdir())
 
 try:
@@ -426,7 +428,9 @@ def fuzz_resolve_credential_file(data: bytes) -> None:
         environ[mural.ENV_XDG_CONFIG_HOME] = xdg
     elif shape == 2 and appdata:
         environ["APPDATA"] = appdata
-    with suppress(ValueError):
+    # ``expanduser`` raises RuntimeError for unresolvable ``~user`` forms in the
+    # fuzzed MURAL_ENV_FILE value; that is a valid input outcome, not a defect.
+    with suppress(ValueError, RuntimeError):
         result = mural._resolve_credential_file(profile, environ)
         assert isinstance(result, _pathlib.Path)
 
