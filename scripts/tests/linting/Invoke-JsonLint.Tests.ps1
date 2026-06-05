@@ -154,7 +154,7 @@ Describe 'Invoke-JsonLintCore' -Tag 'Unit' {
 
     It 'Emits a CI annotation with File and Error level for malformed JSON' {
         '{ "x": 1, }' | Set-Content -LiteralPath (Join-Path $script:CaseDir 'bad.json')
-        try { Invoke-JsonLintCore -Paths @($script:CaseDir) -OutputPath $script:Output } catch {}
+        { Invoke-JsonLintCore -Paths @($script:CaseDir) -OutputPath $script:Output } | Should -Throw
         Assert-MockCalled Write-CIAnnotation -ParameterFilter { $File -like '*bad.json' -and $Level -eq 'Error' }
     }
 }
