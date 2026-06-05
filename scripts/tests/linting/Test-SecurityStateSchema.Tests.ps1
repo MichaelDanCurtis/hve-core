@@ -47,3 +47,16 @@ Describe 'Cross-schema parity for disclaimerShownAt' {
         $secProp | Should -Be $raiProp -Because 'disclaimerShownAt definitions must remain in lockstep across schemas'
     }
 }
+
+Describe 'RAI-disabled invariant' {
+    It 'rejects a disabled state with inconsistent RAI fields' {
+        $fixturePath = Join-Path $script:repoRoot 'scripts/tests/fixtures/security-state/phase-1-minimal.json'
+        $base = Get-Content -Path $fixturePath -Raw | ConvertFrom-Json
+        $base.raiScope = 'embedded'
+        $base.raiTier = 'standard'
+        $base.aiComponents = @('stray-component')
+        $invalidJson = $base | ConvertTo-Json -Depth 10
+        $result = Test-Json -Json $invalidJson -Schema $script:schemaJson -ErrorAction SilentlyContinue
+        $result | Should -BeFalse -Because 'raiEnabled=false must force raiScope/raiTier to none, no dispatch, and no AI components'
+    }
+}

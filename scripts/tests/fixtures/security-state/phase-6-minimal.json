@@ -22,7 +22,7 @@
     "dataClassification": "restricted",
     "complianceTargets": ["SOC2", "ISO27001"]
   },
-  "referencesProcessed": [ { "filePath": "docs/architecture.md", "processedInPhase": 2, "sourceDescription": "Architecture" } ],
+  "referencesProcessed": [ { "filePath": "docs/architecture.md", "type": "standard", "processedInPhase": 2, "sourceDescription": "Architecture", "status": "processed" } ],
   "nextActions": [],
   "userPreferences": { "autonomyTier": "full" },
   "raiEnabled": true,
