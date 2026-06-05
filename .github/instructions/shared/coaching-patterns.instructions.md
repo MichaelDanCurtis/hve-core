@@ -125,7 +125,7 @@ After initial context capture, ask the user about output preferences:
 
 "How would you like the assessment outputs formatted?
 
-* **Detail level**: summary (key points only), standard (balanced), or comprehensive (full analysis with evidence chains)?
+* **Detail level**: minimal (key points only), standard (balanced), or detailed (full analysis with evidence chains)?
 * **Target system**: ADO, GitHub, or both for work item creation?
 * **Audience**: technical team, executive stakeholders, or mixed audience?
 * **Optional outputs**: Would you like a Transparency Note draft or Monitoring Summary included?"
