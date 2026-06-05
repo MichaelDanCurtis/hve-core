@@ -1024,7 +1024,7 @@ function Repair-PluginSymlinkIndex {
         [System.StringComparer]::OrdinalIgnoreCase
     )
     $pluginsRel = [System.IO.Path]::GetRelativePath($RepoRoot, $PluginsDir) -replace '\\', '/'
-    $lsOutput = git ls-files --stage -- $pluginsRel 2>$null
+    $lsOutput = git -C $RepoRoot ls-files --stage -- $pluginsRel 2>$null
     if ($lsOutput) {
         foreach ($line in @($lsOutput)) {
             if ($line -match '^(\d+)\s+[0-9a-f]+\s+\d+\t(.+)$') {
@@ -1067,7 +1067,7 @@ function Repair-PluginSymlinkIndex {
             continue
         }
 
-        $hashOutput = git hash-object -w -- $file.FullName 2>&1
+        $hashOutput = git -C $RepoRoot hash-object -w -- $file.FullName 2>&1
         if ($LASTEXITCODE -ne 0) {
             Write-Warning "Failed to hash-object for $repoRelPath"
             continue
@@ -1083,7 +1083,7 @@ function Repair-PluginSymlinkIndex {
         # Use --add for untracked files; harmless for already-tracked entries.
         # Avoids --index-info piping which breaks on Windows due to CRLF stdin.
         $addFlag = if (-not $trackedPaths.Contains($repoRelPath)) { '--add' } else { $null }
-        $cacheArgs = @('update-index') + @($addFlag | Where-Object { $_ }) + @('--cacheinfo', "120000,$sha,$repoRelPath")
+        $cacheArgs = @('-C', $RepoRoot, 'update-index') + @($addFlag | Where-Object { $_ }) + @('--cacheinfo', "120000,$sha,$repoRelPath")
         $cacheResult = & git @cacheArgs 2>&1
         if ($LASTEXITCODE -ne 0) {
             $errorMsg = @($cacheResult | ForEach-Object { $_.ToString() }) -join '; '
