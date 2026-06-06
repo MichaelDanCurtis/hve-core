@@ -2,7 +2,7 @@
   "CleanWorkspace": {
     "ScenarioName": "CleanWorkspace",
     "AgentBytes": 10881,
-    "ColdStartBytes": 39194,
+    "ColdStartBytes": 40241,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
@@ -14,15 +14,15 @@
       },
       {
         "Path": ".github/instructions/shared/disclaimer-language.instructions.md",
-        "Bytes": 4181
+        "Bytes": 5228
       }
     ],
-    "Hash": "159c7ec9a3a4d4454d1edc7446c373e295ef954e8990a1291fa59d790ffeba6f"
+    "Hash": "e49a42c24c980d2ccdc1a35037f55d7d3e59db0580f24abdc77c67a1acf28e76"
   },
   "SteadyState": {
     "ScenarioName": "SteadyState",
     "AgentBytes": 10881,
-    "ColdStartBytes": 81058,
+    "ColdStartBytes": 82105,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
@@ -50,15 +50,15 @@
       },
       {
         "Path": ".github/instructions/shared/disclaimer-language.instructions.md",
-        "Bytes": 4181
+        "Bytes": 5228
       }
     ],
-    "Hash": "b06786a6dbf3625631bde7c4a967029d75f46ee3fcf7b394d6cae5cb8a8e7d65"
+    "Hash": "d7c9e150fb29fb741664e15636ed606d75b91e22a16f9e2df8f6edf840739f66"
   },
   "GovernEntry": {
     "ScenarioName": "GovernEntry",
     "AgentBytes": 10881,
-    "ColdStartBytes": 94454,
+    "ColdStartBytes": 95501,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
@@ -86,19 +86,19 @@
       },
       {
         "Path": ".github/instructions/shared/disclaimer-language.instructions.md",
-        "Bytes": 4181
+        "Bytes": 5228
       },
       {
         "Path": ".github/skills/project-planning/adr-author/SKILL.md",
         "Bytes": 13396
       }
     ],
-    "Hash": "9f7d88d1dd54ba69226a0b3f4bfe92c3dd805811d1c39311c267fe8cf267c8c5"
+    "Hash": "0f91657f1f4a47f6c6f25dbad37e7fa66d5fa3fc6bf439910f189c34974fa2bd"
   },
   "AdoptTemplate": {
     "ScenarioName": "AdoptTemplate",
     "AgentBytes": 10881,
-    "ColdStartBytes": 101448,
+    "ColdStartBytes": 102495,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
@@ -126,7 +126,7 @@
       },
       {
         "Path": ".github/instructions/shared/disclaimer-language.instructions.md",
-        "Bytes": 4181
+        "Bytes": 5228
       },
       {
         "Path": ".github/skills/project-planning/adr-author/scripts/normalize_template.py",
@@ -137,6 +137,6 @@
         "Bytes": 13396
       }
     ],
-    "Hash": "be23311d4811a7c2d7c9c57b84a955f019f1e2515b9e85e08597ea59bd472032"
+    "Hash": "8d231c4f7e5a5c3646cd92a91c7cc94b9e02ce921cd65274016659c3405b23e9"
   }
 }
