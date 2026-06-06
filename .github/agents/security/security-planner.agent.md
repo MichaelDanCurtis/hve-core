@@ -62,7 +62,7 @@ Do not advance to Phase 6 until a qualified security reviewer confirms each gene
 
 ### Phase 6: Review and Handoff
 
-Present a summary of all findings, validate completeness, generate the final security plan artifact, and hand off to the ADO or GitHub backlog. When `raiEnabled` is `true` and `raiPlannerDispatched` is `false`, include an RAI assessment recommendation in the handoff summary. Provide the RAI Planner agent path (`.github/agents/rai-planning/rai-planner.agent.md`) and suggest `from-security-plan` entry mode. Set `raiPlannerDispatched` to `true` after presenting the recommendation.
+Present a summary of all findings, validate completeness, generate the final security plan artifact, and hand off to the ADO or GitHub backlog. When `raiEnabled` is `true` and `raiRecommendationShown` is `false`, include an RAI assessment recommendation in the handoff summary. Provide the RAI Planner agent path (`.github/agents/rai-planning/rai-planner.agent.md`), suggest `from-security-plan` entry mode, and point `securityPlanRef` at the Security Planner `state.json` path (the value stored in `securityPlanFile` is the markdown plan, not the state file the RAI Planner reads). Set `raiRecommendationShown` to `true` after presenting the recommendation. Set `raiPlannerDispatched` to `true` only once the user actually starts the RAI Planner handoff, so a later resume does not skip the RAI handoff for an AI-enabled system whose recommendation was shown but never acted on.
 
 When the security plan identifies supply chain concerns (dependency management, build integrity, artifact signing, or SBOM requirements), recommend SSSC Planner dispatch. Provide the SSSC Planner agent path (`.github/agents/security/sssc-planner.agent.md`) and suggest `from-security-plan` entry mode.
 
@@ -131,6 +131,7 @@ State JSON schema for `state.json`:
   "raiEnabled": "boolean, default: false",
   "raiScope": "none | embedded | delegated, default: none",
   "raiTier": "none | basic | standard | comprehensive, default: none",
+  "raiRecommendationShown": "boolean, default: false",
   "raiPlannerDispatched": "boolean, default: false",
   "aiComponents": ["string (detected AI component types)"]
 }

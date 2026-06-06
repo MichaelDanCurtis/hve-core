@@ -103,12 +103,13 @@ After the standard scoping questionnaire, assess for AI/ML components:
 
 #### RAI Planner Handoff
 
-When `raiEnabled` is `true` and `raiPlannerDispatched` is `false`:
+When `raiEnabled` is `true` and `raiRecommendationShown` is `false`:
 
 * Include an RAI assessment recommendation in the handoff summary.
 * Provide the RAI Planner agent path: `.github/agents/rai-planning/rai-planner.agent.md`
-* Suggest entry mode: `from-security-plan` with reference to the completed security plan path stored in `securityPlanFile`.
-* Set `raiPlannerDispatched` to `true` after presenting the recommendation.
+* Suggest entry mode: `from-security-plan`, and set `securityPlanRef` to the Security Planner `state.json` path. The RAI `from-security-plan` flow reads `state.json` fields such as `aiComponents` from `securityPlanRef`, so it must point at the state file rather than the markdown plan stored in `securityPlanFile`.
+* Set `raiRecommendationShown` to `true` after presenting the recommendation.
+* Set `raiPlannerDispatched` to `true` only once the user actually starts the RAI Planner handoff. Presenting the recommendation alone does not mark RAI as dispatched, so a later resume still surfaces the RAI handoff for an AI-enabled system the user has not yet acted on.
 * When `raiEnabled` is `false`, skip this section entirely.
 
 ## Entry Modes
@@ -162,6 +163,7 @@ The canonical starting state is shown below as JSON-literal defaults. Phases 1, 
   "raiEnabled": false,
   "raiScope": "none",
   "raiTier": "none",
+  "raiRecommendationShown": false,
   "raiPlannerDispatched": false,
   "aiComponents": []
 }
