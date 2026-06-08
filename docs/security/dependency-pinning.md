@@ -3,7 +3,7 @@ title: Dependency Pinning
 description: How HVE Core enforces dependency pinning across GitHub Actions, npm, pip, and shell downloads with automated CI validation
 sidebar_position: 3
 author: Microsoft
-ms.date: 2026-03-02
+ms.date: 2026-06-08
 ms.topic: concept
 keywords:
   - dependency pinning
@@ -87,11 +87,11 @@ DevContainer features declared in `.devcontainer/devcontainer.json` are pinned t
 
 The `devcontainer-lockfile-check.yml` workflow enforces three checks during PR validation:
 
-| Check              | Failure Condition                                                        |
-|--------------------|--------------------------------------------------------------------------|
-| Lockfile existence | `devcontainer-lock.json` is absent from the repository                   |
+| Check              | Failure Condition                                                          |
+|--------------------|----------------------------------------------------------------------------|
+| Lockfile existence | `devcontainer-lock.json` is absent from the repository                     |
 | SHA-256 integrity  | A feature entry is missing `resolved` or `integrity` with `sha256:` prefix |
-| Feature coverage   | A feature in `devcontainer.json` has no corresponding lockfile entry      |
+| Feature coverage   | A feature in `devcontainer.json` has no corresponding lockfile entry       |
 
 ### Lockfile Format
 

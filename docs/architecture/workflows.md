@@ -3,7 +3,7 @@ title: Build Workflows
 description: GitHub Actions CI/CD pipeline architecture for validation, security, and release automation
 sidebar_position: 3
 author: WilliamBerryiii
-ms.date: 2026-05-20
+ms.date: 2026-06-08
 ms.topic: overview
 ---
 
@@ -141,25 +141,25 @@ flowchart LR
 
 ### Jobs
 
-| Job                      | Reusable Workflow             | Validates                      |
-|--------------------------|-------------------------------|--------------------------------|
-| spell-check              | `spell-check.yml`             | Spelling across all files      |
-| markdown-lint            | `markdown-lint.yml`           | Markdown formatting rules      |
-| table-format             | `table-format.yml`            | Markdown table structure       |
-| psscriptanalyzer         | `ps-script-analyzer.yml`      | PowerShell code quality        |
-| yaml-lint                | `yaml-lint.yml`               | YAML syntax                    |
-| pester-tests             | `pester-tests.yml`            | PowerShell unit tests          |
-| frontmatter-validation   | `frontmatter-validation.yml`  | AI artifact metadata           |
-| skill-validation         | `skill-validation.yml`        | Skill directory structure      |
-| link-lang-check          | `link-lang-check.yml`         | Link accessibility             |
-| markdown-link-check      | `markdown-link-check.yml`     | Broken links                   |
-| dependency-pinning-check      | `dependency-pinning-scan.yml`      | Dependency pinning             |
-| devcontainer-lockfile-check   | `devcontainer-lockfile-check.yml`  | Devcontainer lockfile integrity|
-| npm-audit                     | Inline                             | npm dependency vulnerabilities |
-| codeql                   | `codeql-analysis.yml`         | Code security patterns         |
-| copyright-headers        | `copyright-headers.yml`       | Copyright header compliance    |
-| plugin-validation        | `plugin-validation.yml`       | Plugin and collection metadata |
-| gitleaks-scan            | `gitleaks-scan.yml`           | Secret detection               |
+| Job                         | Reusable Workflow                 | Validates                       |
+|-----------------------------|-----------------------------------|---------------------------------|
+| spell-check                 | `spell-check.yml`                 | Spelling across all files       |
+| markdown-lint               | `markdown-lint.yml`               | Markdown formatting rules       |
+| table-format                | `table-format.yml`                | Markdown table structure        |
+| psscriptanalyzer            | `ps-script-analyzer.yml`          | PowerShell code quality         |
+| yaml-lint                   | `yaml-lint.yml`                   | YAML syntax                     |
+| pester-tests                | `pester-tests.yml`                | PowerShell unit tests           |
+| frontmatter-validation      | `frontmatter-validation.yml`      | AI artifact metadata            |
+| skill-validation            | `skill-validation.yml`            | Skill directory structure       |
+| link-lang-check             | `link-lang-check.yml`             | Link accessibility              |
+| markdown-link-check         | `markdown-link-check.yml`         | Broken links                    |
+| dependency-pinning-check    | `dependency-pinning-scan.yml`     | Dependency pinning              |
+| devcontainer-lockfile-check | `devcontainer-lockfile-check.yml` | Devcontainer lockfile integrity |
+| npm-audit                   | Inline                            | npm dependency vulnerabilities  |
+| codeql                      | `codeql-analysis.yml`             | Code security patterns          |
+| copyright-headers           | `copyright-headers.yml`           | Copyright header compliance     |
+| plugin-validation           | `plugin-validation.yml`           | Plugin and collection metadata  |
+| gitleaks-scan               | `gitleaks-scan.yml`               | Secret detection                |
 
 All jobs run in parallel with no dependencies, enabling fast feedback (typically under 3 minutes).
 
