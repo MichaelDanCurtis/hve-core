@@ -4,7 +4,7 @@ description: 'BRD-author view of the BRD-to-PRD handoff payload contract - the b
 
 # BRD-to-PRD Handoff Payload — BRD Author View
 
-This document is the brd-author skill's authoritative description of the payload the BRD Builder orchestrator emits at Govern exit and that the PRD Builder accepts via its `from-brd-handoff` entry mode. The payload itself is governed by the schema in [brd-quality-formats/references/brd-to-prd-handoff-v1.md](../../brd-quality-formats/references/brd-to-prd-handoff-v1.md); this file restates the schema in the BRD author's vocabulary so the canonical template, the orchestrator's exit gate, and the `brd-standard-assessor` subagent all reference a single contract.
+This document is the brd-author skill's authoritative description of the payload the BRD Builder orchestrator emits at Govern exit and that the PRD Builder accepts via its `from-brd-handoff` entry mode. The payload itself is governed by the schema in [brd-to-prd-handoff-v1.md](brd-to-prd-handoff-v1.md); this file restates the schema in the BRD author's vocabulary so the canonical template, the orchestrator's exit gate, and the `brd-standard-assessor` subagent all reference a single contract.
 
 The brd-author bundle is the sole writer of the `brd:`, `business_goals:`, `partitions:`, `known_open_items:`, and `prd_consumer_notes:` fields. The `quality_report:`, `counts:`, `traceability:`, and `signoff:` fields are written by the orchestrator and assessor pipeline; this view documents them for completeness so the template author knows what downstream consumers will receive.
 
@@ -71,8 +71,8 @@ prd_consumer_notes: |                   # optional, free text; conventionally ho
 
 * `brd.id` MUST be allocated by `scripts/update_lineage.py allocate` (Step 2.8) and recorded in the BRD frontmatter overlay before Govern exit.
 * `brd.version` MUST advance to `1.0.0` or higher at signoff; drafts (`0.x.y`) are rejected by upstream validation.
-* `business_goals[].id` MUST match the `BG-###` namespace described in [`traceability-naming`](../../traceability-naming/SKILL.md).
-* `business_goals[].priority` MUST be drawn from the MoSCoW labels defined in [`prioritization-schemes`](../../prioritization-schemes/SKILL.md).
+* `business_goals[].id` MUST match the `BG-###` namespace described in [`traceability-naming`](traceability-naming.md).
+* `business_goals[].priority` MUST be drawn from the MoSCoW labels defined in [`prioritization-schemes`](prioritization-schemes.md).
 * `business_goals[].smart_status` is written by the `brd-standard-assessor` subagent per [quality-rubric.md](quality-rubric.md); the brd-author MUST NOT emit a goal whose statement does not meet the SMART rubric before requesting signoff.
 * `known_open_items[].target_phase` MUST be one of the four upstream-allowed values; deferring to anything else is rejected.
 * `partitions[]` MUST be present when the BRD declares partitions in its frontmatter overlay; otherwise it MUST be omitted.
@@ -93,7 +93,7 @@ The brd-author bundle's contribution to the payload is validated by:
 
 1. `scripts/validate_frontmatter.py` (Step 2.7) — confirms `brd_id`, `version`, `title`, `business_goal_ids`, and `business_goal_smart_status` are present and well-formed on the BRD source.
 2. The orchestrator's pre-handoff structural check — confirms `business_goals[].id` cardinality matches the BRD's §Business Goals section.
-3. The upstream `BRD_TO_PRD_HANDOFF_V1` schema validator owned by [brd-quality-formats](../../brd-quality-formats/SKILL.md) — final authority on the assembled payload.
+3. The upstream `BRD_TO_PRD_HANDOFF_V1` schema validator owned by [brd-quality-formats](brd-quality-formats.md) — final authority on the assembled payload.
 
 ## License
 

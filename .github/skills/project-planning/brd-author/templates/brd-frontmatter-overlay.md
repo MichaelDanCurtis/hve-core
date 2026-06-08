@@ -125,11 +125,12 @@ requirement_id_prefixes:
   fr: "FR"        # Functional Requirement prefix (default)
   ac: "AC"        # Acceptance Criteria prefix (default)
   nfr: "NFR"      # Non-Functional Requirement prefix (default)
+  con: "CON"      # Constraint prefix (default)
   br: "BR"        # Business Rule prefix (default)
 ```
 
-**Default**: `{ fr: "FR", ac: "AC", nfr: "NFR", br: "BR" }`
-**Description**: Snapshot of ID prefix strings active when this BRD was authored. Allows downstream consumers (PRD, ADR) to see actual prefix strings rather than re-deriving from `.brd-config.yml`. Four-tier namespace separation (FR/AC/NFR/BR) is NOT overridable; only prefix strings per namespace.
+**Default**: `{ fr: "FR", ac: "AC", nfr: "NFR", con: "CON", br: "BR" }`
+**Description**: Snapshot of ID prefix strings active when this BRD was authored. Allows downstream consumers (PRD, ADR) to see actual prefix strings rather than re-deriving from `.brd-config.yml`. Five-tier namespace separation (FR/AC/NFR/CON/BR) is NOT overridable; only prefix strings per namespace.
 
 ### `license`
 
