@@ -11,7 +11,7 @@ This skill tells the BRD Builder when a written requirement is better expressed 
 The skill is consumed by:
 
 * the `BRD Author` skill during the Define phase when capturing flows, decisions, or structural relationships;
-* the `brd-standard-assessor` subagent when verifying that complex behavior has a visual representation;
+* the `BRD Standards Assessor` subagent when verifying that complex behavior has a visual representation;
 * the BRD-phase instruction file for Define when the conversation reaches a process-heavy requirement.
 
 This file is original Microsoft content licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The OMG specifications listed in the [cite-only registry](#cite-only-registry) are referenced by name and version only; their prose, notation glyph definitions, and metamodel diagrams are not embedded.

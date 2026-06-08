@@ -11,7 +11,7 @@ This document defines the rubric the BRD Builder applies to every business goal 
 Per DD-08, the BRD Builder applies SMART scoring on a two-phase cadence:
 
 * **Discover (draft)** - business goals are captured in the stakeholder's own words. The BRD Builder does not block on SMART compliance during Discover. It flags goals that are obviously non-SMART and queues them for refinement.
-* **Define (refine)** - every business goal is rewritten into SMART form. The `brd-standard-assessor` subagent applies the rubric below and emits a per-goal pass/fail. The Define → Govern hard gate requires every business goal to pass SMART.
+* **Define (refine)** - every business goal is rewritten into SMART form. The `BRD Standards Assessor` subagent applies the rubric below and emits a per-goal pass/fail. The Define → Govern hard gate requires every business goal to pass SMART.
 
 A goal passes when all five attributes pass. Any single attribute failure marks the goal as not-SMART and blocks the Define → Govern gate.
 
@@ -72,7 +72,7 @@ The BRD Builder follows this cadence for every business goal:
 1. **Discover capture** - capture the goal in the stakeholder's words. Apply a quick SMART triage and record the result as a draft annotation; do not block.
 2. **Define rewrite** - rewrite the goal into the canonical SMART form. The author may consult the stakeholder one or more times to obtain missing baseline, target, or deadline values.
 3. **Define self-score** - the BRD author applies the rubric above and records a per-attribute result.
-4. **Define-exit assessment** - the `brd-standard-assessor` subagent re-applies the rubric and emits the per-goal verdict in `BRD_STANDARD_FINDINGS_V1`. Any goal with verdict *fail* blocks the Define → Govern gate.
+4. **Define-exit assessment** - the `BRD Standards Assessor` subagent re-applies the rubric and emits the per-goal verdict in `BRD_STANDARD_FINDINGS_V1`. Any goal with verdict *fail* blocks the Define → Govern gate.
 5. **Govern monitoring** - the BRD Builder does not rescore SMART during Govern unless a goal is materially changed; material changes trigger a return to step 2.
 
 ## License

@@ -79,7 +79,7 @@ This document defines all YAML frontmatter fields for BRD documents in the HVE-C
 **Type**: Enum
 **Valid Values**: `pass`, `fail`, `deferred`
 **Default**: `deferred`
-**Description**: SMART rubric evaluation result (from `requirements-definition` skill). Populated by `brd-standard-assessor` subagent at Define→Govern gate:
+**Description**: SMART rubric evaluation result (from `requirements-definition` skill). Populated by `BRD Standards Assessor` subagent at Define→Govern gate:
 
 - `pass`: All SMART criteria (Specific, Measurable, Achievable, Relevant, Time-bound) met
 - `fail`: One or more SMART criteria unmet; must resolve before Govern approval

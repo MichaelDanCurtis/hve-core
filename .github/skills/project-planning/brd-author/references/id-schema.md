@@ -4,7 +4,7 @@ description: 'Five-tier requirement identifier schema (FR / AC / NFR / CON / BR)
 
 # Five-Tier Identifier Schema
 
-This reference defines the canonical five-tier identifier schema used by the HVE-Core BRD Builder template. The schema is consumed by the `brd-standard-assessor` subagent (coverage math, prefix-consistency checks) and by any downstream tooling that parses a BRD draft.
+This reference defines the canonical five-tier identifier schema used by the HVE-Core BRD Builder template. The schema is consumed by the `BRD Standards Assessor` subagent (coverage math, prefix-consistency checks) and by any downstream tooling that parses a BRD draft.
 
 The five namespaces are *structural* and are not collapsible. Only the prefix strings themselves are overridable. See [Override Semantics](#override-semantics) below.
 
@@ -58,7 +58,7 @@ Constraints are distinct from business rules (`BR-###`): a constraint bounds how
 * Regex (default prefix): `^BR-\d{3,}$`
 * Examples: `BR-001` (a regulatory data-residency rule), `BR-014` (an organizational approval-threshold policy)
 
-An FR may optionally declare which business rules it enforces via an `enforces: [BR-###]` field in its metadata block. In v1 of the schema this is an authoring convention only; the `brd-standard-assessor` does not currently validate the `enforces` field. See the parent SKILL's *Optional Authoring Convention: `enforces`* section.
+An FR may optionally declare which business rules it enforces via an `enforces: [BR-###]` field in its metadata block. In v1 of the schema this is an authoring convention only; the `BRD Standards Assessor` does not currently validate the `enforces` field. See the parent SKILL's *Optional Authoring Convention: `enforces`* section.
 
 ## Override Semantics
 
@@ -90,7 +90,7 @@ requirement_id_prefixes:
   br: "POL-"
 ```
 
-Under this configuration, identifiers in the BRD draft would read `FEAT-001`, `TEST-017`, `QUAL-023`, `BOUND-005`, `POL-014`. The `brd-standard-assessor` reads the configured prefixes and applies the regex `^<prefix>\d{3,}$` per namespace.
+Under this configuration, identifiers in the BRD draft would read `FEAT-001`, `TEST-017`, `QUAL-023`, `BOUND-005`, `POL-014`. The `BRD Standards Assessor` reads the configured prefixes and applies the regex `^<prefix>\d{3,}$` per namespace.
 
 ### What Is and Is Not Overridable
 
@@ -102,7 +102,7 @@ Under this configuration, identifiers in the BRD draft would read `FEAT-001`, `T
 | The within-BRD sequential numbering rule                           | **No** - structural  |
 | Whether identifiers must be unique within a BRD draft              | **No** - structural  |
 
-Attempting to collapse two namespaces into one (for example, by setting `fr` and `nfr` to the same prefix) is rejected by the `brd-standard-assessor` because it makes coverage math and category-presence checks ambiguous.
+Attempting to collapse two namespaces into one (for example, by setting `fr` and `nfr` to the same prefix) is rejected by the `BRD Standards Assessor` because it makes coverage math and category-presence checks ambiguous.
 
 ## Validation Patterns
 

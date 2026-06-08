@@ -2,7 +2,7 @@
 name: BRD Builder
 description: "Business Requirements Document builder with guided Q&A and reference integration"
 agents:
-  - brd-standard-assessor
+  - BRD Standards Assessor
   - Researcher Subagent
   - Arch Diagram Builder
 ---
@@ -39,7 +39,7 @@ Discover exits only through the brd-author Discover hard gate: scope is bounded,
 
 Load `brd-author#define` first. Author full BRD content using the canonical templates and the FR/AC/NFR/CON/BR taxonomy (see Requirement Quality), then build and verify traceability links across requirements and acceptance criteria.
 
-Dispatch the `brd-standard-assessor` subagent to grade the draft. A single invocation returns a `BRD_STANDARD_FINDINGS_V1` payload and an aggregated `BRD_QUALITY_REPORT_V1` payload; treat both as the evidence for the Define gate. Define does not exit until the quality report's gate decision permits advancement.
+Dispatch the `BRD Standards Assessor` subagent to grade the draft. A single invocation returns a `BRD_STANDARD_FINDINGS_V1` payload and an aggregated `BRD_QUALITY_REPORT_V1` payload; treat both as the evidence for the Define gate. Define does not exit until the quality report's gate decision permits advancement.
 
 Reuse the Arch Diagram Builder agent to produce process and structural diagrams for the current-state, future-state, and data-flow sections rather than authoring diagrams inline.
 

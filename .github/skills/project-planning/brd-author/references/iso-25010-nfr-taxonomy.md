@@ -4,7 +4,7 @@ description: 'Cite-only summary of ISO/IEC 25010 product-quality model - the eig
 
 # ISO/IEC 25010 - NFR Category-Presence Checklist (Cite-Only)
 
-This document is a cite-only summary. It names the eight ISO/IEC 25010 product-quality characteristics the BRD Builder treats as non-functional-requirement (NFR) categories, defines each category in original Microsoft prose, and supplies the binary presence checklist the `brd-standard-assessor` subagent uses at Define exit per DD-12. It does not redistribute ISO/IEC 25010 text.
+This document is a cite-only summary. It names the eight ISO/IEC 25010 product-quality characteristics the BRD Builder treats as non-functional-requirement (NFR) categories, defines each category in original Microsoft prose, and supplies the binary presence checklist the `BRD Standards Assessor` subagent uses at Define exit per DD-12. It does not redistribute ISO/IEC 25010 text.
 
 ## What This Document Is
 
@@ -90,7 +90,7 @@ Presence indicator: at least one NFR names a target environment, install constra
 
 ## Define-Exit Checklist
 
-The `brd-standard-assessor` subagent emits this checklist as part of `BRD_STANDARD_FINDINGS_V1`:
+The `BRD Standards Assessor` subagent emits this checklist as part of `BRD_STANDARD_FINDINGS_V1`:
 
 | Category               | Present (true / false) | Notes |
 |------------------------|------------------------|-------|

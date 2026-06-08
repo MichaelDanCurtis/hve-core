@@ -12,7 +12,7 @@ The skill provides three versioned schemas used during BRD assessment, rollup re
 
 Apply this skill in the following situations:
 
-* Implementing or maintaining the `brd-standard-assessor` subagent (Phase 4) — it must emit a `BRD_STANDARD_FINDINGS_V1` payload per invocation.
+* Implementing or maintaining the `BRD Standards Assessor` subagent (Phase 4) — it must emit a `BRD_STANDARD_FINDINGS_V1` payload per invocation.
 * Implementing or maintaining the `brd-quality-report-generator` subagent (Phase 4) — it must emit a `BRD_QUALITY_REPORT_V1` payload that aggregates per-standard findings.
 * Implementing or maintaining the BRD-to-PRD handoff produced at the Govern exit gate — the handoff payload follows `BRD_TO_PRD_HANDOFF_V1`.
 * Authoring or updating the frontmatter validator script (`validate_frontmatter.py`, Step 2.7) — that script consults these schemas when verifying BRD-quality artifacts.
@@ -20,7 +20,7 @@ Apply this skill in the following situations:
 
 ## Normative references
 
-1. [BRD Standard Findings V1](brd-standard-findings-v1.md) — `BRD_STANDARD_FINDINGS_V1` payload emitted by the `brd-standard-assessor` subagent for a single standard assessment.
+1. [BRD Standard Findings V1](brd-standard-findings-v1.md) — `BRD_STANDARD_FINDINGS_V1` payload emitted by the `BRD Standards Assessor` subagent for a single standard assessment.
 2. [BRD Quality Report V1](brd-quality-report-v1.md) — `BRD_QUALITY_REPORT_V1` payload emitted by the `brd-quality-report-generator` subagent that rolls up per-standard findings into the BRD-level quality report.
 3. [BRD-to-PRD Handoff V1](brd-to-prd-handoff-v1.md) — `BRD_TO_PRD_HANDOFF_V1` payload produced at the Govern exit gate and consumed by the PRD Builder.
 
@@ -28,7 +28,7 @@ Apply this skill in the following situations:
 
 | Schema | Produced by | Consumed by | Trigger |
 |--------|-------------|-------------|---------|
-| `BRD_STANDARD_FINDINGS_V1` | `brd-standard-assessor` subagent | `brd-quality-report-generator` subagent; BRD Builder orchestrator (Define-exit gate) | One invocation per applicable standard at Define-exit or on user request |
+| `BRD_STANDARD_FINDINGS_V1` | `BRD Standards Assessor` subagent | `brd-quality-report-generator` subagent; BRD Builder orchestrator (Define-exit gate) | One invocation per applicable standard at Define-exit or on user request |
 | `BRD_QUALITY_REPORT_V1` | `brd-quality-report-generator` subagent | BRD Builder orchestrator (Define-exit and Govern-exit gates); human reviewer | Once per Define-exit gate run; regenerated after material BRD revisions |
 | `BRD_TO_PRD_HANDOFF_V1` | BRD Builder orchestrator at Govern exit | PRD Builder orchestrator (downstream agent); release manager; auditing tools | Once per Govern-exit signoff |
 

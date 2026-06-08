@@ -1,12 +1,12 @@
 ---
-description: 'BRD traceability matrix template with required FR-to-AC coverage, optional FR-to-business-goal mapping, informational business-rule-to-FR mapping, and the FR-to-AC coverage column that supports the brd-standard-assessor coverage math - Brought to you by microsoft/hve-core'
+description: 'BRD traceability matrix template with required FR-to-AC coverage, optional FR-to-business-goal mapping, informational business-rule-to-FR mapping, and the FR-to-AC coverage column that supports the BRD Standards Assessor coverage math - Brought to you by microsoft/hve-core'
 ---
 
 # Traceability Matrix Template
 
 This reference defines the shape of the traceability matrix section that appears in every HVE-Core BRD draft. The matrix records the relationships between the five identifier tiers ([FR / AC / NFR / CON / BR](id-schema.md)) and the business goals captured in the BRD's Goals section.
 
-The matrix is consumed by the `brd-standard-assessor` subagent at the Define→Govern transition. The FR↔AC coverage column in particular is the source of truth for the assessor's coverage-percentage calculation.
+The matrix is consumed by the `BRD Standards Assessor` subagent at the Define→Govern transition. The FR↔AC coverage column in particular is the source of truth for the assessor's coverage-percentage calculation.
 
 ## Relationship Classes
 
@@ -35,7 +35,7 @@ This table is the source of truth for the assessor's coverage math. One row per 
 
 ### Coverage % Calculation (Supports DD-09)
 
-The coverage percentage the `brd-standard-assessor` reports is computed from this table:
+The coverage percentage the `BRD Standards Assessor` reports is computed from this table:
 
 $$\text{coverage \%} = \frac{\text{count of FRs with Coverage} \geq 1}{\text{count of FRs in BRD}} \times 100$$
 
@@ -83,7 +83,7 @@ This table records which FRs enforce which business rules. It is the reverse vie
 | BR-014 | Data residency: EU users data stored in EU  | (none)          |
 ```
 
-The *Enforcing FR(s)* column lists FRs that exist to enforce the business rule. A `(none)` entry is a signal for the reviewer: either an FR is missing, or the business rule is enforced by a non-functional control (a security NFR, an infrastructure constraint, or an operational procedure) and is not the BRD's responsibility to implement directly. In v1 of the schema the `brd-standard-assessor` does not gate on this table; it is included for human reviewer use.
+The *Enforcing FR(s)* column lists FRs that exist to enforce the business rule. A `(none)` entry is a signal for the reviewer: either an FR is missing, or the business rule is enforced by a non-functional control (a security NFR, an infrastructure constraint, or an operational procedure) and is not the BRD's responsibility to implement directly. In v1 of the schema the `BRD Standards Assessor` does not gate on this table; it is included for human reviewer use.
 
 ## Matrix Section Layout
 

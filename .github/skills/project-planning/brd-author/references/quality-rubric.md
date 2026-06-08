@@ -1,10 +1,10 @@
 ---
-description: 'Operational BRD quality rubric used by the brd-standard-assessor subagent and the Define-phase exit gate - maps the requirements-quality 0-3 attribute scoring to the BRD author status taxonomy (RISK, CAUTION, COVERED, NOT_APPLICABLE) and defines anchor descriptions for every score level - Brought to you by microsoft/hve-core'
+description: 'Operational BRD quality rubric used by the BRD Standards Assessor subagent and the Define-phase exit gate - maps the requirements-quality 0-3 attribute scoring to the BRD author status taxonomy (RISK, CAUTION, COVERED, NOT_APPLICABLE) and defines anchor descriptions for every score level - Brought to you by microsoft/hve-core'
 ---
 
 # BRD Author Quality Rubric
 
-This file is the operational rubric the `brd-standard-assessor` subagent applies at the Define-phase exit gate, on mid-Define on-demand assessments, and during Govern drift checks. It is intentionally narrow: it specifies the scoring scale, the status taxonomy the BRD Builder surfaces to authors, and the gate decision rule. The underlying attribute definitions (ISO 29148 individual-requirement characteristics, ISO/IEC 25010 NFR categories, SMART business-goal pass/fail, ISTQB testability heuristics) are owned by the `requirements-definition` skill bundle and cited from there rather than duplicated here.
+This file is the operational rubric the `BRD Standards Assessor` subagent applies at the Define-phase exit gate, on mid-Define on-demand assessments, and during Govern drift checks. It is intentionally narrow: it specifies the scoring scale, the status taxonomy the BRD Builder surfaces to authors, and the gate decision rule. The underlying attribute definitions (ISO 29148 individual-requirement characteristics, ISO/IEC 25010 NFR categories, SMART business-goal pass/fail, ISTQB testability heuristics) are owned by the `requirements-definition` skill bundle and cited from there rather than duplicated here.
 
 For the source-of-truth attribute definitions and the assessor's emitted findings schema, see [requirements-quality-rubric.md](requirements-quality-rubric.md).
 

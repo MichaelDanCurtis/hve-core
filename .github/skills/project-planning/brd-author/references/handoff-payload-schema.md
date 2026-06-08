@@ -4,7 +4,7 @@ description: 'BRD-author view of the BRD-to-PRD handoff payload contract - the b
 
 # BRD-to-PRD Handoff Payload — BRD Author View
 
-This document is the brd-author skill's authoritative description of the payload the BRD Builder orchestrator emits at Govern exit and that the PRD Builder accepts via its `from-brd-handoff` entry mode. The payload itself is governed by the schema in [brd-to-prd-handoff-v1.md](brd-to-prd-handoff-v1.md); this file restates the schema in the BRD author's vocabulary so the canonical template, the orchestrator's exit gate, and the `brd-standard-assessor` subagent all reference a single contract.
+This document is the brd-author skill's authoritative description of the payload the BRD Builder orchestrator emits at Govern exit and that the PRD Builder accepts via its `from-brd-handoff` entry mode. The payload itself is governed by the schema in [brd-to-prd-handoff-v1.md](brd-to-prd-handoff-v1.md); this file restates the schema in the BRD author's vocabulary so the canonical template, the orchestrator's exit gate, and the `BRD Standards Assessor` subagent all reference a single contract.
 
 The brd-author bundle is the sole writer of the `brd:`, `business_goals:`, `partitions:`, `known_open_items:`, and `prd_consumer_notes:` fields. The `quality_report:`, `counts:`, `traceability:`, and `signoff:` fields are written by the orchestrator and assessor pipeline; this view documents them for completeness so the template author knows what downstream consumers will receive.
 
@@ -73,7 +73,7 @@ prd_consumer_notes: |                   # optional, free text; conventionally ho
 * `brd.version` MUST advance to `1.0.0` or higher at signoff; drafts (`0.x.y`) are rejected by upstream validation.
 * `business_goals[].id` MUST match the `BG-###` namespace described in [`traceability-naming`](traceability-naming.md).
 * `business_goals[].priority` MUST be drawn from the MoSCoW labels defined in [`prioritization-schemes`](prioritization-schemes.md).
-* `business_goals[].smart_status` is written by the `brd-standard-assessor` subagent per [quality-rubric.md](quality-rubric.md); the brd-author MUST NOT emit a goal whose statement does not meet the SMART rubric before requesting signoff.
+* `business_goals[].smart_status` is written by the `BRD Standards Assessor` subagent per [quality-rubric.md](quality-rubric.md); the brd-author MUST NOT emit a goal whose statement does not meet the SMART rubric before requesting signoff.
 * `known_open_items[].target_phase` MUST be one of the four upstream-allowed values; deferring to anything else is rejected.
 * `partitions[]` MUST be present when the BRD declares partitions in its frontmatter overlay; otherwise it MUST be omitted.
 * `prd_consumer_notes` MUST be valid YAML if the BRD chooses to express scope statement and assumptions as a nested mapping; otherwise it MAY be a plain string.
@@ -83,7 +83,7 @@ prd_consumer_notes: |                   # optional, free text; conventionally ho
 These fields are not authored from the BRD template, but the template's quality fields determine the values written by the pipeline. They are listed here so the BRD author can predict what consumers will see.
 
 * `signoff.{status,approvers,waivers}` — written by the orchestrator from the Govern approval workflow.
-* `quality_report.{report_ref,overall_status,govern_exit_decision}` — written by the orchestrator from the final `brd-standard-assessor` run.
+* `quality_report.{report_ref,overall_status,govern_exit_decision}` — written by the orchestrator from the final `BRD Standards Assessor` run.
 * `counts.{functional_requirements,non_functional_requirements,business_rules,constraints,acceptance_criteria,business_goals}` — written by the orchestrator from a structural pass over the BRD artifact.
 * `traceability.{matrix_ref,fr_to_ac_coverage_pct,fr_to_bg_coverage_pct}` — written by the orchestrator from the traceability matrix snapshot at signoff.
 

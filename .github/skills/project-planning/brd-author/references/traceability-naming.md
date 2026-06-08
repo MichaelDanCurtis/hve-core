@@ -6,7 +6,7 @@ description: 'Canonical five-tier requirement identifier schema (FR / AC / NFR /
 
 ## Overview
 
-This skill owns two BRD-wide conventions: the identifier schema used to label every requirement-like statement in a BRD draft, and the traceability matrix shape used to record relationships between those statements. Both are structural conventions of the HVE-Core BRD template; they exist so that downstream consumers (the `brd-standard-assessor` subagent, the PRD/ADR/test handoffs, and any tooling that parses BRD frontmatter) can rely on a consistent vocabulary.
+This skill owns two BRD-wide conventions: the identifier schema used to label every requirement-like statement in a BRD draft, and the traceability matrix shape used to record relationships between those statements. Both are structural conventions of the HVE-Core BRD template; they exist so that downstream consumers (the `BRD Standards Assessor` subagent, the PRD/ADR/test handoffs, and any tooling that parses BRD frontmatter) can rely on a consistent vocabulary.
 
 The schema is five-tier: `FR-###` for functional requirements, `AC-###` for acceptance criteria, `NFR-###` for non-functional requirements, `CON-###` for imposed constraints, and `BR-###` for business rules. The five namespaces are *structural* and are not collapsible. Only the prefix strings themselves are overridable, via a `.brd-config.yml` field documented in [`id-schema.md`](id-schema.md).
 
@@ -19,7 +19,7 @@ Apply this skill when:
 * Assigning an identifier to any newly captured requirement, acceptance criterion, non-functional requirement, constraint, or business rule during the Define phase.
 * Reviewing a BRD draft for identifier-prefix consistency before the Define→Govern transition.
 * Authoring or refreshing the traceability matrix section of a BRD draft.
-* Computing acceptance-criteria coverage (the percentage of FRs that carry at least one AC) for the `brd-standard-assessor` rubric.
+* Computing acceptance-criteria coverage (the percentage of FRs that carry at least one AC) for the `BRD Standards Assessor` rubric.
 * Translating a BRD's identifier set into downstream PRD or test artifacts that need to back-reference BRD requirements.
 
 ## Five-Tier Identifier Schema
@@ -42,7 +42,7 @@ Per-project override of the prefix *strings* is supported through the `.brd-conf
 
 The HVE-Core BRD template includes a single traceability matrix section that records the relationships between the five identifier tiers and the business goals captured in the BRD's Goals section. The matrix uses three relationship classes:
 
-* **Required**: FR ↔ AC. Every FR must have at least one AC; the matrix is the place where this is visible to a human reviewer and machine-checkable by the `brd-standard-assessor`.
+* **Required**: FR ↔ AC. Every FR must have at least one AC; the matrix is the place where this is visible to a human reviewer and machine-checkable by the `BRD Standards Assessor`.
 * **Optional**: FR ↔ BG (business goal). Recording the goal each FR supports is recommended but not gate-blocking.
 * **Informational**: BR ↔ FR. Recording which FRs enforce which business rules is helpful for downstream policy review; in v1 of the schema this is an authoring convention only and is not machine-enforced.
 
@@ -50,7 +50,7 @@ The matrix template, row and column conventions, the FR↔AC coverage column, an
 
 ### Optional Authoring Convention: `enforces`
 
-An FR may declare an `enforces: [BR-###, BR-###]` field in its metadata block to record which business rules the FR exists to enforce. This is an authoring convention only in v1 of the schema; the `brd-standard-assessor` does not currently validate that every BR is enforced by at least one FR, nor that referenced BRs exist. Schema-level enforcement of the `enforces` field is tracked for a future version.
+An FR may declare an `enforces: [BR-###, BR-###]` field in its metadata block to record which business rules the FR exists to enforce. This is an authoring convention only in v1 of the schema; the `BRD Standards Assessor` does not currently validate that every BR is enforced by at least one FR, nor that referenced BRs exist. Schema-level enforcement of the `enforces` field is tracked for a future version.
 
 ## Decision Tree
 

@@ -1,10 +1,10 @@
 ---
-description: 'BRD_STANDARD_FINDINGS_V1 schema - single-standard assessor output emitted by the brd-standard-assessor subagent, including ISO 29148 attribute scores, ISO 25010 category presence, SMART business-goal evaluation, and FR-to-AC coverage - Brought to you by microsoft/hve-core'
+description: 'BRD_STANDARD_FINDINGS_V1 schema - single-standard assessor output emitted by the BRD Standards Assessor subagent, including ISO 29148 attribute scores, ISO 25010 category presence, SMART business-goal evaluation, and FR-to-AC coverage - Brought to you by microsoft/hve-core'
 ---
 
 # BRD Standard Findings — `BRD_STANDARD_FINDINGS_V1`
 
-This document defines the `BRD_STANDARD_FINDINGS_V1` payload emitted by the `brd-standard-assessor` subagent. One payload is produced per `(standard, BRD partition)` invocation.
+This document defines the `BRD_STANDARD_FINDINGS_V1` payload emitted by the `BRD Standards Assessor` subagent. One payload is produced per `(standard, BRD partition)` invocation.
 
 ## Purpose
 

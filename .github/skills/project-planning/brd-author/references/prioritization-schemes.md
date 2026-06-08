@@ -11,7 +11,7 @@ This skill documents the four prioritization schemes the BRD Builder offers stak
 The skill is consumed by:
 
 * the `BRD Author` skill (prioritization-section authoring guidance);
-* the `brd-standard-assessor` subagent (rubric for evaluating the prioritization section of a BRD draft);
+* the `BRD Standards Assessor` subagent (rubric for evaluating the prioritization section of a BRD draft);
 * the BRD-phase instruction file for Define.
 
 ## When to Apply

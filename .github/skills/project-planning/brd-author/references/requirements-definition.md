@@ -15,7 +15,7 @@ This skill is the single requirements-definition bundle the BRD Builder loads wh
 The skill is consumed by:
 
 * the `brd-author` skill (template population, Define-phase rewriting, per-partition acceptance-criteria sections, and self-scoring);
-* the `brd-standard-assessor` subagent (plan-mode rubric at Define exit, mid-Define on demand, and post-Govern drift detection);
+* the `BRD Standards Assessor` subagent (plan-mode rubric at Define exit, mid-Define on demand, and post-Govern drift detection);
 * the BRD-phase instruction files for Discover, Define, and Govern.
 
 This file is original Microsoft content licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The atomicity checklist in `references/atomicity-checklist.md` is also original Microsoft content under CC BY 4.0. External frameworks listed in the [cite-only registry](#cite-only-registry) are referenced by name and clause or section only; their prose is not embedded.
@@ -34,7 +34,7 @@ Apply this skill in the following situations:
 * Checking that every ISO/IEC 25010 quality characteristic is represented by at least one NFR before exiting Define (per DD-12).
 * Refining a Discover-phase business-goal draft into a SMART goal during Define (per DD-08).
 * Asking whether a requirement is testable, and if not, what minimum information would make it testable (per ISTQB testability).
-* Producing the combined quality score the `brd-standard-assessor` subagent emits in `BRD_STANDARD_FINDINGS_V1`.
+* Producing the combined quality score the `BRD Standards Assessor` subagent emits in `BRD_STANDARD_FINDINGS_V1`.
 
 ## Requirement Categories
 
@@ -167,7 +167,7 @@ Scored per individual requirement. The BRD Builder recognizes the nine §5.2.5 i
 8. *Correct* - the requirement accurately reflects the underlying stakeholder intent and is free of factual, semantic, or scope errors.
 9. *Conforming* - the requirement follows the format, structure, and language standards established for the BRD's requirement set, including the canonical statement form and the BRD glossary.
 
-The 0-3 anchor scale used by the `brd-standard-assessor` subagent is defined in [iso-29148-quality-attrs.md](iso-29148-quality-attrs.md). See [requirements-quality-rubric.md](requirements-quality-rubric.md) for the combined scoring sheet the subagent emits. Cross-cutting traceability is enforced by the [`traceability-naming`](traceability-naming.md) skill rather than scored here.
+The 0-3 anchor scale used by the `BRD Standards Assessor` subagent is defined in [iso-29148-quality-attrs.md](iso-29148-quality-attrs.md). See [requirements-quality-rubric.md](requirements-quality-rubric.md) for the combined scoring sheet the subagent emits. Cross-cutting traceability is enforced by the [`traceability-naming`](traceability-naming.md) skill rather than scored here.
 
 ### Dimension 2 - NFR Category Presence (ISO/IEC 25010, per DD-12)
 
@@ -244,7 +244,7 @@ Internal:
 * [volere-pointer.md](volere-pointer.md) - cite-only summary of the Volere Requirements Specification Template and outbound link.
 * [smart-rubric.md](smart-rubric.md) - SMART rubric per DD-08, with per-attribute anchor descriptions and binary pass/fail for the Define → Govern hard gate.
 * [istqb-testability.md](istqb-testability.md) - cite-only testability heuristics from the ISTQB Glossary.
-* [requirements-quality-rubric.md](requirements-quality-rubric.md) - combined HVE-Core rubric used by the `brd-standard-assessor` subagent.
+* [requirements-quality-rubric.md](requirements-quality-rubric.md) - combined HVE-Core rubric used by the `BRD Standards Assessor` subagent.
 * [given-when-then.md](given-when-then.md) - canonical Given/When/Then pattern with generic examples and Cucumber attribution.
 * [atomicity-checklist.md](atomicity-checklist.md) - original Microsoft atomicity checklist (CC BY 4.0).
 * [wiegers-templates.md](wiegers-templates.md) - cite-only pointer to Karl Wiegers, *Software Requirements*.

@@ -1,10 +1,10 @@
 ---
-description: 'Combined HVE-Core quality rubric the brd-standard-assessor subagent applies at Define exit - 0-3 ISO 29148 §5.2.5 characteristic scoring per requirement, ISO/IEC 25010 NFR category-presence per BRD per DD-12, and SMART pass/fail per business goal per DD-08, plus the Define-to-Govern gate decision rule - Brought to you by microsoft/hve-core'
+description: 'Combined HVE-Core quality rubric the BRD Standards Assessor subagent applies at Define exit - 0-3 ISO 29148 §5.2.5 characteristic scoring per requirement, ISO/IEC 25010 NFR category-presence per BRD per DD-12, and SMART pass/fail per business goal per DD-08, plus the Define-to-Govern gate decision rule - Brought to you by microsoft/hve-core'
 ---
 
 # HVE-Core BRD Quality Rubric
 
-This document is the single combined rubric the `brd-standard-assessor` subagent (Step 4.2) applies at Define exit, mid-Define on demand, and post-Govern drift detection. It composes three independent scoring dimensions and one diagnostic heuristic set into the payload schema emitted in `BRD_STANDARD_FINDINGS_V1`. All third-party standards (ISO/IEC/IEEE 29148:2018, ISO/IEC 25010, ISTQB Glossary) are cited by name only; the rubric itself is original Microsoft content.
+This document is the single combined rubric the `BRD Standards Assessor` subagent (Step 4.2) applies at Define exit, mid-Define on demand, and post-Govern drift detection. It composes three independent scoring dimensions and one diagnostic heuristic set into the payload schema emitted in `BRD_STANDARD_FINDINGS_V1`. All third-party standards (ISO/IEC/IEEE 29148:2018, ISO/IEC 25010, ISTQB Glossary) are cited by name only; the rubric itself is original Microsoft content.
 
 ## Rubric Structure
 

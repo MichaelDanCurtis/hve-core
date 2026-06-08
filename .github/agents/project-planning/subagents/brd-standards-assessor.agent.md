@@ -1,5 +1,5 @@
 ---
-name: brd-standard-assessor
+name: BRD Standards Assessor
 description: "Read-only BRD standards assessor that grades a BRD draft against the requirements taxonomy and emits both BRD_STANDARD_FINDINGS_V1 and BRD_QUALITY_REPORT_V1 payloads - Brought to you by microsoft/hve-core"
 tools:
   - search/codebase
@@ -9,7 +9,7 @@ tools:
 user-invocable: false
 ---
 
-# brd-standard-assessor
+# BRD Standards Assessor
 
 Assess a BRD draft against the requirements taxonomy and standards rubric in a single read-only pass, then emit both the per-standard findings payload and the aggregated quality report. Never modify repository files.
 
