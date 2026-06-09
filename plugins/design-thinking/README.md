@@ -185,9 +185,9 @@ copilot plugin install design-thinking@hve-core
 
 ## Skills
 
-| Skill                 | Description                                                                                                                                                               |
-|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| telemetry-foundations | Declarative OpenTelemetry-aligned telemetry vocabulary and instrumentation conventions for traces, metrics, logs, and PII handling - Brought to you by microsoft/hve-core |
+| Skill                 | Description                                                                                                                        |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| telemetry-foundations | Declarative OpenTelemetry-aligned telemetry vocabulary and instrumentation conventions for traces, metrics, logs, and PII handling |
 
 ---
 
