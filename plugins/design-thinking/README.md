@@ -47,7 +47,8 @@ Coaching identity, quality constraints, and methodology instructions for AI-enha
 | Name                                                     | Description                                                                                                                                                                                                                                                 |
 |----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **design-thinking/dt-canonical-deck**                    | Opt-in canonical deck and customer-card workflow for DT coaching                                                                                                                                                                                            |
-| **design-thinking/dt-coaching-identity**                 | Required instructions when working with or doing any Design Thinking (DT); Contains instructions for the Design Thinking coach identity, philosophy, and user interaction and communication requirements for consistent coaching behavior.                  |
+| **design-thinking/dt-coach-telemetry**                   | Design Thinking Coach telemetry overlay applying telemetry-foundations vocabulary to DT session artifacts                                                                                                                                                   |
+| **design-thinking/dt-coaching-identity**                 | Design Thinking coach identity, philosophy, and user interaction requirements for consistent coaching                                                                                                                                                       |
 | **design-thinking/dt-coaching-state**                    | Coaching state schema for Design Thinking session persistence, method progress tracking, and session recovery                                                                                                                                               |
 | **design-thinking/dt-curriculum-01-scoping**             | DT Curriculum Module 1: Scope Conversations - concepts, techniques, checks, and exercises                                                                                                                                                                   |
 | **design-thinking/dt-curriculum-02-research**            | DT Curriculum Module 2: Design Research - concepts, techniques, checks, and exercises                                                                                                                                                                       |
@@ -91,6 +92,12 @@ Coaching identity, quality constraints, and methodology instructions for AI-enha
 | **design-thinking/dt-subagent-handoff**                  | DT subagent handoff workflow: readiness assessment, artifact compilation, and handoff validation via subagent dispatch                                                                                                                                      |
 | **shared/hve-core-location**                             | Important: hve-core is the repository containing this instruction file; Guidance: if a referenced prompt, instructions, agent, or script is missing in the current directory, fall back to this hve-core location by walking up this file's directory tree. |
 
+### Skills
+
+| Name                      | Description                                                                                                                        |
+|---------------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| **telemetry-foundations** | Declarative OpenTelemetry-aligned telemetry vocabulary and instrumentation conventions for traces, metrics, logs, and PII handling |
+
 <!-- END AUTO-GENERATED ARTIFACTS -->
 
 ## Install
@@ -130,7 +137,7 @@ copilot plugin install design-thinking@hve-core
 
 | Instruction                                       | Description                                                                                                                                                                                                                                                 |
 |---------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| dt-coaching-identity.instructions                 | Required instructions when working with or doing any Design Thinking (DT); Contains instructions for the Design Thinking coach identity, philosophy, and user interaction and communication requirements for consistent coaching behavior.                  |
+| dt-coaching-identity.instructions                 | Design Thinking coach identity, philosophy, and user interaction requirements for consistent coaching                                                                                                                                                       |
 | dt-method-07-hifi-prototypes.instructions         | Design Thinking Method 7: High-Fidelity Prototypes; technical translation, functional prototypes, and specifications                                                                                                                                        |
 | dt-method-07-deep.instructions                    | Deep expertise for Method 7: High-Fidelity Prototypes; fidelity translation, architecture, and specification writing                                                                                                                                        |
 | dt-method-08-testing.instructions                 | Design Thinking Method 8: User Testing - evidence-based evaluation, test protocols, and non-linear iteration support                                                                                                                                        |
@@ -174,6 +181,13 @@ copilot plugin install design-thinking@hve-core
 | dt-curriculum-09-handoff.instructions             | DT Curriculum Module 9: Iteration at Scale - concepts, techniques, checks, and exercises                                                                                                                                                                    |
 | dt-curriculum-scenario-manufacturing.instructions | Manufacturing reference scenario for DT learning - factory floor improvement project used across all 9 curriculum modules                                                                                                                                   |
 | hve-core-location.instructions                    | Important: hve-core is the repository containing this instruction file; Guidance: if a referenced prompt, instructions, agent, or script is missing in the current directory, fall back to this hve-core location by walking up this file's directory tree. |
+| dt-coach-telemetry.instructions                   | Design Thinking Coach telemetry overlay applying telemetry-foundations vocabulary to DT session artifacts                                                                                                                                                   |
+
+## Skills
+
+| Skill                 | Description                                                                                                                        |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| telemetry-foundations | Declarative OpenTelemetry-aligned telemetry vocabulary and instrumentation conventions for traces, metrics, logs, and PII handling |
 
 ---
 
