@@ -28,6 +28,8 @@
     "audit:pip": "pwsh -NoProfile -File scripts/security/Invoke-PipAudit.ps1",
     "audit:npm": "audit-ci --config audit-ci.json",
     "rai:sign": "pwsh -NoProfile -File scripts/security/Sign-PlannerArtifacts.ps1",
+    "security:sign": "pwsh -NoProfile -File scripts/security/Sign-PlannerArtifacts.ps1",
+    "sssc:sign": "pwsh -NoProfile -File scripts/security/Sign-PlannerArtifacts.ps1",
     "lint:ai-artifacts": "pwsh -NoProfile -Command \"& './scripts/linting/Validate-PlannerArtifacts.ps1' -FailOnMissing\"",
     "lint:models": "pwsh -NoProfile -File scripts/linting/Test-ModelReferences.ps1 -OutputPath logs/model-validation-results.json",
     "lint:models:refresh": "pwsh -NoProfile -File scripts/linting/Update-ModelCatalog.ps1",
