@@ -1,4 +1,4 @@
-#Requires -Modules Pester
+#Requires -Modules Pester, powershell-yaml
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: MIT
 <#
@@ -9,27 +9,34 @@
     matching the Phase 6 audit matrix migration map.
 #>
 
-$script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
-Import-Module powershell-yaml -Force -ErrorAction SilentlyContinue
+BeforeDiscovery {
+    $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 
-$script:scanRoots = @(
-    (Join-Path $script:repoRoot '.github/instructions/security'),
-    (Join-Path $script:repoRoot '.github/instructions/rai-planning')
-)
+    $script:scanRoots = @(
+        (Join-Path $script:repoRoot '.github/instructions/security'),
+        (Join-Path $script:repoRoot '.github/instructions/rai-planning')
+    )
 
-$script:cases = foreach ($root in $script:scanRoots) {
-    if (-not (Test-Path $root)) { continue }
-    Get-ChildItem -Path $root -Filter '*.md' -Recurse -File | ForEach-Object {
-        @{
-            Path = $_.FullName
-            Rel  = ($_.FullName.Substring($script:repoRoot.Length + 1) -replace '\\','/')
+    $script:cases = foreach ($root in $script:scanRoots) {
+        if (-not (Test-Path $root)) {
+            throw "Scan root not found: $root"
         }
+
+        Get-ChildItem -Path $root -Filter '*.md' -Recurse -File | ForEach-Object {
+            @{
+                Path = $_.FullName
+                Rel  = ($_.FullName.Substring($script:repoRoot.Length + 1) -replace '\\','/')
+            }
+        }
+    }
+
+    if (-not $script:cases) {
+        throw 'No instruction files discovered to validate.'
     }
 }
 
-Describe 'Phase-narrowed applyTo regression guard' {
+Describe 'Phase-narrowed applyTo regression guard' -Tag 'Unit' {
     BeforeAll {
-        Import-Module powershell-yaml -Force -ErrorAction SilentlyContinue
         $script:applyToAllowlist = @()
         function Test-WorkspaceWideApplyTo {
             param($Value)
