@@ -1,6 +1,6 @@
 ---
 name: telemetry-foundations
-description: 'Declarative OpenTelemetry-aligned telemetry vocabulary and instrumentation conventions for traces, metrics, logs, and PII handling - Brought to you by microsoft/hve-core'
+description: 'Declarative OpenTelemetry-aligned telemetry vocabulary and instrumentation conventions for traces, metrics, logs, and PII handling'
 ---
 
 # Telemetry Foundations
