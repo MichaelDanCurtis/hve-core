@@ -179,7 +179,7 @@
         },
         "entryMode": {
           "type": "string",
-          "enum": ["capture", "from-prd", "from-security-plan", "from-rai-plan"],
+          "enum": ["capture", "from-prd", "from-brd", "from-security-plan", "from-rai-plan"],
           "description": "How the assessment was initiated"
         },
         "surfaces": {
