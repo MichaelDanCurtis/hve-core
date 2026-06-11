@@ -210,7 +210,7 @@ Give us feedback on HVE Core or on this document by opening a GitHub issue at [m
 
 ## Appendices: per-agent transparency notes
 
-The five appendices below cover the agents whose output most influences downstream decisions, plus the synthetic-persona skill that carries the most direct Responsible AI weight. They are not exhaustive. The full agent inventory lives in the repository's `.github/agents/` tree, and per-agent notes for the remaining agents are not yet written.
+The five appendices below cover the agents whose output most influences downstream decisions, plus the Customer Card Render skill. They are not exhaustive. The full agent inventory lives in the repository's `.github/agents/` tree, and per-agent notes for the remaining agents are not yet written.
 
 ### Appendix 1: RAI Planner
 
