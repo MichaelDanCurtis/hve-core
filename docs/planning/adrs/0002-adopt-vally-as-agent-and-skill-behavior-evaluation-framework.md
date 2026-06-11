@@ -55,15 +55,15 @@ success_criteria:
   - metric: "baseline-equivalence-divergence"
     target: "zero undocumented divergences between the customization layer and the underlying Copilot baseline"
     measurement_window: "per-PR for baseline-equivalence suite"
-    source: "evals/baseline-equivalence/README.md"
+    source: "baseline-equivalence comparison contract"
   - metric: "eval-ci-gating"
     target: "the evaluation matrix runs in PR CI and blocks merge on authoritative-gate failures"
     measurement_window: "every PR run"
-    source: ".github/workflows/evals-agent-matrix.yml"
+    source: "PR evaluation matrix workflow design"
   - metric: "corpus-moderation-enforcement"
     target: "generated test corpora pass the moderation pipeline before use, with refusal-taxonomy categories enforced"
     measurement_window: "per corpus generation"
-    source: "scripts/evals/moderation/moderate.py"
+    source: "corpus moderation pipeline design"
 decisionMetadata:
   driverToTriggerMap:
     "Regression safety": "ASR-maintainability-eval-suite"
@@ -103,7 +103,6 @@ authoring skill at `.github/skills/hve-core/vally-tests/`, a
 `.github/workflows/pr-validation.yml`. How should hve-core standardize
 behavioral evaluation of its AI artifacts?
 
-> Source: `.copilot-tracking/adr-plans/agent-evaluation-framework/state.json`, Frame-phase scope, drivers, constraints, and ASR triggers.
 > Source: `evals/README.md`, six-suite evaluation architecture.
 > Source: `evals/baseline-equivalence/README.md`, baseline-equivalence comparison contract.
 
@@ -170,7 +169,7 @@ its tag-routed grader catalog matches the multi-suite design, and it is npm-
 and GitHub-Actions-native so it fits existing PR CI and local `npm run`
 workflows.
 
-`vyta/beval` (Option B) is treated as **complementary rather than rejected**: it
+`vyta/beval` (Option B) is treated as complementary rather than rejected. It
 targets a different layer (runtime, multi-turn agentic behavior with scored
 multi-dimensional metrics and persona-driven conversation simulation over
 ACP/A2A) and is being integrated through open pull requests. It does not
@@ -342,7 +341,6 @@ No data migration is required: removing the framework leaves the underlying AI c
 
 ## More Information
 
-* Session state: `.copilot-tracking/adr-plans/agent-evaluation-framework/state.json`
 * Suite architecture: `evals/README.md` and the `evals/` suite tree
 * Central config: `./.vally.yaml`
 * Orchestration: `scripts/evals/` (PowerShell and Python)
