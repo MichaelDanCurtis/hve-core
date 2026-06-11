@@ -2,7 +2,7 @@
 title: "Transparency Note: HVE Core (May 2026)"
 description: "Public Transparency Note for HVE Core, a prompt-engineering and agentic-customization framework distributed by microsoft/hve-core."
 author: HVE Core Maintainers
-ms.date: 2026-06-10
+ms.date: 2026-06-11
 ms.topic: overview
 keywords:
   - responsible-ai
@@ -12,15 +12,6 @@ keywords:
   - copilot
 estimated_reading_time: 14
 ---
-## Overview
-
-| Field         | Value                         |
-|---------------|-------------------------------|
-| System        | HVE Core (microsoft/hve-core) |
-| Document type | Transparency Note             |
-| Cycle         | May 2026                      |
-| Last updated  | 2026-06-10                    |
-
 ## What is a Transparency Note?
 
 A Transparency Note explains how an AI-related system works, the choices its maintainers made, and the limits to keep in mind when you decide whether and how to use it. The goal is to help you understand what the system can and cannot do, where a human needs to stay in control, and how to use it responsibly.
@@ -67,7 +58,7 @@ HVE Core ships text files and supporting tools. When you load an HVE Core file i
 
 HVE Core has no model, no API, no network calls while you author or install it, and no telemetry. Validation tools (linters, frontmatter checks, Pester tests, plugin generation) run in CI on pull requests. Nothing runs on your machine unless you install the VS Code extension or run a packaged script yourself.
 
-A few skills assemble media outputs from authored content:
+Most skills are pure authoring or validation helpers with no independent Responsible AI surface and are not called out individually. A few skills warrant specific mention because they assemble media outputs or depend on external services:
 
 * The **Customer Card Render** skill assembles synthetic-persona slides from authored Design Thinking content through a template-driven PowerPoint pipeline; HVE Core has no image-generation model. When concept imagery is needed, the workflow emits prompts the operator runs on an external platform such as M365 Copilot, where the host's Responsible AI layers apply. The cards stay low-fidelity and carry disclosure, redaction, and stereotyping-review controls. See Appendix 5.
 * The **PowerPoint Builder** and **TTS Voice-over** experimental skills turn authored YAML into slides and audio. They do not create likenesses of people or claim to be a real speaker; they assemble content that was written elsewhere. The TTS Voice-over skill depends on an external speech service (such as Azure Speech) that you provision and govern under its own subscription and terms.
@@ -90,7 +81,7 @@ A few skills assemble media outputs from authored content:
 
 HVE Core is built for these situations:
 
-* **Faster starts for Microsoft engineers and field teams.** Agents and prompts capture common workflows (research, planning, implementation, review, discovery) so starting a task with Copilot takes less setup.
+* **Faster starts for engineers and field teams.** Agents and prompts capture common workflows (research, planning, implementation, review, discovery) so starting a task with Copilot takes less setup.
 * **Consistent coding standards through Copilot.** Per-language instructions and code-review agents bring shared guidance into Copilot when you work in C#, Python, PowerShell, Rust, Bash, Bicep, Terraform, and related stacks.
 * **Help with governance-aware planning.** The RAI Planner, Security Planner, and SSSC Planner help teams structure assessments aligned with the NIST AI RMF, STRIDE, and the OpenSSF Scorecard family. These agents produce drafts; a qualified person must review and approve every output.
 * **Backlog help for Azure DevOps, GitHub Issues, and Jira.** Agents can search, draft, triage, and prepare updates for a human to review and approve.
@@ -178,7 +169,7 @@ Fairness and representational considerations:
 
 ## Evaluating and integrating HVE Core for your use
 
-HVE Core is engineering tooling, not a managed service. At integration time, three things are on you:
+HVE Core is engineering tooling, not a managed service. At integration time, three things are still the responsibility of the HVE Core user:
 
 * **Pick the right scope.** Coding-standards collections suit engineering productivity. Planning collections (RAI, Security, SSSC) support governance work but still need qualified human reviewers. The experimental collection ships features that are deliberately less mature.
 * **Check the host platform.** Current GitHub Copilot Chat in VS Code or the GitHub Copilot CLI are the supported hosts. Other clients are not characterized.
@@ -230,7 +221,7 @@ The five appendices below cover the agents whose output most influences downstre
 * **Outputs:** Markdown artifacts under `.copilot-tracking/security-plans/{project}/`, including operational-bucket inventory, security model, standards mapping, and backlog handoff. All outputs carry the AI-assistance disclosure footer.
 * **Intended uses:** Drafting an initial threat model for a system that does not yet have one, expanding an existing model with additional buckets, or preparing material for review by a security architect or threat-modeling lead.
 * **Specific limitations:** The agent does not perform live vulnerability discovery, does not run penetration tests, and does not query CVE databases at runtime. Standards mapping reflects the embedded standards in the agent's instructions and should be cross-checked against current authoritative sources before publication. The agent does not produce certifications, attestations, or compliance evidence; its outputs are inputs to those processes.
-* **Specific considerations:** Threat IDs and concern levels are suggested. A qualified security reviewer must validate the threat surface, the proposed mitigations, and the residual-risk reads before any operational decision.
+* **Specific considerations:** Treat every output as a draft; do not promote a draft to approved status. Threat IDs and concern levels are suggested. A qualified security reviewer must validate the threat surface, the proposed mitigations, and the residual-risk reads before any operational decision.
 
 ### Appendix 3: SSSC Planner
 
@@ -261,7 +252,7 @@ The five appendices below cover the agents whose output most influences downstre
 * **Purpose:** Generates customer-card PowerPoint content from Design Thinking canonical artifacts (interview notes, observations, synthesized themes). Each card represents a synthetic persona drawn from the research and is intended for stakeholder communication, not for delivery to the depicted individuals.
 * **Inputs:** Canonical Design Thinking artifacts under `.copilot-tracking/dt/{project}/`, including research notes and synthesis output. Optionally, persona templates from the bundled set.
 * **Outputs:** PowerPoint slide content YAML and rendered `.pptx` files. Cards include a low-fidelity visual rendering and persona narrative.
-* **Intended uses:** Producing internal stakeholder-facing summaries of customer-research findings during ISE engagements. Communicating synthesized insight in a format that reads as illustrative rather than as a literal portrait of any individual.
+* **Intended uses:** Producing internal stakeholder-facing summaries of customer-research findings during customer engagements. Communicating synthesized insight in a format that reads as illustrative rather than as a literal portrait of any individual.
 * **Specific limitations:**
   * The skill assembles cards through a template-driven PowerPoint pipeline; it does not call an image-generation model. Where the Design Thinking workflow needs concept imagery, the operator runs generated prompts on an external platform such as M365 Copilot, which applies its own Responsible AI layers. Because the cards depict people-like figures, AI-disclosure, redaction, and stereotyping controls apply.
   * Even with low-fidelity enforcement, the output may be misread as portraying real individuals.
@@ -285,12 +276,13 @@ Outputs from HVE Core agents and skills are advisory. They do not constitute leg
 
 ## About this document
 
-| Field         | Value             |
-|---------------|-------------------|
-| Published     | 2026-05-14        |
-| Last updated  | 2026-06-10        |
-| Cycle         | May 2026          |
-| Document type | Transparency Note |
+| Field         | Value                         |
+|---------------|-------------------------------|
+| System        | HVE Core (microsoft/hve-core) |
+| Document type | Transparency Note             |
+| Cycle         | May 2026                      |
+| Published     | 2026-06-11                    |
+| Last updated  | 2026-06-11                    |
 
 This document is provided as-is and for informational purposes only. Information in this document, including URL and other references, may change without notice. This document is not legal advice. Consult appropriate counsel for jurisdiction-specific obligations.
 
