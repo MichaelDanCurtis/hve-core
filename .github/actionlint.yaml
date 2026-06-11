@@ -10,6 +10,11 @@ self-hosted-runner:
 # HVE_DEVCONTAINER_IMAGE and HVE_GITHUB_API_URL are environment variables
 # consumed at runtime, not GitHub configuration variables.
 config-variables:
+  - GH_AW_DEFAULT_DETECTION_MAX_AI_CREDITS
+  - GH_AW_DEFAULT_MAX_AI_CREDITS
+  - GH_AW_DEFAULT_MAX_DAILY_AI_CREDITS
+  - GH_AW_DEFAULT_MAX_TURNS
+  - GH_AW_DEFAULT_MODEL_COPILOT
   - GH_AW_MODEL_AGENT_COPILOT
   - GH_AW_MODEL_DETECTION_COPILOT
   - HVE_GITHUB_RELEASES_URL
@@ -27,3 +32,4 @@ paths:
       - "shellcheck reported issue in this script: SC2016:.+"
       - "shellcheck reported issue in this script: SC2086:.+"
       - "shellcheck reported issue in this script: SC2129:.+"
+      - 'unexpected key "queue" for "concurrency" section.+'
