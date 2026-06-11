@@ -15,7 +15,7 @@ estimated_reading_time: 14
 ## Overview
 
 | Field         | Value                         |
-| ------------- | ----------------------------- |
+|---------------|-------------------------------|
 | System        | HVE Core (microsoft/hve-core) |
 | Document type | Transparency Note             |
 | Cycle         | May 2026                      |
@@ -37,23 +37,23 @@ HVE Core does not run any AI model itself. It does not train models, host infere
 2. The trust people place in files that carry Microsoft branding through this repository and the official VS Code extension.
 3. The saved-memory feature and the customer-handoff steps that some agents drive.
 
-The appendices at the end add detail for the agents that most influence downstream decisions, plus the one feature that generates images directly (the Customer Card Render skill).
+The appendices at the end add detail for the agents that most influence downstream decisions, plus the synthetic-persona skill that carries the most direct Responsible AI weight (the Customer Card Render skill).
 
 ### Key terms
 
-| Term                 | Meaning in HVE Core                                                                                                                                                             |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Artifact             | A file HVE Core ships: an agent, prompt, instruction, skill, collection, script, or workflow. Other tools read these files; the files do not run on their own.                  |
-| Custom agent         | A persona (`*.agent.md`) that Copilot Chat can take on to run a specialized workflow. An agent can call subagents and use instructions, prompts, and skills.                  |
-| Prompt               | A reusable user-message template (`*.prompt.md`) you load into a Copilot Chat or CLI session.                                                                                 |
-| Instructions         | Guidance (`*.instructions.md`) that shapes how the model responds for a given file type, language, or workflow.                                                               |
-| Skill                | A self-contained capability package (`SKILL.md` plus optional scripts and references) that documents a reusable task.                                                         |
-| Collection           | A bundle of files (`*.collection.yml` plus a description) that you can install as one unit.                                                                                   |
-| Subagent             | An agent that another agent calls for a focused task, such as a read-only researcher or a single implementation step.                                                           |
-| Distribution channel | One of the six ways HVE Core files reach you: VS Code extension, npm package, GitHub plugin marketplace, direct git clone, internal Microsoft mirror, or a customer repository. |
-| Host platform        | The Copilot surface that runs the model: GitHub Copilot Chat in Visual Studio Code, or the GitHub Copilot CLI. HVE Core does not include or replace it.                         |
-| Memory layer         | The saved-notes feature the host platform offers. HVE Core agents may write notes scoped to a user, a session, or a repository. The host controls storage and retention.        |
-| Decision-shaping     | An agent whose output tends to drive downstream decisions by default: planning agents, code-review agents that gate pull requests, and customer-handoff agents.                 |
+| Term                 | Meaning in HVE Core                                                                                                                                                      |
+|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Artifact             | A file HVE Core ships: an agent, prompt, instruction, skill, collection, script, or workflow. Other tools read these files; the files do not run on their own.           |
+| Custom agent         | A persona (`*.agent.md`) that Copilot Chat can take on to run a specialized workflow. An agent can call subagents and use instructions, prompts, and skills.             |
+| Prompt               | A reusable user-message template (`*.prompt.md`) you load into a Copilot Chat or CLI session.                                                                            |
+| Instructions         | Guidance (`*.instructions.md`) that shapes how the model responds for a given file type, language, or workflow.                                                          |
+| Skill                | A self-contained capability package (`SKILL.md` plus optional scripts and references) that documents a reusable task.                                                    |
+| Collection           | A bundle of files (`*.collection.yml` plus a description) that you can install as one unit.                                                                              |
+| Subagent             | An agent that another agent calls for a focused task, such as a read-only researcher or a single implementation step.                                                    |
+| Distribution channel | One of the ways HVE Core files reach you: the VS Code extension, the GitHub plugin marketplace, a direct git clone, or a copy placed in a customer repository.           |
+| Host platform        | The Copilot surface that runs the model: GitHub Copilot Chat in Visual Studio Code, or the GitHub Copilot CLI. HVE Core does not include or replace it.                  |
+| Memory layer         | The saved-notes feature the host platform offers. HVE Core agents may write notes scoped to a user, a session, or a repository. The host controls storage and retention. |
+| Decision-shaping     | An agent whose output tends to drive downstream decisions by default: planning agents, code-review agents that gate pull requests, and customer-handoff agents.          |
 
 ## Capabilities
 
@@ -67,22 +67,22 @@ HVE Core ships text files and supporting tools. When you load an HVE Core file i
 
 HVE Core has no model, no API, no network calls while you author or install it, and no telemetry. Validation tools (linters, frontmatter checks, Pester tests, plugin generation) run in CI on pull requests. Nothing runs on your machine unless you install the VS Code extension or run a packaged script yourself.
 
-A few files cross over into generating content directly:
+A few skills assemble media outputs from authored content:
 
-* The **Customer Card Render** skill builds slides of synthetic personas using image generation. This is the only feature in HVE Core that generates images directly. Because the output shows people-like figures, the skill keeps the visual style deliberately low-fidelity and carries disclosure, redaction, and stereotyping-review controls. See Appendix 5.
-* The **PowerPoint Builder** and **TTS Voice-over** experimental skills turn authored YAML into slides and audio. They do not create likenesses of people or claim to be a real speaker; they assemble content that was written elsewhere.
+* The **Customer Card Render** skill assembles synthetic-persona slides from authored Design Thinking content through a template-driven PowerPoint pipeline; HVE Core has no image-generation model. When concept imagery is needed, the workflow emits prompts the operator runs on an external platform such as M365 Copilot, where the host's Responsible AI layers apply. The cards stay low-fidelity and carry disclosure, redaction, and stereotyping-review controls. See Appendix 5.
+* The **PowerPoint Builder** and **TTS Voice-over** experimental skills turn authored YAML into slides and audio. They do not create likenesses of people or claim to be a real speaker; they assemble content that was written elsewhere. The TTS Voice-over skill depends on an external speech service (such as Azure Speech) that you provision and govern under its own subscription and terms.
 
 #### Responsibility boundary
 
-| Aspect                         | HVE Core (microsoft/hve-core)                                              | Host platform (Copilot Chat or CLI)                                            |
-| ------------------------------ | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Inference                      | None                                                                       | All inference happens here                                                     |
-| Model selection and management | Recommends models in artifact frontmatter; cannot enforce a model choice   | Selects, hosts, and operates the model                                         |
-| Safety classifiers             | None                                                                       | Provides input and output classification, jailbreak detection, content filters |
-| User authentication            | None                                                                       | Manages identity, tenant scope, and access controls                            |
-| Telemetry and feedback         | None at the artifact level; CI logs only                                   | Collects user interaction telemetry per the host's privacy statement           |
-| Persistent memory              | Authors agents that write to memory; does not store memory itself          | Stores, retains, and exposes the memory layer                                  |
-| Attribution                    | Embeds "Brought to you by microsoft/hve-core" attribution where convention | Surfaces attribution to the user through the chat session                      |
+| Aspect                         | HVE Core (microsoft/hve-core)                                                                                         | Host platform (Copilot Chat or CLI)                                                                                                     |
+|--------------------------------|-----------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| Inference                      | None                                                                                                                  | All inference happens here                                                                                                              |
+| Model selection and management | Recommends models in artifact frontmatter; cannot enforce a model choice                                              | Selects, hosts, and operates the model                                                                                                  |
+| Safety classifiers             | None                                                                                                                  | Provides input and output classification, jailbreak detection, content filters                                                          |
+| User authentication            | None at the framework level; some skills authenticate to third-party services and carry a skill-specific threat model | Manages identity, tenant scope, and access controls                                                                                     |
+| Telemetry and feedback         | None at the artifact level; CI logs only                                                                              | Collects user interaction telemetry per the [host's telemetry and privacy docs](https://code.visualstudio.com/docs/configure/telemetry) |
+| Persistent memory              | Authors agents that write to memory; does not store memory itself                                                     | Stores, retains, and exposes the memory layer                                                                                           |
+| Attribution                    | Embeds "Brought to you by microsoft/hve-core" attribution where convention                                            | Surfaces attribution to the user through the chat session                                                                               |
 
 ### Use cases
 
@@ -143,7 +143,7 @@ Quality rests on a few things:
 * **CI checks on every pull request.** Markdown linting, frontmatter validation, model-reference checks, link checking, PowerShell and Python linting, YAML validation, collection-metadata and marketplace validation, dependency-pinning and action-version checks, copyright-header checks, and skill-structure validation all run on each pull request and block merge on failure.
 * **Plugin-generation gate.** Collection manifests are regenerated from source on every change; a mismatch with the generated `plugins/` outputs blocks merge.
 * **Human review.** Every file change needs human review. Supply-chain and dependency checks surface to reviewers.
-* **Versioning.** Releases follow `release-please` conventional-commit rules with a CHANGELOG. The VS Code extension and npm packages carry version metadata you can pin against.
+* **Phase-gated releases.** Artifacts move through experimental, prerelease, and stable maturity stages, giving natural points for deeper human review before broad adoption. Releases follow `release-please` conventional-commit rules with a CHANGELOG, and the VS Code extension carries version metadata you can pin against.
 * **Feedback channel.** GitHub issues on `microsoft/hve-core` are the main place for bugs, requests, and concerns.
 
 HVE Core does not measure performance against a specific model. If you need reproducible behavior, pin both the file version and the host configuration.
@@ -151,7 +151,7 @@ HVE Core does not measure performance against a specific model. If you need repr
 ### Getting the best results
 
 * **Pin to a release tag.** Treat the main branch as a moving target. For anything production-relevant, pin to a release tag and review changes before upgrading.
-* **Adopt one collection at a time.** HVE Core ships thirteen collections, and most teams do not need all of them. Start with the one closest to your work and grow from there.
+* **Adopt one collection at a time.** HVE Core ships several collections (see the `collections/` manifests for the current set), and most teams do not need all of them. Start with the one closest to your work and grow from there.
 * **Read an agent's description before loading it.** Each agent file documents its purpose, inputs, outputs, and limits. Skipping this is the most common cause of surprises.
 * **Treat decision-shaping output as a draft.** Planning agents, code-review agents that gate pull requests, and customer-handoff agents produce drafts. Do not turn a draft into a binding decision without qualified human review.
 * **Check saved memory before sharing a workspace.** Agents that write to the memory layer carry context across sessions. Inspect and clear it through the host's controls before sharing a workspace, screenshot, or recording.
@@ -189,9 +189,10 @@ Watch out for automation bias. Treat agent suggestions as starting points for hu
 ## Learn more about responsible AI
 
 * [Microsoft AI Principles](https://www.microsoft.com/ai/responsible-ai)
-* [Microsoft Responsible AI Resources](https://www.microsoft.com/en-us/ai/responsible-ai-resources)
+* [Microsoft Responsible AI Resources](https://www.microsoft.com/en-us/ai/tools-practices)
 * [NIST AI Risk Management Framework 1.0](https://www.nist.gov/itl/ai-risk-management-framework)
 * [Responsible use of GitHub Copilot features](https://docs.github.com/en/copilot/responsible-use)
+* [GitHub Copilot Trust Center](https://copilot.github.trust.page/)
 
 ## Learn more about HVE Core
 
@@ -209,7 +210,7 @@ Give us feedback on HVE Core or on this document by opening a GitHub issue at [m
 
 ## Appendices: per-agent transparency notes
 
-The five appendices below cover the agents whose output most influences downstream decisions, plus the one feature that generates images directly. They are not exhaustive. The full agent inventory lives in the repository's `.github/agents/` tree, and per-agent notes for the remaining agents are not yet written.
+The five appendices below cover the agents whose output most influences downstream decisions, plus the synthetic-persona skill that carries the most direct Responsible AI weight. They are not exhaustive. The full agent inventory lives in the repository's `.github/agents/` tree, and per-agent notes for the remaining agents are not yet written.
 
 ### Appendix 1: RAI Planner
 
@@ -262,7 +263,7 @@ The five appendices below cover the agents whose output most influences downstre
 * **Outputs:** PowerPoint slide content YAML and rendered `.pptx` files. Cards include a low-fidelity visual rendering and persona narrative.
 * **Intended uses:** Producing internal stakeholder-facing summaries of customer-research findings during ISE engagements. Communicating synthesized insight in a format that reads as illustrative rather than as a literal portrait of any individual.
 * **Specific limitations:**
-  * This is the only direct generative-AI touchpoint in HVE Core. Because the output is synthetic media depicting people-like figures, AI-disclosure, redaction, and stereotyping controls apply.
+  * The skill assembles cards through a template-driven PowerPoint pipeline; it does not call an image-generation model. Where the Design Thinking workflow needs concept imagery, the operator runs generated prompts on an external platform such as M365 Copilot, which applies its own Responsible AI layers. Because the cards depict people-like figures, AI-disclosure, redaction, and stereotyping controls apply.
   * Even with low-fidelity enforcement, the output may be misread as portraying real individuals.
   * The bundled persona templates may encode demographic shorthand; a stereotyping review of these templates is not yet complete.
   * Real participant data may bleed from source Design Thinking artifacts into rendered cards if the operator does not redact it before invoking the skill.
@@ -284,12 +285,12 @@ Outputs from HVE Core agents and skills are advisory. They do not constitute leg
 
 ## About this document
 
-| Field         | Value                             |
-| ------------- | --------------------------------- |
-| Published     | 2026-05-14                        |
-| Last updated  | 2026-06-10                        |
-| Cycle         | May 2026                          |
-| Document type | Transparency Note                 |
+| Field         | Value             |
+|---------------|-------------------|
+| Published     | 2026-05-14        |
+| Last updated  | 2026-06-10        |
+| Cycle         | May 2026          |
+| Document type | Transparency Note |
 
 This document is provided as-is and for informational purposes only. Information in this document, including URL and other references, may change without notice. This document is not legal advice. Consult appropriate counsel for jurisdiction-specific obligations.
 
