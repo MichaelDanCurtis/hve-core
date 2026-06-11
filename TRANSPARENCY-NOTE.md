@@ -189,7 +189,7 @@ Watch out for automation bias. Treat agent suggestions as starting points for hu
 ## Learn more about responsible AI
 
 * [Microsoft AI Principles](https://www.microsoft.com/ai/responsible-ai)
-* [Microsoft Responsible AI Resources](https://www.microsoft.com/en-us/ai/tools-practices)
+* [Microsoft Responsible AI Resources](https://www.microsoft.com/ai/tools-practices)
 * [NIST AI Risk Management Framework 1.0](https://www.nist.gov/itl/ai-risk-management-framework)
 * [Responsible use of GitHub Copilot features](https://docs.github.com/en/copilot/responsible-use)
 * [GitHub Copilot Trust Center](https://copilot.github.trust.page/)
