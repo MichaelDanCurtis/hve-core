@@ -115,9 +115,7 @@ def read_xlsx_rows(path: Path) -> Iterator[dict[str, str]]:
     try:
         from openpyxl import load_workbook  # noqa: PLC0415
     except ImportError as exc:  # pragma: no cover
-        raise CorpusImportError(
-            "openpyxl is required to import .xlsx files"
-        ) from exc
+        raise CorpusImportError("openpyxl is required to import .xlsx files") from exc
     workbook = load_workbook(filename=str(path), read_only=True, data_only=True)
     sheet = workbook.active
     if sheet is None:
@@ -148,9 +146,7 @@ def read_rows(path: Path) -> Iterator[dict[str, str]]:
         return read_csv_rows(path)
     if suffix in {".xlsx", ".xlsm"}:
         return read_xlsx_rows(path)
-    raise CorpusImportError(
-        f"{path}: unsupported suffix '{suffix}'; use .csv or .xlsx"
-    )
+    raise CorpusImportError(f"{path}: unsupported suffix '{suffix}'; use .csv or .xlsx")
 
 
 def validate_row(row: dict[str, str], line_no: int) -> str | None:
@@ -270,9 +266,7 @@ def build_patch_entry(row: dict[str, str], digest: str) -> str:
     parts.append("    advisory: true\n")
     expected = row.get("expected_refusal_category", "")
     if expected:
-        parts.append(
-            f"  expected_refusal_category: {_yaml_scalar(expected)}\n"
-        )
+        parts.append(f"  expected_refusal_category: {_yaml_scalar(expected)}\n")
     notes = row.get("notes", "")
     if notes:
         parts.append(f"  notes: {_yaml_scalar(notes)}\n")
@@ -323,9 +317,7 @@ def import_corpus(
         if not skip_safety:
             safety = safety_check(row["prompt"], lint_script, pwsh=pwsh)
             if safety["exit_code"] != 0:
-                report.flagged.append(
-                    {"line": index, "safety": safety, "row": row}
-                )
+                report.flagged.append({"line": index, "safety": safety, "row": row})
                 continue
 
         accepted_blocks.append(build_patch_entry(row, digest))
@@ -382,8 +374,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--skip-safety",
         action="store_true",
         help=(
-            "Skip the per-row safety lint subprocess "
-            "(for offline test environments)."
+            "Skip the per-row safety lint subprocess (for offline test environments)."
         ),
     )
     return parser
@@ -396,9 +387,7 @@ def main(argv: list[str] | None = None) -> int:
     target = Path(args.target).resolve() if args.target else None
     report_dir = Path(args.report_dir).resolve()
     lint_script = (
-        Path(args.lint_script).resolve()
-        if args.lint_script
-        else _default_lint_script()
+        Path(args.lint_script).resolve() if args.lint_script else _default_lint_script()
     )
     try:
         report, report_path, patch_path = import_corpus(
@@ -415,12 +404,7 @@ def main(argv: list[str] | None = None) -> int:
     totals = report.totals()
     print(f"report: {report_path}")
     print(f"patch:  {patch_path}")
-    print(
-        " ".join(
-            f"{key}={value}"
-            for key, value in totals.items()
-        )
-    )
+    print(" ".join(f"{key}={value}" for key, value in totals.items()))
     return 0 if (totals["rejected"] == 0 and totals["flagged"] == 0) else 1
 
 
