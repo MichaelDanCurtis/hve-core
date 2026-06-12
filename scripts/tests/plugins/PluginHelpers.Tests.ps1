@@ -79,6 +79,9 @@ Describe 'New-PluginReadmeContent - CollectionContent H1 stripping' {
         $result | Should -Match '<!-- BEGIN AUTO-GENERATED ARTIFACTS -->'
         $result | Should -Match '<!-- END AUTO-GENERATED ARTIFACTS -->'
         $result | Should -Match '## Included Artifacts'
+        $includedArtifactMatches = [regex]::Matches($result, '(?m)^## Included Artifacts$')
+        $includedArtifactMatches.Count | Should -Be 1
+        $result | Should -Not -Match '(?m)^## Agents$'
     }
 
     It 'Emits Overview section when CollectionContent has body text' {
