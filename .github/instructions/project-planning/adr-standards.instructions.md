@@ -5,7 +5,8 @@ applyTo: '**/.copilot-tracking/adr-plans/**, **/docs/planning/adrs/**'
 
 # ADR Standards Reference
 
-This file is the standards anchor for the ADR Creator agent. It embeds the MADR v4.0.0 template (CC0-1.0), the Y-Statement six-slot formula (Zimmermann/Zdun), the canonical status taxonomy with legal transitions, the file-naming rule, and the ASR (Architecturally Significant Requirement) trigger schema. Microsoft-authored guidance is paraphrased under CC-BY 4.0 with explicit change indication. Other sources (Nygard 2011, IEEE 42010:2022, arc42 §9, joelparkerhenderson) are cite-only to prevent CC-BY-SA contamination. Standards lookups outside this embedded set are delegated to the Researcher Subagent at runtime.
+This file is the standards anchor for the ADR Creator agent. It embeds the MADR v4.0.0 template (CC0-1.0), the Y-Statement six-slot formula (Zimmermann/Zdun), the canonical status taxonomy with legal transitions, the file-naming rule, and the ASR (Architecturally Significant Requirement) trigger schema.
+Microsoft-authored guidance is paraphrased under CC-BY 4.0 with explicit change indication. Other sources (Nygard 2011, IEEE 42010:2022, arc42 §9, joelparkerhenderson) are cite-only to prevent CC-BY-SA contamination. Standards lookups outside this embedded set are delegated to the Researcher Subagent at runtime.
 
 ## MADR v4.0.0 Verbatim Template
 
@@ -185,7 +186,7 @@ ADRs are durable, version-controlled artifacts that travel with the repository a
 * Refer to participants by their role or persona — for example, "the platform on-call engineer", "the security reviewer", "the data platform team" — rather than by personal name, `@mention`, email address, or other personal identifier.
 * Abstract paraphrased input, objections, and endorsements to the contributing role. "The on-call engineer raised reliability concerns" is preferred over "Jordan raised reliability concerns".
 * The single exception is named decider attribution: when the user explicitly requires that a specific individual be credited as a decider for accountability, that name may appear in the deciders metadata. Even then, prefer pairing the name with the role.
-* This rule is enforced at the Govern phase before any durable write. It is independent of the Sensitive-Content Scan Gate, which detects secrets and internal URLs but does not detect persona-versus-name usage.
+* This rule is enforced at the Govern phase before any durable write. It is independent of the Sensitive-Content Scan Gate, which detects PII and public-repository internal URLs but does not detect persona-versus-name usage.
 
 ## ASR Trigger Schema (GP-07)
 
