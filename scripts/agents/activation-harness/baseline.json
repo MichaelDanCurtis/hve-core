@@ -22,7 +22,7 @@
   "SteadyState": {
     "ScenarioName": "SteadyState",
     "AgentBytes": 10842,
-    "ColdStartBytes": 83227,
+    "ColdStartBytes": 83230,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
@@ -38,7 +38,7 @@
       },
       {
         "Path": ".github/instructions/project-planning/adr-handoff.instructions.md",
-        "Bytes": 16728
+        "Bytes": 16731
       },
       {
         "Path": ".github/instructions/project-planning/adr-identity.instructions.md",
@@ -53,12 +53,12 @@
         "Bytes": 6220
       }
     ],
-    "Hash": "dd506419af1d41e86ed5442d304e273eb2462163cf847667a3f3f82329a4f3bf"
+    "Hash": "8955ccfe05d0f8cf8594dffc85a0a7cf8d88c973e4a20e09948b0ae10ee8b456"
   },
   "GovernEntry": {
     "ScenarioName": "GovernEntry",
     "AgentBytes": 10842,
-    "ColdStartBytes": 97373,
+    "ColdStartBytes": 97225,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
@@ -74,7 +74,7 @@
       },
       {
         "Path": ".github/instructions/project-planning/adr-handoff.instructions.md",
-        "Bytes": 16728
+        "Bytes": 16731
       },
       {
         "Path": ".github/instructions/project-planning/adr-identity.instructions.md",
@@ -90,15 +90,15 @@
       },
       {
         "Path": ".github/skills/project-planning/adr-author/SKILL.md",
-        "Bytes": 14146
+        "Bytes": 13995
       }
     ],
-    "Hash": "8110a135ab2695f6635185478a9c04d5f8e0ad9e3663707659dbc2c5ef24d53c"
+    "Hash": "d09977c23a59d973d2733b3bc29c218d8cfcdacc6b10110058166defabea91d0"
   },
   "AdoptTemplate": {
     "ScenarioName": "AdoptTemplate",
     "AgentBytes": 10842,
-    "ColdStartBytes": 104367,
+    "ColdStartBytes": 104219,
     "LoadedFiles": [
       {
         "Path": ".github/agents/project-planning/adr-creation.agent.md",
@@ -114,7 +114,7 @@
       },
       {
         "Path": ".github/instructions/project-planning/adr-handoff.instructions.md",
-        "Bytes": 16728
+        "Bytes": 16731
       },
       {
         "Path": ".github/instructions/project-planning/adr-identity.instructions.md",
@@ -134,9 +134,9 @@
       },
       {
         "Path": ".github/skills/project-planning/adr-author/SKILL.md",
-        "Bytes": 14146
+        "Bytes": 13995
       }
     ],
-    "Hash": "f44ce8a0eaeabb2947cb14c7e7033f79d9052fee7777328f49605e940efd341a"
+    "Hash": "97fb7526c7ee93518a652c1f310eccd9efd44d05e53c664b1bb305fcd1b8b90b"
   }
 }
