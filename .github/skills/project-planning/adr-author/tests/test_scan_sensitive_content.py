@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: MIT
 """Tests for `scripts.scan_sensitive_content`.
 
-Covers high-confidence true positives (tokens, keys, internal URLs), benign
-ADR prose true negatives, the warn-only email contract, and the external-sink
-gating contract that non-zero exit accompanies any high-confidence finding.
+Covers high-confidence PII and public internal-URL findings, benign ADR prose
+true negatives, non-PII credential-shaped text, and the external-sink gating
+contract that non-zero exit accompanies any high-confidence finding.
 """
 
 from __future__ import annotations
@@ -30,30 +30,23 @@ def _invoke(args: list[str], capsys: pytest.CaptureFixture[str]) -> tuple[int, d
 
 class TestScanHighConfidenceTruePositives:
     @pytest.mark.parametrize(
-        ("category", "secret"),
+        ("pii", "category"),
         [
-            ("github_token", "ghp_" + "a" * 36),
-            ("github_token", "github_pat_" + "A1b2C3d4E5f6G7h8I9j0K1"),
-            ("aws_access_key", "AKIAIOSFODNN7EXAMPLE"),
-            ("google_api_key", "AIza" + "B" * 35),  # gitleaks:allow
-            ("slack_token", "xoxb-123456789012-abcdefABCDEF"),
-            ("openai_api_key", "sk-" + "X" * 40),
-            (
-                "private_key",
-                "-----BEGIN RSA PRIVATE KEY-----",
-            ),
+            ("alice@example.com", "email_address"),
+            ("425-555-0100", "phone_number"),
+            ("123-45-6789", "national_identifier"),
         ],
     )
-    def test_given_secret_when_scan_then_high_finding_and_nonzero_exit(
+    def test_given_pii_when_scan_then_high_finding_and_nonzero_exit(
         self,
         tmp_path: Path,
-        category: str,
-        secret: str,
         capsys: pytest.CaptureFixture[str],
+        pii: str,
+        category: str,
     ) -> None:
         # Arrange
         target = tmp_path / "adr.md"
-        target.write_text(f"Context references {secret} in deployment.\n", encoding="utf-8")
+        target.write_text(f"Contact detail: {pii}\n", encoding="utf-8")
 
         # Act
         exit_code, report = _invoke([str(target)], capsys)
@@ -63,8 +56,8 @@ class TestScanHighConfidenceTruePositives:
         categories = {f["category"] for f in report["findings"]}
         assert category in categories
         assert report["summary"]["high"] >= 1
-        # The raw secret must not be echoed back verbatim (redaction contract).
-        assert secret not in json.dumps(report)
+        # The raw PII must not be echoed back verbatim (redaction contract).
+        assert pii not in json.dumps(report)
 
 
 class TestScanSafeNegatives:
@@ -93,6 +86,34 @@ class TestScanSafeNegatives:
         # Assert
         assert exit_code == scan_sensitive_content.EXIT_SUCCESS
         assert report["summary"]["high"] == 0
+
+    @pytest.mark.parametrize(
+        "provider_key_shape",
+        [
+            "-----BEGIN RSA PRIVATE KEY-----",
+            "ghp_0123456789abcdefghijklmnopqrstuvwxyz",
+            "AKIAIOSFODNN7EXAMPLE",
+            "AIzaSyA0123456789abcdefghijklmnopqrstuvwxyz0",
+            "example slack token placeholder",
+            "sk-0123456789abcdefghijklmnopqrstuvwxyzABCDEF",
+        ],
+    )
+    def test_given_provider_key_shape_when_scan_then_no_findings_and_zero_exit(
+        self,
+        tmp_path: Path,
+        provider_key_shape: str,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        # Arrange
+        target = tmp_path / "adr.md"
+        target.write_text(f"Decision note includes {provider_key_shape} as sample text.\n", encoding="utf-8")
+
+        # Act
+        exit_code, report = _invoke([str(target)], capsys)
+
+        # Assert
+        assert exit_code == scan_sensitive_content.EXIT_SUCCESS
+        assert report["summary"] == {"high": 0, "warn": 0, "total": 0}
 
 
 class TestScanInternalUrlVisibility:
@@ -151,27 +172,8 @@ class TestScanInternalUrlVisibility:
         assert report["summary"]["high"] >= 1
 
 
-class TestScanWarnOnly:
-    def test_given_email_when_scan_then_warn_finding_and_zero_exit(
-        self,
-        tmp_path: Path,
-        capsys: pytest.CaptureFixture[str],
-    ) -> None:
-        # Arrange
-        target = tmp_path / "adr.md"
-        target.write_text("Contact alice@example.com for context.\n", encoding="utf-8")
-
-        # Act
-        exit_code, report = _invoke([str(target)], capsys)
-
-        # Assert
-        assert exit_code == scan_sensitive_content.EXIT_SUCCESS
-        assert report["summary"]["warn"] >= 1
-        assert report["summary"]["high"] == 0
-
-
 class TestScanStdin:
-    def test_given_secret_on_stdin_when_scan_then_nonzero_exit(
+    def test_given_pii_on_stdin_when_scan_then_nonzero_exit(
         self,
         monkeypatch: pytest.MonkeyPatch,
         capsys: pytest.CaptureFixture[str],
@@ -179,8 +181,7 @@ class TestScanStdin:
         # Arrange
         import io
 
-        secret = "ghp_" + "z" * 36
-        monkeypatch.setattr("sys.stdin", io.StringIO(f"token: {secret}\n"))
+        monkeypatch.setattr("sys.stdin", io.StringIO("Contact: alice@example.com\n"))
 
         # Act
         exit_code, report = _invoke([], capsys)

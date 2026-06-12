@@ -1,19 +1,20 @@
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: MIT
-"""Scan ADR and handoff content for high-confidence sensitive data.
+"""Scan ADR and handoff content for guarded disclosure risks.
 
-Deterministic, regex-based scanner that flags high-confidence secrets
-(API keys, tokens, private keys) and internal-only URLs/hostnames before
-durable ADR writes or external handoff emission. Detection is intentionally
-conservative to minimize false positives: it favors well-known, high-entropy
-token shapes and explicit internal-network markers over broad PII heuristics.
+Deterministic, regex-based scanner that flags high-confidence PII and, for
+public repositories, internal-only URLs/hostnames before durable ADR writes or
+external handoff emission. Detection is intentionally conservative: it favors
+personal contact details and national identifier shapes over broad name or role
+heuristics.
 
 Findings carry a ``confidence`` label:
 
-* ``high`` -- a token, key, or internal URL that must block durable/external
-  writes until redacted. Any high-confidence finding sets a non-zero exit.
-* ``warn`` -- advisory matches (such as email addresses) that surface for
-  review but do not block on their own.
+* ``high`` -- PII or a public-repository internal URL that must block
+    durable/external writes until redacted. Any high-confidence finding sets a
+    non-zero exit.
+* ``warn`` -- advisory matches that surface for review but do not block on
+    their own.
 
 Input may be one or more file paths or, when no paths are given, stdin. Output
 is a JSON object on stdout with ``findings`` (a list) and summary counts.
@@ -56,48 +57,23 @@ class Rule(NamedTuple):
     pattern: re.Pattern[str]
 
 
-# High-confidence secret patterns. Each shape is well-known and high-entropy
-# enough that a match is very unlikely to be benign ADR prose.
+# High-confidence PII blocks durable/external writes. Names and roles are not
+# scanned because deterministic regexes produce too many false positives there.
 RULES: tuple[Rule, ...] = (
     Rule(
-        "github_token",
-        "high",
-        re.compile(r"\bghp_[A-Za-z0-9]{36}\b"),
-    ),
-    Rule(
-        "github_token",
-        "high",
-        re.compile(r"\bgithub_pat_[A-Za-z0-9_]{22,}\b"),
-    ),
-    Rule(
-        "aws_access_key",
-        "high",
-        re.compile(r"\b(?:AKIA|ASIA)[0-9A-Z]{16}\b"),
-    ),
-    Rule(
-        "google_api_key",
-        "high",
-        re.compile(r"\bAIza[0-9A-Za-z_\-]{35}\b"),
-    ),
-    Rule(
-        "slack_token",
-        "high",
-        re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{10,}\b"),
-    ),
-    Rule(
-        "openai_api_key",
-        "high",
-        re.compile(r"\bsk-[A-Za-z0-9]{32,}\b"),
-    ),
-    Rule(
-        "private_key",
-        "high",
-        re.compile(r"-----BEGIN (?:RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----"),
-    ),
-    Rule(
         "email_address",
-        "warn",
+        "high",
         re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"),
+    ),
+    Rule(
+        "phone_number",
+        "high",
+        re.compile(r"\b(?:\+?1[\s.-]?)?(?:\(?\d{3}\)?[\s.-]?)\d{3}[\s.-]?\d{4}\b"),
+    ),
+    Rule(
+        "national_identifier",
+        "high",
+        re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
     ),
 )
 
@@ -125,7 +101,7 @@ PUBLIC_ONLY_RULES: tuple[Rule, ...] = (
 
 
 def _redact(match: str) -> str:
-    """Return a masked preview of a matched secret for safe reporting."""
+    """Return a masked preview of matched content for safe reporting."""
     stripped = match.strip()
     if len(stripped) <= 8:
         return stripped[0] + "***" if stripped else "***"
@@ -161,7 +137,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="scan_sensitive_content",
         description=(
-            "Scan ADR/handoff content for high-confidence secrets and internal URLs before durable or external writes."
+            "Scan ADR/handoff content for high-confidence PII and public-repository internal URLs."
         ),
     )
     parser.add_argument(
