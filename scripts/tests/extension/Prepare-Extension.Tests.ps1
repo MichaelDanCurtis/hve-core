@@ -686,6 +686,47 @@ This requires setup first.
             $mdContent | Should -Match '## Prerequisites'
             $mdContent | Should -Match 'This requires setup first'
         }
+
+        It 'Produces identical output when run twice (idempotent regeneration)' {
+            $collection = @{
+                id          = 'idempotent'
+                name        = 'Idempotent'
+                description = 'Idempotency guard test'
+                items       = @(
+                    @{ kind = 'agent'; path = '.github/agents/alpha.agent.md' },
+                    @{ kind = 'agent'; path = '.github/agents/zebra.agent.md' },
+                    @{ kind = 'prompt'; path = '.github/prompts/my-prompt.prompt.md' },
+                    @{ kind = 'instruction'; path = '.github/instructions/my-instr.instructions.md' },
+                    @{ kind = 'skill'; path = '.github/skills/my-skill/' }
+                )
+            }
+            $mdPath = Join-Path $script:tempDir 'idempotent.collection.md'
+            @"
+Idempotent intro.
+
+<!-- BEGIN AUTO-GENERATED ARTIFACTS -->
+
+Stale artifact placeholder.
+
+<!-- END AUTO-GENERATED ARTIFACTS -->
+
+## Prerequisites
+
+Footer content preserved across runs.
+"@ | Set-Content -Path $mdPath -Encoding utf8NoBOM
+            $outPath = Join-Path $script:tempDir 'README.idempotent.md'
+
+            New-CollectionReadme -Collection $collection -CollectionMdPath $mdPath -TemplatePath $script:templatePath -RepoRoot $script:tempDir -OutputPath $outPath
+            $firstReadme = Get-Content -Path $outPath -Raw
+            $firstMd = Get-Content -Path $mdPath -Raw
+
+            New-CollectionReadme -Collection $collection -CollectionMdPath $mdPath -TemplatePath $script:templatePath -RepoRoot $script:tempDir -OutputPath $outPath
+            $secondReadme = Get-Content -Path $outPath -Raw
+            $secondMd = Get-Content -Path $mdPath -Raw
+
+            $secondReadme | Should -BeExactly $firstReadme
+            $secondMd | Should -BeExactly $firstMd
+        }
     }
 }
 
