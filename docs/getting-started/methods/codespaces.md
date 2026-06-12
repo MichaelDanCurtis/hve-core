@@ -3,7 +3,7 @@ title: GitHub Codespaces Installation
 description: Install HVE Core in GitHub Codespaces using postCreateCommand
 sidebar_position: 8
 author: Microsoft
-ms.date: 2026-03-10
+ms.date: 2026-06-11
 ms.topic: how-to
 keywords:
   - codespaces
