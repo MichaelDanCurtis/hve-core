@@ -54,7 +54,7 @@ artifacts: []
 
 # Additional workflow-specific state blocks may be present.
 # The canonical deck workflow adds `canonical_deck` and `customer_card_render`
-# blocks as defined in .github/skills/design-thinking/dt-coaching-foundation/references/canonical-deck.md.
+# blocks as defined in canonical-deck.md.
 ```
 
 ### Field Definitions

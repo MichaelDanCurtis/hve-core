@@ -31,7 +31,7 @@ Exit criteria: a findings document exists with evidence-backed patterns, environ
 
 ## Coaching Hats
 
-Two specialized hats activate based on conversation context. See .github/skills/design-thinking/dt-methods/references/method-02-deep.md for detailed hat guidance, activation triggers, and coaching focus areas.
+Two specialized hats activate based on conversation context. See method-02-deep.md for detailed hat guidance, activation triggers, and coaching focus areas.
 
 | Hat               | Role                                                                   | Activation                                                    |
 |-------------------|------------------------------------------------------------------------|---------------------------------------------------------------|
@@ -66,7 +66,7 @@ A research plan covers: prioritized objectives, tiered user targets with access 
 
 ## Interview Techniques
 
-Design questions for discovery rather than confirmation. See .github/skills/design-thinking/dt-methods/references/method-02-deep.md for detailed question patterns, live coaching strategies, and recovery techniques.
+Design questions for discovery rather than confirmation. See method-02-deep.md for detailed question patterns, live coaching strategies, and recovery techniques.
 
 * Use open-ended questions about specific situations and workflows, not abstract preferences
 * Follow workarounds and adaptations: user-created solutions reveal unmet needs
@@ -93,7 +93,7 @@ Method 2 artifacts enforce raw-data fidelity. The coach actively prevents premat
 
 ## Mid-Session Subagent Dispatch
 
-The coach can dispatch subagents via `runSubagent` for parallel research analysis (cross-interview patterns, constraint catalogs, assumption validation) while continuing the conversation. See .github/skills/design-thinking/dt-methods/references/method-02-deep.md for dispatch protocol and task examples.
+The coach can dispatch subagents via `runSubagent` for parallel research analysis (cross-interview patterns, constraint catalogs, assumption validation) while continuing the conversation. See method-02-deep.md for dispatch protocol and task examples.
 
 ## Quality Rules
 

@@ -51,7 +51,7 @@ Load the matching reference when the team identifies its industry context.
 ## Skill layout
 
 ```text
-.github/skills/design-thinking/dt-methods/
+.
 ├── SKILL.md
 └── references/
     ├── method-01-scope.md

@@ -31,7 +31,7 @@ Exit criteria: problem definition and how-might-we artifacts exist, five-dimensi
 
 ## Coaching Hats
 
-Two specialized hats activate based on conversation context. See .github/skills/design-thinking/dt-methods/references/method-03-deep.md for detailed hat guidance, activation triggers, coaching focus areas, and Human-AI Collaboration patterns.
+Two specialized hats activate based on conversation context. See method-03-deep.md for detailed hat guidance, activation triggers, coaching focus areas, and Human-AI Collaboration patterns.
 
 | Hat             | Role                                                                       | Activation                                                        |
 |-----------------|----------------------------------------------------------------------------|-------------------------------------------------------------------|

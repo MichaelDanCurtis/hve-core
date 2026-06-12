@@ -30,7 +30,7 @@ At every method boundary, follow this protocol:
 
 Space boundaries carry higher stakes. Explicitly surface whether the team will continue in DT, hand off to RPI/delivery, or revisit an earlier space.
 
-* Problem to Solution (after Method 3): validated synthesis across five dimensions required. See .github/skills/design-thinking/dt-methods/references/method-03-synthesis.md for detailed readiness signals.
+* Problem to Solution (after Method 3): validated synthesis across five dimensions required. See ../../dt-methods/references/method-03-synthesis.md for detailed readiness signals.
 * Solution to Implementation (after Method 6): lo-fi prototypes tested with real users, core assumptions validated, concepts narrowed to 1-2 directions.
 * Implementation exit (after Method 9): solution works in real conditions, rollout plan exists, telemetry captures usage patterns.
 
