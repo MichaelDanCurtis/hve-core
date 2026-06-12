@@ -10,7 +10,7 @@ agents:
 
 # Code Review Full Agent
 
-Orchestrator that runs a two-phase code review on code changes by delegating to specialized subagents and merging their outputs into a single report.
+Orchestrator that runs a multi-phase code review on code changes by delegating to specialized subagents and merging their outputs into a single report.
 
 1. Functional review catches logic errors, edge case gaps, error handling deficiencies, concurrency issues, and contract violations.
 2. Standards review enforces project-defined coding standards via dynamically loaded skills.
@@ -54,10 +54,10 @@ Emit immediately after subagents are dispatched. When a subagent is unavailable,
 
 ### Step 2b Announcement
 
-Emit after both subagents complete:
+Emit after all subagents complete:
 
 ```markdown
-**🔍 Code Review Full, Step 2: Both reviews complete**
+**🔍 Code Review Full, Step 2: All reviews complete**
 
 | Reviewer      | Findings                                       | Verdict |
 |---------------|------------------------------------------------|---------|
@@ -202,7 +202,7 @@ Construct the full prompt string for each available subagent **before dispatchin
 
 * If `untrackedFiles` in `diff-state.json` is non-empty, append to both prompts: `"The following files are untracked (not in the committed diff). Read each file in full and treat all lines as in-scope for findings: <list of paths>."` Subagents read `diffPatchPath` for committed changes and the listed files separately for untracked content.
 
-#### 2B: Dispatch both subagents in parallel
+#### 2B: Dispatch all subagents in parallel
 
 **Issue all available `runSubagent` calls in a single tool-call block so they execute concurrently.** Do not wait for one subagent to finish before dispatching the others. For L/XL reviews, issue all batch trios in a single tool-call block.
 
@@ -212,7 +212,7 @@ If a subagent returns clarifying questions instead of findings, surface the ques
 
 ### Step 3: Merged Report
 
-If both subagents were skipped, inform the user that no review could be performed and stop.
+If all subagents were skipped, inform the user that no review could be performed and stop.
 
 #### Read Findings
 
@@ -234,7 +234,7 @@ Read `docs/templates/full-review-output-format.md` for the Subagent Findings JSO
 
 #### Transformation Rules
 
-These rules operate on the JSON `findings` arrays from both subagents. **Preserve each finding's existing `current_code` and `suggested_fix` fields verbatim from the source JSON — do not regenerate, reformat, or re-render code snippets.**
+These rules operate on the JSON `findings` arrays from all subagents. **Preserve each finding's existing `current_code` and `suggested_fix` fields verbatim from the source JSON — do not regenerate, reformat, or re-render code snippets.**
 
 1. Concatenate all `findings` arrays and sort by severity (Critical, High, Medium, Low). Assign new sequential `number` values starting from 1.
 2. Append `[Functional]`, `[Standards]`, or `[Accessibility]` to the end of each finding's `title` to indicate the originating subagent (for example, `Missing null check [Functional]`). Preserve the `skill` and `category` fields from each subagent's output. Omit skill/category fields only when the subagent did not provide them.
@@ -257,7 +257,7 @@ Follow the Report Skeleton and Persist and Present sections from the output form
 * If a subagent invocation fails or returns no output, treat it as skipped and apply the skip messaging defined in Step 2.
 * If a subagent returns malformed output (missing sections, truncated content), re-invoke it once targeting only files whose paths suggest elevated risk — files with `security`, `auth`, `cred`, `token`, `payment`, `secret`, `api`, `route`, `middleware`, `schema`, or `migration` anywhere in their path or name. If malformed output persists, present both findings files verbatim, prepend `⚠️ Merged report could not be produced — subagent outputs shown separately.`, and annotate the affected transformation rules as partially applied.
 * If artifact persistence in the Persist and Present step fails, present the merged report in the conversation and note: "Artifact persistence failed; review was not saved to `.copilot-tracking/`."
-* If both subagents return only clarifying questions after two invocations each, stop and surface all outstanding questions to the user.
+* If all subagents return only clarifying questions after two invocations each, stop and surface all outstanding questions to the user.
 
 ---
 
