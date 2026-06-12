@@ -119,10 +119,10 @@ Describe 'Canonical state schemas declare noticeLog audit entries' {
         $schema.required | Should -Contain 'noticeLog'
     }
 
-    It 'accessibility-state.schema.json declares optional noticeLog correctly' {
+    It 'accessibility-state.schema.json declares noticeLog correctly' {
         $schema = Get-Content -Path $script:accessibilitySchema -Raw | ConvertFrom-Json
         Assert-NoticeLogSchema -Schema $schema
-        $schema.required | Should -Not -Contain 'noticeLog'
+        $schema.required | Should -Contain 'noticeLog'
     }
 }
 
