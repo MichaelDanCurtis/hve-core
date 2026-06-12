@@ -84,4 +84,3 @@ Load the matching reference when the team identifies its industry context.
     └── dt-coach-telemetry.instructions.md
 ```
 
-*🤖 Crafted with precision by ✨Copilot following brilliant human instruction, then carefully refined by our team of discerning human reviewers.*

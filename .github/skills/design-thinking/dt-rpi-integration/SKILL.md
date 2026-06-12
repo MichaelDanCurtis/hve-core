@@ -39,4 +39,3 @@ The dt-coach loads these references at handoff points where Design Thinking coac
 
 ---
 
-*🤖 Crafted with precision by ✨Copilot following brilliant human instruction, then carefully refined by our team of discerning human reviewers.*

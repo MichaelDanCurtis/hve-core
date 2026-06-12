@@ -150,4 +150,3 @@ Your design challenge: **How do we design a clinical program that maximizes pati
 
 **Scope:** This reference scenario illustrates how **empathy for fragmented care, patient heterogeneity, and payer risk management** can drive better regulatory strategy, more inclusive trial design, and faster access to therapy. DT methods (user observation, co-design with patients, value workshops) surface these insights earlier, reducing late-stage regulatory and commercial surprises. The "solution" is not just a better drug—it's a **better development & access model** informed by stakeholder needs.
 
-*🤖 Crafted with precision by ✨Copilot following brilliant human instruction, then carefully refined by our team of discerning human reviewers.*
