@@ -80,5 +80,10 @@ items:
   # Instructions
   - path: .github/instructions/shared/hve-core-location.instructions.md
     kind: instruction
+  # Telemetry
+  - path: .github/skills/shared/telemetry-foundations
+    kind: skill
+  - path: .github/skills/design-thinking/dt-methods/references/dt-coach-telemetry.instructions.md
+    kind: instruction
 display:
   ordering: alpha

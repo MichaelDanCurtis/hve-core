@@ -16,6 +16,7 @@ Entrypoint for Design Thinking method coaching knowledge. The `dt-coach` agent l
 * Read the method reference for the method currently active in coaching state to ground day-to-day coaching.
 * Read the matching deep reference when the conversation needs advanced facilitation, recovery techniques, or expert frameworks beyond the core method guidance.
 * Read the industry reference when the team has identified one of the nine covered industries as their context, and weave its vocabulary, constraints, and empathy tools into method-specific guidance.
+* Read [dt-coach-telemetry.instructions.md](references/dt-coach-telemetry.instructions.md) when DT session artifacts need observable telemetry expectations grounded in `telemetry-foundations`.
 
 ## Method references
 
@@ -79,7 +80,8 @@ Load the matching reference when the team identifies its industry context.
     ├── industry-pharmaceuticals-life-sciences.md
     ├── industry-professional-services.md
     ├── industry-public-sector.md
-    └── industry-retail-cpg.md
+    ├── industry-retail-cpg.md
+    └── dt-coach-telemetry.instructions.md
 ```
 
 *🤖 Crafted with precision by ✨Copilot following brilliant human instruction, then carefully refined by our team of discerning human reviewers.*
