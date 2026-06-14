@@ -128,15 +128,48 @@ All persistent state, session notes, and workflow artifacts are tracked in `.cop
 
 All `.copilot-tracking/` files begin with `<!-- markdownlint-disable-file -->` and are exempt from mega-linter rules.
 
-| Artifact             | Path                                                                                            | Create when                                                                                         |
-|----------------------|-------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| Research Document    | `.copilot-tracking/research/{{YYYY-MM-DD}}/{{topic}}-research.md`                               | Difficulty is medium-hard or challenging, or upgraded after deeper investigation                     |
-| Subagent Research    | `.copilot-tracking/research/subagents/{{YYYY-MM-DD}}/{{topic}}-research.md`                     | `Researcher Subagent` runs are used                                                                 |
-| Implementation Plan  | `.copilot-tracking/plans/{{YYYY-MM-DD}}/{{task-description}}-plan.instructions.md`              | Task is medium-hard or challenging, or requires durable multi-phase coordination                    |
-| Implementation Details | `.copilot-tracking/details/{{YYYY-MM-DD}}/{{task-description}}-details.md`                    | Alongside the implementation plan when explicit phase-by-phase execution notes help                  |
-| Planning Log         | `.copilot-tracking/plans/logs/{{YYYY-MM-DD}}/{{task-description}}-log.md`                       | An artifact-backed planning workflow is active                                                       |
-| Changes Log          | `.copilot-tracking/changes/{{YYYY-MM-DD}}/{{task-description}}-changes.md`                      | Implementation spans enough work for durable change tracking, or earlier phases created plan artifacts |
-| Review Log           | `.copilot-tracking/reviews/{{YYYY-MM-DD}}/{{plan-name}}-plan-review.md`                         | Durable planning or review artifacts are in use, or review findings need to persist across turns     |
+| Artifact               | Path                                                                                            | Create when                                                                                         |
+|------------------------|-------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| Research Document      | `.copilot-tracking/research/{{YYYY-MM-DD}}/{{topic}}-research.md`                               | Difficulty is medium-hard or challenging, or upgraded after deeper investigation                     |
+| Subagent Research      | `.copilot-tracking/research/subagents/{{YYYY-MM-DD}}/{{topic}}-research.md`                     | `Researcher Subagent` runs are used                                                                 |
+| Implementation Plan    | `.copilot-tracking/plans/{{YYYY-MM-DD}}/{{task-description}}-plan.instructions.md`              | Task is medium-hard or challenging, or requires durable multi-phase coordination                    |
+| Implementation Details | `.copilot-tracking/details/{{YYYY-MM-DD}}/{{task-description}}-details.md`                      | Alongside the implementation plan when explicit phase-by-phase execution notes help                  |
+| Planning Log           | `.copilot-tracking/plans/logs/{{YYYY-MM-DD}}/{{task-description}}-log.md`                       | An artifact-backed planning workflow is active                                                       |
+| Changes Log            | `.copilot-tracking/changes/{{YYYY-MM-DD}}/{{task-description}}-changes.md`                      | Implementation spans enough work for durable change tracking, or earlier phases created plan artifacts |
+| Review Log             | `.copilot-tracking/reviews/{{YYYY-MM-DD}}/{{plan-name}}-plan-review.md`                         | Durable planning or review artifacts are in use, or review findings need to persist across turns     |
+
+### Artifact Content
+
+Research Document and Implementation Plan content is defined in Phase 1 Step 3 and Phase 2 Step 2 respectively. Review Log content is defined in Phase 4 Step 3. The remaining artifacts include:
+
+Subagent Research:
+
+* Findings and discoveries
+* References and sources
+* Next research topics
+* Clarifying questions
+
+Implementation Details:
+
+* Context references (plan, research, instructions files)
+* Per-phase step details and file operations
+* Discrepancy references to planning log
+* Per-step success criteria and dependencies
+
+Planning Log:
+
+* Discrepancy log (unaddressed research items, plan deviations from research)
+* Implementation paths considered (selected approach with rationale, alternatives)
+* Suggested follow-on work
+
+Changes Log:
+
+* Related plan reference
+* Implementation date
+* Summary of changes
+* Changes by category: added, modified, removed (each with file paths)
+* Additional or deviating changes with reasons
+* Release summary after final phase
 
 ## Required Phases
 
