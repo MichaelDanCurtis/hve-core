@@ -256,14 +256,33 @@ def _comment_value(value: str) -> str:
     return value.replace("\r\n", " ").replace("\r", " ").replace("\n", " ")
 
 
+def _block_scalar_safe(prompt: str) -> bool:
+    """Return True when ``prompt`` can ride safely in a literal block scalar.
+
+    A literal block scalar auto-detects its content indentation from the first
+    non-empty line. A leading empty line, or a first line carrying leading
+    whitespace, makes that detection ambiguous: a later, less-indented line
+    de-indents below the detected level, terminates the scalar early, and
+    corrupts the surrounding block mapping. Control characters cannot survive a
+    literal block scalar at all. Such prompts must use a double-quoted scalar.
+    """
+    if _YAML_NON_PRINTABLE.search(prompt):
+        return False
+    lines = prompt.splitlines()
+    if not lines:
+        return False
+    first = lines[0]
+    return first != "" and first[0] not in " \t"
+
+
 def build_patch_entry(row: dict[str, str], digest: str) -> str:
     prompt = row["prompt"]
-    if _YAML_NON_PRINTABLE.search(prompt):
-        # Control characters cannot survive a literal block scalar; emit a
-        # double-quoted scalar so the patch round-trips through yaml.safe_load.
-        prompt_lines = [f"- prompt: {_yaml_scalar(prompt)}\n"]
-    else:
+    if _block_scalar_safe(prompt):
         prompt_lines = ["- prompt: |\n", _indent_block(prompt, "    ")]
+    else:
+        # Fall back to a double-quoted scalar so the patch round-trips through
+        # yaml.safe_load even when a literal block scalar would be ambiguous.
+        prompt_lines = [f"- prompt: {_yaml_scalar(prompt)}\n"]
     parts: list[str] = [
         f"# sha256:{digest}\n",
         f"# kind:{_comment_value(row['kind'])}\n",
