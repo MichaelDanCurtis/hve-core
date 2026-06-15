@@ -29,8 +29,12 @@ Describe 'VallyRunner module' -Tag 'Unit' {
             $outDir = Join-Path $script:WorkRoot 'out'
             New-Item -ItemType Directory -Path $outDir -Force | Out-Null
             $older = New-Item -ItemType Directory -Path (Join-Path $outDir 'older') -Force
-            Start-Sleep -Milliseconds 50
             $newer = New-Item -ItemType Directory -Path (Join-Path $outDir 'newer') -Force
+            # Resolve-VallyRunDir sorts by LastWriteTime; set the timestamps
+            # explicitly so ordering is deterministic regardless of filesystem
+            # timestamp resolution on a loaded CI runner.
+            $older.LastWriteTime = (Get-Date).AddMinutes(-5)
+            $newer.LastWriteTime = (Get-Date)
 
             $resolved = Resolve-VallyRunDir -OutputDir $outDir
             $resolved | Should -Be $newer.FullName

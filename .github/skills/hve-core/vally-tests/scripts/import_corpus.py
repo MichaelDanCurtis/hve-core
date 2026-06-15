@@ -26,6 +26,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
+import yaml.reader
+
 REQUIRED_COLUMNS: tuple[str, ...] = (
     "prompt",
     "kind",
@@ -227,12 +229,11 @@ def _indent_block(text: str, prefix: str) -> str:
     return "".join(f"{prefix}{line}\n" for line in lines)
 
 
-# Characters PyYAML rejects when reading a stream (its NON_PRINTABLE set). A
-# literal block scalar cannot carry these bytes, so a prompt containing any of
-# them must be emitted as a double-quoted scalar instead.
-_YAML_NON_PRINTABLE = re.compile(
-    "[^\x09\x0a\x0d\x20-\x7e\x85\xa0-\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]"
-)
+# Characters PyYAML rejects when reading a stream. Reuse the reader's own
+# NON_PRINTABLE pattern so this matches PyYAML exactly: a prompt containing any
+# of these bytes cannot ride in a literal block scalar and must be emitted as a
+# double-quoted scalar instead.
+_YAML_NON_PRINTABLE = yaml.reader.Reader.NON_PRINTABLE
 
 
 def _yaml_scalar(value: str) -> str:

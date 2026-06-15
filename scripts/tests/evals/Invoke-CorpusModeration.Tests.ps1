@@ -25,8 +25,17 @@ Set-Content -LiteralPath `$outPath -Value '$jsonLiteral' -Encoding utf8 -NoNewli
 if (`$json.summary.flaggedCount -gt 0) { exit 1 } else { exit 0 }
 "@ | Set-Content -LiteralPath $stubScript -Encoding utf8 -NoNewline
 
-        $shim = Join-Path $stubDir 'python.cmd'
-        "@pwsh -NoProfile -File `"$stubScript`" %*" | Set-Content -LiteralPath $shim -Encoding ascii -NoNewline
+        if ($IsWindows) {
+            $shim = Join-Path $stubDir 'python.cmd'
+            "@pwsh -NoProfile -File `"$stubScript`" %*" | Set-Content -LiteralPath $shim -Encoding ascii -NoNewline
+        }
+        else {
+            # `.cmd` shims are not honored by PATH lookups on Linux/macOS CI, so
+            # emit an extensionless executable that `Get-Command python` resolves.
+            $shim = Join-Path $stubDir 'python'
+            "#!/usr/bin/env sh`npwsh -NoProfile -File `"$stubScript`" `"`$@`"`n" | Set-Content -LiteralPath $shim -Encoding ascii -NoNewline
+            & chmod +x $shim
+        }
         return $stubDir
     }
 
