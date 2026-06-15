@@ -70,10 +70,10 @@ See [linting/README.md](linting/README.md) for detailed documentation.
 
 The `devcontainer/` directory contains scripts for devcontainer infrastructure validation:
 
-| Script                              | Purpose                                                  |
-|-------------------------------------|----------------------------------------------------------|
-| `Test-DevcontainerLockfile.ps1`     | Validate lockfile existence, SHA-256 integrity, coverage |
-| `Write-DevcontainerChangeLog.ps1`   | Classify changed files and generate markdown summary     |
+| Script                            | Purpose                                                  |
+|-----------------------------------|----------------------------------------------------------|
+| `Test-DevcontainerLockfile.ps1`   | Validate lockfile existence, SHA-256 integrity, coverage |
+| `Write-DevcontainerChangeLog.ps1` | Classify changed files and generate markdown summary     |
 
 Run locally:
 
@@ -114,17 +114,17 @@ Collection validation and shared helpers.
 
 Pester test organization matching the scripts structure.
 
-| Directory        | Tests For                       |
-|------------------|---------------------------------|
-| `collections/`   | Collection helpers tests        |
-| `devcontainer/`  | Devcontainer validation tests   |
-| `extension/`     | Extension packaging tests       |
-| `lib/`           | Library utility tests           |
-| `linting/`       | Linting script tests            |
-| `security/`      | Security validation tests       |
-| `plugins/`       | Plugin generation tests         |
-| `Fixtures/`      | Shared test fixtures            |
-| `Mocks/`         | Shared mock data                |
+| Directory       | Tests For                     |
+|-----------------|-------------------------------|
+| `collections/`  | Collection helpers tests      |
+| `devcontainer/` | Devcontainer validation tests |
+| `extension/`    | Extension packaging tests     |
+| `lib/`          | Library utility tests         |
+| `linting/`      | Linting script tests          |
+| `security/`     | Security validation tests     |
+| `plugins/`      | Plugin generation tests       |
+| `Fixtures/`     | Shared test fixtures          |
+| `Mocks/`        | Shared mock data              |
 
 Run all tests:
 
