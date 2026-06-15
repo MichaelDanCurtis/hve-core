@@ -1,6 +1,6 @@
 # RPI Skills
 
-This collection packages the skill-forward RPI entry points for research, planning, implementation, and review. It keeps the current RPI agent-first workflow intact while making the five new phase skills and the umbrella `rpi` skill available as standalone, packageable entry points.
+This collection packages the skill-forward RPI entry points for research, planning, implementation, and review. It keeps the current RPI agent-first workflow intact while making the five new phase skills and the umbrella `rpi` skill available as standalone packaged entry points.
 
 ## Local enablement
 
