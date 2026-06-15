@@ -140,7 +140,15 @@ All `.copilot-tracking/` files begin with `<!-- markdownlint-disable-file -->` a
 
 ### Artifact Content
 
-Implementation Plan content is defined in Phase 2 Step 2. The remaining artifacts include:
+Implementation Plan:
+
+* User Requests section listing each explicit user request with source
+* Overview and objectives (derived objectives with reasoning)
+* Context summary referencing discovered instructions files
+* Implementation checklist with phases, checkboxes, and parallelization markers (`<!-- parallelizable: true/false -->`)
+* Planning log reference
+* Dependencies (including discovered skills)
+* Success criteria
 
 Research Document:
 
