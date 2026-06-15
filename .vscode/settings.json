@@ -68,7 +68,7 @@
     ".github/prompts/design-thinking": true,
     ".github/prompts/experimental": true,
     ".github/prompts/github": true,
-    ".github/prompts/hve-core": true,
+    ".github/prompts/hve-core": false,
     ".github/prompts/jira": true,
     ".github/prompts/rai-planning": true,
     ".github/prompts/security": true
@@ -81,7 +81,7 @@
     ".github/skills/github": true,
     ".github/skills/gitlab": true,
     ".github/skills/jira": true,
-    ".github/skills/rpi": false,
+    ".github/skills/rpi": true,
     ".github/skills/security": true,
     ".github/skills/shared": true
   },
