@@ -16,15 +16,15 @@ Grader identifiers below use the Vally CLI 0.4.0 catalog (`semantic_similarity`,
 
 ## Contract Summary
 
-| Topic | Section in prompt-builder.instructions.md | Line range |
-|---|---|---|
-| Frontmatter and name | Skill frontmatter structure | L346-L400 |
-| File location and portability | Self-contained skill packaging | L401-L550 |
-| Optional subdirectories | scripts, references, assets | L410-L450 |
-| Content sections | Required SKILL.md body sections | L451-L487 |
-| Progressive disclosure | Token budgets and lazy loading | L488-L510 |
-| Semantic invocation | Description-driven matching | L511-L540 |
-| Attribution | Frontmatter and footer attribution | L552-L562 |
+| Topic                         | Section in prompt-builder.instructions.md | Line range |
+|-------------------------------|-------------------------------------------|------------|
+| Frontmatter and name          | Skill frontmatter structure               | L346-L400  |
+| File location and portability | Self-contained skill packaging            | L401-L550  |
+| Optional subdirectories       | scripts, references, assets               | L410-L450  |
+| Content sections              | Required SKILL.md body sections           | L451-L487  |
+| Progressive disclosure        | Token budgets and lazy loading            | L488-L510  |
+| Semantic invocation           | Description-driven matching               | L511-L540  |
+| Attribution                   | Frontmatter and footer attribution        | L552-L562  |
 
 ## Conformance Checks
 
@@ -62,11 +62,11 @@ Grader identifiers below use the Vally CLI 0.4.0 catalog (`semantic_similarity`,
 
 ### Check 5: Required Content Sections
 
-* Contract source: `prompt-builder.instructions.md` L451-L487.
-* Testable behavior: SKILL.md MUST present the following sections in order: H1 Title, Overview, Prerequisites, Quick Start (or Architecture plus Workflow Steps), and either a Parameters Reference (when the skill exposes parameters) or a Troubleshooting section.
-* Suggested stimulus: ask the assistant to list the section headings of a named skill in order.
-* Grader recommendation: `regex` with pattern `(?m)^##\s+(?:Overview|Purpose)\b` AND `(?m)^##\s+(?:Prerequisites|Requirements)\b` AND `(?m)^##\s+(?:Quick\s+Start|Architecture|Workflow)\b`.
-* Evidence: `.github/skills/experimental/vscode-playwright/SKILL.md` L10-L27 lays out the required section sequence.
+* Contract source: `prompt-builder.instructions.md` L300-L370.
+* Testable behavior: SKILL.md MUST open with an H1 Title followed by an Overview (or Purpose) section. It SHOULD then follow the recommended structure — Prerequisites, Quick Start (or Architecture plus Workflow Steps), and, when the skill ships scripts or parameters, a Parameters Reference and Script Reference. Skills without scripts MAY omit the Parameters Reference and Script Reference sections. The Troubleshooting section is governed solely by Check 9 and is not required here.
+* Suggested stimulus: ask the assistant to list the section headings of a named skill in order and identify which recommended sections are present or intentionally omitted.
+* Grader recommendation: `regex` with pattern `(?m)^#\s+\S` AND `(?m)^##\s+(?:Overview|Purpose)\b` for the required H1 and Overview, paired with a `semantic_similarity` rubric "Does the SKILL.md follow the recommended section ordering (Overview, then Prerequisites and Quick Start or Architecture plus Workflow), omitting the Parameters Reference and Script Reference only when the skill ships no scripts?".
+* Evidence: `.github/skills/experimental/vscode-playwright/SKILL.md` L10-L27 lays out the recommended section sequence, while script-free skills legitimately omit the Parameters Reference and Script Reference sections.
 
 ### Check 6: Relative Path Portability
 
@@ -94,8 +94,8 @@ Grader identifiers below use the Vally CLI 0.4.0 catalog (`semantic_similarity`,
 
 ### Check 9: Troubleshooting Section
 
-* Contract source: `prompt-builder.instructions.md` L451-L487.
-* Testable behavior: SKILL.md SHOULD include a Troubleshooting section that documents common failure modes and their resolutions, or that explicitly states no common issues exist.
+* Contract source: `prompt-builder.instructions.md` L300-L370.
+* Testable behavior: SKILL.md SHOULD include a Troubleshooting section that documents common failure modes and their resolutions, or that explicitly states no common issues exist. This SHOULD is the only Troubleshooting requirement; Check 5 does not impose a stronger one, so a script-free skill that omits Troubleshooting passes both checks.
 * Suggested stimulus: ask the assistant which common issues a named skill calls out under Troubleshooting and what the recommended fix is for each.
 * Grader recommendation: `regex` with pattern `(?m)^##\s+Troubleshooting\b`.
 * Evidence: the `.github/skills/experimental/vscode-playwright/` skill exposes a Troubleshooting section in line with the convention.
@@ -114,5 +114,3 @@ Grader identifiers below use the Vally CLI 0.4.0 catalog (`semantic_similarity`,
 * Grader catalog and selection rules: [grader-catalog.md](./grader-catalog.md).
 * Refusal categories and regex source of truth: [refusal-taxonomy.md](./refusal-taxonomy.md).
 * Eval target routing for `skill` kind (primary plus DR-03 fallback): [eval-suite-routing.md](./eval-suite-routing.md).
-
-*🤖 Crafted with precision by ✨Copilot following brilliant human instruction, then carefully refined by our team of discerning human reviewers.*
