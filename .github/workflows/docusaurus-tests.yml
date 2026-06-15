@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write  # Required for Codecov OIDC
     steps:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -35,16 +36,57 @@ jobs:
         working-directory: docs/docusaurus
         run: npm ci
 
+      - name: Lint accessibility
+        working-directory: docs/docusaurus
+        run: npm run lint:a11y
+
       - name: Run tests
         working-directory: docs/docusaurus
-        run: npm test
+        run: npm run test:coverage
         env:
           COLLECTIONS_DIR: ${{ github.workspace }}/collections
         continue-on-error: ${{ inputs.soft-fail }}
 
+      - name: Upload to Codecov
+        if: success()
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          files: docs/docusaurus/coverage/lcov.info
+          use_oidc: true
+          fail_ci_if_error: false
+          verbose: true
+          flags: docusaurus
+          name: docusaurus-coverage
+        continue-on-error: true
+
       - name: Build site
         working-directory: docs/docusaurus
         run: npm run build
+
+      - name: Accessibility scan (pa11y-ci)
+        working-directory: docs/docusaurus
+        run: |
+          npm run serve:ci &
+          npx wait-on -t 60000 http-get://127.0.0.1:3001/hve-core/
+          npm run a11y:ci
+        continue-on-error: ${{ inputs.soft-fail }}
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('docs/docusaurus/package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install Playwright browsers
+        working-directory: docs/docusaurus
+        run: npx playwright install --with-deps chromium
+
+      - name: Accessibility journeys (Playwright)
+        working-directory: docs/docusaurus
+        run: npm run test:e2e
+        continue-on-error: ${{ inputs.soft-fail }}
 
       - name: Upload test results
         if: always()

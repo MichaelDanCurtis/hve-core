@@ -53,6 +53,8 @@
     "clean:logs": "pwsh -NoProfile -Command \"Get-ChildItem -Path logs -File -Recurse -Exclude .gitkeep | Remove-Item -Force\"",
     "docs:build": "npm --prefix docs/docusaurus run build",
     "docs:test": "npm --prefix docs/docusaurus test",
+    "docs:test:coverage": "npm --prefix docs/docusaurus run test:coverage",
+    "docs:lint": "npm --prefix docs/docusaurus run lint:a11y",
     "docs:serve": "npm --prefix docs/docusaurus run serve",
     "eval:lint:vally": "pwsh -NoProfile -File scripts/evals/Build-AgentBehaviorSpec.ps1 -WhatIf && vally lint --eval-spec evals/",
     "eval:lint:schema": "pwsh -NoProfile -File scripts/evals/Test-EvalSpec.ps1",

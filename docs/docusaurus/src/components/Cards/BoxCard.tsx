@@ -26,7 +26,7 @@ export default function BoxCard({
     <div className={styles.boxCard}>
       {iconUrl && (
         <div className={styles.boxCardIcon}>
-          <img src={iconUrl} alt="" width="48" height="48" />
+          <img src={iconUrl} alt="" aria-hidden="true" width="48" height="48" />
         </div>
       )}
       <h3 className={styles.boxCardTitle}>{title}</h3>
