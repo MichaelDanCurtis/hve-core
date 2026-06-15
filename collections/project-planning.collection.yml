@@ -40,6 +40,9 @@ items:
   - path: .github/agents/rai-planning/rai-planner.agent.md
     kind: agent
     maturity: experimental
+  - path: .github/agents/accessibility/accessibility-planner.agent.md
+    kind: agent
+    maturity: experimental
   - path: .github/agents/security/security-planner.agent.md
     kind: agent
     maturity: experimental
@@ -181,6 +184,27 @@ items:
     kind: instruction
     maturity: experimental
   - path: .github/instructions/security/sssc-handoff.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/accessibility/accessibility-identity.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/accessibility/accessibility-capture-coaching.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/accessibility/accessibility-framework-selection.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/accessibility/accessibility-impact-assessment.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/accessibility/accessibility-backlog-handoff.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/accessibility/accessibility-license-posture.instructions.md
+    kind: instruction
+    maturity: experimental
+  - path: .github/instructions/shared/planner-identity-base.instructions.md
     kind: instruction
     maturity: experimental
   - path: .github/instructions/shared/coaching-patterns.instructions.md
