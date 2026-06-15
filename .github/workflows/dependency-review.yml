@@ -88,8 +88,11 @@ jobs:
           # them against allow-licenses: torch is BSD-3-Clause; filelock is
           # Unlicense (public domain); hf-xet, idna, and safetensors ship
           # permissive licenses (Apache-2.0 / BSD-style) per their source
-          # repositories. The moderation eval is an internal test harness,
-          # not a distributed product.
+          # repositories. pkg:pypi/regex declares a compound SPDX expression
+          # (CNRI-Python AND Apache-2.0) and is pulled transitively by
+          # transformers; CNRI-Python is a permissive PSF-style license. The
+          # moderation eval is an internal test harness, not a distributed
+          # product.
           allow-dependencies-licenses: >-
             pkg:pypi/lxml,
             pkg:pypi/typing-extensions,
@@ -107,6 +110,7 @@ jobs:
             pkg:pypi/hf-xet,
             pkg:pypi/idna,
             pkg:pypi/safetensors,
+            pkg:pypi/regex,
             pkg:npm/dompurify,
             pkg:npm/lunr-languages,
             pkg:npm/lightningcss,
