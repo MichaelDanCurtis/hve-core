@@ -1,6 +1,6 @@
 ---
 name: supply-chain-security
-description: Software supply chain security reference covering OpenSSF Scorecard checks, SLSA v1.0 build levels, OpenSSF Best Practices Badge, Sigstore (cosign) maturity, NTIA SBOM minimum elements, the 27 combined capabilities inventory, and the adoption, effort, concern, and priority taxonomies used to assess posture and derive a backlog.
+description: Software supply chain security reference covering OpenSSF Scorecard, SLSA v1.0, Sigstore, SBOM, and the posture and backlog taxonomies.
 license: MIT
 user-invocable: true
 ---

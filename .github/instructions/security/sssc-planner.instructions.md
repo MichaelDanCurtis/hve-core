@@ -1,5 +1,5 @@
 ---
-description: "SSSC Planner identity, orchestration, and per-phase protocols: six-phase workflow, state.json schema, session recovery, question cadence, and the Phase 2-6 assessment, standards mapping, gap analysis, backlog, and handoff protocols"
+description: "SSSC Planner identity, six-phase orchestration, state schema, session recovery, and Phase 2-6 assessment protocols"
 applyTo: '**/.copilot-tracking/sssc-plans/**'
 ---
 
