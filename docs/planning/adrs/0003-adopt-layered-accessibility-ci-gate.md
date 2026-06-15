@@ -115,15 +115,15 @@ and the npm scripts that wire these together live in
 
 ## Decision Outcome
 
-| Decision driver                       | Option A | Option B | Option C |
-|---------------------------------------|----------|----------|----------|
-| Regression prevention before merge    | Yes      | Partial  | Partial  |
-| Contributor trust through low flakiness | Yes    | Yes      | Partial  |
-| Layered coverage of defect classes    | Yes      | No       | Partial  |
-| Reusability as a lighthouse pattern   | Yes      | Partial  | No       |
-| Maintainability under upstream churn  | Partial  | Yes      | Partial  |
-| Fast CI feedback                      | Partial  | Yes      | Yes      |
-| Evolvability for new page types       | Yes      | Partial  | Partial  |
+| Decision driver                         | Option A | Option B | Option C |
+|-----------------------------------------|----------|----------|----------|
+| Regression prevention before merge      | Yes      | Partial  | Partial  |
+| Contributor trust through low flakiness | Yes      | Yes      | Partial  |
+| Layered coverage of defect classes      | Yes      | No       | Partial  |
+| Reusability as a lighthouse pattern     | Yes      | Partial  | No       |
+| Maintainability under upstream churn    | Partial  | Yes      | Partial  |
+| Fast CI feedback                        | Partial  | Yes      | Yes      |
+| Evolvability for new page types         | Yes      | Partial  | Partial  |
 
 Chosen option: **"Option A: Layered multi-tool gate"**, because it is the only
 option that covers every distinct accessibility defect class while still gating
