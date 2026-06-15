@@ -355,8 +355,6 @@ items:
   kind: instruction
 - path: .github/instructions/coding-standards/bicep/bicep.instructions.md
   kind: instruction
-- path: .github/instructions/coding-standards/code-review-telemetry.instructions.md
-  kind: instruction
 - path: .github/instructions/coding-standards/code-review/diff-computation.instructions.md
   kind: instruction
   maturity: experimental
@@ -431,8 +429,6 @@ items:
   kind: instruction
 - path: .github/instructions/hve-core/pull-request.instructions.md
   kind: instruction
-- path: .github/instructions/hve-core/task-implementor-telemetry.instructions.md
-  kind: instruction
 - path: .github/instructions/hve-core/writing-style.instructions.md
   kind: instruction
 - path: .github/instructions/jira/jira-backlog-discovery.instructions.md
@@ -448,8 +444,6 @@ items:
 - path: .github/instructions/project-planning/adr-byo-template.instructions.md
   kind: instruction
   maturity: experimental
-- path: .github/instructions/project-planning/adr-creation-telemetry.instructions.md
-  kind: instruction
 - path: .github/instructions/project-planning/adr-handoff.instructions.md
   kind: instruction
   maturity: experimental
@@ -459,8 +453,6 @@ items:
 - path: .github/instructions/project-planning/adr-standards.instructions.md
   kind: instruction
   maturity: experimental
-- path: .github/instructions/project-planning/prd-builder-telemetry.instructions.md
-  kind: instruction
 - path: .github/instructions/rai-planning/rai-backlog-handoff.instructions.md
   kind: instruction
   maturity: experimental
@@ -473,8 +465,6 @@ items:
 - path: .github/instructions/rai-planning/rai-impact-assessment.instructions.md
   kind: instruction
   maturity: experimental
-- path: .github/instructions/rai-planning/rai-planner-telemetry.instructions.md
-  kind: instruction
 - path: .github/instructions/rai-planning/rai-risk-classification.instructions.md
   kind: instruction
   maturity: experimental
@@ -496,26 +486,7 @@ items:
 - path: .github/instructions/security/security-model.instructions.md
   kind: instruction
   maturity: experimental
-- path: .github/instructions/security/security-planner-telemetry.instructions.md
-  kind: instruction
-- path: .github/instructions/security/sssc-assessment.instructions.md
-  kind: instruction
-  maturity: experimental
-- path: .github/instructions/security/sssc-backlog.instructions.md
-  kind: instruction
-  maturity: experimental
-- path: .github/instructions/security/sssc-gap-analysis.instructions.md
-  kind: instruction
-  maturity: experimental
-- path: .github/instructions/security/sssc-handoff.instructions.md
-  kind: instruction
-  maturity: experimental
-- path: .github/instructions/security/sssc-identity.instructions.md
-  kind: instruction
-  maturity: experimental
-- path: .github/instructions/security/sssc-planner-telemetry.instructions.md
-  kind: instruction
-- path: .github/instructions/security/sssc-standards.instructions.md
+- path: .github/instructions/security/sssc-planner.instructions.md
   kind: instruction
   maturity: experimental
 - path: .github/instructions/security/standards-mapping.instructions.md
@@ -531,6 +502,8 @@ items:
   kind: instruction
   maturity: experimental
 - path: .github/instructions/shared/story-quality.instructions.md
+  kind: instruction
+- path: .github/instructions/shared/telemetry-overlay.instructions.md
   kind: instruction
 - path: .github/skills/design-thinking/dt-methods/references/dt-coach-telemetry.instructions.md
   kind: instruction
@@ -615,6 +588,9 @@ items:
   kind: skill
   maturity: experimental
 - path: .github/skills/security/security-reviewer-formats
+  kind: skill
+  maturity: experimental
+- path: .github/skills/security/supply-chain-security
   kind: skill
   maturity: experimental
 - path: .github/skills/shared/backlog-templates
