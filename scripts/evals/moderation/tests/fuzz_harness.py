@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: MIT
 """Polyglot Atheris fuzz harness for OSSF Scorecard compliance.
 
 This file satisfies the fuzzing requirement when run via Atheris, and

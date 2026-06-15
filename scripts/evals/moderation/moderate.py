@@ -112,9 +112,7 @@ def classify_records(
     try:
         from detoxify import Detoxify
     except ImportError as exc:
-        raise ImportError(
-            "detoxify package not installed; run: uv pip install -r requirements.txt"
-        ) from exc
+        raise ImportError("detoxify package not installed; run: uv pip install -r requirements.txt") from exc
 
     logger.info("Loading Detoxify model: %s", model_name)
     model = Detoxify(model_name)

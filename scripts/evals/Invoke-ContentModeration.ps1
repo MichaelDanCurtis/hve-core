@@ -69,7 +69,10 @@ param(
     [string]$OutFile,
 
     [Parameter(Mandatory = $false)]
-    [string]$RepoRoot = (git rev-parse --show-toplevel 2>$null) ?? $PSScriptRoot
+    [string]$RepoRoot = $(
+        $detectedRoot = git rev-parse --show-toplevel 2>$null
+        if ($detectedRoot) { $detectedRoot } else { $PSScriptRoot }
+    )
 )
 
 Set-StrictMode -Version Latest
