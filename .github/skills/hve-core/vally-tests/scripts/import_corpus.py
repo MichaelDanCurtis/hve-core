@@ -227,6 +227,14 @@ def _indent_block(text: str, prefix: str) -> str:
     return "".join(f"{prefix}{line}\n" for line in lines)
 
 
+# Characters PyYAML rejects when reading a stream (its NON_PRINTABLE set). A
+# literal block scalar cannot carry these bytes, so a prompt containing any of
+# them must be emitted as a double-quoted scalar instead.
+_YAML_NON_PRINTABLE = re.compile(
+    "[^\x09\x0a\x0d\x20-\x7e\x85\xa0-\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]"
+)
+
+
 def _yaml_scalar(value: str) -> str:
     """Render a string as a safely-quoted YAML scalar.
 
@@ -248,12 +256,18 @@ def _comment_value(value: str) -> str:
 
 
 def build_patch_entry(row: dict[str, str], digest: str) -> str:
+    prompt = row["prompt"]
+    if _YAML_NON_PRINTABLE.search(prompt):
+        # Control characters cannot survive a literal block scalar; emit a
+        # double-quoted scalar so the patch round-trips through yaml.safe_load.
+        prompt_lines = [f"- prompt: {_yaml_scalar(prompt)}\n"]
+    else:
+        prompt_lines = ["- prompt: |\n", _indent_block(prompt, "    ")]
     parts: list[str] = [
         f"# sha256:{digest}\n",
         f"# kind:{_comment_value(row['kind'])}\n",
         f"# target:{_comment_value(row['target_artifact'])}\n",
-        "- prompt: |\n",
-        _indent_block(row["prompt"], "    "),
+        *prompt_lines,
         f"  grader: {_yaml_scalar(row['grader'] or '<unset>')}\n",
         "  tags:\n",
     ]
