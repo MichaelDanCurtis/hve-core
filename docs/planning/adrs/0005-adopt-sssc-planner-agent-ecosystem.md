@@ -157,14 +157,14 @@ primary planning interface, with HVE-Core only documenting how to run them.
 
 ## Decision Outcome
 
-| Decision driver                       | Option 1 | Option 2 | Option 3 | Option 4 |
-|---------------------------------------|----------|----------|----------|----------|
+| Decision driver                         | Option 1 | Option 2 | Option 3 | Option 4 |
+|-----------------------------------------|----------|----------|----------|----------|
 | Repeatable non-certification assessment | Partial  | Yes      | Partial  | Partial  |
-| Standards/orchestration separation    | No       | Yes      | Partial  | No       |
-| Thin entry prompts                    | No       | Yes      | No       | No       |
-| Single protocol surface               | No       | Yes      | Partial  | No       |
-| Coherent ecosystem packaging          | No       | Yes      | Partial  | No       |
-| Explicit repository-local review      | Partial  | Yes      | Partial  | No       |
+| Standards/orchestration separation      | No       | Yes      | Partial  | No       |
+| Thin entry prompts                      | No       | Yes      | No       | No       |
+| Single protocol surface                 | No       | Yes      | Partial  | No       |
+| Coherent ecosystem packaging            | No       | Yes      | Partial  | No       |
+| Explicit repository-local review        | Partial  | Yes      | Partial  | No       |
 
 Chosen option: Option 2, adopt a dedicated SSSC Planner ecosystem.
 
