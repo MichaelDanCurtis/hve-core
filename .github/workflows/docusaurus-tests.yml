@@ -79,7 +79,21 @@ jobs:
 
       - name: Install Chrome for pa11y (puppeteer)
         working-directory: docs/docusaurus
-        run: npx puppeteer browsers install chrome
+        run: |
+          # A restored cache can contain a Chrome build folder whose executable
+          # is missing, which makes `puppeteer browsers install` fail because it
+          # treats the folder as already installed. Prune incomplete builds first.
+          chrome_root="$HOME/.cache/puppeteer/chrome"
+          if [ -d "$chrome_root" ]; then
+            for build in "$chrome_root"/*/; do
+              [ -d "$build" ] || continue
+              if [ -z "$(find "$build" -type f -name chrome 2>/dev/null)" ]; then
+                echo "Removing incomplete Chrome build: $build"
+                rm -rf "$build"
+              fi
+            done
+          fi
+          npx puppeteer browsers install chrome
 
       - name: Accessibility scan (pa11y-ci)
         working-directory: docs/docusaurus
