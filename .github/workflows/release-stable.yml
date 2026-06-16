@@ -159,21 +159,88 @@ jobs:
       matrix:
         directory: ${{ fromJson(needs.discover-python-projects.outputs.directories) }}
 
-  release-please:
-    name: Release Please
+  validation-gate:
+    name: Validation Gate
+    if: always()
     needs:
       - spell-check
       - markdown-lint
       - table-format
       - dependency-pinning-scan
+      - action-version-consistency-scan
       - gitleaks-scan
       - pester-tests
       - docusaurus-tests
+      - discover-python-projects
       - python-lint
       - pytest
-    # Allow release-please to run when conditional CI jobs (python-lint,
-    # pytest) are skipped. Block only on actual failures or cancellations.
-    if: ${{ !cancelled() && !failure() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check job results
+        shell: bash
+        run: |
+          {
+            echo "## Validation Gate Summary"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          FAILED=""
+
+          check_result() {
+            local name="$1"
+            local result="$2"
+
+            if [ "$result" = "success" ]; then
+              echo "✅ **$name**: passed" >> "$GITHUB_STEP_SUMMARY"
+            elif [ "$result" = "skipped" ]; then
+              echo "⏭️ **$name**: skipped" >> "$GITHUB_STEP_SUMMARY"
+            elif [ "$result" = "failure" ]; then
+              echo "❌ **$name**: failed" >> "$GITHUB_STEP_SUMMARY"
+              FAILED="${FAILED}${name}, "
+            elif [ "$result" = "cancelled" ]; then
+              echo "⚠️ **$name**: cancelled" >> "$GITHUB_STEP_SUMMARY"
+              FAILED="${FAILED}${name} (cancelled), "
+            else
+              echo "⚠️ **$name**: ${result}" >> "$GITHUB_STEP_SUMMARY"
+              FAILED="${FAILED}${name} (${result}), "
+            fi
+          }
+
+          check_result "Spell Check" "${{ needs.spell-check.result }}"
+          check_result "Markdown Lint" "${{ needs.markdown-lint.result }}"
+          check_result "Table Format" "${{ needs.table-format.result }}"
+          check_result "Dependency Pinning Scan" "${{ needs.dependency-pinning-scan.result }}"
+          check_result "Action Version Consistency" "${{ needs.action-version-consistency-scan.result }}"
+          check_result "Gitleaks" "${{ needs.gitleaks-scan.result }}"
+          check_result "PowerShell Tests" "${{ needs.pester-tests.result }}"
+          check_result "Docusaurus Tests" "${{ needs.docusaurus-tests.result }}"
+          check_result "Discover Python Projects" "${{ needs.discover-python-projects.result }}"
+          check_result "Python Lint" "${{ needs.python-lint.result }}"
+          check_result "Python Tests" "${{ needs.pytest.result }}"
+
+          if [ -n "$FAILED" ]; then
+            {
+              echo ""
+              echo "---"
+              echo "❌ **Validation failed**: ${FAILED%, }"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "One or more required checks failed: ${FAILED%, }"
+            exit 1
+          fi
+
+          {
+            echo ""
+            echo "---"
+            echo "✅ **All validations passed**"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  release-please:
+    name: Release Please
+    needs:
+      - validation-gate
+    if: ${{ success() }}
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
