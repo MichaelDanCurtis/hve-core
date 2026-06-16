@@ -68,7 +68,14 @@ jobs:
       - name: Add job summary
         if: always()
         run: |
-          if [ "${{ env.MARKDOWN_LINT_FAILED }}" == "true" ]; then
+          if [ "${{ env.MARKDOWN_LINT_FAILED }}" == "true" ] && [ "${{ inputs.soft-fail }}" == "true" ]; then
+            {
+              echo "## Markdown Lint Results"
+              echo "⚠️ **Status**: Warnings (soft-fail)"
+              echo ""
+              echo "Markdown linting violations detected but soft-fail is enabled. Review the artifact for details."
+            } >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ env.MARKDOWN_LINT_FAILED }}" == "true" ]; then
             {
               echo "## Markdown Lint Results"
               echo "❌ **Status**: Failed"

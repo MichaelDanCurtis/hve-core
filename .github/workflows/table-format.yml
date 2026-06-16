@@ -71,7 +71,16 @@ jobs:
         run: |
           {
             echo "## Table Format Check Results"
-            if [ "${{ env.TABLE_FORMAT_FAILED }}" == "true" ]; then
+            if [ "${{ env.TABLE_FORMAT_FAILED }}" == "true" ] && [ "${{ inputs.soft-fail }}" == "true" ]; then
+              echo "⚠️ **Status**: Warnings (soft-fail)"
+              echo ""
+              echo "Table formatting issues found but soft-fail is enabled."
+              echo ""
+              echo "**To fix manually:**"
+              echo "1. Run \`npm run format:tables\` locally"
+              echo "2. Review and commit the changes"
+              echo "3. Push to update this PR"
+            elif [ "${{ env.TABLE_FORMAT_FAILED }}" == "true" ]; then
               echo "❌ **Status**: Failed"
               echo ""
               echo "⚠️ **Note**: This check does NOT auto-fix tables."

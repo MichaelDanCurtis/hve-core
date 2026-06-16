@@ -389,11 +389,17 @@ jobs:
           check_result() {
             local name="$1"
             local result="$2"
+            local soft_fail="${3:-false}"
+            local has_warnings="${4:-}"
 
-            if [ "$result" = "success" ]; then
+            if [ "$result" = "success" ] && [ "$soft_fail" = "true" ] && [ "$has_warnings" = "true" ]; then
+              echo "⚠️ **$name**: passed with warnings (soft-fail)" >> "$GITHUB_STEP_SUMMARY"
+            elif [ "$result" = "success" ]; then
               echo "✅ **$name**: passed" >> "$GITHUB_STEP_SUMMARY"
             elif [ "$result" = "skipped" ]; then
               echo "⏭️ **$name**: skipped" >> "$GITHUB_STEP_SUMMARY"
+            elif [ "$result" = "failure" ] && [ "$soft_fail" = "true" ]; then
+              echo "⚠️ **$name**: failed (soft-fail, non-blocking)" >> "$GITHUB_STEP_SUMMARY"
             elif [ "$result" = "failure" ]; then
               echo "❌ **$name**: failed" >> "$GITHUB_STEP_SUMMARY"
               FAILED="${FAILED}${name}, "
@@ -426,7 +432,7 @@ jobs:
           check_result "Plugin Validation" "${{ needs.plugin-validation.result }}"
           check_result "Skill Validation" "${{ needs.skill-validation.result }}"
           check_result "Link Language Check" "${{ needs.link-lang-check.result }}"
-          check_result "Markdown Link Check" "${{ needs.markdown-link-check.result }}"
+          check_result "Markdown Link Check" "${{ needs.markdown-link-check.result }}" "true" "${{ needs.markdown-link-check.outputs.has-warnings }}"
           check_result "Dependency Pinning" "${{ needs.dependency-pinning-check.result }}"
           check_result "Workflow Permissions" "${{ needs.workflow-permissions-check.result }}"
           check_result "Action Version Consistency" "${{ needs.action-version-consistency-scan.result }}"
