@@ -228,16 +228,16 @@ For full frontmatter schema, naming conventions, and contribution requirements, 
 
 Agent frontmatter supports these fields:
 
-| Field                      | Type    | Required | Purpose                                                      |
-|----------------------------|---------|----------|--------------------------------------------------------------|
-| `name`                     | string  | Yes      | Human-readable name shown in the agent picker                |
-| `description`              | string  | Yes      | One-line purpose with attribution suffix                     |
-| `tools`                    | array   | No       | Restrict available tools; omit for full access               |
-| `agents`                   | array   | No       | Human-readable names of subagent dependencies                |
-| `handoffs`                 | array   | No       | Structured transitions to other agents                       |
+| Field                      | Type           | Required | Purpose                                                                          |
+|----------------------------|----------------|----------|----------------------------------------------------------------------------------|
+| `name`                     | string         | Yes      | Human-readable name shown in the agent picker                                    |
+| `description`              | string         | Yes      | One-line purpose with attribution suffix                                         |
+| `tools`                    | array          | No       | Restrict available tools; omit for full access                                   |
+| `agents`                   | array          | No       | Human-readable names of subagent dependencies                                    |
+| `handoffs`                 | array          | No       | Structured transitions to other agents                                           |
 | `model`                    | string / array | No       | Preferred model(s); array tried in order until one is available; omit to inherit |
-| `disable-model-invocation` | boolean | No       | Set `true` for orchestrators that only delegate to subagents |
-| `user-invocable`           | boolean | No       | Set `false` for subagents not meant for direct invocation    |
+| `disable-model-invocation` | boolean        | No       | Set `true` for orchestrators that only delegate to subagents                     |
+| `user-invocable`           | boolean        | No       | Set `false` for subagents not meant for direct invocation                        |
 
 ### model
 
