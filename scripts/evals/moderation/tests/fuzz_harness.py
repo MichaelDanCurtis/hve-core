@@ -32,9 +32,9 @@ def fuzz_moderate_input(data: bytes) -> None:
         _ = {"id": "fuzz-record", "text": text}
         # Input accepted
     except Exception:
-        # A fuzz target must never propagate exceptions: the harness exists to
-        # surface crashes in the code under test, so unexpected input is
-        # intentionally swallowed here.
+        # Fuzz harness intentionally swallows all exceptions: arbitrary/malformed
+        # input is expected to raise, and the goal is to surface crashes (segfaults,
+        # hangs) rather than ordinary Python exceptions.
         pass
 
 

@@ -48,11 +48,12 @@ param(
 
     [Parameter(Mandatory = $false)]
     [string]$RepoRoot = $(
-        $detected = git rev-parse --show-toplevel 2>$null
-        if ($detected) { $detected } else { $PSScriptRoot }
+        $detectedRoot = git rev-parse --show-toplevel 2>$null
+        if ($detectedRoot) { $detectedRoot } else { $PSScriptRoot }
     )
 )
 
+Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 Import-Module (Join-Path $PSScriptRoot 'Modules/CorpusReader.psm1') -Force

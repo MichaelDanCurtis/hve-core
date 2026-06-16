@@ -70,11 +70,12 @@ param(
 
     [Parameter(Mandatory = $false)]
     [string]$RepoRoot = $(
-        $detected = git rev-parse --show-toplevel 2>$null
-        if ($detected) { $detected } else { $PSScriptRoot }
+        $detectedRoot = git rev-parse --show-toplevel 2>$null
+        if ($detectedRoot) { $detectedRoot } else { $PSScriptRoot }
     )
 )
 
+Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 Import-Module (Join-Path $PSScriptRoot 'Modules/ModerationRunner.psm1') -Force
@@ -155,26 +156,26 @@ if ($MyInvocation.InvocationName -ne '.') {
         # Invoke moderate.py
         $moderatePy = Join-Path $PSScriptRoot 'moderation/moderate.py'
         if (-not (Test-Path $moderatePy)) {
-            Write-Error "moderate.py not found at $moderatePy"
+            [Console]::Error.WriteLine("moderate.py not found at $moderatePy")
             exit 2
         }
 
         Write-Verbose "Invoking moderate.py: threshold=$Threshold model=$Model"
         $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
         if (-not $pythonCmd) {
-            Write-Error "python not found in PATH; ensure Python 3.11+ is installed"
+            [Console]::Error.WriteLine("python not found in PATH; ensure Python 3.11+ is installed")
             exit 2
         }
 
         & python $moderatePy --input $tempInput --threshold $Threshold --model $Model --output $OutFile
 
         if ($LASTEXITCODE -ne 0) {
-            Write-Error "moderate.py exited with code $LASTEXITCODE"
+            [Console]::Error.WriteLine("moderate.py exited with code $LASTEXITCODE")
             # Check if output exists and surface errors
             if (Test-Path $OutFile) {
                 $flagged = Test-ModerationOutput -OutputPath $OutFile
                 if ($flagged) {
-                    Write-Error "Content moderation failed for scope: $Scope"
+                    [Console]::Error.WriteLine("Content moderation failed for scope: $Scope")
                     exit 1
                 }
             }
@@ -184,7 +185,7 @@ if ($MyInvocation.InvocationName -ne '.') {
         # Surface any flags
         $flagged = Test-ModerationOutput -OutputPath $OutFile
         if ($flagged) {
-            Write-Error "Content moderation failed for scope: $Scope"
+            [Console]::Error.WriteLine("Content moderation failed for scope: $Scope")
             exit 1
         }
 
