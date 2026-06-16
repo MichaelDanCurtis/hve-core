@@ -32,36 +32,15 @@ jobs:
           cache: npm
           cache-dependency-path: docs/docusaurus/package-lock.json
 
-      # This job only needs Node and a Chromium build. Reclaim space from
-      # large preinstalled SDKs (android ~9GB, dotnet ~3GB, GHC ~5GB) so the
-      # puppeteer and Playwright browser archives have extraction headroom.
-      # A near-full disk makes browser extraction abort mid-stream, leaving a
-      # partial chrome-linux64/ tree (binary missing) and the .zip behind.
-      - name: Free disk space for browser installs
-        run: |
-          set -u
-          echo "--- disk before cleanup ---"
-          df -h /
-          sudo rm -rf \
-            /usr/local/lib/android \
-            /usr/share/dotnet \
-            /opt/ghc \
-            /usr/local/.ghcup \
-            /opt/hostedtoolcache/CodeQL || true
-          echo "--- disk after cleanup ---"
-          df -h /
-
       - name: Install dependencies
         working-directory: docs/docusaurus
         run: npm ci
         env:
-          # Provision Chrome exclusively through the dedicated
-          # restore -> verify -> save steps below. Letting the puppeteer
-          # postinstall also download Chrome here creates a second, unverified
-          # download whose truncated output can poison ~/.cache/puppeteer and
-          # which the later cache restore layers over, masking failures.
-          # Skipping it makes browser provisioning single-sourced and
-          # verifiable.
+          # pa11y uses the runner's system Google Chrome (provisioned by the
+          # "Provision system Chrome" step below), so skip the puppeteer
+          # postinstall download. That self-download failed deterministically
+          # in CI by extracting a partial browser tree while still exiting 0,
+          # poisoning ~/.cache/puppeteer.
           PUPPETEER_SKIP_DOWNLOAD: 'true'
 
       - name: Lint accessibility
@@ -91,86 +70,29 @@ jobs:
         working-directory: docs/docusaurus
         run: npm run build
 
-      - name: Resolve puppeteer version
-        id: puppeteer-version
-        working-directory: docs/docusaurus
-        run: echo "version=$(node -p "require('puppeteer/package.json').version")" >> "$GITHUB_OUTPUT"
-
-      # Restore-only: the matching save step runs after the Chrome binary is
-      # verified executable, so a broken/partial cache can never be persisted.
-      - name: Restore puppeteer Chrome cache
-        id: puppeteer-cache
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ~/.cache/puppeteer
-          key: puppeteer-v3-${{ runner.os }}-${{ steps.puppeteer-version.outputs.version }}-${{ hashFiles('docs/docusaurus/package-lock.json') }}
-          restore-keys: |
-            puppeteer-v3-${{ runner.os }}-${{ steps.puppeteer-version.outputs.version }}-
-            puppeteer-v3-${{ runner.os }}-
-
-      - name: Install Chrome for pa11y (puppeteer)
-        working-directory: docs/docusaurus
+      # Both accessibility tools reuse the ubuntu-latest runner's maintained
+      # Google Chrome stable build instead of self-downloading a browser:
+      # pa11y drives it over CDP via puppeteer (honouring
+      # PUPPETEER_EXECUTABLE_PATH because `.pa11yci` sets no `executablePath`),
+      # and Playwright drives it via `channel: 'chrome'` in
+      # playwright.config.ts. Self-downloading failed deterministically in CI:
+      # the archive downloaded in full but extraction silently dropped the
+      # main `chrome` binary while the install still exited 0, so no retry or
+      # disk-space change could recover it. This step is the single source of
+      # the shared Chrome dependency; its presence check and `--version` echo
+      # guard both tools by failing the job loudly here -- with a clear
+      # message -- rather than as an opaque browser-launch error downstream.
+      - name: Provision system Chrome
         run: |
           set -u
-          # pa11y launches the Chrome build that puppeteer resolves via
-          # executablePath(). Earlier runs failed deterministically: the
-          # `@puppeteer/browsers` install downloaded the archive but the
-          # *extraction* aborted partway, leaving the <version>-chrome-linux64.zip
-          # behind (puppeteer deletes the archive only after a clean extract)
-          # and a chrome-linux64/ tree missing the main `chrome` binary. The
-          # real extract error stayed hidden because the install ran under
-          # `|| true`, so every retry re-ran the same broken install with no
-          # signal. Now the resolved browser-cache subtree is purged so each
-          # attempt re-downloads cleanly, the install command's output and exit
-          # code are surfaced on every attempt, and disk usage is printed so an
-          # ENOSPC mid-extract is immediately visible (the dedicated free-disk
-          # step above provides extraction headroom).
-          chrome_path() { node -p "require('puppeteer').executablePath()"; }
-          install_chrome() {
-            # Resolve the build path, then delete the whole browser cache
-            # subtree (e.g. ~/.cache/puppeteer/chrome) including any leftover
-            # archive so `browsers install` performs a real download instead
-            # of re-extracting a partial tree.
-            local target build_root status
-            target="$(chrome_path)"
-            # target:     .../chrome/linux-<ver>/chrome-linux64/chrome
-            # build_root: .../chrome (parent of the versioned dir + any archive)
-            build_root="$(dirname "$(dirname "$(dirname "$target")")")"
-            rm -rf "$build_root"
-            echo "--- disk before install ---"
-            df -h /
-            status=0
-            npx puppeteer browsers install chrome 2>&1 || status=$?
-            if [ "$status" -ne 0 ]; then
-              echo "::warning::puppeteer browsers install exited ${status}"
-            fi
-          }
-          attempt=0
-          max_attempts=3
-          until [ -x "$(chrome_path)" ]; do
-            attempt=$((attempt + 1))
-            if [ "$attempt" -gt "$max_attempts" ]; then
-              echo "::error::Chrome install failed after ${max_attempts} attempts"
-              echo "Resolved executablePath: $(chrome_path)"
-              echo "--- disk usage ---"
-              df -h /
-              echo "--- contents of puppeteer cache ---"
-              ls -laR "$HOME/.cache/puppeteer" || echo "(cache directory absent)"
-              exit 1
-            fi
-            echo "Chrome not present (attempt ${attempt}/${max_attempts}); installing..."
-            install_chrome
-          done
-          echo "Chrome executable present at $(chrome_path)"
-
-      # Reached only when the install step verified an executable Chrome and
-      # there was no exact-key hit, so only a known-good cache is ever saved.
-      - name: Save puppeteer Chrome cache
-        if: steps.puppeteer-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ~/.cache/puppeteer
-          key: puppeteer-v3-${{ runner.os }}-${{ steps.puppeteer-version.outputs.version }}-${{ hashFiles('docs/docusaurus/package-lock.json') }}
+          chrome_bin="$(command -v google-chrome || command -v google-chrome-stable || true)"
+          if [ -z "$chrome_bin" ]; then
+            echo "::error::No system Google Chrome found on the runner; pa11y and Playwright both require it"
+            exit 1
+          fi
+          echo "Using system Chrome at: $chrome_bin"
+          "$chrome_bin" --version
+          echo "PUPPETEER_EXECUTABLE_PATH=$chrome_bin" >> "$GITHUB_ENV"
 
       - name: Accessibility scan (pa11y-ci)
         working-directory: docs/docusaurus
@@ -180,53 +102,12 @@ jobs:
           npm run a11y:ci
         continue-on-error: ${{ inputs.soft-fail }}
 
-      - name: Resolve Playwright version
-        id: playwright-version
-        working-directory: docs/docusaurus
-        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
-
-      # Restore-only: the matching save step runs after a successful install,
-      # so a partial browser cache can never be persisted.
-      - name: Restore Playwright browsers cache
-        id: playwright-cache
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}-${{ hashFiles('docs/docusaurus/package-lock.json') }}
-          restore-keys: |
-            playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}-
-            playwright-${{ runner.os }}-
-
-      - name: Install Playwright browsers
-        working-directory: docs/docusaurus
-        run: |
-          set -u
-          # Playwright extracts its chromium build the same way puppeteer does,
-          # so a near-full disk can abort extraction mid-stream and leave a
-          # partial browser tree. Print disk usage before the install and, on
-          # failure, surface the exit code plus disk and cache state so an
-          # ENOSPC mid-extract is immediately visible (the dedicated free-disk
-          # step earlier in the job provides extraction headroom).
-          echo "--- disk before install ---"
-          df -h /
-          status=0
-          npx playwright install --with-deps chromium 2>&1 || status=$?
-          if [ "$status" -ne 0 ]; then
-            echo "::error::Playwright browser install exited ${status}"
-            echo "--- disk usage ---"
-            df -h /
-            echo "--- contents of Playwright cache ---"
-            ls -laR "$HOME/.cache/ms-playwright" || echo "(cache directory absent)"
-            exit "$status"
-          fi
-
-      - name: Save Playwright browsers cache
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}-${{ hashFiles('docs/docusaurus/package-lock.json') }}
-
+      # Playwright drives Google Chrome stable via `channel: 'chrome'` in
+      # playwright.config.ts, reusing the runner's maintained Chrome build
+      # instead of self-downloading a bundled Chromium, so no browser install
+      # or cache step is needed. The "Provision system Chrome" step above is
+      # the shared dependency and already fails the job loudly when no system
+      # Chrome is present.
       - name: Accessibility journeys (Playwright)
         working-directory: docs/docusaurus
         run: npm run test:e2e
