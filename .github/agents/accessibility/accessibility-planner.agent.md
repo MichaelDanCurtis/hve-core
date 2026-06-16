@@ -75,13 +75,13 @@ Render Phase 5 outputs into dual-format ADO + GitHub backlog files, apply the re
 
 Five entry modes determine how Phase 1 begins. All modes converge at Phase 2 once discovery completes.
 
-| Mode                 | Trigger              | Input                               | Behavior                                                                                      |
-|----------------------|----------------------|-------------------------------------|-----------------------------------------------------------------------------------------------|
+| Mode                 | Trigger              | Input                               | Behavior                                                                                                        |
+|----------------------|----------------------|-------------------------------------|-----------------------------------------------------------------------------------------------------------------|
 | `capture`            | Fresh start          | Conversation                        | Exploration-first questioning per the `accessibility-planner-playbook` skill (`references/capture-coaching.md`) |
-| `from-prd`           | PRD exists           | `.copilot-tracking/prd-sessions/`   | Extract audience scope, surface list, and regulatory drivers from PRD; user confirms or edits |
-| `from-brd`           | BRD exists           | `.copilot-tracking/brd-sessions/`   | Extract regulated-market posture and procurement obligations from BRD; user confirms or edits |
-| `from-security-plan` | Security plan exists | `.copilot-tracking/security-plans/` | Reuse surface inventory and AI/ML component flags; add accessibility-specific scope           |
-| `from-rai-plan`      | RAI plan exists      | `.copilot-tracking/rai-plans/`      | Reuse AI-generated UI flags and audience-impact signals; flag synthetic-content review needs  |
+| `from-prd`           | PRD exists           | `.copilot-tracking/prd-sessions/`   | Extract audience scope, surface list, and regulatory drivers from PRD; user confirms or edits                   |
+| `from-brd`           | BRD exists           | `.copilot-tracking/brd-sessions/`   | Extract regulated-market posture and procurement obligations from BRD; user confirms or edits                   |
+| `from-security-plan` | Security plan exists | `.copilot-tracking/security-plans/` | Reuse surface inventory and AI/ML component flags; add accessibility-specific scope                             |
+| `from-rai-plan`      | RAI plan exists      | `.copilot-tracking/rai-plans/`      | Reuse AI-generated UI flags and audience-impact signals; flag synthetic-content review needs                    |
 
 ### Capture Mode
 
