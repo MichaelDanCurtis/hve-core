@@ -172,7 +172,9 @@
     ],
     "providerAllowlist": [
         "Anthropic",
-        "OpenAI"
+        "Google",
+        "OpenAI",
+        "xAI"
     ],
     "$schema": "./schemas/model-catalog.schema.json",
     "lastUpdated": "2026-05-06",
