@@ -432,7 +432,6 @@ Purpose: Enforce Python code quality standards across all Python skills in the r
 
 * Workflow: `.github/workflows/python-lint.yml`
 * npm script: `npm run lint:py`
-* npm script (**Local** use): `npm run lint:py:fix`
 
 #### `Invoke-PythonTests.ps1`
 
