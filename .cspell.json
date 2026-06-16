@@ -30,7 +30,8 @@
   ],
   "ignoreRegExpList": [
     "/#.*/g",
-    "/^authors?:.*(?:\\r?\\n\\s*-.*)*$/gmi"
+    "/^authors?:.*(?:\\r?\\n\\s*-.*)*$/gmi",
+    "/\\*\\*[A-Za-z]\\*\\*[a-z]+/g"
   ],
   "dictionaryDefinitions": [
     {
@@ -74,6 +75,7 @@
     "brainwriting",
     "clusterfuzzlite",
     "collab",
+    "dogfooding",
     "easyops",
     "evals",
     "fetchone",
@@ -84,6 +86,7 @@
     "idor",
     "learning",
     "normaliz",
+    "packageable",
     "prval",
     "skillmd",
     "smol",
@@ -96,6 +99,7 @@
     "πρᾶξις",
     "agentic",
     "ystatement",
+    "underspecified",
     "sssc",
     "SSSC",
     "SLSA",

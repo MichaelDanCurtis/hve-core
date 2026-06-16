@@ -65,6 +65,7 @@
     "eval:execute": "pwsh -NoProfile -File scripts/evals/Invoke-VallyEvals.ps1 -ManifestPath logs/changed-ai-artifacts.json -LogsDir logs/",
     "eval:moderate": "pwsh -NoProfile -File scripts/evals/Invoke-ContentModeration.ps1",
     "eval:moderate:corpus": "pwsh -NoProfile -File scripts/evals/Invoke-CorpusModeration.ps1 -ManifestPath logs/changed-ai-artifacts.json -OutFile logs/moderation-corpus.json",
+    "eval:moderate:test": "pwsh -NoProfile -File scripts/tests/Invoke-PesterTests.ps1 -TestPath scripts/tests/evals/Invoke-ContentModeration.Tests.ps1",
     "eval:run": "vally eval --suite skill-quality && vally eval --suite agent-behavior && vally eval --suite script-validation",
     "eval:run:skills": "vally eval --suite skill-quality",
     "eval:run:agents": "vally eval --suite agent-behavior",
@@ -87,7 +88,7 @@
   },
   "devDependencies": {
     "@cspell/cspell-json-reporter": "10.0.1",
-    "@microsoft/vally-cli": "0.5.0",
+    "@microsoft/vally-cli": "0.6.0",
     "@vscode/vsce": "3.9.2",
     "alex": "11.0.1",
     "audit-ci": "7.1.0",
@@ -106,8 +107,10 @@
   "overrides": {
     "basic-ftp": "6.0.1",
     "brace-expansion@^5": "5.0.6",
+    "form-data": "4.0.6",
     "ip-address": "10.2.0",
-    "markdown-it": "14.1.1",
+    "js-yaml": "4.2.0",
+    "markdown-it": "14.2.0",
     "picomatch@^2": "2.3.2",
     "picomatch@^4": "4.0.4",
     "smol-toml": "1.6.1",
