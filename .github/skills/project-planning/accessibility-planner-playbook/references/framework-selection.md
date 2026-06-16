@@ -1,8 +1,3 @@
----
-description: "Framework selection protocol for the Accessibility Planner: host-aware multi-select, default selections, conformance levels, and the atomic disabled bundle"
-applyTo: '**/.copilot-tracking/accessibility/**'
----
-
 # Accessibility Framework Selection
 
 Phase 2 of the Accessibility Planner captures which accessibility frameworks apply to the assessment. Selection is always **explicit**: every default framework is either explicitly enabled or carries an atomic disabled bundle. There is no auto-include and no implicit fallback.

@@ -1,8 +1,3 @@
----
-description: 'Accessibility impact assessment covering control surfaces, evidence register, tradeoff documentation, and seed work-item generation'
-applyTo: '**/.copilot-tracking/accessibility/**'
----
-
 # Accessibility Impact Assessment
 
 Phase 5 (`impact-evidence`) translates the framework selections, control mappings, and risk tier captured in Phases 1-4 into a structured evidence register, a tradeoff log, and a list of seed work-items ready for the Phase 6 backlog handoff. This file defines the taxonomy, schemas, and rules that govern those activities so downstream agents (Security Planner, SSSC Planner, and RAI Planner) can consume the outputs without reshaping them.
@@ -20,7 +15,7 @@ Phase 5 produces three artifacts written into `.copilot-tracking/accessibility/{
 
 * `evidenceRegister` — the catalog of every artifact that demonstrates a control is met, partially met, or absent
 * `tradeoffLog` — a record of accessibility decisions that traded against performance, cost, schedule, or other non-accessibility concerns
-* `workItemSeeds` — pre-shaped seed records that the Phase 6 backlog handoff (`accessibility-backlog-handoff.instructions.md`) renders into ADO or GitHub work items without further transformation
+* `workItemSeeds` — pre-shaped seed records that the Phase 6 backlog handoff (`references/backlog-handoff.md`) renders into ADO or GitHub work items without further transformation
 
 The planner does not perform criterion-level adjudication during Phase 5; framework SKILL packages and qualified human accessibility review own normative judgments. Phase 5 records what is present, what is missing, and what was traded away.
 
@@ -151,7 +146,7 @@ When a tradeoff causes an evidence entry to land at `status: partial` or `status
 
 ## Seed Work-Item Generation Rules
 
-Work-item seeds are pre-shaped records the Phase 6 handoff renders directly. The seed shape is deliberately wide enough that both the ADO and GitHub renderers in `accessibility-backlog-handoff.instructions.md` can consume it without further transformation.
+Work-item seeds are pre-shaped records the Phase 6 handoff renders directly. The seed shape is deliberately wide enough that both the ADO and GitHub renderers in `references/backlog-handoff.md` can consume it without further transformation.
 
 Schema (YAML):
 

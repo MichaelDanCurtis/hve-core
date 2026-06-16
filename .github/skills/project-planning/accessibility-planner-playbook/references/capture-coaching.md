@@ -1,8 +1,3 @@
----
-description: "Exploration-first questioning techniques for accessibility capture mode covering personas, contextual inquiry, and conflict surfacing"
-applyTo: '**/.copilot-tracking/accessibility/**'
----
-
 # Accessibility Capture Mode Coaching
 
 Governs conversational behavior during the `capture` entry mode of the Accessibility Planner. Capture coaching is the default questioning posture for Phase 1 (Discovery) and is reapplied during Phase 4 (Plan Risk Assessment) whenever escalation triggers reopen scoping questions. These techniques replace checklist interrogation with exploration-first inquiry adapted from contextual research methods.
@@ -132,7 +127,7 @@ Transition out of capture into Phase 2 (`framework-selection`) when every item b
 * Outstanding questions are tracked in `planRiskAssessment.watchlist` rather than carried in the planner's working memory.
 * The user has confirmed the discovery summary via the gate-confirmation prompt.
 
-When the criteria are met, set `gates.discovery.confirmed = true` with `confirmedAt` and `confirmedBy`, advance `phase` to `framework-selection`, and hand off to the multi-select pattern defined in `accessibility-framework-selection.instructions.md`.
+When the criteria are met, set `gates.discovery.confirmed = true` with `confirmedAt` and `confirmedBy`, advance `phase` to `framework-selection`, and hand off to the multi-select pattern defined in `references/framework-selection.md`.
 
 ## Anti-Patterns
 
