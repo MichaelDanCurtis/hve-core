@@ -80,22 +80,43 @@ jobs:
       - name: Install Chrome for pa11y (puppeteer)
         working-directory: docs/docusaurus
         run: |
-          # A restored cache can leave a Chrome build folder without its
-          # executable. In that state `puppeteer browsers install` does not
-          # re-download; it fails hard with "the executable ... is missing",
-          # which aborts this step before any post-install check runs. Guard
-          # the install so any failure (or a missing executable afterwards)
-          # wipes the puppeteer cache and reinstalls from scratch, then
-          # verify the exact path puppeteer resolves so pa11y can launch it.
-          verify_chrome() {
-            node -e "const fs=require('fs');const p=require('puppeteer').executablePath();if(!fs.existsSync(p)){console.error('Chrome executable missing at '+p);process.exit(1);}console.log('Chrome executable present at '+p);"
-          }
-          if ! npx puppeteer browsers install chrome || ! verify_chrome; then
-            echo "Chrome install incomplete; clearing the puppeteer cache and reinstalling"
-            rm -rf "$HOME/.cache/puppeteer"
+          set -u
+          # pa11y launches the Chrome build that puppeteer resolves via
+          # executablePath(). Two independent failure modes have to be handled:
+          #   1. A restored cache can leave a build folder without its binary;
+          #      `browsers install` then refuses to re-download and fails with
+          #      "the executable ... is missing".
+          #   2. The download from the Chrome CDN is intermittently flaky on
+          #      hosted runners, leaving the folder present but the binary
+          #      absent even on a clean cache.
+          # Both are recoverable by removing the resolved build directory and
+          # retrying the download. Verify against the exact path puppeteer
+          # resolves, and on terminal failure dump diagnostics so the real
+          # cause is visible instead of a bare "missing" line.
+          chrome_path() { node -p "require('puppeteer').executablePath()"; }
+          install_chrome() {
+            # Remove the specific build dir so `browsers install` performs a
+            # real download instead of treating a partial folder as complete.
+            local target
+            target="$(chrome_path)"
+            rm -rf "$(dirname "$(dirname "$target")")"
             npx puppeteer browsers install chrome
-            verify_chrome
-          fi
+          }
+          attempt=0
+          max_attempts=3
+          until [ -x "$(chrome_path)" ]; do
+            attempt=$((attempt + 1))
+            if [ "$attempt" -gt "$max_attempts" ]; then
+              echo "::error::Chrome install failed after ${max_attempts} attempts"
+              echo "Resolved executablePath: $(chrome_path)"
+              echo "--- contents of puppeteer cache ---"
+              ls -laR "$HOME/.cache/puppeteer" || echo "(cache directory absent)"
+              exit 1
+            fi
+            echo "Chrome not present (attempt ${attempt}/${max_attempts}); installing..."
+            install_chrome || true
+          done
+          echo "Chrome executable present at $(chrome_path)"
 
       - name: Accessibility scan (pa11y-ci)
         working-directory: docs/docusaurus
