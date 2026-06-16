@@ -1,3 +1,7 @@
+---
+description: Exploration-first capture mode coaching techniques for Accessibility Planner Discovery and risk assessment phases
+---
+
 # Accessibility Capture Mode Coaching
 
 Governs conversational behavior during the `capture` entry mode of the Accessibility Planner. Capture coaching is the default questioning posture for Phase 1 (Discovery) and is reapplied during Phase 4 (Plan Risk Assessment) whenever escalation triggers reopen scoping questions. These techniques replace checklist interrogation with exploration-first inquiry adapted from contextual research methods.

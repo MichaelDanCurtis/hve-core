@@ -1,3 +1,7 @@
+---
+description: Phase 2 accessibility framework selection rules with explicit enable and atomic disabled-bundle requirements
+---
+
 # Accessibility Framework Selection
 
 Phase 2 of the Accessibility Planner captures which accessibility frameworks apply to the assessment. Selection is always **explicit**: every default framework is either explicitly enabled or carries an atomic disabled bundle. There is no auto-include and no implicit fallback.

@@ -1,3 +1,7 @@
+---
+description: Accessibility backlog handoff protocol consuming impact-assessment state and writing handoff artifacts
+---
+
 # Accessibility Backlog Handoff
 
 

@@ -1,3 +1,7 @@
+---
+description: Phase 5 accessibility impact assessment taxonomy, evidence register, tradeoff log, and seed work-item schemas
+---
+
 # Accessibility Impact Assessment
 
 Phase 5 (`impact-evidence`) translates the framework selections, control mappings, and risk tier captured in Phases 1-4 into a structured evidence register, a tradeoff log, and a list of seed work-items ready for the Phase 6 backlog handoff. This file defines the taxonomy, schemas, and rules that govern those activities so downstream agents (Security Planner, SSSC Planner, and RAI Planner) can consume the outputs without reshaping them.
