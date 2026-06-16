@@ -2,7 +2,7 @@
 title: Linting Scripts
 description: PowerShell scripts for code quality validation and documentation checks
 author: HVE Core Team
-ms.date: 2026-03-17
+ms.date: 2026-06-16
 ms.topic: reference
 keywords:
   - powershell
