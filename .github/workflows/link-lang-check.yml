@@ -33,7 +33,10 @@ jobs:
         shell: pwsh
         run: |
           & scripts/linting/Invoke-LinkLanguageCheck.ps1 -ExcludePaths 'scripts/tests/**'
-        continue-on-error: true
+          if ($LASTEXITCODE -ne 0) {
+            "LINK_LANG_FAILED=true" >> $env:GITHUB_ENV
+          }
+          exit 0
 
       - name: Upload results
         if: always()

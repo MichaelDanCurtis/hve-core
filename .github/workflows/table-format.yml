@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      TABLE_FORMAT_FAILED: 'false'
     steps:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -49,7 +51,7 @@ jobs:
               git diff --name-only
             fi
           fi
-        continue-on-error: true
+          exit 0
 
       - name: Create annotations
         if: env.TABLE_FORMAT_FAILED == 'true'

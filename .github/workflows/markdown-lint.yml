@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      MARKDOWN_LINT_FAILED: 'false'
     steps:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -40,9 +42,15 @@ jobs:
       - name: Run markdown lint
         id: markdown-lint
         run: |
-          npm run lint:md > markdown-lint-output.txt 2>&1 || echo "MARKDOWN_LINT_FAILED=true" >> "$GITHUB_ENV"
+          set +e
+          npm run lint:md > markdown-lint-output.txt 2>&1
+          EXIT_CODE=$?
+          set -e
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo "MARKDOWN_LINT_FAILED=true" >> "$GITHUB_ENV"
+          fi
           cat markdown-lint-output.txt
-        continue-on-error: true
+          exit 0
 
       - name: Create annotations
         if: env.MARKDOWN_LINT_FAILED == 'true'

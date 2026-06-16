@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      SPELL_CHECK_FAILED: 'false'
     steps:
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -40,16 +42,15 @@ jobs:
       - name: Run spell check
         id: spell-check
         run: |
-          set +e  # Disable errexit to capture exit code
+          set +e
           npm run spell-check > logs/spell-check-results.txt 2>&1
           EXIT_CODE=$?
-          set -e  # Re-enable errexit
+          set -e
           if [ "$EXIT_CODE" -ne 0 ]; then
             echo "SPELL_CHECK_FAILED=true" >> "$GITHUB_ENV"
           fi
           cat logs/spell-check-results.txt
-          exit "$EXIT_CODE"
-        continue-on-error: true
+          exit 0
 
       - name: Create annotations
         if: env.SPELL_CHECK_FAILED == 'true'

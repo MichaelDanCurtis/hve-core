@@ -77,7 +77,10 @@ jobs:
           }
           
           & scripts/linting/Validate-MarkdownFrontmatter.ps1 @params
-        continue-on-error: true
+          if ($LASTEXITCODE -ne 0) {
+            "FRONTMATTER_VALIDATION_FAILED=true" >> $env:GITHUB_ENV
+          }
+          exit 0
 
       - name: Upload frontmatter validation results
         if: always()
