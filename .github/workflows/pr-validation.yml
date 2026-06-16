@@ -338,3 +338,106 @@ jobs:
       security-events: write  # Required for SARIF upload to Security tab
       actions: read
 
+  validation-gate:
+    name: Validation Gate
+    if: always()
+    needs:
+      - spell-check
+      - markdown-lint
+      - table-format
+      - psscriptanalyzer
+      - discover-python-projects
+      - python-lint
+      - copyright-headers
+      - yaml-lint
+      - pester-tests
+      - pytest
+      - fuzz-tests
+      - pip-audit
+      - docusaurus-tests
+      - frontmatter-validation
+      - adr-consistency-validation
+      - ai-artifact-validation
+      - msdate-freshness
+      - plugin-validation
+      - skill-validation
+      - link-lang-check
+      - markdown-link-check
+      - dependency-pinning-check
+      - workflow-permissions-check
+      - action-version-consistency-scan
+      - gitleaks-scan
+      - npm-audit
+      - codeql
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check job results
+        shell: bash
+        run: |
+          echo "## Validation Gate Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          FAILED=""
+
+          check_result() {
+            local name="$1"
+            local result="$2"
+
+            if [ "$result" = "success" ]; then
+              echo "✅ **$name**: passed" >> "$GITHUB_STEP_SUMMARY"
+            elif [ "$result" = "skipped" ]; then
+              echo "⏭️ **$name**: skipped" >> "$GITHUB_STEP_SUMMARY"
+            elif [ "$result" = "failure" ]; then
+              echo "❌ **$name**: failed" >> "$GITHUB_STEP_SUMMARY"
+              FAILED="${FAILED}${name}, "
+            elif [ "$result" = "cancelled" ]; then
+              echo "⚠️ **$name**: cancelled" >> "$GITHUB_STEP_SUMMARY"
+              FAILED="${FAILED}${name} (cancelled), "
+            else
+              echo "⚠️ **$name**: ${result}" >> "$GITHUB_STEP_SUMMARY"
+              FAILED="${FAILED}${name} (${result}), "
+            fi
+          }
+
+          check_result "Spell Check" "${{ needs.spell-check.result }}"
+          check_result "Markdown Lint" "${{ needs.markdown-lint.result }}"
+          check_result "Table Format" "${{ needs.table-format.result }}"
+          check_result "PowerShell Lint" "${{ needs.psscriptanalyzer.result }}"
+          check_result "Discover Python Projects" "${{ needs.discover-python-projects.result }}"
+          check_result "Python Lint" "${{ needs.python-lint.result }}"
+          check_result "Copyright Headers" "${{ needs.copyright-headers.result }}"
+          check_result "YAML Lint" "${{ needs.yaml-lint.result }}"
+          check_result "PowerShell Tests" "${{ needs.pester-tests.result }}"
+          check_result "Python Tests" "${{ needs.pytest.result }}"
+          check_result "Fuzz Tests" "${{ needs.fuzz-tests.result }}"
+          check_result "pip-audit" "${{ needs.pip-audit.result }}"
+          check_result "Docusaurus Tests" "${{ needs.docusaurus-tests.result }}"
+          check_result "Frontmatter Validation" "${{ needs.frontmatter-validation.result }}"
+          check_result "ADR Consistency" "${{ needs.adr-consistency-validation.result }}"
+          check_result "AI Artifact Validation" "${{ needs.ai-artifact-validation.result }}"
+          check_result "ms.date Freshness" "${{ needs.msdate-freshness.result }}"
+          check_result "Plugin Validation" "${{ needs.plugin-validation.result }}"
+          check_result "Skill Validation" "${{ needs.skill-validation.result }}"
+          check_result "Link Language Check" "${{ needs.link-lang-check.result }}"
+          check_result "Markdown Link Check" "${{ needs.markdown-link-check.result }}"
+          check_result "Dependency Pinning" "${{ needs.dependency-pinning-check.result }}"
+          check_result "Workflow Permissions" "${{ needs.workflow-permissions-check.result }}"
+          check_result "Action Version Consistency" "${{ needs.action-version-consistency-scan.result }}"
+          check_result "Gitleaks" "${{ needs.gitleaks-scan.result }}"
+          check_result "npm Audit" "${{ needs.npm-audit.result }}"
+          check_result "CodeQL" "${{ needs.codeql.result }}"
+
+          if [ -n "$FAILED" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "---" >> "$GITHUB_STEP_SUMMARY"
+            echo "❌ **Validation failed**: ${FAILED%, }" >> "$GITHUB_STEP_SUMMARY"
+            echo "One or more required checks failed: ${FAILED%, }"
+            exit 1
+          fi
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "✅ **All validations passed**" >> "$GITHUB_STEP_SUMMARY"
+
