@@ -72,25 +72,26 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ~/.cache/puppeteer
-          key: puppeteer-${{ runner.os }}-${{ steps.puppeteer-version.outputs.version }}-${{ hashFiles('docs/docusaurus/package-lock.json') }}
+          key: puppeteer-v2-${{ runner.os }}-${{ steps.puppeteer-version.outputs.version }}-${{ hashFiles('docs/docusaurus/package-lock.json') }}
           restore-keys: |
-            puppeteer-${{ runner.os }}-${{ steps.puppeteer-version.outputs.version }}-
-            puppeteer-${{ runner.os }}-
+            puppeteer-v2-${{ runner.os }}-${{ steps.puppeteer-version.outputs.version }}-
+            puppeteer-v2-${{ runner.os }}-
 
       - name: Install Chrome for pa11y (puppeteer)
         working-directory: docs/docusaurus
         run: |
           # A restored cache can leave a Chrome build folder without its
-          # executable. puppeteer then treats Chrome as already installed and
-          # skips the download, so pa11y fails at launch with "Could not find
-          # Chrome". Verify the exact path puppeteer resolves and, if it is
-          # missing, wipe the cache and reinstall from scratch.
+          # executable. In that state `puppeteer browsers install` does not
+          # re-download; it fails hard with "the executable ... is missing",
+          # which aborts this step before any post-install check runs. Guard
+          # the install so any failure (or a missing executable afterwards)
+          # wipes the puppeteer cache and reinstalls from scratch, then
+          # verify the exact path puppeteer resolves so pa11y can launch it.
           verify_chrome() {
             node -e "const fs=require('fs');const p=require('puppeteer').executablePath();if(!fs.existsSync(p)){console.error('Chrome executable missing at '+p);process.exit(1);}console.log('Chrome executable present at '+p);"
           }
-          npx puppeteer browsers install chrome
-          if ! verify_chrome; then
-            echo "Reinstalling Chrome after clearing the puppeteer cache"
+          if ! npx puppeteer browsers install chrome || ! verify_chrome; then
+            echo "Chrome install incomplete; clearing the puppeteer cache and reinstalling"
             rm -rf "$HOME/.cache/puppeteer"
             npx puppeteer browsers install chrome
             verify_chrome
