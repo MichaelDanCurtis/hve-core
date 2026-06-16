@@ -199,7 +199,26 @@ jobs:
 
       - name: Install Playwright browsers
         working-directory: docs/docusaurus
-        run: npx playwright install --with-deps chromium
+        run: |
+          set -u
+          # Playwright extracts its chromium build the same way puppeteer does,
+          # so a near-full disk can abort extraction mid-stream and leave a
+          # partial browser tree. Print disk usage before the install and, on
+          # failure, surface the exit code plus disk and cache state so an
+          # ENOSPC mid-extract is immediately visible (the dedicated free-disk
+          # step earlier in the job provides extraction headroom).
+          echo "--- disk before install ---"
+          df -h /
+          status=0
+          npx playwright install --with-deps chromium 2>&1 || status=$?
+          if [ "$status" -ne 0 ]; then
+            echo "::error::Playwright browser install exited ${status}"
+            echo "--- disk usage ---"
+            df -h /
+            echo "--- contents of Playwright cache ---"
+            ls -laR "$HOME/.cache/ms-playwright" || echo "(cache directory absent)"
+            exit "$status"
+          fi
 
       - name: Save Playwright browsers cache
         if: steps.playwright-cache.outputs.cache-hit != 'true'
