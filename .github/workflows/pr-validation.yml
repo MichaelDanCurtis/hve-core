@@ -188,6 +188,7 @@ jobs:
       id-token: write # Required for Codecov OIDC in the reusable workflow
     with:
       soft-fail: false
+      changed-files-only: true
 
   frontmatter-validation:
     name: Frontmatter Validation
