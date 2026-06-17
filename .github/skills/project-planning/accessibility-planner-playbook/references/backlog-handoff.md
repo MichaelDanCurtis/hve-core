@@ -15,6 +15,7 @@ Phase 6 executes a fixed six-step sequence. Steps run in order; each step gates 
 2. **Resolve target system** — Read `userPreferences.targetSystem` if set. When unset, ask the user whether to render `ado`, `github`, or `both`. Persist the response under `userPreferences.targetSystem`.
 3. **Run the review rubric** — Walk the checkpoints and quality checklist below. Record findings into the Accessibility Review Summary template. Block the rest of the phase if any checkpoint is Not Met.
 4. **Render work items** — Apply the dual-format templates to every seed in `workItemSeeds`. Derive suggested priority and autonomy tier per the mapping table. Attach evidence cross-links, tradeoff cross-links, and cross-planner refs.
+5. **Sanitize and emit** — Apply the content sanitization protocol, write ADO output to `.copilot-tracking/workitems/backlog/{project-slug}-a11y/work-items.md` and GitHub output to `.copilot-tracking/github-issues/discovery/{project-slug}-a11y/issues-plan.md`, include the disclaimer block in the generated artifacts, then emit the professional-review reminder and handoff summary.
 6. **Finalize state** — Update `state.json` per the Final State Update section. Set `gates.backlog-handoff.confirmed = true` only after the user explicitly confirms the rendered backlog.
 
 The phase is non-destructive. Re-running Phase 6 regenerates output files in place but preserves any user-supplied content under a `## User Notes` heading at the bottom of each output file.
