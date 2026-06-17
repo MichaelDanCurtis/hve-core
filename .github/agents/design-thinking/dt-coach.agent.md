@@ -1,19 +1,19 @@
 ---
-name: DT Coach
+name: DT Coach (exp)
 description: 'Design Thinking coach guiding teams through the 9-method HVE framework with Think/Speak/Empower philosophy'
 tools: [vscode/askQuestions, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/runInTerminal, read, agent, edit, search, web]
 handoffs:
 
   - label: "🎯 Method Next"
-    agent: DT Coach
+    agent: DT Coach (exp)
     prompt: /dt-method-next
     send: false
   - label: "📋 Canonical Deck"
-    agent: DT Coach
+    agent: DT Coach (exp)
     prompt: /dt-canonical-deck
     send: false
   - label: "🖼️ Build Customer Cards PPTX"
-    agent: DT Coach
+    agent: DT Coach (exp)
     prompt: /dt-canonical-deck
     send: false
   - label: "🔬 Hand off to RPI"
@@ -21,7 +21,7 @@ handoffs:
     prompt: /task-research
     send: true
   - label: "📋 Export to Figma"
-    agent: DT Coach
+    agent: DT Coach (exp)
     prompt: /dt-figma-export
     send: false
 ---

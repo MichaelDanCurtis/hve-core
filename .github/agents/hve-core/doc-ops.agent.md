@@ -1,5 +1,5 @@
 ---
-name: Doc Ops
+name: Doc Ops (exp)
 description: 'Documentation operations agent for pattern compliance, accuracy verification, and gap detection'
 disable-model-invocation: true
 agents:

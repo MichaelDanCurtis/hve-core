@@ -1,12 +1,12 @@
 ---
-name: DT Learning Tutor
+name: DT Learning Tutor (exp)
 description: 'Design Thinking learning tutor providing structured curriculum, comprehension checks, and adaptive pacing'
 tools:
   - read/readFile
   - search
   - edit/createFile
 handoffs:
-  - agent: DT Coach
+  - agent: DT Coach (exp)
     label: Start a DT project
     prompt: /dt-start-project
 ---

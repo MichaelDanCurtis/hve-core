@@ -1,5 +1,5 @@
 ---
-name: BRD Quality Reviewer
+name: BRD Quality Reviewer (exp)
 description: "Read-only BRD quality reviewer that emits both BRD_STANDARD_FINDINGS_V1 and BRD_QUALITY_REPORT_V1 payloads - Brought to you by microsoft/hve-core"
 tools:
   - search/codebase

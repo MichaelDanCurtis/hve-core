@@ -1,9 +1,9 @@
 ---
-name: Accessibility Reviewer
+name: Accessibility Reviewer (pre)
 description: "Accessibility skill assessment orchestrator for codebase profiling and accessibility findings reporting"
 agents:
   - Codebase Profiler
-  - Accessibility Skill Assessor
+  - Accessibility Skill Assessor (pre)
   - Finding Deep Verifier
   - Report Generator
 tools:

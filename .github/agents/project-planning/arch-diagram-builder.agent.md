@@ -1,5 +1,5 @@
 ---
-name: Arch Diagram Builder
+name: Arch Diagram Builder (exp)
 description: Architecture diagram builder that produces high-quality ASCII-art diagrams
 ---
 

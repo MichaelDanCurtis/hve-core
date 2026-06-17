@@ -1,5 +1,5 @@
 ---
-name: Accessibility Skill Assessor
+name: Accessibility Skill Assessor (pre)
 description: "Assesses a single accessibility knowledge skill against the codebase, reading success-criterion references and returning structured findings"
 tools:
   - search/codebase

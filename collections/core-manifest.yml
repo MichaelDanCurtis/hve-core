@@ -214,6 +214,30 @@ agents:
     collections:
     - ado
     - hve-core-all
+  .github/agents/accessibility/accessibility-planner.agent.md:
+    path: .github/agents/accessibility/accessibility-planner.agent.md
+    maturity: experimental
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/agents/accessibility/accessibility-reviewer.agent.md:
+    path: .github/agents/accessibility/accessibility-reviewer.agent.md
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/agents/accessibility/subagents/accessibility-skill-assessor.agent.md:
+    path: .github/agents/accessibility/subagents/accessibility-skill-assessor.agent.md
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/agents/coding-standards/code-review-accessibility.agent.md:
+    path: .github/agents/coding-standards/code-review-accessibility.agent.md
+    maturity: experimental
+    collections:
+    - coding-standards
+    - hve-core-all
   .github/agents/coding-standards/code-review-full.agent.md:
     path: .github/agents/coding-standards/code-review-full.agent.md
     maturity: experimental
@@ -264,13 +288,13 @@ agents:
     - hve-core-all
   .github/agents/design-thinking/dt-coach.agent.md:
     path: .github/agents/design-thinking/dt-coach.agent.md
-    maturity: stable
+    maturity: experimental
     collections:
     - design-thinking
     - hve-core-all
   .github/agents/design-thinking/dt-learning-tutor.agent.md:
     path: .github/agents/design-thinking/dt-learning-tutor.agent.md
-    maturity: stable
+    maturity: experimental
     collections:
     - design-thinking
     - hve-core-all
@@ -479,6 +503,18 @@ agents:
     - project-planning
   .github/agents/project-planning/ux-ui-designer.agent.md:
     path: .github/agents/project-planning/ux-ui-designer.agent.md
+    maturity: experimental
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/agents/project-planning/subagents/brd-quality-reviewer.agent.md:
+    path: .github/agents/project-planning/subagents/brd-quality-reviewer.agent.md
+    maturity: experimental
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/agents/project-planning/subagents/prd-quality-reviewer.agent.md:
+    path: .github/agents/project-planning/subagents/prd-quality-reviewer.agent.md
     maturity: experimental
     collections:
     - hve-core-all
@@ -703,6 +739,11 @@ prompts:
     maturity: stable
     collections:
     - hve-core-all
+  .github/prompts/experimental/graph-research.prompt.md:
+    path: .github/prompts/experimental/graph-research.prompt.md
+    maturity: experimental
+    collections:
+    - hve-core-all
   .github/prompts/github/github-add-issue.prompt.md:
     path: .github/prompts/github/github-add-issue.prompt.md
     maturity: stable
@@ -853,6 +894,12 @@ prompts:
     collections:
     - hve-core-all
     - project-planning
+  .github/prompts/jira/jira-setup.prompt.md:
+    path: .github/prompts/jira/jira-setup.prompt.md
+    maturity: stable
+    collections:
+    - hve-core-all
+    - project-planning
   .github/prompts/jira/jira-triage-issues.prompt.md:
     path: .github/prompts/jira/jira-triage-issues.prompt.md
     maturity: stable
@@ -964,6 +1011,18 @@ prompts:
     - project-planning
     - security
 instructions:
+  .github/instructions/accessibility/accessibility-identity.instructions.md:
+    path: .github/instructions/accessibility/accessibility-identity.instructions.md
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/instructions/accessibility/accessibility-license-posture.instructions.md:
+    path: .github/instructions/accessibility/accessibility-license-posture.instructions.md
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
   .github/instructions/ado/ado-backlog-sprint.instructions.md:
     path: .github/instructions/ado/ado-backlog-sprint.instructions.md
     maturity: stable
@@ -1098,267 +1157,49 @@ instructions:
     - coding-standards
     - data-science
     - hve-core-all
-  .github/instructions/design-thinking/dt-canonical-deck.instructions.md:
-    path: .github/instructions/design-thinking/dt-canonical-deck.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-coaching-identity.instructions.md:
-    path: .github/instructions/design-thinking/dt-coaching-identity.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-coaching-state.instructions.md:
-    path: .github/instructions/design-thinking/dt-coaching-state.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-curriculum-01-scoping.instructions.md:
-    path: .github/instructions/design-thinking/dt-curriculum-01-scoping.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-curriculum-02-research.instructions.md:
-    path: .github/instructions/design-thinking/dt-curriculum-02-research.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-curriculum-03-synthesis.instructions.md:
-    path: .github/instructions/design-thinking/dt-curriculum-03-synthesis.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-curriculum-04-brainstorming.instructions.md:
-    path: .github/instructions/design-thinking/dt-curriculum-04-brainstorming.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-curriculum-05-concepts.instructions.md:
-    path: .github/instructions/design-thinking/dt-curriculum-05-concepts.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-curriculum-06-prototypes.instructions.md:
-    path: .github/instructions/design-thinking/dt-curriculum-06-prototypes.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-curriculum-07-testing.instructions.md:
-    path: .github/instructions/design-thinking/dt-curriculum-07-testing.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-curriculum-08-iteration.instructions.md:
-    path: .github/instructions/design-thinking/dt-curriculum-08-iteration.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-curriculum-09-handoff.instructions.md:
-    path: .github/instructions/design-thinking/dt-curriculum-09-handoff.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-curriculum-scenario-manufacturing.instructions.md:
-    path: .github/instructions/design-thinking/dt-curriculum-scenario-manufacturing.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-image-prompt-generation.instructions.md:
-    path: .github/instructions/design-thinking/dt-image-prompt-generation.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-industry-energy.instructions.md:
-    path: .github/instructions/design-thinking/dt-industry-energy.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-industry-healthcare.instructions.md:
-    path: .github/instructions/design-thinking/dt-industry-healthcare.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-industry-manufacturing.instructions.md:
-    path: .github/instructions/design-thinking/dt-industry-manufacturing.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-01-deep.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-01-deep.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-01-scope.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-01-scope.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-02-deep.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-02-deep.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-02-research.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-02-research.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-03-deep.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-03-deep.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-03-synthesis.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-03-synthesis.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-04-brainstorming.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-04-brainstorming.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-04-deep.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-04-deep.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-05-concepts.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-05-concepts.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-05-deep.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-05-deep.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-06-deep.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-06-deep.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-06-lofi-prototypes.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-06-lofi-prototypes.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-07-deep.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-07-deep.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-07-hifi-prototypes.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-07-hifi-prototypes.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-08-deep.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-08-deep.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-08-testing.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-08-testing.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-09-deep.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-09-deep.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-09-iteration.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-09-iteration.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-method-sequencing.instructions.md:
-    path: .github/instructions/design-thinking/dt-method-sequencing.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-quality-constraints.instructions.md:
-    path: .github/instructions/design-thinking/dt-quality-constraints.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-rpi-handoff-contract.instructions.md:
-    path: .github/instructions/design-thinking/dt-rpi-handoff-contract.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-rpi-implement-context.instructions.md:
-    path: .github/instructions/design-thinking/dt-rpi-implement-context.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-rpi-planning-context.instructions.md:
-    path: .github/instructions/design-thinking/dt-rpi-planning-context.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-rpi-research-context.instructions.md:
-    path: .github/instructions/design-thinking/dt-rpi-research-context.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-rpi-review-context.instructions.md:
-    path: .github/instructions/design-thinking/dt-rpi-review-context.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
-  .github/instructions/design-thinking/dt-subagent-handoff.instructions.md:
-    path: .github/instructions/design-thinking/dt-subagent-handoff.instructions.md
-    maturity: stable
-    collections:
-    - design-thinking
-    - hve-core-all
   .github/instructions/experimental/experiment-designer.instructions.md:
     path: .github/instructions/experimental/experiment-designer.instructions.md
     maturity: stable
+    collections:
+    - hve-core-all
+  .github/instructions/experimental/graphify.instructions.md:
+    path: .github/instructions/experimental/graphify.instructions.md
+    maturity: experimental
+    collections:
+    - hve-core-all
+  .github/instructions/experimental/mural/mural-bootstrap.instructions.md:
+    path: .github/instructions/experimental/mural/mural-bootstrap.instructions.md
+    maturity: experimental
+    collections:
+    - hve-core-all
+  .github/instructions/experimental/mural/mural-destinations.instructions.md:
+    path: .github/instructions/experimental/mural/mural-destinations.instructions.md
+    maturity: experimental
+    collections:
+    - hve-core-all
+  .github/instructions/experimental/mural/mural-human-record.instructions.md:
+    path: .github/instructions/experimental/mural/mural-human-record.instructions.md
+    maturity: experimental
+    collections:
+    - hve-core-all
+  .github/instructions/experimental/mural/mural-log-hygiene.instructions.md:
+    path: .github/instructions/experimental/mural/mural-log-hygiene.instructions.md
+    maturity: experimental
+    collections:
+    - hve-core-all
+  .github/instructions/experimental/mural/mural-seeding-patterns.instructions.md:
+    path: .github/instructions/experimental/mural/mural-seeding-patterns.instructions.md
+    maturity: experimental
+    collections:
+    - hve-core-all
+  .github/instructions/experimental/mural/mural-writeback-hygiene.instructions.md:
+    path: .github/instructions/experimental/mural/mural-writeback-hygiene.instructions.md
+    maturity: experimental
+    collections:
+    - hve-core-all
+  .github/instructions/experimental/mural/mural-writing-style.instructions.md:
+    path: .github/instructions/experimental/mural/mural-writing-style.instructions.md
+    maturity: experimental
     collections:
     - hve-core-all
   .github/instructions/experimental/pptx.instructions.md:
@@ -1462,6 +1303,30 @@ instructions:
     collections:
     - hve-core-all
     - project-planning
+  .github/instructions/project-planning/adr-byo-template.instructions.md:
+    path: .github/instructions/project-planning/adr-byo-template.instructions.md
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/instructions/project-planning/adr-handoff.instructions.md:
+    path: .github/instructions/project-planning/adr-handoff.instructions.md
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/instructions/project-planning/adr-identity.instructions.md:
+    path: .github/instructions/project-planning/adr-identity.instructions.md
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/instructions/project-planning/adr-standards.instructions.md:
+    path: .github/instructions/project-planning/adr-standards.instructions.md
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
   .github/instructions/rai-planning/rai-backlog-handoff.instructions.md:
     path: .github/instructions/rai-planning/rai-backlog-handoff.instructions.md
     maturity: experimental
@@ -1546,47 +1411,11 @@ instructions:
     - hve-core-all
     - project-planning
     - security
-  .github/instructions/security/sssc-assessment.instructions.md:
-    path: .github/instructions/security/sssc-assessment.instructions.md
-    maturity: experimental
+  .github/instructions/security/sssc-planner.instructions.md:
+    path: .github/instructions/security/sssc-planner.instructions.md
+    maturity: preview
     collections:
     - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/security/sssc-backlog.instructions.md:
-    path: .github/instructions/security/sssc-backlog.instructions.md
-    maturity: experimental
-    collections:
-    - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/security/sssc-gap-analysis.instructions.md:
-    path: .github/instructions/security/sssc-gap-analysis.instructions.md
-    maturity: experimental
-    collections:
-    - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/security/sssc-handoff.instructions.md:
-    path: .github/instructions/security/sssc-handoff.instructions.md
-    maturity: experimental
-    collections:
-    - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/security/sssc-identity.instructions.md:
-    path: .github/instructions/security/sssc-identity.instructions.md
-    maturity: experimental
-    collections:
-    - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/security/sssc-standards.instructions.md:
-    path: .github/instructions/security/sssc-standards.instructions.md
-    maturity: experimental
-    collections:
-    - hve-core-all
-    - project-planning
     - security
   .github/instructions/security/standards-mapping.instructions.md:
     path: .github/instructions/security/standards-mapping.instructions.md
@@ -1622,18 +1451,82 @@ instructions:
     - hve-core-all
     - project-planning
     - security
+  .github/instructions/shared/planner-identity-base.instructions.md:
+    path: .github/instructions/shared/planner-identity-base.instructions.md
+    maturity: preview
+    collections:
+    - hve-core-all
   .github/instructions/shared/story-quality.instructions.md:
     path: .github/instructions/shared/story-quality.instructions.md
     maturity: stable
     collections:
     - hve-core-all
     - project-planning
+  .github/instructions/shared/telemetry-overlay.instructions.md:
+    path: .github/instructions/shared/telemetry-overlay.instructions.md
+    maturity: preview
+    collections:
+    - hve-core-all
 skills:
+  .github/skills/accessibility/aria-apg:
+    path: .github/skills/accessibility/aria-apg
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/skills/accessibility/coga:
+    path: .github/skills/accessibility/coga
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/skills/accessibility/en-301-549:
+    path: .github/skills/accessibility/en-301-549
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/skills/accessibility/section-508:
+    path: .github/skills/accessibility/section-508
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/skills/accessibility/wcag-22:
+    path: .github/skills/accessibility/wcag-22
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
   .github/skills/coding-standards/python-foundational:
     path: .github/skills/coding-standards/python-foundational
     maturity: experimental
     collections:
     - coding-standards
+    - hve-core-all
+  .github/skills/design-thinking/dt-coaching-foundation:
+    path: .github/skills/design-thinking/dt-coaching-foundation
+    maturity: preview
+    collections:
+    - design-thinking
+    - hve-core-all
+  .github/skills/design-thinking/dt-curriculum:
+    path: .github/skills/design-thinking/dt-curriculum
+    maturity: preview
+    collections:
+    - design-thinking
+    - hve-core-all
+  .github/skills/design-thinking/dt-methods:
+    path: .github/skills/design-thinking/dt-methods
+    maturity: preview
+    collections:
+    - design-thinking
+    - hve-core-all
+  .github/skills/design-thinking/dt-rpi-integration:
+    path: .github/skills/design-thinking/dt-rpi-integration
+    maturity: preview
+    collections:
+    - design-thinking
     - hve-core-all
   .github/skills/experimental/customer-card-render:
     path: .github/skills/experimental/customer-card-render
@@ -1660,6 +1553,11 @@ skills:
     maturity: stable
     collections:
     - hve-core-all
+  .github/skills/experimental/mural:
+    path: .github/skills/experimental/mural
+    maturity: preview
+    collections:
+    - hve-core-all
   .github/skills/github/gh-code-scanning:
     path: .github/skills/github/gh-code-scanning
     maturity: stable
@@ -1672,6 +1570,11 @@ skills:
     collections:
     - hve-core-all
     - project-planning
+  .github/skills/hve-core/vally-tests:
+    path: .github/skills/hve-core/vally-tests
+    maturity: experimental
+    collections:
+    - hve-core-all
   .github/skills/installer/hve-core-installer:
     path: .github/skills/installer/hve-core-installer
     maturity: stable
@@ -1680,6 +1583,24 @@ skills:
   .github/skills/jira/jira:
     path: .github/skills/jira/jira
     maturity: stable
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/skills/project-planning/accessibility-planner-playbook:
+    path: .github/skills/project-planning/accessibility-planner-playbook
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/skills/project-planning/adr-author:
+    path: .github/skills/project-planning/adr-author
+    maturity: preview
+    collections:
+    - hve-core-all
+    - project-planning
+  .github/skills/project-planning/requirements-author:
+    path: .github/skills/project-planning/requirements-author
+    maturity: preview
     collections:
     - hve-core-all
     - project-planning
@@ -1736,6 +1657,12 @@ skills:
     collections:
     - hve-core-all
     - security
+  .github/skills/security/supply-chain-security:
+    path: .github/skills/security/supply-chain-security
+    maturity: preview
+    collections:
+    - hve-core-all
+    - security
   .github/skills/shared/pr-reference:
     path: .github/skills/shared/pr-reference
     maturity: stable
@@ -1745,6 +1672,16 @@ skills:
     - hve-core
     - hve-core-all
     - security
+  .github/skills/shared/backlog-templates:
+    path: .github/skills/shared/backlog-templates
+    maturity: experimental
+    collections:
+    - hve-core-all
+  .github/skills/shared/telemetry-foundations:
+    path: .github/skills/shared/telemetry-foundations
+    maturity: preview
+    collections:
+    - hve-core-all
 releases:
   hve-core-all:
     channel: stable
@@ -1755,8 +1692,6 @@ releases:
     artifacts:
     - .github/agents/ado/ado-backlog-manager.agent.md
     - .github/agents/ado/ado-prd-to-wit.agent.md
-    - .github/agents/design-thinking/dt-coach.agent.md
-    - .github/agents/design-thinking/dt-learning-tutor.agent.md
     - .github/agents/experimental/experiment-designer.agent.md
     - .github/agents/experimental/pptx.agent.md
     - .github/agents/experimental/subagents/pptx-subagent.agent.md
@@ -1790,49 +1725,6 @@ releases:
     - .github/instructions/ado/ado-update-wit-items.instructions.md
     - .github/instructions/ado/ado-wit-discovery.instructions.md
     - .github/instructions/ado/ado-wit-planning.instructions.md
-    - .github/instructions/design-thinking/dt-canonical-deck.instructions.md
-    - .github/instructions/design-thinking/dt-coaching-identity.instructions.md
-    - .github/instructions/design-thinking/dt-coaching-state.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-01-scoping.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-02-research.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-03-synthesis.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-04-brainstorming.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-05-concepts.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-06-prototypes.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-07-testing.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-08-iteration.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-09-handoff.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-scenario-manufacturing.instructions.md
-    - .github/instructions/design-thinking/dt-image-prompt-generation.instructions.md
-    - .github/instructions/design-thinking/dt-industry-energy.instructions.md
-    - .github/instructions/design-thinking/dt-industry-healthcare.instructions.md
-    - .github/instructions/design-thinking/dt-industry-manufacturing.instructions.md
-    - .github/instructions/design-thinking/dt-method-01-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-01-scope.instructions.md
-    - .github/instructions/design-thinking/dt-method-02-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-02-research.instructions.md
-    - .github/instructions/design-thinking/dt-method-03-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-03-synthesis.instructions.md
-    - .github/instructions/design-thinking/dt-method-04-brainstorming.instructions.md
-    - .github/instructions/design-thinking/dt-method-04-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-05-concepts.instructions.md
-    - .github/instructions/design-thinking/dt-method-05-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-06-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-06-lofi-prototypes.instructions.md
-    - .github/instructions/design-thinking/dt-method-07-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-07-hifi-prototypes.instructions.md
-    - .github/instructions/design-thinking/dt-method-08-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-08-testing.instructions.md
-    - .github/instructions/design-thinking/dt-method-09-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-09-iteration.instructions.md
-    - .github/instructions/design-thinking/dt-method-sequencing.instructions.md
-    - .github/instructions/design-thinking/dt-quality-constraints.instructions.md
-    - .github/instructions/design-thinking/dt-rpi-handoff-contract.instructions.md
-    - .github/instructions/design-thinking/dt-rpi-implement-context.instructions.md
-    - .github/instructions/design-thinking/dt-rpi-planning-context.instructions.md
-    - .github/instructions/design-thinking/dt-rpi-research-context.instructions.md
-    - .github/instructions/design-thinking/dt-rpi-review-context.instructions.md
-    - .github/instructions/design-thinking/dt-subagent-handoff.instructions.md
     - .github/instructions/experimental/experiment-designer.instructions.md
     - .github/instructions/experimental/pptx.instructions.md
     - .github/instructions/github/community-interaction.instructions.md
@@ -1987,49 +1879,6 @@ releases:
     - .github/instructions/coding-standards/rust/rust.instructions.md
     - .github/instructions/coding-standards/terraform/terraform.instructions.md
     - .github/instructions/coding-standards/uv-projects.instructions.md
-    - .github/instructions/design-thinking/dt-canonical-deck.instructions.md
-    - .github/instructions/design-thinking/dt-coaching-identity.instructions.md
-    - .github/instructions/design-thinking/dt-coaching-state.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-01-scoping.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-02-research.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-03-synthesis.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-04-brainstorming.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-05-concepts.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-06-prototypes.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-07-testing.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-08-iteration.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-09-handoff.instructions.md
-    - .github/instructions/design-thinking/dt-curriculum-scenario-manufacturing.instructions.md
-    - .github/instructions/design-thinking/dt-image-prompt-generation.instructions.md
-    - .github/instructions/design-thinking/dt-industry-energy.instructions.md
-    - .github/instructions/design-thinking/dt-industry-healthcare.instructions.md
-    - .github/instructions/design-thinking/dt-industry-manufacturing.instructions.md
-    - .github/instructions/design-thinking/dt-method-01-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-01-scope.instructions.md
-    - .github/instructions/design-thinking/dt-method-02-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-02-research.instructions.md
-    - .github/instructions/design-thinking/dt-method-03-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-03-synthesis.instructions.md
-    - .github/instructions/design-thinking/dt-method-04-brainstorming.instructions.md
-    - .github/instructions/design-thinking/dt-method-04-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-05-concepts.instructions.md
-    - .github/instructions/design-thinking/dt-method-05-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-06-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-06-lofi-prototypes.instructions.md
-    - .github/instructions/design-thinking/dt-method-07-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-07-hifi-prototypes.instructions.md
-    - .github/instructions/design-thinking/dt-method-08-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-08-testing.instructions.md
-    - .github/instructions/design-thinking/dt-method-09-deep.instructions.md
-    - .github/instructions/design-thinking/dt-method-09-iteration.instructions.md
-    - .github/instructions/design-thinking/dt-method-sequencing.instructions.md
-    - .github/instructions/design-thinking/dt-quality-constraints.instructions.md
-    - .github/instructions/design-thinking/dt-rpi-handoff-contract.instructions.md
-    - .github/instructions/design-thinking/dt-rpi-implement-context.instructions.md
-    - .github/instructions/design-thinking/dt-rpi-planning-context.instructions.md
-    - .github/instructions/design-thinking/dt-rpi-research-context.instructions.md
-    - .github/instructions/design-thinking/dt-rpi-review-context.instructions.md
-    - .github/instructions/design-thinking/dt-subagent-handoff.instructions.md
     - .github/instructions/experimental/experiment-designer.instructions.md
     - .github/instructions/experimental/pptx.instructions.md
     - .github/instructions/github/community-interaction.instructions.md
@@ -2059,12 +1908,6 @@ releases:
     - .github/instructions/security/identity.instructions.md
     - .github/instructions/security/operational-buckets.instructions.md
     - .github/instructions/security/security-model.instructions.md
-    - .github/instructions/security/sssc-assessment.instructions.md
-    - .github/instructions/security/sssc-backlog.instructions.md
-    - .github/instructions/security/sssc-gap-analysis.instructions.md
-    - .github/instructions/security/sssc-handoff.instructions.md
-    - .github/instructions/security/sssc-identity.instructions.md
-    - .github/instructions/security/sssc-standards.instructions.md
     - .github/instructions/security/standards-mapping.instructions.md
     - .github/instructions/shared/coaching-patterns.instructions.md
     - .github/instructions/shared/disclaimer-language.instructions.md
