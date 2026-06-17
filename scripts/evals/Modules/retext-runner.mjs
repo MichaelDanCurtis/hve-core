@@ -13,7 +13,7 @@
 // Report schema:
 //   { "results": [ { spec, stimulus, source, messages: [{rule, message, line, column}] } ] }
 
-import { stdin as input, stdout as output, exit, stderr } from 'node:process';
+import { stdin as input, stdout as output, stderr } from 'node:process';
 import { text as alexText } from 'alex';
 import { unified } from 'unified';
 import retextEnglish from 'retext-english';
@@ -210,7 +210,8 @@ async function main() {
     const raw = await readStdin();
     if (!raw.trim()) {
         output.write(JSON.stringify({ results: [] }) + '\n');
-        exit(0);
+        process.exitCode = 0;
+        return;
     }
 
     let manifest;
@@ -218,12 +219,14 @@ async function main() {
         manifest = JSON.parse(raw);
     } catch (err) {
         stderr.write(`retext-runner: failed to parse manifest JSON — ${err.message}\n`);
-        exit(2);
+        process.exitCode = 2;
+        return;
     }
 
     if (!Array.isArray(manifest)) {
         stderr.write('retext-runner: manifest must be a JSON array\n');
-        exit(2);
+        process.exitCode = 2;
+        return;
     }
 
     const results = [];
@@ -249,10 +252,10 @@ async function main() {
     }
 
     output.write(JSON.stringify({ results }) + '\n');
-    exit(flagged > 0 ? 1 : 0);
+    process.exitCode = flagged > 0 ? 1 : 0;
 }
 
 main().catch((err) => {
     stderr.write(`retext-runner: unexpected error — ${err.stack ?? err.message}\n`);
-    exit(2);
+    process.exitCode = 2;
 });
