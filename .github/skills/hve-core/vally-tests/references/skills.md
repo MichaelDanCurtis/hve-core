@@ -31,9 +31,9 @@ Grader identifiers below use the Vally CLI 0.4.0 catalog (`semantic_similarity`,
 ### Check 1: Required Frontmatter Fields
 
 * Contract source: `prompt-builder.instructions.md` L346-L400.
-* Testable behavior: SKILL.md frontmatter MUST include a `name:` field in lowercase kebab-case AND a `description:` field that is non-empty, under 120 characters, and carries the attribution suffix `- Brought to you by organization/repository-name`.
+* Testable behavior: SKILL.md frontmatter MUST include a `name:` field in lowercase kebab-case AND a `description:` field that is non-empty and under 120 characters. Source artifacts omit the attribution suffix; distribution adds it automatically.
 * Suggested stimulus: ask the assistant to identify a named skill by its frontmatter `name:` and `description:` values.
-* Grader recommendation: `regex` with pattern `(?m)^name:\s*['"]?[a-z0-9][a-z0-9-]*['"]?` combined with `(?m)^description:\s*['"].{1,120}.*Brought to you by`.
+* Grader recommendation: `regex` with pattern `(?m)^name:\s*['"]?[a-z0-9][a-z0-9-]*['"]?` combined with `(?m)^description:\s*['"].{1,120}['"]?$`.
 * Evidence: `.github/skills/experimental/vscode-playwright/SKILL.md` L1-L7 demonstrates the required pair.
 
 ### Check 2: Name Matches Directory

@@ -526,7 +526,12 @@ function New-CollectionReadme {
     $parsed = Split-CollectionMdByMarkers -Content $bodyContent
 
     if ($parsed.HasMarkers -and -not [string]::IsNullOrWhiteSpace($CollectionMdPath) -and (Test-Path -Path $CollectionMdPath -PathType Leaf)) {
-        $bodyForTemplate = $parsed.Intro
+        # Strip "## Included Artifacts" from intro when building template body.
+        # This heading is added during writeback and rendered separately in the
+        # artifacts section, so including it here causes output to differ between
+        # first and subsequent runs (non-idempotent).
+        $introForBody = $parsed.Intro -replace '(?m)(\r?\n)*^## Included Artifacts\s*$', ''
+        $bodyForTemplate = $introForBody.TrimEnd()
         if (-not [string]::IsNullOrWhiteSpace($parsed.Footer)) {
             $bodyForTemplate = $bodyForTemplate + "`n`n" + $parsed.Footer.TrimEnd()
         }
