@@ -1,49 +1,65 @@
 ---
 name: rpi
-description: Umbrella RPI playbook that sequences Research, Plan, Implement, Review, and Discover for one-shot task execution with legacy-equivalent quality gates.
+description: Umbrella RPI playbook that sequences Research, Plan, Implement, Review, and Discover for one-shot task execution with quality gates.
 license: MIT
 user-invocable: true
 ---
 
 # RPI
 
-Use [references/orchestration.md](references/orchestration.md) for the deeper legacy-equivalent orchestration contract, artifact-path matrix, and validator dispatch rules.
+Use [references/orchestration.md](references/orchestration.md) for the orchestration contract, artifact-path matrix, and validator dispatch rules.
 
 ## Goal
 
-Run the full RPI flow as the primary umbrella entry point for one-shot task execution, while preserving the existing phase-skill delegation model and the legacy continuation contract.
+Run the full RPI flow as the primary umbrella entry point for one-shot task execution, and delegate each phase to the matching task skill.
 
 ## Flow
 
 1. Research: establish task scope, evidence, and difficulty.
-2. Plan: create or refresh the dated plan, details, and planning log artifacts.
-3. Implement: execute the approved plan and update the changes log.
+2. Plan: create or refresh the plan and supporting notes when the task needs them.
+3. Implement: apply the current plan and update the changes log.
 4. Review: validate the result and record the review outcome.
-5. Discover: required before completion, pause, escalation, or handoff to produce Suggested Next Work.
+5. Discover: run before completion, pause, escalation, or handoff to produce Suggested Next Work.
+
+If Review or Discover reveals more work on the active task, restart from the earliest affected phase of that task.
+
+## Delegation crosswalk
+
+* Research -> /task-researcher, which uses its internal Researcher Subagent path.
+* Plan -> /task-planner, which uses its internal Plan Validator path.
+* Implement -> /task-implementor, which uses its internal Phase Implementor and Implementation Validator path.
+* Review -> /task-reviewer, which uses its internal RPI Validator and Implementation Validator path.
+* Discover -> handled by the orchestrator in its own context, with no separate sub-skill.
+
+When sub-skill dispatch is unavailable, run the phase inline by dispatching that phase's listed subagent(s) or validator(s) directly via `runSubagent` or `task`; when those are also unavailable, perform the equivalent work inline and record it.
 
 ## Inputs
 
 * `task=...`: primary task description or inferred intent.
-* `continue={1|1,2|all}`: resume from prior Discover suggestions and restart from the earliest affected phase; accept a single number, multiple numbers, or `all`.
+* `continue={1|1,2|all}`: select one or more saved Discover suggestions; each selected suggestion starts a new RPI cycle at Research (Phase 1); `all` processes every saved suggestion in listed priority order.
 * `suggest`: run Discover directly to refresh next-work suggestions.
+* `task_slug`: lower-kebab-case derived from the primary task or target; use the current date in `YYYY-MM-DD` for dated artifacts.
 
 ## Success criteria
 
-* The same dated `.copilot-tracking/` artifact set is carried forward across phases and resumed in place.
-* Research, planning, implementation, review, and Discover gates run in order and stop on blocking findings.
+* For Simple and Medium work, the orchestrator may keep phases in its own context and skip durable artifacts; for Medium-hard and Challenging work, use the dated `.copilot-tracking/` artifact set and carry it forward.
+* Dated artifacts share one `task_slug` and `YYYY-MM-DD` date across every phase of a task.
+* Research, planning, implementation, review, and Discover run in order and stop on blocking findings.
 * The umbrella skill delegates detailed phase work to `/task-researcher`, `/task-planner`, `/task-implementor`, and `/task-reviewer`.
+* When `continue={1|1,2|all}` selects saved suggestions, each selection starts a new RPI cycle at Research (Phase 1); `all` processes every saved suggestion in the saved priority order.
 * The final response includes phase status, iteration count, artifact paths, validation status, review outcome, and Suggested Next Work.
 * When review outcome is Complete, include a commit message in a markdown code block following `.github/instructions/hve-core/commit-message.instructions.md`, excluding `.copilot-tracking` files.
 * Still run Discover before any user-facing finish, pause, escalation, or handoff.
 
 ## Constraints
 
-* Keep the umbrella skill as the sequencing and quality-gate layer, not as a full duplicate of every granular phase playbook.
-* Use the existing RPI subagents and validators when they are available: Researcher Subagent, Plan Validator, Phase Implementor, RPI Validator, and Implementation Validator.
-* If a required dispatch or validation gate is unavailable, stop and report that limitation instead of guessing.
+* Keep the umbrella skill as the sequencing layer, not as a full duplicate of every granular phase playbook.
+* Dispatch each phase to its sub-skill; each sub-skill owns its internal validator or quality gate, and the orchestrator does not add a separate validator layer.
+* If dispatch tooling is unavailable, run the phase inline by dispatching the listed subagent(s) or validator(s) directly via `runSubagent` or `task`; when those are also unavailable, perform the equivalent work inline and record it.
+* Stop only when a real product decision or acceptance criterion cannot be responsibly inferred and requires user input.
 * Retry failed subagent calls with a more specific prompt, and run an additional research subagent when missing context is blocking.
-* Fall back to direct tool usage only after subagent retries fail, and only for the smallest safe scope needed to preserve the current quality gate.
-* Fallback may cover supporting investigation or bounded execution, but unavailable required validation gates remain stop-and-report blockers.
+* Fall back to direct tool usage only after subagent retries fail, and only for the smallest safe scope that still maintains the required quality gate.
+* Genuine blockers remain hard stops: missing required inputs or an unresolvable task.
 
 ## Quality gates
 
@@ -57,7 +73,9 @@ Run the full RPI flow as the primary umbrella entry point for one-shot task exec
 * Stop if Plan Validator reports blocking findings.
 * Stop if implementation is blocked by a dependency or validation failure.
 * Stop if review validation fails or the evidence trail is incomplete.
-* Stop if the dated artifact set cannot be discovered or resumed for the current task.
+* Stop when required inputs are missing for the current task.
+* Stop only when a real product decision or acceptance criterion cannot be responsibly inferred and requires user input.
+* Stop if the dated artifact set cannot be discovered or resumed for the current task when the workflow uses durable artifacts.
 
 ## Handoff
 
@@ -65,7 +83,7 @@ Use the granular phase skills for the detailed execution path: `/task-researcher
 
 ## Final response contract
 
-Return a compact summary that includes:
+Return a brief summary that includes:
 
 * phase status and iteration count,
 * the dated artifact paths used or updated,

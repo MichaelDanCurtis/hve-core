@@ -5,6 +5,8 @@
 
 Sources: {{context_sources}}
 
+Author this file first, then cite its line ranges from the implementation plan with the `Details: (Lines X-Y)` convention.
+
 ## Implementation Phase 1: {{phase_1_name}}
 
 <!-- parallelizable: {{true_or_false}} -->

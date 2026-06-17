@@ -1,65 +1,52 @@
 ---
 name: prompt-builder
-description: 'Build, refactor, test, evaluate, and update prompt engineering artifacts with the existing Prompt Builder subagent workflow.'
+description: 'Orchestrate prompt engineering research, validation, and updates through the prompt-builder phase loop.'
 license: MIT
 user-invocable: true
 ---
 
 # Prompt Builder Skill
 
-Use [references/orchestration.md](references/orchestration.md) for the compact phase loop, sandbox contract, subagent dispatch matrix, artifact-path rules, and cleanup contract.
+Use [references/orchestration.md](references/orchestration.md) as the single authoritative contract for the phase loop, sandbox contract, subagent dispatch matrix, artifact paths, and cleanup contract.
 
 ## Goal
 
-Preserve the legacy Prompt Builder workflow in a compact skill-forward form: create or improve prompt, agent, instruction, and skill artifacts; execute and evaluate them safely in a sandbox; research gaps when needed; and iterate until the evaluation log shows no remaining issues.
+Create, improve, refactor, analyze, and apply fixes to prompt engineering artifacts by orchestrating the named subagents through the phase loop until the evaluation log shows no remaining issues.
 
-## Three-phase flow
+## Delegation rules
 
-1. Execution and evaluation: announce the phase, inspect existing `.copilot-tracking/sandbox/{{YYYY-MM-DD}}-{{topic}}-*` folders to choose the next available `-001`, `-002`, and so on, then run `Prompt Tester` and `Prompt Evaluator` with `runSubagent` or `task` when available, and read the evaluation log to decide whether more work is needed.
-2. Research: announce the phase, create or update the primary research document under `.copilot-tracking/research/{{YYYY-MM-DD}}/`, and use `Researcher Subagent` with `runSubagent` or `task` when available for deeper evidence when the evaluation log or user request needs it.
-3. Modifications: announce the phase, run `Prompt Updater` with `runSubagent` or `task` when available, keep the current findings and tracking file path visible, then return to Phase 1 to re-execute and re-evaluate the updated artifacts.
+* Select the named subagent directly and provide the inputs listed for its phase.
+* Avoid reading prompt file(s) directly; have the subagents read them.
+* Repeat each subagent dispatch, answering any clarifying questions it returns, until that step completes.
+* Use the orchestration reference for the full phase loop, sandbox contract, dispatch matrix, artifact paths, and cleanup contract.
 
-## Sandbox contract
+## Three-phase summary
 
-* Sandbox root: `.copilot-tracking/sandbox/`.
-* Naming: `{{YYYY-MM-DD}}-{{topic}}-{{run-number}}`.
-* Run-number discovery: inspect existing `.copilot-tracking/sandbox/{{YYYY-MM-DD}}-{{topic}}-*` folders and choose the next available `-001`, `-002`, and so on before starting a new iteration.
-* Cross-run continuity: reuse prior sandbox folders when iterating and compare previous evaluation outputs when validation repeats.
-* Sandbox mirroring: when testing inside a sandbox, mirror root runtime paths such as `.copilot-tracking/research/...` and `.copilot-tracking/prompts/...` under the sandbox root; keep real source edits outside the sandbox only when the modification phase intentionally changes target files.
-* Cleanup rule: delete sandbox files and folders before the final response unless the user explicitly asked to keep sandbox artifacts or logs available, such as during Prompt Tester or evaluation sessions.
+1. Execution and evaluation: run the tester and evaluator pair in the chosen sandbox, inspect the evaluation log, and repeat until that step completes.
+2. Research: create or update the primary research artifact, run `Researcher Subagent` in parallel when topics are independent, and finalize the research before Phase 3.
+3. Modifications: run `Prompt Updater` in parallel when prompt files are independent, review updater tracking, and return to Phase 1.
 
-## Subagent delegation
+## Sandbox and naming
 
-* `Prompt Tester`: literal execution in the sandbox, execution-log capture, and explicit `runSubagent` or `task` invocation when those tools are available.
-* `Prompt Evaluator`: quality evaluation, severity-graded findings, and checklist generation through `runSubagent` or `task` when available.
-* `Researcher Subagent`: deeper evidence gathering and subagent research notes through `runSubagent` or `task` when available.
-* `Prompt Updater`: source changes, prompt updater tracking files, modification status reporting, and explicit `runSubagent` or `task` invocation when available.
+* Derive `{{topic}}` from the name of the primary target artifact, the skill or prompt folder name, or the file base name without suffixes, in kebab-case.
+* Use `.copilot-tracking/sandbox/{{YYYY-MM-DD}}-{{topic}}-*` to discover the next run number and name the next sandbox `{{YYYY-MM-DD}}-{{topic}}-{{run-number}}`.
+* Keep all sandbox edits inside the assigned sandbox folder and reuse prior runs for continuity across iterations.
 
-## Output contract
+## Cleanup gate
 
-Create or update these runtime artifacts as needed:
+* Clean up all sandbox files and folders created for this request before the final response, unless the user asked to keep the sandbox artifacts.
+* Do not return the final response until the cleanup pass is complete.
 
-* sandbox execution logs under `.copilot-tracking/sandbox/.../execution-log.md`,
-* evaluation logs under `.copilot-tracking/sandbox/.../evaluation-log.md`,
-* primary research under `.copilot-tracking/research/{{YYYY-MM-DD}}/{{topic}}-research.md`,
-* subagent research under `.copilot-tracking/research/subagents/{{YYYY-MM-DD}}/{{topic}}-research.md`,
-* prompt updater tracking under `.copilot-tracking/prompts/{{YYYY-MM-DD}}/{{prompt-filename}}-updates.md`.
+## User communication contract
 
-## Stop and iteration rules
-
-* Repeat the phase loop until the current evaluation log shows no remaining issues.
-* If the evaluation log still reports blockers, return to research or modification and re-run the execution/evaluation cycle.
-* If the required subagent or validation capability is unavailable, stop and report that limitation instead of guessing.
+* Use well-formatted markdown.
+* Put the most important detail or question last.
+* Announce each phase before starting work.
+* Summarize outcomes when a phase completes and explain how the next phase will proceed.
+* Surface decisions and questions when progression is unclear.
 
 ## Final response contract
 
-Before responding, finish the sandbox cleanup unless the user explicitly asked to keep sandbox artifacts or logs available, then return a compact summary that includes:
-
-* current phase status and iteration count,
-* the key artifacts touched,
-* any outstanding issues or blockers,
-* the evaluation outcome,
-* the key decisions or questions surfaced during the run, and
-* the next recommended step if more work is needed.
+After cleanup, return a concise summary that includes the current phase status and iteration count, the key artifacts touched, any outstanding issues or blockers, the evaluation outcome, the key decisions or questions surfaced during the run, and the next recommended step if more work is needed.
 
 > Brought to you by microsoft/hve-core

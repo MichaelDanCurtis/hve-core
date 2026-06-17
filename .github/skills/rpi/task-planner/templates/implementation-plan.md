@@ -1,5 +1,5 @@
 ---
-applyTo: '.copilot-tracking/changes/{{YYYY-MM-DD}}/{{task}}-changes.md'
+applyTo: '.copilot-tracking/changes/{{YYYY-MM-DD}}/{{task_slug}}-changes.md'
 ---
 <!-- markdownlint-disable-file -->
 # Implementation Plan: {{task_name}}
@@ -39,9 +39,9 @@ applyTo: '.copilot-tracking/changes/{{YYYY-MM-DD}}/{{task}}-changes.md'
 <!-- parallelizable: {{true_or_false}} -->
 
 * [ ] Step 1.1: {{specific_action_1_1}}
-  * Details: `.copilot-tracking/details/{{YYYY-MM-DD}}/{{task}}-details.md` (Lines {{line_start}}-{{line_end}})
+  * Details: `.copilot-tracking/details/{{YYYY-MM-DD}}/{{task_slug}}-details.md` (Lines {{line_start}}-{{line_end}})
 * [ ] Step 1.2: {{specific_action_1_2}}
-  * Details: `.copilot-tracking/details/{{YYYY-MM-DD}}/{{task}}-details.md` (Lines {{line_start}}-{{line_end}})
+  * Details: `.copilot-tracking/details/{{YYYY-MM-DD}}/{{task_slug}}-details.md` (Lines {{line_start}}-{{line_end}})
 * [ ] Step 1.3: Validate phase changes
   * Run {{phase_validation_command_or_skip_reason}}
 
@@ -60,7 +60,7 @@ applyTo: '.copilot-tracking/changes/{{YYYY-MM-DD}}/{{task}}-changes.md'
 
 ## Planning Log
 
-See `.copilot-tracking/plans/logs/{{YYYY-MM-DD}}/{{task}}-log.md` for discrepancy tracking, implementation paths considered, and suggested follow-on work.
+See `.copilot-tracking/plans/logs/{{YYYY-MM-DD}}/{{task_slug}}-log.md` for discrepancy tracking, validator findings, implementation paths considered, and suggested follow-on work.
 
 ## Dependencies
 

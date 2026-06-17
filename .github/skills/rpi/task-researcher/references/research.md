@@ -1,14 +1,17 @@
 ---
-description: "Research template and compact protocol for the task-researcher RPI skill"
+description: "Research template and protocol for the task-researcher RPI skill"
 ---
 
 # Task Researcher Reference
 
-Use this reference for the research phase when the skill needs a planning-ready document rather than a long inline protocol.
+Use this reference for the research phase when the skill needs a planning-ready document.
 
 ## Template
 
-Use [../templates/research.md](../templates/research.md) for `.copilot-tracking/research/{{YYYY-MM-DD}}/<task>-research.md`.
+Use [../templates/research.md](../templates/research.md) for `.copilot-tracking/research/YYYY-MM-DD/{{task_slug}}-research.md`.
+
+* Derive `{{task_slug}}` from the primary research target with lower-kebab-case.
+* Replace `YYYY-MM-DD` with the current date at execution time.
 
 The template includes these planning-ready sections.
 
@@ -18,7 +21,7 @@ The template includes these planning-ready sections.
 * Assumptions: list what is assumed to be true until verified.
 * Success Criteria:
   * Evidence is grounded in actual code, docs, or tooling results.
-  * Alternatives are compared with trade-offs.
+  * Alternatives are compared with trade-offs and one selected approach is justified with rationale.
   * Open gaps are explicit and actionable.
 
 ### Research Executed
@@ -48,13 +51,36 @@ The template includes these planning-ready sections.
 * Name the selected approach, the primary evidence file, and the next step for `/task-planner`.
 * If material gaps remain, repeat the research cycle and update the dated artifact before planning.
 
-## Compact Protocol Detail
+### Subagent Return Contract
+
+* Return the subagent research artifact path at `.copilot-tracking/research/subagents/YYYY-MM-DD/<topic>-research.md`.
+* Report the current status and the most important findings.
+* Record recommended next research items and clarifying questions.
+* Keep the output evidence-linked and use it to update the primary research artifact rather than to replace it.
+
+### Operational Contract
+
+1. Research and analysis are the two linked phases; move from evidence gathering to synthesis, then re-enter research while material gaps remain.
+2. Write the primary research artifact under `.copilot-tracking/research/YYYY-MM-DD/` and keep it current as new evidence arrives.
+3. Prefer `Researcher Subagent` via `runSubagent` or `task` when available; if dispatch tooling is unavailable, perform the equivalent research inline and record it in the same primary artifact.
+4. After subagent work, summarize the artifact path, status, key findings, recommended next research, and any clarifying questions in the primary research document.
+5. Hard stop only on missing required input, an unresolvable task, or an unwritable research path.
+
+### Document Management
+
+* Keep the primary evidence document in `.copilot-tracking/research/YYYY-MM-DD/`.
+* Keep delegated evidence in `.copilot-tracking/research/subagents/YYYY-MM-DD/` when subagent dispatch is used.
+* Use plain workspace-relative file paths in research artifacts, and do not invent parallel evidence stores.
+
+## Protocol Detail
 
 1. Create or update the primary dated research artifact first.
 2. Dispatch the Researcher Subagent with `runSubagent` or `task` when available, providing the topic, questions, and a dated subagent artifact path.
-3. Consolidate findings into the primary research document and keep the document current as new evidence arrives.
-4. Run a gap check after each iteration: if the research still misses critical evidence, repeat research rather than guessing.
-5. When alternatives are clear, capture them in the document and recommend one approach for planning.
+3. If dispatch tooling is unavailable, perform the equivalent research inline and record it in the same primary artifact.
+4. Capture the subagent return contract in the primary document: artifact path, status, key findings, recommended next research, and clarifying questions.
+5. Consolidate findings into the primary research document and keep the document current as new evidence arrives.
+6. Run a gap check after each iteration: if the research still misses critical evidence, repeat research rather than guessing.
+7. When alternatives are clear, capture them in the document, evaluate each option, and recommend one approach for planning.
 
 ## Deeper Research Re-entry
 

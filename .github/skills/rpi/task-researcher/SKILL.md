@@ -11,19 +11,22 @@ user-invocable: true
 
 Produce a planning-ready research brief under `.copilot-tracking/research/` and hand it to the planning phase with explicit, dated evidence.
 
+Derive `{{task_slug}}` from the primary research target with lower-kebab-case, and use the current date in `YYYY-MM-DD` for the dated folder.
+
 ## Execution
 
 Use [references/research.md](references/research.md) for the research template and deeper protocol detail.
 
 1. Confirm the task scope, target files, and expected outcome.
-2. Create or update the primary research artifact at `.copilot-tracking/research/{{YYYY-MM-DD}}/<task>-research.md`.
-3. Dispatch the existing Researcher Subagent with `runSubagent` or `task` when available: provide the research topic or questions and a dated subagent output path at `.copilot-tracking/research/subagents/{{YYYY-MM-DD}}/<topic>-research.md`. Parallelize independent topics when useful.
-4. Consolidate subagent return values into the primary research document, capture key discoveries, technical scenarios, alternatives, and unresolved gaps, and repeat research if material gaps remain.
-5. Finish with a compact summary and the planning handoff to `/task-planner` using the dated research artifact path.
+2. Create or update the primary research artifact at `.copilot-tracking/research/YYYY-MM-DD/{{task_slug}}-research.md`.
+3. Prefer delegating research to `Researcher Subagent` via `runSubagent` or `task` when available. If neither dispatch tool is available, perform the equivalent research inline and record it in the same research artifact.
+4. Move through research and analysis, then re-enter research while material gaps remain.
+5. Consolidate findings into the primary research document, capture key discoveries, technical scenarios, alternatives, and unresolved gaps, and update the dated artifact before the planning handoff.
+6. Finish with a concise summary and the planning handoff to `/task-planner` using the dated research artifact path.
 
 ## Success criteria
 
-* The primary research artifact exists under `.copilot-tracking/research/{{YYYY-MM-DD}}/`.
+* The primary research artifact exists under `.copilot-tracking/research/YYYY-MM-DD/`.
 * The document covers scope, evidence, key discoveries, technical scenarios or alternatives, open questions, and planning guidance.
 * The handoff names `/task-planner` and the dated research artifact path for planning.
 
@@ -31,17 +34,19 @@ Use [references/research.md](references/research.md) for the research template a
 
 * Do not plan, implement, or review in this phase.
 * Do not write files outside `.copilot-tracking/research/` for this phase, except subagent outputs or workflow tracking files explicitly required by the current execution.
-* Keep the response compact and evidence-first.
-* Prefer `runSubagent` or `task` for deeper research and use existing subagents rather than inventing a new orchestration layer.
+* Keep responses concise and evidence-first, and do not repeat large subagent output in the closing turn.
+* Delegate deeper research to `Researcher Subagent` instead of adding another orchestration layer.
 
 ## Stop rules
 
-* Stop if the task context is missing or ambiguous.
-* Stop if the research artifact cannot be written under `.copilot-tracking/research/`.
+* Hard stop if the task context is missing or ambiguous.
+* Hard stop if the research artifact cannot be written under `.copilot-tracking/research/`.
+* Hard stop if the task is unresolvable from the provided inputs.
+* Use `Researcher Subagent` when available, but do not dead-stop solely because dispatch tooling is unavailable; perform the research inline if needed.
 * Re-enter deeper research when significant gaps remain.
 
 ## Handoff
 
-After research is complete, continue with `/task-planner` and attach the dated primary research artifact at `.copilot-tracking/research/{{YYYY-MM-DD}}/<task>-research.md`. If material gaps remain, re-invoke this skill for deeper research before planning.
+After research is complete, continue with `/task-planner` and attach the dated primary research artifact at `.copilot-tracking/research/YYYY-MM-DD/{{task_slug}}-research.md`. If material gaps remain, re-invoke this skill for deeper research before planning.
 
 > Brought to you by microsoft/hve-core

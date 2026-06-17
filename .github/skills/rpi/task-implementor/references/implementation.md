@@ -4,19 +4,31 @@ description: "Deeper implementation protocol and tracking templates for the task
 
 # Task Implementor Reference
 
-Use this reference for the deeper implementation protocol that the compact skill entry point points to.
+Use this reference for the detailed implementation protocol, templates, and subagent contracts.
 
 ## Plan Discovery and Artifact Path Derivation
 
 1. Discover the implementation plan from the user request, attached files, the current open file, or the most recent `.copilot-tracking/plans/**/<task>-plan.instructions.md`.
-2. Derive the dated task path from the plan file path:
+2. Derive the canonical task slug and phase tokens before execution:
+   * `task_slug = lower-kebab-case(primary task/target)`
+   * `task_date = YYYY-MM-DD` at execution time
+   * `phase = <phase>` or `phase-<n>` consistently across all outputs
+   * When the plan is provided as request text rather than as a file, derive `task_slug` from the plan title or the user request summary and derive `task_date` from the current execution date.
+3. Derive the dated task path from the plan file path:
    * plan: `.copilot-tracking/plans/{{YYYY-MM-DD}}/<task>-plan.instructions.md`
    * details: `.copilot-tracking/details/{{YYYY-MM-DD}}/<task>-details.md`
    * research: `.copilot-tracking/research/{{YYYY-MM-DD}}/<task>-research.md`
    * planning log: `.copilot-tracking/plans/logs/{{YYYY-MM-DD}}/<task>-log.md`
    * changes log: `.copilot-tracking/changes/{{YYYY-MM-DD}}/<task>-changes.md`
-3. Verify the plan and details exist before phase execution. Read research and the planning log when available.
-4. Create or update the changes log immediately when the implementation begins; begin the file with `<!-- markdownlint-disable-file -->`.
+4. Verify the plan and details exist before phase execution. Read research and the planning log when available.
+5. Create or update the changes log immediately when the implementation begins; begin the file with `<!-- markdownlint-disable-file -->`.
+
+## Phase 1 / 2 / 3 Execution Contract
+
+1. Phase 1: Read the implementation plan, details, research, and current tracking files. Derive artifact paths from the plan filename and date, verify required files exist, and create the changes log when needed.
+2. Phase 2: Prefer `Phase Implementor` for each phase in the plan order, using `runSubagent` or `task`. Use `Implementation Validator` when the phase plan includes `Validation:` or `required`, when blockers or deviations appear, or when the user asks for review evidence. Use `Researcher Subagent` as the fallback when context is missing. If dispatch tooling is unavailable, perform the equivalent work inline and record it.
+3. Phase 3: Review the full plan, confirm every required phase is complete or explicitly blocked, verify validation evidence, and prepare the review handoff summary.
+4. Bounded run rule: if the user asks for one phase only, stop after that phase, update the changes log, and hand off the current status with blockers or follow-on work. Do not require all phases to be complete before a bounded handoff.
 
 ## Phase Implementor Input / Output Contract
 
@@ -47,28 +59,46 @@ Expect a completion report with:
 * files changed;
 * issues, suggested additional steps, validation results, and clarifying questions.
 
+Use the completion report to update the implementation plan checklist, the changes log, and the planning log before starting the next phase.
+
 ## Researcher Subagent Fallback Contract
 
 Use `runSubagent` or `task` when the plan is ambiguous, the phase requires missing context, or Phase Implementor returns clarifying questions.
 
-Write the output to `.copilot-tracking/research/subagents/{{YYYY-MM-DD}}/<topic>-research.md` when the parent needs a deeper research artifact. Stop and ask the user only when the research cannot resolve the question or subagent dispatch is unavailable.
+Provide:
 
-## RPI Validator Input / Output Contract
+* the research question or topic;
+* the target research artifact path `.copilot-tracking/research/subagents/{{YYYY-MM-DD}}/<topic>-research.md`;
+* the related plan, details, or implementation files needed to ground the search.
 
-Run RPI Validator when:
+Return:
 
-* the plan explicitly requires validation;
+* the research artifact path;
+* the current status;
+* important findings;
+* recommended next research items;
+* clarifying questions when the answer is incomplete.
+
+Stop and ask the user only when the research cannot resolve the blocker or subagent dispatch is unavailable.
+
+## Implementation Validator Input / Output Contract
+
+Run `Implementation Validator` when:
+
+* the phase plan includes a `Validation:` command or the word `required`;
 * a phase report includes blockers or deviations;
 * plan-to-change coverage is uncertain before review handoff;
 * the user asks for validation.
+
+Do not dispatch `Implementation Validator` when validation is explicitly optional and the current phase has no blockers, deviations, or review evidence to confirm.
 
 Provide:
 
 * plan path;
 * changes log path;
 * research path when available;
-* phase number; and
-* validation output path `.copilot-tracking/reviews/rpi/{{YYYY-MM-DD}}/<plan-file-name-without-instructions-md>-<phase>-validation.md`.
+* the phase number to validate; and
+* the validation output path `.copilot-tracking/reviews/rpi/{{YYYY-MM-DD}}/<plan-file-name-without-instructions-md>-<phase>-validation.md`.
 
 Treat the result as Pass only when no open Critical or High findings remain.
 
@@ -78,7 +108,14 @@ Use [../templates/changes-log.md](../templates/changes-log.md) for `.copilot-tra
 
 ## Planning Log Updates
 
-The task planner owns the planning log template. During implementation, update the existing planning log at `.copilot-tracking/plans/logs/{{YYYY-MM-DD}}/<task>-log.md` only when discrepancies, follow-on work, or user decisions appear. Preserve the existing structure and do not create a separate planning-log template from this skill.
+Update the planning log at `.copilot-tracking/plans/logs/{{YYYY-MM-DD}}/<task>-log.md` when discrepancies, follow-on work, or user decisions appear. Keep the current planning-log structure unchanged and record the source phase and step for each follow-on item.
+
+## Dependency and Iteration Rules
+
+* Defer dependent phases when an upstream phase is incomplete or blocked.
+* Revisit blocked phases after the blocker is resolved or after the user provides clarification.
+* Stop and ask the user when the blocker affects scope, validation, or required approvals.
+* Use the completion report to decide whether to continue, add follow-on work, or return to Phase 1 for a new plan section.
 
 ## Progressive Tracking Rules
 
@@ -89,10 +126,22 @@ The task planner owns the planning log template. During implementation, update t
 
 ## Resumption and Review Handoff
 
-When resuming, read the existing changes log and plan, preserve completed work, and continue from the next unchecked phase. Hand off review work with `/task-reviewer`.
+When resuming work, read the current changes log and plan, continue from the next unchecked phase, and hand off review work with `/task-reviewer`.
+
+## Final Response and Review Handoff Contract
+
+Present the completion summary in this order:
+
+* phase execution results with files changed and validation status;
+* additional work items added to the planning files;
+* suggested follow-on work from the planning log;
+* blockers or clarifying questions that require user input;
+* the review command and the links to the changes log and planning log.
+
+Use the changes log and planning log as the evidence base for the review handoff.
 
 ## Telemetry, Commit Messages, and Review Compatibility
 
-* If implementation touches observable production behavior, apply the telemetry overlay in `.github/instructions/hve-core/task-implementor-telemetry.instructions.md` and consult the `telemetry-foundations` skill.
+* If implementation touches observable production behavior, apply the telemetry overlay in `.github/instructions/shared/telemetry-overlay.instructions.md` and consult the `telemetry-foundations` skill.
 * When you output a commit message, follow `.github/instructions/hve-core/commit-message.instructions.md` and exclude `.copilot-tracking/` files from the commit scope.
-* Keep the final handoff evidence-first and compact for `/task-reviewer`.
+* Keep the final handoff evidence-first and brief for `/task-reviewer`.

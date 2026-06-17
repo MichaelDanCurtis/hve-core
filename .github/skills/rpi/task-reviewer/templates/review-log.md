@@ -16,7 +16,7 @@
 
 ### Phase 001
 
-* Status: {{Pass / Fail / Blocked}}
+* Phase Status: {{Pass / Fail / Blocked}}
 * Evidence: {{summary}}
 * Findings: {{list_of_phase_findings}}
 
@@ -43,6 +43,6 @@
 
 ## Validation Commands
 
-| Command     | Scope                                | Status                       | Summary                                        |
-|-------------|--------------------------------------|------------------------------|------------------------------------------------|
-| {{command}} | {{changed_files_package_or_project}} | {{Passed_Failed_or_Skipped}} | {{important_output_summary_or_skip_rationale}} |
+| Command | Scope | Status | Summary |
+|---|---|---|---|
+| {{command}} | {{changed_files_package_or_project}} | {{Passed / Failed / Skipped}} | {{important_output_summary_or_skip_rationale}} |

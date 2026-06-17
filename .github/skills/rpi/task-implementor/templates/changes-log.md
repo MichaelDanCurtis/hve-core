@@ -1,6 +1,8 @@
 <!-- markdownlint-disable-file -->
 # Release Changes: {{task_name}}
 
+**Task Slug**: {{task_slug}}
+**Phase**: {{phase}}
 **Related Plan**: {{plan_file_name}}
 **Implementation Date**: {{YYYY-MM-DD}}
 

@@ -1,5 +1,5 @@
 <!-- markdownlint-disable-file -->
-# Task Research: {{task_name}}
+# Task Research: {{task_slug}}
 
 ## Scope and Success Criteria
 
@@ -14,7 +14,7 @@
 
 * Questions investigated: {{research_questions}}
 * Sources checked: {{files_search_terms_docs_tools}}
-* Subagent outputs: {{subagent_research_paths_or_not_used}}
+* Subagent outputs: `.copilot-tracking/research/subagents/YYYY-MM-DD/<topic>-research.md` and any inline research notes recorded in the primary artifact.
 
 ## Key Discoveries
 
@@ -45,5 +45,5 @@
 ## Planning Handoff
 
 * Recommended next step: `/task-planner`
-* Primary evidence file: `.copilot-tracking/research/{{YYYY-MM-DD}}/{{task}}-research.md`
+* Primary evidence file: `.copilot-tracking/research/YYYY-MM-DD/{{task_slug}}-research.md`
 * Notes for planning: {{planning_notes}}

@@ -1,7 +1,7 @@
 <!-- markdownlint-disable-file -->
 # Planning Log: {{task_name}}
 
-**Related Plan**: `.copilot-tracking/plans/{{YYYY-MM-DD}}/{{task}}-plan.instructions.md`
+**Related Plan**: `.copilot-tracking/plans/{{YYYY-MM-DD}}/{{task_slug}}-plan.instructions.md`
 
 ## Discrepancy Log
 
@@ -25,6 +25,13 @@
   * Source: {{source_file}}
   * Citation: {{citation_or_reference}}
   * Impact: {{impact}}
+
+## Validator Findings
+
+* VF-01: {{validator_finding_summary}}
+  * Severity: {{Critical_or_High_or_Medium_or_Low}}
+  * Location: {{artifact_path}} (Lines {{line_start}}-{{line_end}})
+  * Action: {{required_fix_or_follow_up}}
 
 ## Implementation Paths Considered
 
