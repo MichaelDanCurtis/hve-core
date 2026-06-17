@@ -106,6 +106,7 @@ Discover and run validation commands when available and relevant to changed file
 * Run commands scoped to changed files or affected components when available.
 * Use diagnostics for changed files when command execution is unavailable or too broad for the current review.
 * Record each command, scope, exit status, and important output summary in the parent review log.
+* Flag any produced code, code comments, documentation strings, or commit messages that reference `.copilot-tracking/` paths or other internal planning, research, or implementation artifacts; treat such leaks as findings.
 * Treat failed validation commands as findings and include their severity in the final status.
 * When no relevant validation command exists, record `Skipped` with the reason in the review log.
 * Do not mark the review `Complete` unless relevant commands have passed or the skip reason is explicit.

@@ -56,6 +56,7 @@ When sub-skill dispatch is unavailable, run the phase inline by dispatching that
 * Keep the umbrella skill as the sequencing layer, not as a full duplicate of every granular phase playbook.
 * Dispatch each phase to its sub-skill; each sub-skill owns its internal validator or quality gate, and the orchestrator does not add a separate validator layer.
 * If dispatch tooling is unavailable, run the phase inline by dispatching the listed subagent(s) or validator(s) directly via `runSubagent` or `task`; when those are also unavailable, perform the equivalent work inline and record it.
+* Ensure delegated phases keep `.copilot-tracking/` paths and other internal planning, research, or implementation artifact references out of production code, code comments, documentation strings, and commit messages; internal artifacts still guide implementation logic.
 * Stop only when a real product decision or acceptance criterion cannot be responsibly inferred and requires user input.
 * Retry failed subagent calls with a more specific prompt, and run an additional research subagent when missing context is blocking.
 * Fall back to direct tool usage only after subagent retries fail, and only for the smallest safe scope that still maintains the required quality gate.

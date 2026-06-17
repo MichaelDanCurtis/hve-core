@@ -70,6 +70,7 @@ The template includes these planning-ready sections.
 
 * Keep the primary evidence document in `.copilot-tracking/research/YYYY-MM-DD/`.
 * Keep delegated evidence in `.copilot-tracking/research/subagents/YYYY-MM-DD/` when subagent dispatch is used.
+* Research references guide implementation logic during downstream RPI phases; do not direct that `.copilot-tracking/` paths or internal workflow artifact references be reproduced in production code, code comments, documentation strings, commit messages, or artifacts outside `.copilot-tracking/`.
 * Use plain workspace-relative file paths in research artifacts, and do not invent parallel evidence stores.
 
 ## Protocol Detail

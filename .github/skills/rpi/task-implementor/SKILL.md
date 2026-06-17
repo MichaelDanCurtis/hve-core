@@ -33,6 +33,7 @@ Execute an approved implementation plan with phase-by-phase tracking, validation
 
 * Do not expand scope beyond the approved phase.
 * Use [references/implementation.md](references/implementation.md) for the detailed protocol, subagent contracts, dependency rules, and template guidance.
+* Keep `.copilot-tracking/` paths and other internal planning, research, or implementation artifact references out of produced code, code comments, documentation strings, and commit messages; see [references/implementation.md](references/implementation.md) for the comment-reference rule.
 * Stop when required artifacts or subagent dispatch are unavailable.
 
 ## Stop rules

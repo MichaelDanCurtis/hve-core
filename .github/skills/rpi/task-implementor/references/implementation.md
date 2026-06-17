@@ -140,6 +140,13 @@ Present the completion summary in this order:
 
 Use the changes log and planning log as the evidence base for the review handoff.
 
+## Code Comments and Documentation References
+
+* Follow the exact file paths, schemas, and instruction documents cited in the plan, details, and research references for implementation logic; produced code comments must not reference those internal artifacts.
+* Keep code comments and documentation strings self-contained; they may cite public materials such as RFCs, published specifications, official documentation, or open-source library docs with appropriate citations.
+* Code comments may reference code or documentation in this codebase or related codebases when the reference is durable and accessible to future maintainers.
+* Do not include internal planning, research, or implementation artifact references, including `.copilot-tracking/` paths, in code comments, production code, or documentation strings. This rule governs produced and shipped code and documentation; it does not apply to `.copilot-tracking/` tracking artifacts or the review handoff, which reference those paths by design.
+
 ## Telemetry, Commit Messages, and Review Compatibility
 
 * If implementation touches observable production behavior, apply the telemetry overlay in `.github/instructions/shared/telemetry-overlay.instructions.md` and consult the `telemetry-foundations` skill.

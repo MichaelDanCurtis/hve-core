@@ -34,6 +34,7 @@ Use [references/research.md](references/research.md) for the research template a
 
 * Do not plan, implement, or review in this phase.
 * Do not write files outside `.copilot-tracking/research/` for this phase, except subagent outputs or workflow tracking files explicitly required by the current execution.
+* Research artifacts may cite `.copilot-tracking/` evidence, but never instruct embedding those paths or other internal planning, research, or implementation artifact references into production code, code comments, documentation strings, or commit messages.
 * Keep responses concise and evidence-first, and do not repeat large subagent output in the closing turn.
 * Delegate deeper research to `Researcher Subagent` instead of adding another orchestration layer.
 

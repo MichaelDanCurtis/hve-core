@@ -31,5 +31,6 @@ Use this guidance for the new RPI skill packages and their tracking outputs.
 * Implementation and validation results stay under `.copilot-tracking/changes/{{YYYY-MM-DD}}/<task>-changes.md` and related review logs.
 * Generated `.copilot-tracking/**` markdown artifacts include `<!-- markdownlint-disable-file -->` near the top because tracking files are exempt from repository markdownlint rules.
 * Use plain-text workspace-relative paths in tracking documents for AI consumption.
+* Keep `.copilot-tracking/` paths and other internal planning, research, or implementation artifact references out of production code, code comments, documentation strings, and commit messages. Internal artifacts guide implementation logic; comments must stay self-contained and may cite public materials (RFCs, specifications, official or open-source library docs) or durable code and docs in this or related repositories.
 * For the research phase, do not write files outside `.copilot-tracking/research/` except subagent outputs or workflow tracking files explicitly required by the current execution.
 * When material gaps remain, re-enter the same research phase and update the dated artifact rather than skipping to planning.
