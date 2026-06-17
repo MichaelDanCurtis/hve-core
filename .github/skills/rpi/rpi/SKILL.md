@@ -9,6 +9,8 @@ user-invocable: true
 
 Use [references/orchestration.md](references/orchestration.md) for the orchestration contract, artifact-path matrix, and validator dispatch rules.
 
+Follow the shared conventions in `copilot-tracking.instructions.md`.
+
 ## Goal
 
 Run the full RPI flow as the primary umbrella entry point for one-shot task execution, and delegate each phase to the matching task skill.

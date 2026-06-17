@@ -9,6 +9,8 @@ user-invocable: true
 
 Use [references/planning.md](references/planning.md) for the planning template and protocol detail.
 
+Follow the shared conventions in `copilot-tracking.instructions.md`.
+
 ## Goal
 
 Convert validated research into an implementation-ready plan, supporting details, and a dated planning log with explicit validation evidence.

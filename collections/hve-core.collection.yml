@@ -99,6 +99,8 @@ items:
     kind: instruction
   - path: .github/instructions/hve-core/prompt-builder.instructions.md
     kind: instruction
+  - path: .github/instructions/hve-core/copilot-tracking.instructions.md
+    kind: instruction
   - path: .github/instructions/hve-core/git-merge.instructions.md
     kind: instruction
   - path: .github/instructions/hve-core/pull-request.instructions.md

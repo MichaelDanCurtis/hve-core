@@ -7,6 +7,8 @@ user-invocable: true
 
 # Task Researcher
 
+Follow the shared conventions in `copilot-tracking.instructions.md`.
+
 ## Goal
 
 Produce a planning-ready research brief under `.copilot-tracking/research/` and hand it to the planning phase with explicit, dated evidence.

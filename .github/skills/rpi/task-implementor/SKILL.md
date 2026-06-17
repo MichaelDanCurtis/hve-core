@@ -7,6 +7,8 @@ user-invocable: true
 
 # Task Implementor
 
+Follow the shared conventions in `copilot-tracking.instructions.md`.
+
 ## Goal
 
 Execute an approved implementation plan with phase-by-phase tracking, validation evidence, and review-ready handoff.

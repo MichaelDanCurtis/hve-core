@@ -1,1 +1,0 @@
-../../../../.github/instructions/hve-core/rpi-skill-forward.instructions.md

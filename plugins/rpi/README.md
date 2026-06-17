@@ -47,9 +47,9 @@ copilot plugin install rpi@hve-core
 
 ## Instructions
 
-| Instruction                    | Description                                                                                       |
-|--------------------------------|---------------------------------------------------------------------------------------------------|
-| rpi-skill-forward.instructions | Shared guidance for RPI skill-forward artifacts, subagent dispatch, and tracking-file conventions |
+| Instruction                   | Description                                                                                                                                 |
+|-------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| copilot-tracking.instructions | Shared .copilot-tracking conventions for intermediate artifacts, file paths, and subagent handoffs across the RPI and prompt-builder skills |
 
 ## Skills
 

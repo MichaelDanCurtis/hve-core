@@ -9,6 +9,8 @@ user-invocable: true
 
 Use [references/orchestration.md](references/orchestration.md) as the single authoritative contract for the phase loop, sandbox contract, subagent dispatch matrix, artifact paths, and cleanup contract.
 
+Follow the shared conventions in `copilot-tracking.instructions.md`.
+
 ## Goal
 
 Create, improve, refactor, analyze, and apply fixes to prompt engineering artifacts by orchestrating the named subagents through the phase loop until the evaluation log shows no remaining issues.

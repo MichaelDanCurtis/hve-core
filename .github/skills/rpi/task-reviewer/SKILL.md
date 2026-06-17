@@ -9,6 +9,8 @@ user-invocable: true
 
 Use [references/review.md](references/review.md) for the full review protocol, templates, and validator contracts.
 
+Follow the shared conventions in `copilot-tracking.instructions.md`.
+
 ## Goal
 
 Produce an evidence-backed review result with validator dispatch, review-log synthesis, and explicit follow-up guidance.

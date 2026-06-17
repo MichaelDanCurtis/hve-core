@@ -413,6 +413,8 @@ items:
   kind: instruction
 - path: .github/instructions/hve-core/commit-message.instructions.md
   kind: instruction
+- path: .github/instructions/hve-core/copilot-tracking.instructions.md
+  kind: instruction
 - path: .github/instructions/hve-core/git-merge.instructions.md
   kind: instruction
 - path: .github/instructions/hve-core/markdown.instructions.md
@@ -420,8 +422,6 @@ items:
 - path: .github/instructions/hve-core/prompt-builder.instructions.md
   kind: instruction
 - path: .github/instructions/hve-core/pull-request.instructions.md
-  kind: instruction
-- path: .github/instructions/hve-core/rpi-skill-forward.instructions.md
   kind: instruction
 - path: .github/instructions/hve-core/writing-style.instructions.md
   kind: instruction

@@ -29,5 +29,5 @@ items:
     kind: agent
   - path: .github/agents/hve-core/subagents/rpi-validator.agent.md
     kind: agent
-  - path: .github/instructions/hve-core/rpi-skill-forward.instructions.md
+  - path: .github/instructions/hve-core/copilot-tracking.instructions.md
     kind: instruction
