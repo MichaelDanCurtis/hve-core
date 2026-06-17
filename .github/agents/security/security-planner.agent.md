@@ -46,12 +46,12 @@ Durable security reference material — operational buckets, STRIDE model detail
 
 Each phase entry begins with a mandatory `read_file` of the indicated skill references before any user-facing analysis. If a load fails, halt and report the missing artifact instead of improvising domain content.
 
-| Phase entry | Skill references to read (`read_file`) |
-|-------------|----------------------------------------|
-| Phase 2     | the `security-planning` skill's `references/operational-buckets.md` |
+| Phase entry | Skill references to read (`read_file`)                                                                                                                              |
+|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Phase 2     | the `security-planning` skill's `references/operational-buckets.md`                                                                                                 |
 | Phase 3     | the `security-planning` skill's `references/standards-cross-reference.md` and `references/nist-control-families.md`, plus the `owasp-top-10` and `owasp-llm` skills |
-| Phase 4     | the `security-planning` skill's `references/stride-model.md` |
-| Phase 5     | the `security-planning` skill's `references/backlog-formats.md`, plus the shared `backlog-templates` skill |
+| Phase 4     | the `security-planning` skill's `references/stride-model.md`                                                                                                        |
+| Phase 5     | the `security-planning` skill's `references/backlog-formats.md`, plus the shared `backlog-templates` skill                                                          |
 
 ## Six-Phase Architecture
 

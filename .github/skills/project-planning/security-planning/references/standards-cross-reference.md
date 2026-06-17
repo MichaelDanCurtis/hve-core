@@ -22,11 +22,11 @@ Preferred references:
 
 Use a compact mapping table like this:
 
-| Bucket | Finding | Control family | Example standards |
-|---|---|---|---|
-| data | Unencrypted backup storage | Data protection | OWASP A02, NIST SC-28 |
-| web/UI/reporting | Input validation gaps | Application security | OWASP A03, NIST SI-10 |
-| devops/platform-ops | Secret exposure in pipelines | Identity and access | NIST AC-2, NIST IA-5 |
+| Bucket              | Finding                      | Control family       | Example standards     |
+|---------------------|------------------------------|----------------------|-----------------------|
+| data                | Unencrypted backup storage   | Data protection      | OWASP A02, NIST SC-28 |
+| web/UI/reporting    | Input validation gaps        | Application security | OWASP A03, NIST SI-10 |
+| devops/platform-ops | Secret exposure in pipelines | Identity and access  | NIST AC-2, NIST IA-5  |
 
 ## Guidance
 

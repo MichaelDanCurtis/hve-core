@@ -35,19 +35,19 @@ Use `T-{BUCKET_ABBREV}-{NNN}` for standard buckets and `T-{BUCKET_ABBREV}-AI-{NN
 
 ## Threat table format
 
-| ID | STRIDE | Description | Component | Likelihood | Impact | Risk | Mitigation | Standards |
-|---|---|---|---|---|---|---|---|---|
-| T-INFRA-001 | Tampering | Config drift via unauthorized changes | IaC pipeline | High | High | Critical | Immutable infrastructure, drift detection | CIS 5.1, NIST CM-3 |
+| ID          | STRIDE    | Description                           | Component    | Likelihood | Impact | Risk     | Mitigation                                | Standards          |
+|-------------|-----------|---------------------------------------|--------------|------------|--------|----------|-------------------------------------------|--------------------|
+| T-INFRA-001 | Tampering | Config drift via unauthorized changes | IaC pipeline | High       | High   | Critical | Immutable infrastructure, drift detection | CIS 5.1, NIST CM-3 |
 
 ## Risk matrix
 
 Use the bucketed likelihood/impact matrix to derive directional priority ratings:
 
-| | Impact: Low | Impact: Medium | Impact: High |
-|---|---|---|---|
-| Likelihood: High | Low | High | Critical |
-| Likelihood: Medium | Low | Medium | High |
-| Likelihood: Low | Informational | Low | Low |
+|                    | Impact: Low   | Impact: Medium | Impact: High |
+|--------------------|---------------|----------------|--------------|
+| Likelihood: High   | Low           | High           | Critical     |
+| Likelihood: Medium | Low           | Medium         | High         |
+| Likelihood: Low    | Informational | Low            | Low          |
 
 ## Data-flow analysis guidance
 

@@ -22,14 +22,14 @@ Use this skill when you need to:
 
 Load the reference file that matches the phase or topic you need.
 
-| Reference | Topic |
-|---|---|
-| [references/00-index.md](references/00-index.md) | Navigation catalog and consolidated attribution |
-| [references/operational-buckets.md](references/operational-buckets.md) | Operational bucket definitions, GS overlay, and classification guidance |
-| [references/stride-model.md](references/stride-model.md) | STRIDE methodology, AI extensions, risk matrix, and data-flow analysis |
-| [references/standards-cross-reference.md](references/standards-cross-reference.md) | Bucket-to-standards mapping table and component mapping output format |
-| [references/nist-control-families.md](references/nist-control-families.md) | NIST 800-53 priority tiers and NIST AI RMF subcategory mappings |
-| [references/backlog-formats.md](references/backlog-formats.md) | Security-specific prioritization and RAI work item categories |
+| Reference                                                                          | Topic                                                                   |
+|------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [references/00-index.md](references/00-index.md)                                   | Navigation catalog and consolidated attribution                         |
+| [references/operational-buckets.md](references/operational-buckets.md)             | Operational bucket definitions, GS overlay, and classification guidance |
+| [references/stride-model.md](references/stride-model.md)                           | STRIDE methodology, AI extensions, risk matrix, and data-flow analysis  |
+| [references/standards-cross-reference.md](references/standards-cross-reference.md) | Bucket-to-standards mapping table and component mapping output format   |
+| [references/nist-control-families.md](references/nist-control-families.md)         | NIST 800-53 priority tiers and NIST AI RMF subcategory mappings         |
+| [references/backlog-formats.md](references/backlog-formats.md)                     | Security-specific prioritization and RAI work item categories           |
 
 ## Attribution
 
