@@ -59,10 +59,10 @@ The RAI Planner agent definition lives at `.github/agents/rai-planning/rai-plann
 | `rai-identity.instructions.md`        | Agent identity, orchestration, state management, session recovery         |
 | `rai-license-posture.instructions.md` | RAI standards licensing posture, source-class mapping, attribution gating |
 
-| Skill                  | Domain                                                                                                         |
-|------------------------|----------------------------------------------------------------------------------------------------------------|
-| `rai-planner` | Risk classification, impact assessment, security model, capture coaching, and backlog handoff phase references |
-| `rai-standards`        | NIST AI RMF 1.0 trustworthiness characteristics, subcategory mappings, framework isolation, AI STRIDE overlay  |
+| Skill           | Domain                                                                                                         |
+|-----------------|----------------------------------------------------------------------------------------------------------------|
+| `rai-planner`   | Risk classification, impact assessment, security model, capture coaching, and backlog handoff phase references |
+| `rai-standards` | NIST AI RMF 1.0 trustworthiness characteristics, subcategory mappings, framework isolation, AI STRIDE overlay  |
 
 ## State Management
 
