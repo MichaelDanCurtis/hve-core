@@ -42,7 +42,6 @@ items:
   kind: agent
 - path: .github/agents/design-thinking/dt-coach.agent.md
   kind: agent
-  maturity: preview
 - path: .github/agents/design-thinking/dt-learning-tutor.agent.md
   kind: agent
   maturity: preview
