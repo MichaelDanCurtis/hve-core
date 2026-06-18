@@ -102,9 +102,9 @@ Display the completion summary in this order:
 
 1. A `📦 Output Artifacts` table listing every artifact produced this run with its path and status:
 
-   | Artifact   | Path                  | Status    |
-   |------------|-----------------------|-----------|
-   | RAI report | `<REPORT_FILE_PATH>`  | Generated |
+   | Artifact   | Path                 | Status    |
+   |------------|----------------------|-----------|
+   | RAI report | `<REPORT_FILE_PATH>` | Generated |
 
    Add one row per report file when multiple reports are produced. Use the path returned by `Report Generator`.
 
