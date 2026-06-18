@@ -132,6 +132,239 @@ Describe 'VallyRunner module' -Tag 'Unit' {
             $result.assertionsFailed | Should -Be 2
             $result.assertionsPassed | Should -Be 0
         }
+
+        It 'Tees stdout/stderr to the log file when -LogPath is supplied' {
+            $outDir  = Join-Path $script:WorkRoot 'spec-log'
+            $logPath = Join-Path $script:WorkRoot 'nested/log/run.log'
+            $env:STUB_VALLY_MODE = 'pass'
+            try {
+                $result = Invoke-VallySpec `
+                    -SpecPath (Join-Path $script:WorkRoot 'fake.yaml') `
+                    -OutputDir $outDir `
+                    -Model 'claude-opus-4.7' `
+                    -VallyCommand $script:StubPath `
+                    -LogPath $logPath
+            }
+            finally {
+                Remove-Item Env:\STUB_VALLY_MODE -ErrorAction SilentlyContinue
+            }
+
+            $result.exitCode | Should -Be 0
+            Test-Path -LiteralPath $logPath | Should -BeTrue
+        }
+    }
+
+    Context 'Test-SpecInputModeration (exit-code classification)' {
+        BeforeEach {
+            $script:StubModeration = Join-Path $PSScriptRoot 'fixtures/stub-moderation.ps1'
+            $script:ModSpecPath = Join-Path $script:WorkRoot 'mod-spec.yaml'
+            @(
+                'stimuli:'
+                '  - prompt: "first prompt"'
+                '  - prompt: "second prompt"'
+            ) -join "`n" | Set-Content -LiteralPath $script:ModSpecPath -Encoding utf8
+        }
+
+        AfterEach {
+            Remove-Item Env:\STUB_MODERATION_EXIT -ErrorAction SilentlyContinue
+            Remove-Item Env:\STUB_MODERATION_COUNT -ErrorAction SilentlyContinue
+        }
+
+        It 'Classifies a clean exit (0) as neither flagged nor error' {
+            $env:STUB_MODERATION_EXIT = '0'
+            $result = Test-SpecInputModeration `
+                -SpecPath $script:ModSpecPath `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.flagged | Should -BeFalse
+            $result.error | Should -BeFalse
+        }
+
+        It 'Classifies exit 1 as a genuine content flag, not an error' {
+            $env:STUB_MODERATION_EXIT = '1'
+            $env:STUB_MODERATION_COUNT = '1'
+            $result = Test-SpecInputModeration `
+                -SpecPath $script:ModSpecPath `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.flagged | Should -BeTrue
+            $result.error | Should -BeFalse
+        }
+
+        It 'Classifies an infrastructure exit (>=2) as error, not a content flag' {
+            $env:STUB_MODERATION_EXIT = '2'
+            $result = Test-SpecInputModeration `
+                -SpecPath $script:ModSpecPath `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.error | Should -BeTrue
+            $result.flagged | Should -BeFalse
+        }
+
+        It 'Treats higher infrastructure exit codes (>2) as error as well' {
+            $env:STUB_MODERATION_EXIT = '3'
+            $result = Test-SpecInputModeration `
+                -SpecPath $script:ModSpecPath `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.error | Should -BeTrue
+            $result.flagged | Should -BeFalse
+        }
+
+        It 'Extracts stimulus prompts parsed from YAML (regression for hashtable key access)' {
+            # ConvertFrom-Yaml returns a [hashtable]; the prior implementation
+            # probed $spec.PSObject.Properties['stimuli'], which is always empty
+            # on a hashtable, so stimuli were silently skipped and the
+            # moderation script was never invoked. A non-null outputPath proves
+            # the prompts were extracted and the moderation script ran.
+            $env:STUB_MODERATION_EXIT = '0'
+            $result = Test-SpecInputModeration `
+                -SpecPath $script:ModSpecPath `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.outputPath | Should -Not -BeNullOrEmpty
+            Test-Path -LiteralPath $result.outputPath | Should -BeTrue
+        }
+
+        It 'Propagates flaggedCount from the moderation summary output' {
+            $env:STUB_MODERATION_EXIT = '1'
+            $env:STUB_MODERATION_COUNT = '2'
+            $result = Test-SpecInputModeration `
+                -SpecPath $script:ModSpecPath `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.flaggedCount | Should -Be 2
+        }
+
+        It 'Returns a non-flagged result when the spec file is missing' {
+            $result = Test-SpecInputModeration `
+                -SpecPath (Join-Path $script:WorkRoot 'no-such-spec.yaml') `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.flagged | Should -BeFalse
+            $result.flaggedCount | Should -Be 0
+            $result.outputPath | Should -BeNullOrEmpty
+        }
+
+        It 'Skips moderation when the spec has no stimulus prompts' {
+            $emptySpec = Join-Path $script:WorkRoot 'empty-spec.yaml'
+            "model: claude-opus-4.7`nstimuli: []" | Set-Content -LiteralPath $emptySpec -Encoding utf8
+
+            $result = Test-SpecInputModeration `
+                -SpecPath $emptySpec `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.flagged | Should -BeFalse
+            $result.outputPath | Should -BeNullOrEmpty
+        }
+
+        It 'Reports an error when the moderation script cannot be invoked' {
+            $result = Test-SpecInputModeration `
+                -SpecPath $script:ModSpecPath `
+                -ArtifactId 'unit' `
+                -ModerationScript (Join-Path $script:WorkRoot 'does-not-exist.ps1') `
+                -RepoRoot $script:WorkRoot
+
+            $result.error | Should -BeTrue
+            $result.flagged | Should -BeFalse
+        }
+    }
+
+    Context 'Test-SpecOutputModeration (exit-code classification)' {
+        BeforeEach {
+            $script:StubModeration = Join-Path $PSScriptRoot 'fixtures/stub-moderation.ps1'
+            $script:OutRunDir = Join-Path $script:WorkRoot 'out-run'
+            New-Item -ItemType Directory -Path $script:OutRunDir -Force | Out-Null
+            $rec1 = @{ trajectory = @{ stimulus = @{ name = 's1' }; output = 'first output' } } | ConvertTo-Json -Depth 6 -Compress
+            $rec2 = @{ trajectory = @{ stimulus = @{ name = 's2' }; output = 'second output' } } | ConvertTo-Json -Depth 6 -Compress
+            Set-Content -LiteralPath (Join-Path $script:OutRunDir 'results.jsonl') -Value @($rec1, $rec2) -Encoding utf8
+        }
+
+        AfterEach {
+            Remove-Item Env:\STUB_MODERATION_EXIT -ErrorAction SilentlyContinue
+            Remove-Item Env:\STUB_MODERATION_COUNT -ErrorAction SilentlyContinue
+        }
+
+        It 'Classifies a clean exit (0) as neither flagged nor error' {
+            $env:STUB_MODERATION_EXIT = '0'
+            $result = Test-SpecOutputModeration `
+                -RunDir $script:OutRunDir `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.flagged | Should -BeFalse
+            $result.error | Should -BeFalse
+        }
+
+        It 'Classifies exit 1 as a genuine content flag, not an error' {
+            $env:STUB_MODERATION_EXIT = '1'
+            $env:STUB_MODERATION_COUNT = '1'
+            $result = Test-SpecOutputModeration `
+                -RunDir $script:OutRunDir `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.flagged | Should -BeTrue
+            $result.error | Should -BeFalse
+            $result.flaggedCount | Should -Be 1
+        }
+
+        It 'Classifies an infrastructure exit (>=2) as error, not a content flag' {
+            $env:STUB_MODERATION_EXIT = '2'
+            $result = Test-SpecOutputModeration `
+                -RunDir $script:OutRunDir `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.error | Should -BeTrue
+            $result.flagged | Should -BeFalse
+        }
+
+        It 'Returns a non-flagged result when results.jsonl has no model outputs' {
+            $emptyRunDir = Join-Path $script:WorkRoot 'out-run-empty'
+            New-Item -ItemType Directory -Path $emptyRunDir -Force | Out-Null
+            $noOutput = @{ trajectory = @{ stimulus = @{ name = 's1' } } } | ConvertTo-Json -Depth 6 -Compress
+            Set-Content -LiteralPath (Join-Path $emptyRunDir 'results.jsonl') -Value @($noOutput) -Encoding utf8
+
+            $result = Test-SpecOutputModeration `
+                -RunDir $emptyRunDir `
+                -ArtifactId 'unit' `
+                -ModerationScript $script:StubModeration `
+                -RepoRoot $script:WorkRoot
+
+            $result.flagged | Should -BeFalse
+            $result.outputPath | Should -BeNullOrEmpty
+        }
+
+        It 'Reports an error when the moderation script cannot be invoked' {
+            $result = Test-SpecOutputModeration `
+                -RunDir $script:OutRunDir `
+                -ArtifactId 'unit' `
+                -ModerationScript (Join-Path $script:WorkRoot 'does-not-exist.ps1') `
+                -RepoRoot $script:WorkRoot
+
+            $result.error | Should -BeTrue
+            $result.flagged | Should -BeFalse
+        }
     }
 }
 
@@ -406,6 +639,54 @@ stimuli:
         $summary.totals.failedSpecs | Should -Be 1
         ($summary.perArtifact | Where-Object { $_.artifactId -eq 'pr-reference' }).status | Should -Be 'pass'
         ($summary.perArtifact | Where-Object { $_.artifactId -eq 'task-research' }).status | Should -Be 'fail'
+    }
+
+    It 'Does not run baseline equivalence by default for agent artifacts' {
+        $spec = @'
+name: agent-spec
+stimuli:
+  - name: s1
+    prompt: hi
+    tags:
+      agent: task-research
+'@
+        $artifacts = @(
+            @{ kind = 'agent'; artifactId = 'task-research'; path = '.github/agents/hve-core/task-research.agent.md'; status = 'M' }
+        )
+        $fx = New-EvalFixture -Artifacts $artifacts -Specs @(@{ Name = 'agent.yaml'; Yaml = $spec })
+
+        $markerPath = Join-Path $fx.Root 'equivalence-called.txt'
+        $equivalenceDriverPath = Join-Path $fx.Root 'fail-equivalence.ps1'
+        $escapedMarkerPath = $markerPath.Replace("'", "''")
+        $equivalenceDriver = @"
+[CmdletBinding()]
+param()
+
+Set-Content -LiteralPath '$escapedMarkerPath' -Value 'called' -Encoding utf8
+exit 9
+"@
+        Set-Content -LiteralPath $equivalenceDriverPath -Value $equivalenceDriver -Encoding utf8
+
+        $env:STUB_VALLY_MODE = 'pass'
+        try {
+            & pwsh -NoProfile -File $script:ScriptPath `
+                -ManifestPath $fx.ManifestPath `
+                -EvalRoot $fx.EvalRoot `
+                -LogsDir $fx.LogsDir `
+                -RepoRoot $fx.Root `
+                -VallyCommand $script:StubPath `
+                -EquivalenceDriverPath $equivalenceDriverPath `
+                -SkipInputModeration `
+                -SkipOutputModeration *> $null
+        }
+        finally {
+            Remove-Item Env:\STUB_VALLY_MODE -ErrorAction SilentlyContinue
+        }
+        $LASTEXITCODE | Should -Be 0
+        Test-Path -LiteralPath $markerPath | Should -BeFalse
+
+        $summary = Get-Content -LiteralPath $fx.SummaryPath -Raw | ConvertFrom-Json
+        @($summary.equivalence).Count | Should -Be 0
     }
 }
 

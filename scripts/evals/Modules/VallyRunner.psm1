@@ -281,7 +281,7 @@ function Test-SpecInputModeration {
     Repository root. Defaults to git root.
 
     .OUTPUTS
-    [hashtable] @{ flagged = $bool; flaggedCount = $int; outputPath = $string }
+    [hashtable] @{ flagged = $bool; flaggedCount = $int; outputPath = $string; error = $bool }
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -317,9 +317,9 @@ function Test-SpecInputModeration {
 
     $records = @()
     $index = 0
-    if ($spec.PSObject.Properties['stimuli'] -and $spec.stimuli) {
+    if ($spec -and $spec.stimuli) {
         foreach ($stimulus in $spec.stimuli) {
-            if ($stimulus.PSObject.Properties['prompt'] -and $stimulus.prompt) {
+            if ($stimulus -and $stimulus.prompt) {
                 $records += @{
                     id   = "input-$ArtifactId-$index"
                     text = [string]$stimulus.prompt
@@ -344,10 +344,12 @@ function Test-SpecInputModeration {
     }
     catch {
         Write-Warning "Content moderation script failed: $_"
-        return @{ flagged = $true; flaggedCount = $records.Count; outputPath = $outFile }
+        return @{ flagged = $false; flaggedCount = 0; outputPath = $outFile; error = $true }
     }
 
-    $flagged = $moderationExitCode -ne 0
+    # Exit 1 = genuine content flag; exit >=2 = moderation infrastructure/usage error.
+    $flagged = $moderationExitCode -eq 1
+    $moderationError = $moderationExitCode -ge 2
     $flaggedCount = 0
     if (Test-Path -LiteralPath $outFile) {
         $output = Get-Content -LiteralPath $outFile -Raw | ConvertFrom-Json
@@ -358,6 +360,7 @@ function Test-SpecInputModeration {
         flagged       = $flagged
         flaggedCount  = $flaggedCount
         outputPath    = $outFile
+        error         = $moderationError
     }
 }
 
@@ -387,7 +390,7 @@ function Test-SpecOutputModeration {
     Repository root.
 
     .OUTPUTS
-    [hashtable] @{ flagged = $bool; flaggedCount = $int; outputPath = $string }
+    [hashtable] @{ flagged = $bool; flaggedCount = $int; outputPath = $string; error = $bool }
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -460,10 +463,12 @@ function Test-SpecOutputModeration {
     }
     catch {
         Write-Warning "Content moderation script failed: $_"
-        return @{ flagged = $true; flaggedCount = $records.Count; outputPath = $outFile }
+        return @{ flagged = $false; flaggedCount = 0; outputPath = $outFile; error = $true }
     }
 
-    $flagged = $moderationExitCode -ne 0
+    # Exit 1 = genuine content flag; exit >=2 = moderation infrastructure/usage error.
+    $flagged = $moderationExitCode -eq 1
+    $moderationError = $moderationExitCode -ge 2
     $flaggedCount = 0
     if (Test-Path -LiteralPath $outFile) {
         $output = Get-Content -LiteralPath $outFile -Raw | ConvertFrom-Json
@@ -474,6 +479,7 @@ function Test-SpecOutputModeration {
         flagged       = $flagged
         flaggedCount  = $flaggedCount
         outputPath    = $outFile
+        error         = $moderationError
     }
 }
 
