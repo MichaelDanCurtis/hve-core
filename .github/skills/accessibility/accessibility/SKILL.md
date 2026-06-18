@@ -23,10 +23,10 @@ This skill is the consolidated entrypoint for accessibility guidance in HVE Core
 
 ## Phase references
 
-* [Capture and exploration](references/phases/capture-and-exploration.md)
+* [Capture and exploration](references/phases/capture-coaching.md)
 * [Framework selection](references/phases/framework-selection.md)
 * [Impact assessment](references/phases/impact-assessment.md)
-* [Review and backlog handoff](references/phases/review-and-backlog-handoff.md)
+* [Review and backlog handoff](references/phases/backlog-handoff.md)
 
 ## Tooling
 
