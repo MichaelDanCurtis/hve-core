@@ -35,6 +35,12 @@
 .PARAMETER StimulusFilter
     Optional regular expression filtering stimulus names. Defaults to `.*` (all stimuli).
 
+.PARAMETER Model
+    Optional explicit model id for the PR tier. When supplied it overrides the agent's
+    frontmatter `model:` hint and the built-in default, letting callers pin a cheaper
+    model for advisory PR-tier runs. Ignored for the `nightly` tier, which always runs
+    its fixed model array.
+
 .PARAMETER RepoRoot
     Repository root. Defaults to the result of `git rev-parse --show-toplevel`, falling
     back to the parent of `$PSScriptRoot`.
@@ -68,6 +74,9 @@ param(
 
     [Parameter(Mandatory = $false)]
     [string]$StimulusFilter = '.*',
+
+    [Parameter(Mandatory = $false)]
+    [string]$Model,
 
     [Parameter(Mandatory = $false)]
     [string]$RepoRoot,
@@ -191,15 +200,17 @@ function Resolve-ModelList {
     param(
         [Parameter(Mandatory)]
         [string]$Tier,
-        [string]$Hint
+        [string]$Hint,
+        [string]$ModelOverride
     )
 
     if ($Tier -eq 'nightly') {
         return @('gpt-5.5', 'claude-opus-4.6', 'claude-sonnet-latest')
     }
 
+    if ($ModelOverride) { return @($ModelOverride) }
     if ($Hint) { return @($Hint) }
-    return @('claude-opus-4.7')
+    return @('claude-haiku-4.5')
 }
 
 function New-DryRunSummary {
@@ -384,7 +395,7 @@ if ($MyInvocation.InvocationName -ne '.') {
         }
 
         $modelHint = Get-AgentModelHint -RepoRoot $resolvedRoot -Agent $Agent
-        $models = @(Resolve-ModelList -Tier $Tier -Hint $modelHint)
+        $models = @(Resolve-ModelList -Tier $Tier -Hint $modelHint -ModelOverride $Model)
         $primaryModel = $models[0]
 
         $outputRoot = Join-Path $resolvedRoot 'evals/results/baseline-equivalence'

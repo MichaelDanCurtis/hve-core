@@ -59,7 +59,7 @@ The driver parses each `vally compare --run-a <baseline> --run-b <customized>` i
 |----------------------|--------|---------------------------------------------------------------------------------------------------------|
 | `agent`              | string | Agent slug under test (matches `-Agent`)                                                                |
 | `tier`               | string | `pr` (advisory, exit 0) or `nightly` (authoritative, exit 1 on fail)                                    |
-| `model`              | string | Primary model the agent's frontmatter resolved to                                                       |
+| `model`              | string | Primary model for the run: PR tier resolves `-Model` override, then frontmatter `model:` hint, then the cheap default (`claude-haiku-4.5`); nightly runs its fixed model array |
 | `stimulusFilter`     | string | Regex applied to stimulus names; empty when the full corpus ran                                         |
 | `runs`               | int    | Total trial lines parsed across all compare logs                                                        |
 | `ties`               | int    | Trials the judge marked `tie`; counts toward the equivalence threshold                                  |

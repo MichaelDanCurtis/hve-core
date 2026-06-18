@@ -131,6 +131,35 @@ Describe 'Invoke-BaselineEquivalence.ps1 (dry-run)' -Tag 'Unit' {
         }
     }
 
+    Context 'Model override' {
+        It 'Pins the PR-tier model to the supplied override' {
+            & $script:ScriptPath `
+                -Agent 'task-researcher' `
+                -Tier 'pr' `
+                -Model 'gpt-5-mini' `
+                -RepoRoot $script:RepoRoot `
+                -OutputPath $script:OutputPath `
+                -WhatIf *> $null
+
+            $summary = Get-Content -LiteralPath $script:OutputPath -Raw | ConvertFrom-Json
+            $summary.model | Should -Be 'gpt-5-mini'
+            ($summary.plannedCommands -join "`n") | Should -Match 'gpt-5-mini'
+        }
+
+        It 'Ignores the override for the nightly tier' {
+            & $script:ScriptPath `
+                -Agent 'task-researcher' `
+                -Tier 'nightly' `
+                -Model 'gpt-5-mini' `
+                -RepoRoot $script:RepoRoot `
+                -OutputPath $script:OutputPath `
+                -WhatIf *> $null
+
+            $summary = Get-Content -LiteralPath $script:OutputPath -Raw | ConvertFrom-Json
+            $summary.model | Should -Be 'gpt-5.5'
+        }
+    }
+
     Context 'Parameter validation' {
         It 'Rejects an unknown tier' {
             { & $script:ScriptPath -Tier 'weekly' -RepoRoot $script:RepoRoot -OutputPath $script:OutputPath -WhatIf } |

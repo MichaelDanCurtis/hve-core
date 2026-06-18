@@ -40,8 +40,9 @@
     Defaults to `logs/`. Created if it does not exist.
 
 .PARAMETER Model
-    Model passed to `vally eval --model`. Defaults to `claude-opus-4.7` to
-    match the PR-tier model used by `Invoke-BaselineEquivalence.ps1`.
+    Model passed to `vally eval --model` and forwarded to the PR-tier
+    `Invoke-BaselineEquivalence.ps1` dispatch. Defaults to `claude-haiku-4.5`,
+    the cheap advisory model used for PR-tier runs.
 
 .PARAMETER VallyCommand
     Path or name of the vally executable. Defaults to `vally`. Tests pass the
@@ -91,7 +92,7 @@ param(
     [string]$ManifestPath,
     [string]$EvalRoot,
     [string]$LogsDir,
-    [string]$Model = 'claude-opus-4.7',
+    [string]$Model = 'claude-haiku-4.5',
     [string]$VallyCommand = 'vally',
     [string]$EquivalenceDriverPath,
     [ValidateSet('pr','nightly')]
@@ -599,6 +600,7 @@ foreach ($equivKey in $equivalenceSpecs.Keys) {
         '-NoProfile', '-File', $EquivalenceDriverPath,
         '-Agent', $agentSlug,
         '-Tier', $EquivalenceTier,
+        '-Model', $Model,
         '-RepoRoot', $resolvedRoot,
         '-OutputPath', $equivOutPath
     )
