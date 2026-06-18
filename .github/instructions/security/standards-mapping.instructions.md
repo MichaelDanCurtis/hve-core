@@ -29,6 +29,17 @@ The following standards are also delegated for runtime lookup due to version sen
 
 Do NOT delegate OWASP, NIST 800-53, OWASP LLM Top 10, or NIST AI RMF lookups. Those standards are covered by the durable skill references listed above.
 
+### Conditional Standards Skills
+
+When buckets or AI components from Phases 1–2 match, prefer the matching specialized security skill over a runtime delegation:
+
+* AI/ML components → `owasp-agentic`, and `owasp-mcp` when MCP tooling is used (alongside the always-loaded `owasp-llm`)
+* `infrastructure` bucket → `owasp-infrastructure`, and `owasp-docker` when containers are used
+* `build` / `devops-platform-ops` buckets → `owasp-cicd`, `supply-chain-security`
+* Cross-cutting GS overlay → `secure-by-design`
+
+These skills are loaded by the Security Planner's Conditional Skill Map. Delegate to the Researcher Subagent only for standards with no matching skill (WAF, CAF, MCSB, PCI-DSS, and the others listed above).
+
 ### When to Delegate
 
 * User requests WAF or CAF alignment for a component.
