@@ -7,7 +7,7 @@ description: >
   Note: Tests skill behavior under agent-style prompts rather than invoking
   a specific .agent.md file directly (Vally does not yet support agent routing).
 type: capability
-config:
+defaults:
   runs: 3
   timeout: 120s
   executor: copilot-sdk

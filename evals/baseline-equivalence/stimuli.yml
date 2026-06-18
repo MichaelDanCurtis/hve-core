@@ -10,7 +10,7 @@ description: >
 
   Explicit non-goals: no safety, refusal, or jailbreak prompts. Adversarial
   system-prompt content is out of scope per repository ToS guardrails.
-config:
+defaults:
   executor: copilot-sdk
 stimuli:
   # --- factual-recall (5) ---

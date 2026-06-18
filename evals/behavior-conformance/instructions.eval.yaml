@@ -9,7 +9,7 @@ description: >
   vocabulary. Per DD-05, this is an advisory tier and grader false-positives
   are absorbed by design.
 type: capability
-config:
+defaults:
   runs: 3
   timeout: 120s
   executor: copilot-sdk

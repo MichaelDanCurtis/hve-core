@@ -4,7 +4,7 @@ description: >
   provide accurate, structured guidance when invoked with domain-specific
   prompts. Uses multiple runs to account for non-deterministic output.
 type: capability
-config:
+defaults:
   runs: 3
   timeout: 120s
   executor: copilot-sdk

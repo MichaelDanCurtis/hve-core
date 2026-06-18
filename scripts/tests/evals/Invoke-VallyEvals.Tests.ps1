@@ -434,7 +434,7 @@ Describe 'Invoke-VallyEvals.ps1 moderation.threshold override' -Tag 'Integration
 
             $specYaml = @"
 name: skill-cover
-config:
+defaults:
   executor: copilot-sdk
 moderation:
   threshold: $SpecThreshold
@@ -533,7 +533,7 @@ exit 0
         $specPath = Join-Path $fx.EvalRoot 'skill-pr-reference.yaml'
         $noOverride = @'
 name: skill-cover
-config:
+defaults:
   executor: copilot-sdk
 stimuli:
   - name: s1

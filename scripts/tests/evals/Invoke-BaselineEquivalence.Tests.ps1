@@ -44,6 +44,30 @@ Describe 'Invoke-BaselineEquivalence.ps1 (dry-run)' -Tag 'Unit' {
             $script:Summary.plannedCommands.Count | Should -Be 3
         }
 
+        It 'Includes workspace and skill-dir flags for baseline and customized runs' {
+            $baselineCommand = $script:Summary.plannedCommands[0]
+            $customizedCommand = $script:Summary.plannedCommands[1]
+
+            $baselineCommand | Should -Match '--workspace'
+            $baselineCommand | Should -Match '--skill-dir'
+            $customizedCommand | Should -Match '--workspace'
+            $customizedCommand | Should -Match '--skill-dir'
+        }
+
+        It 'Isolates the baseline run with empty workspace and skill-dir arguments' {
+            $baselineCommand = $script:Summary.plannedCommands[0]
+
+            $baselineCommand | Should -Match '--workspace ""'
+            $baselineCommand | Should -Match '--skill-dir ""'
+        }
+
+        It 'Points the customized run at populated workspace and skill-dir paths' {
+            $customizedCommand = $script:Summary.plannedCommands[1]
+
+            $customizedCommand | Should -Match '--workspace "[^"]+"'
+            $customizedCommand | Should -Match '--skill-dir "[^"]+\.github[/\\]skills"'
+        }
+
         It 'Reports zeroed run/aggregate counters' {
             $script:Summary.runs | Should -Be 0
             $script:Summary.ties | Should -Be 0

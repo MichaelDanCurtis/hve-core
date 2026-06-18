@@ -140,17 +140,17 @@ function Test-EvalSpecCompliance {
     }
 
     $executor = $null
-    if ($Spec.ContainsKey('config') -and $Spec['config'] -is [System.Collections.IDictionary]) {
-        if ($Spec['config'].ContainsKey('executor')) {
-            $executor = [string]$Spec['config']['executor']
+    if ($Spec.ContainsKey('defaults') -and $Spec['defaults'] -is [System.Collections.IDictionary]) {
+        if ($Spec['defaults'].ContainsKey('executor')) {
+            $executor = [string]$Spec['defaults']['executor']
         }
     }
     if ([string]::IsNullOrWhiteSpace($executor)) {
-        $errors.Add(@{ path = $SpecPath; field = 'config.executor'; message = 'Missing required key: config.executor' })
+        $errors.Add(@{ path = $SpecPath; field = 'defaults.executor'; message = 'Missing required key: defaults.executor' })
     }
     elseif ($script:AllowedExecutors -notcontains $executor) {
         $allowed = $script:AllowedExecutors -join ', '
-        $errors.Add(@{ path = $SpecPath; field = 'config.executor'; message = "Executor '$executor' is not in the whitelist ($allowed)" })
+        $errors.Add(@{ path = $SpecPath; field = 'defaults.executor'; message = "Executor '$executor' is not in the whitelist ($allowed)" })
     }
 
     if ($Spec.ContainsKey('moderation')) {

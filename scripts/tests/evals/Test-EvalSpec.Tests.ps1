@@ -54,7 +54,7 @@ Describe 'Test-EvalSpecCompliance (module)' -Tag 'Unit' {
             $path = Join-Path $script:InvalidFixturesRoot 'missing-executor.yaml'
             $spec = ConvertFrom-Yaml -Yaml (Get-Content -LiteralPath $path -Raw)
             $errors = Test-EvalSpecCompliance -Spec $spec -SpecPath 'missing-executor.yaml' -RepoRoot $script:RepoRoot
-            ($errors | Where-Object { $_.field -eq 'config.executor' }).Count | Should -BeGreaterOrEqual 1
+            ($errors | Where-Object { $_.field -eq 'defaults.executor' }).Count | Should -BeGreaterOrEqual 1
         }
 
         It 'Flags executor not in whitelist' {
@@ -113,7 +113,7 @@ Describe 'Test-EvalSpecCompliance (module)' -Tag 'Unit' {
             foreach ($v in @(0.0, 1.0)) {
                 $spec = @{
                     name = 'boundary'
-                    config = @{ executor = 'copilot-sdk' }
+                    defaults = @{ executor = 'copilot-sdk' }
                     moderation = @{ threshold = $v }
                     stimuli = @(@{ name = 's'; prompt = 'p'; graders = @(@{ type = 'noop' }) })
                 }

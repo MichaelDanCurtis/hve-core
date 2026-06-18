@@ -1,7 +1,7 @@
 name: fixture-invalid-env-path
 description: Non-compliant spec whose environment paths do not resolve relative to the spec directory.
 type: capability
-config:
+defaults:
   runs: 1
   timeout: 60s
   executor: copilot-sdk
