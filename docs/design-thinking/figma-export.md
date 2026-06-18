@@ -136,5 +136,4 @@ The `use_figma` write capability is currently in beta and free during the beta p
 * [DT Coach Guide](dt-coach.md): Overview of the coaching agent and session workflow
 * [Design Thinking Guide](README.md): All nine methods and three spaces
 
-
 🤖 Crafted with precision by ✨Copilot following brilliant human instruction, then carefully refined by our team of discerning human reviewers.

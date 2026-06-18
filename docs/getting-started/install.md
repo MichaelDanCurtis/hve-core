@@ -3,7 +3,7 @@ title: Installing HVE Core
 description: Three ways to install HVE Core with marketplace extension, selective collections, or developer clone
 sidebar_position: 2
 author: Microsoft
-ms.date: 2026-03-11
+ms.date: 2026-06-17
 ms.topic: how-to
 keywords:
   - installation
