@@ -1,6 +1,6 @@
 ---
 description: "RAI-specific overlay mapping RAI standards onto the repository licensing posture"
-applyTo: '**/.github/skills/rai**/**, **/.copilot-tracking/rai-plans/**'
+applyTo: '**/skills/rai**/**, **/.copilot-tracking/rai-plans/**'
 ---
 
 # RAI Standards License Posture

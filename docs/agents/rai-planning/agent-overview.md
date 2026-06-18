@@ -13,7 +13,7 @@ tags:
   - architecture
   - reference
 author: Microsoft
-ms.date: 2026-06-17
+ms.date: 2026-06-18
 ms.topic: reference
 estimated_reading_time: 7
 ---
@@ -52,7 +52,7 @@ flowchart TD
   RP -->|"uses"| S2
 ```
 
-The RAI Planner agent definition lives at `.github/agents/rai-planning/rai-planner.agent.md`. Two instruction files under `.github/instructions/rai-planning/` provide domain-specific guidance, auto-applied via `applyTo` patterns when working within `.copilot-tracking/rai-plans/`. Phase-specific assessment guidance lives in the `rai-planner-playbook` and `rai-standards` skills.
+The RAI Planner agent definition lives at `.github/agents/rai-planning/rai-planner.agent.md`. Two instruction files under `.github/instructions/rai-planning/` provide domain-specific guidance, auto-applied via `applyTo` patterns when working within `.copilot-tracking/rai-plans/`. Phase-specific assessment guidance lives in the shared `backlog-templates` skill and the `rai-standards` skill.
 
 | Instruction file                      | Domain                                                                    |
 |---------------------------------------|---------------------------------------------------------------------------|

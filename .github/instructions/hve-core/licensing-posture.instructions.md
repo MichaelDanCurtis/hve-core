@@ -1,6 +1,6 @@
 ---
 description: "Repository-wide posture for licensing, reproduction, and attribution of third-party standards and reference text in skills and tracking artifacts"
-applyTo: '**/.github/skills/**, **/.copilot-tracking/**'
+applyTo: '**/skills/**, **/.copilot-tracking/**'
 ---
 
 # Licensing Posture
