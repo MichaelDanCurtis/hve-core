@@ -5,44 +5,44 @@ description: US Section 508 ICT Refresh (revised 2017) standards packaged as an 
 
 # Section 508 framework reference
 
-This skill packages the US Section 508 ICT Refresh (revised 2017) standards as an accessibility assessment knowledge base. It covers four normative chapters: E202 (General Requirements), E205 (Electronic Content), E207 (Software), and E208 (Support Documentation and Services). Section 508 incorporates the W3C WCAG 2.0 Level A and AA success criteria by reference, so most clauses below carry WCAG cross-references that link into the sibling [`wcag-22`](../wcag-22/SKILL.md) skill's per-guideline reference files (anchored at `#sc-<n>-<m>-<k>`).
+This skill packages the US Section 508 ICT Refresh (revised 2017) standards as an accessibility assessment knowledge base. It covers four normative chapters: E202 (General Requirements), E205 (Electronic Content), E207 (Software), and E208 (Support Documentation and Services). Section 508 incorporates the W3C WCAG 2.0 Level A and AA success criteria by reference, so most clauses below carry WCAG cross-references that link into the sibling [`wcag-22`](wcag-22.md) skill's per-guideline reference files (anchored at `#sc-<n>-<m>-<k>`).
 
 Source: US Access Board, Information and Communication Technology (ICT) Accessibility Standards, <https://www.access-board.gov/ict/>. Section 508 standards are works of the US federal government and reside in the public domain under 17 U.S.C. § 105. Clause summaries in this skill are paraphrased in the authors' own words for stylistic consistency with sibling W3C-licensed framework skills.
 
 ## Clause Roll-up
 
-| Clause  | Title                        | Type     | WCAG cross-ref                                                                                                                                                                                                                                                                                                  | Reference                                                                   |
-|---------|------------------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| E202.1  | Accessibility                | General  | n/a                                                                                                                                                                                                                                                                                                             | [chapter-e202.md#clause-e202-1](references/chapter-e202.md#clause-e202-1)   |
-| E202.2  | Definitions                  | General  | n/a                                                                                                                                                                                                                                                                                                             | [chapter-e202.md#clause-e202-2](references/chapter-e202.md#clause-e202-2)   |
-| E202.3  | Abbreviations                | General  | n/a                                                                                                                                                                                                                                                                                                             | [chapter-e202.md#clause-e202-3](references/chapter-e202.md#clause-e202-3)   |
-| E202.4  | References to WCAG 2.0       | General  | [WCAG 2.0 A/AA (all SCs)](../wcag-22/SKILL.md)                                                                                                                                                                                                                                                                  | [chapter-e202.md#clause-e202-4](references/chapter-e202.md#clause-e202-4)   |
-| E205.1  | Scope                        | Content  | n/a                                                                                                                                                                                                                                                                                                             | [chapter-e205.md#clause-e205-1](references/chapter-e205.md#clause-e205-1)   |
-| E205.2  | Technical Standards          | Content  | [sc-1-1-1](../wcag-22/references/guideline-1-1.md#sc-1-1-1), [sc-1-3-1](../wcag-22/references/guideline-1-3.md#sc-1-3-1), [sc-1-4-3](../wcag-22/references/guideline-1-4.md#sc-1-4-3), [sc-4-1-2](../wcag-22/references/guideline-4-1.md#sc-4-1-2)                                                              | [chapter-e205.md#clause-e205-2](references/chapter-e205.md#clause-e205-2)   |
-| E205.3  | PDF                          | Content  | [sc-1-1-1](../wcag-22/references/guideline-1-1.md#sc-1-1-1), [sc-2-1-1](../wcag-22/references/guideline-2-1.md#sc-2-1-1), [sc-4-1-2](../wcag-22/references/guideline-4-1.md#sc-4-1-2)                                                                                                                           | [chapter-e205.md#clause-e205-3](references/chapter-e205.md#clause-e205-3)   |
-| E205.4  | WCAG 2.0 Level A and AA      | Content  | [WCAG 2.0 A/AA (all SCs)](../wcag-22/SKILL.md)                                                                                                                                                                                                                                                                  | [chapter-e205.md#clause-e205-4](references/chapter-e205.md#clause-e205-4)   |
-| E205.5  | Audio Description            | Content  | [sc-1-2-3](../wcag-22/references/guideline-1-2.md#sc-1-2-3), [sc-1-2-5](../wcag-22/references/guideline-1-2.md#sc-1-2-5)                                                                                                                                                                                        | [chapter-e205.md#clause-e205-5](references/chapter-e205.md#clause-e205-5)   |
-| E205.6  | Captions                     | Content  | [sc-1-2-2](../wcag-22/references/guideline-1-2.md#sc-1-2-2), [sc-1-2-4](../wcag-22/references/guideline-1-2.md#sc-1-2-4)                                                                                                                                                                                        | [chapter-e205.md#clause-e205-6](references/chapter-e205.md#clause-e205-6)   |
-| E205.7  | Flashing                     | Content  | [sc-2-3-1](../wcag-22/references/guideline-2-3.md#sc-2-3-1), [sc-2-3-2](../wcag-22/references/guideline-2-3.md#sc-2-3-2)                                                                                                                                                                                        | [chapter-e205.md#clause-e205-7](references/chapter-e205.md#clause-e205-7)   |
-| E205.8  | Color Dependency             | Content  | [sc-1-4-1](../wcag-22/references/guideline-1-4.md#sc-1-4-1)                                                                                                                                                                                                                                                     | [chapter-e205.md#clause-e205-8](references/chapter-e205.md#clause-e205-8)   |
-| E205.9  | Alt Text                     | Content  | [sc-1-1-1](../wcag-22/references/guideline-1-1.md#sc-1-1-1)                                                                                                                                                                                                                                                     | [chapter-e205.md#clause-e205-9](references/chapter-e205.md#clause-e205-9)   |
-| E205.10 | Tables                       | Content  | [sc-1-3-1](../wcag-22/references/guideline-1-3.md#sc-1-3-1)                                                                                                                                                                                                                                                     | [chapter-e205.md#clause-e205-10](references/chapter-e205.md#clause-e205-10) |
-| E205.11 | Form Labels and Instructions | Content  | [sc-1-3-1](../wcag-22/references/guideline-1-3.md#sc-1-3-1), [sc-3-2-2](../wcag-22/references/guideline-3-2.md#sc-3-2-2), [sc-3-3-2](../wcag-22/references/guideline-3-3.md#sc-3-3-2)                                                                                                                           | [chapter-e205.md#clause-e205-11](references/chapter-e205.md#clause-e205-11) |
-| E207.1  | Scope                        | Software | n/a                                                                                                                                                                                                                                                                                                             | [chapter-e207.md#clause-e207-1](references/chapter-e207.md#clause-e207-1)   |
-| E207.2  | General Exceptions           | Software | n/a                                                                                                                                                                                                                                                                                                             | [chapter-e207.md#clause-e207-2](references/chapter-e207.md#clause-e207-2)   |
-| E207.3  | User Interface Standards     | Software | [sc-1-4-3](../wcag-22/references/guideline-1-4.md#sc-1-4-3), [sc-2-1-1](../wcag-22/references/guideline-2-1.md#sc-2-1-1)                                                                                                                                                                                        | [chapter-e207.md#clause-e207-3](references/chapter-e207.md#clause-e207-3)   |
-| E207.4  | Keyboard                     | Software | [sc-2-1-1](../wcag-22/references/guideline-2-1.md#sc-2-1-1), [sc-2-1-2](../wcag-22/references/guideline-2-1.md#sc-2-1-2)                                                                                                                                                                                        | [chapter-e207.md#clause-e207-4](references/chapter-e207.md#clause-e207-4)   |
-| E207.5  | Keyboard Focus               | Software | [sc-2-4-3](../wcag-22/references/guideline-2-4.md#sc-2-4-3), [sc-2-4-7](../wcag-22/references/guideline-2-4.md#sc-2-4-7)                                                                                                                                                                                        | [chapter-e207.md#clause-e207-5](references/chapter-e207.md#clause-e207-5)   |
-| E207.6  | Status, Prompts, and Results | Software | [sc-3-2-1](../wcag-22/references/guideline-3-2.md#sc-3-2-1), [sc-3-2-2](../wcag-22/references/guideline-3-2.md#sc-3-2-2), [sc-4-1-3](../wcag-22/references/guideline-4-1.md#sc-4-1-3)                                                                                                                           | [chapter-e207.md#clause-e207-6](references/chapter-e207.md#clause-e207-6)   |
-| E207.7  | Contrast                     | Software | [sc-1-4-3](../wcag-22/references/guideline-1-4.md#sc-1-4-3)                                                                                                                                                                                                                                                     | [chapter-e207.md#clause-e207-7](references/chapter-e207.md#clause-e207-7)   |
-| E207.8  | Flashing                     | Software | [sc-2-3-1](../wcag-22/references/guideline-2-3.md#sc-2-3-1), [sc-2-3-2](../wcag-22/references/guideline-2-3.md#sc-2-3-2)                                                                                                                                                                                        | [chapter-e207.md#clause-e207-8](references/chapter-e207.md#clause-e207-8)   |
-| E207.9  | Controls                     | Software | [sc-2-1-1](../wcag-22/references/guideline-2-1.md#sc-2-1-1), [sc-2-5-5](../wcag-22/references/guideline-2-5.md#sc-2-5-5), [sc-3-2-1](../wcag-22/references/guideline-3-2.md#sc-3-2-1), [sc-3-2-4](../wcag-22/references/guideline-3-2.md#sc-3-2-4)                                                              | [chapter-e207.md#clause-e207-9](references/chapter-e207.md#clause-e207-9)   |
-| E207.10 | Text Properties              | Software | [sc-1-4-12](../wcag-22/references/guideline-1-4.md#sc-1-4-12)                                                                                                                                                                                                                                                   | [chapter-e207.md#clause-e207-10](references/chapter-e207.md#clause-e207-10) |
-| E207.11 | Animation and Motion         | Software | [sc-2-3-3](../wcag-22/references/guideline-2-3.md#sc-2-3-3)                                                                                                                                                                                                                                                     | [chapter-e207.md#clause-e207-11](references/chapter-e207.md#clause-e207-11) |
-| E208.1  | Scope                        | Support  | n/a                                                                                                                                                                                                                                                                                                             | [chapter-e208.md#clause-e208-1](references/chapter-e208.md#clause-e208-1)   |
-| E208.2  | General                      | Support  | n/a                                                                                                                                                                                                                                                                                                             | [chapter-e208.md#clause-e208-2](references/chapter-e208.md#clause-e208-2)   |
-| E208.3  | User Support Services        | Support  | n/a                                                                                                                                                                                                                                                                                                             | [chapter-e208.md#clause-e208-3](references/chapter-e208.md#clause-e208-3)   |
-| E208.4  | Accessible Documentation     | Support  | [sc-1-1-1](../wcag-22/references/guideline-1-1.md#sc-1-1-1), [sc-1-3-1](../wcag-22/references/guideline-1-3.md#sc-1-3-1), [sc-1-4-3](../wcag-22/references/guideline-1-4.md#sc-1-4-3), [sc-2-1-1](../wcag-22/references/guideline-2-1.md#sc-2-1-1), [sc-4-1-2](../wcag-22/references/guideline-4-1.md#sc-4-1-2) | [chapter-e208.md#clause-e208-4](references/chapter-e208.md#clause-e208-4)   |
+| Clause  | Title                        | Type     | WCAG cross-ref                                                                                                                                                      | Reference                                         |
+|---------|------------------------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------|
+| E202.1  | Accessibility                | General  | n/a                                                                                                                                                                 | [chapter-e202.md#clause-e202-1](#clause-e202-1)   |
+| E202.2  | Definitions                  | General  | n/a                                                                                                                                                                 | [chapter-e202.md#clause-e202-2](#clause-e202-2)   |
+| E202.3  | Abbreviations                | General  | n/a                                                                                                                                                                 | [chapter-e202.md#clause-e202-3](#clause-e202-3)   |
+| E202.4  | References to WCAG 2.0       | General  | [WCAG 2.0 A/AA (all SCs)](wcag-22.md)                                                                                                                               | [chapter-e202.md#clause-e202-4](#clause-e202-4)   |
+| E205.1  | Scope                        | Content  | n/a                                                                                                                                                                 | [chapter-e205.md#clause-e205-1](#clause-e205-1)   |
+| E205.2  | Technical Standards          | Content  | [sc-1-1-1](wcag-22.md#sc-1-1-1), [sc-1-3-1](wcag-22.md#sc-1-3-1), [sc-1-4-3](wcag-22.md#sc-1-4-3), [sc-4-1-2](wcag-22.md#sc-4-1-2)                                  | [chapter-e205.md#clause-e205-2](#clause-e205-2)   |
+| E205.3  | PDF                          | Content  | [sc-1-1-1](wcag-22.md#sc-1-1-1), [sc-2-1-1](wcag-22.md#sc-2-1-1), [sc-4-1-2](wcag-22.md#sc-4-1-2)                                                                   | [chapter-e205.md#clause-e205-3](#clause-e205-3)   |
+| E205.4  | WCAG 2.0 Level A and AA      | Content  | [WCAG 2.0 A/AA (all SCs)](wcag-22.md)                                                                                                                               | [chapter-e205.md#clause-e205-4](#clause-e205-4)   |
+| E205.5  | Audio Description            | Content  | [sc-1-2-3](wcag-22.md#sc-1-2-3), [sc-1-2-5](wcag-22.md#sc-1-2-5)                                                                                                    | [chapter-e205.md#clause-e205-5](#clause-e205-5)   |
+| E205.6  | Captions                     | Content  | [sc-1-2-2](wcag-22.md#sc-1-2-2), [sc-1-2-4](wcag-22.md#sc-1-2-4)                                                                                                    | [chapter-e205.md#clause-e205-6](#clause-e205-6)   |
+| E205.7  | Flashing                     | Content  | [sc-2-3-1](wcag-22.md#sc-2-3-1), [sc-2-3-2](wcag-22.md#sc-2-3-2)                                                                                                    | [chapter-e205.md#clause-e205-7](#clause-e205-7)   |
+| E205.8  | Color Dependency             | Content  | [sc-1-4-1](wcag-22.md#sc-1-4-1)                                                                                                                                     | [chapter-e205.md#clause-e205-8](#clause-e205-8)   |
+| E205.9  | Alt Text                     | Content  | [sc-1-1-1](wcag-22.md#sc-1-1-1)                                                                                                                                     | [chapter-e205.md#clause-e205-9](#clause-e205-9)   |
+| E205.10 | Tables                       | Content  | [sc-1-3-1](wcag-22.md#sc-1-3-1)                                                                                                                                     | [chapter-e205.md#clause-e205-10](#clause-e205-10) |
+| E205.11 | Form Labels and Instructions | Content  | [sc-1-3-1](wcag-22.md#sc-1-3-1), [sc-3-2-2](wcag-22.md#sc-3-2-2), [sc-3-3-2](wcag-22.md#sc-3-3-2)                                                                   | [chapter-e205.md#clause-e205-11](#clause-e205-11) |
+| E207.1  | Scope                        | Software | n/a                                                                                                                                                                 | [chapter-e207.md#clause-e207-1](#clause-e207-1)   |
+| E207.2  | General Exceptions           | Software | n/a                                                                                                                                                                 | [chapter-e207.md#clause-e207-2](#clause-e207-2)   |
+| E207.3  | User Interface Standards     | Software | [sc-1-4-3](wcag-22.md#sc-1-4-3), [sc-2-1-1](wcag-22.md#sc-2-1-1)                                                                                                    | [chapter-e207.md#clause-e207-3](#clause-e207-3)   |
+| E207.4  | Keyboard                     | Software | [sc-2-1-1](wcag-22.md#sc-2-1-1), [sc-2-1-2](wcag-22.md#sc-2-1-2)                                                                                                    | [chapter-e207.md#clause-e207-4](#clause-e207-4)   |
+| E207.5  | Keyboard Focus               | Software | [sc-2-4-3](wcag-22.md#sc-2-4-3), [sc-2-4-7](wcag-22.md#sc-2-4-7)                                                                                                    | [chapter-e207.md#clause-e207-5](#clause-e207-5)   |
+| E207.6  | Status, Prompts, and Results | Software | [sc-3-2-1](wcag-22.md#sc-3-2-1), [sc-3-2-2](wcag-22.md#sc-3-2-2), [sc-4-1-3](wcag-22.md#sc-4-1-3)                                                                   | [chapter-e207.md#clause-e207-6](#clause-e207-6)   |
+| E207.7  | Contrast                     | Software | [sc-1-4-3](wcag-22.md#sc-1-4-3)                                                                                                                                     | [chapter-e207.md#clause-e207-7](#clause-e207-7)   |
+| E207.8  | Flashing                     | Software | [sc-2-3-1](wcag-22.md#sc-2-3-1), [sc-2-3-2](wcag-22.md#sc-2-3-2)                                                                                                    | [chapter-e207.md#clause-e207-8](#clause-e207-8)   |
+| E207.9  | Controls                     | Software | [sc-2-1-1](wcag-22.md#sc-2-1-1), [sc-2-5-5](wcag-22.md#sc-2-5-5), [sc-3-2-1](wcag-22.md#sc-3-2-1), [sc-3-2-4](wcag-22.md#sc-3-2-4)                                  | [chapter-e207.md#clause-e207-9](#clause-e207-9)   |
+| E207.10 | Text Properties              | Software | [sc-1-4-12](wcag-22.md#sc-1-4-12)                                                                                                                                   | [chapter-e207.md#clause-e207-10](#clause-e207-10) |
+| E207.11 | Animation and Motion         | Software | [sc-2-3-3](wcag-22.md#sc-2-3-3)                                                                                                                                     | [chapter-e207.md#clause-e207-11](#clause-e207-11) |
+| E208.1  | Scope                        | Support  | n/a                                                                                                                                                                 | [chapter-e208.md#clause-e208-1](#clause-e208-1)   |
+| E208.2  | General                      | Support  | n/a                                                                                                                                                                 | [chapter-e208.md#clause-e208-2](#clause-e208-2)   |
+| E208.3  | User Support Services        | Support  | n/a                                                                                                                                                                 | [chapter-e208.md#clause-e208-3](#clause-e208-3)   |
+| E208.4  | Accessible Documentation     | Support  | [sc-1-1-1](wcag-22.md#sc-1-1-1), [sc-1-3-1](wcag-22.md#sc-1-3-1), [sc-1-4-3](wcag-22.md#sc-1-4-3), [sc-2-1-1](wcag-22.md#sc-2-1-1), [sc-4-1-2](wcag-22.md#sc-4-1-2) | [chapter-e208.md#clause-e208-4](#clause-e208-4)   |
 
 Total: 30 clauses (E202: 4; E205: 11; E207: 11; E208: 4).
 
@@ -162,7 +162,7 @@ Requires electronic content to conform to applicable W3C technical standards (HT
 
 **Applies to**: Web pages, web applications, and structured document formats where W3C standards apply.
 
-**WCAG cross-reference**: [sc-1-1-1](../../wcag-22/references/guideline-1-1.md#sc-1-1-1), [sc-1-3-1](../../wcag-22/references/guideline-1-3.md#sc-1-3-1), [sc-1-4-3](../../wcag-22/references/guideline-1-4.md#sc-1-4-3), [sc-4-1-2](../../wcag-22/references/guideline-4-1.md#sc-4-1-2).
+**WCAG cross-reference**: [sc-1-1-1](wcag-22.md#sc-1-1-1), [sc-1-3-1](wcag-22.md#sc-1-3-1), [sc-1-4-3](wcag-22.md#sc-1-4-3), [sc-4-1-2](wcag-22.md#sc-4-1-2).
 
 **Assessment heuristics**:
 
@@ -179,7 +179,7 @@ Requires PDF files to preserve real text as Unicode, expose a logical reading or
 
 **Applies to**: All PDF documents distributed to users.
 
-**WCAG cross-reference**: [sc-1-1-1](../../wcag-22/references/guideline-1-1.md#sc-1-1-1), [sc-2-1-1](../../wcag-22/references/guideline-2-1.md#sc-2-1-1), [sc-4-1-2](../../wcag-22/references/guideline-4-1.md#sc-4-1-2).
+**WCAG cross-reference**: [sc-1-1-1](wcag-22.md#sc-1-1-1), [sc-2-1-1](wcag-22.md#sc-2-1-1), [sc-4-1-2](wcag-22.md#sc-4-1-2).
 
 **Assessment heuristics**:
 
@@ -213,7 +213,7 @@ Requires prerecorded synchronised media to provide audio descriptions of visual 
 
 **Applies to**: Prerecorded video content with significant visual information.
 
-**WCAG cross-reference**: [sc-1-2-3](../../wcag-22/references/guideline-1-2.md#sc-1-2-3), [sc-1-2-5](../../wcag-22/references/guideline-1-2.md#sc-1-2-5).
+**WCAG cross-reference**: [sc-1-2-3](wcag-22.md#sc-1-2-3), [sc-1-2-5](wcag-22.md#sc-1-2-5).
 
 **Assessment heuristics**:
 
@@ -230,7 +230,7 @@ Requires synchronised media to include captions that convey dialogue, speaker id
 
 **Applies to**: All synchronised audio and video content, including live streams.
 
-**WCAG cross-reference**: [sc-1-2-2](../../wcag-22/references/guideline-1-2.md#sc-1-2-2), [sc-1-2-4](../../wcag-22/references/guideline-1-2.md#sc-1-2-4).
+**WCAG cross-reference**: [sc-1-2-2](wcag-22.md#sc-1-2-2), [sc-1-2-4](wcag-22.md#sc-1-2-4).
 
 **Assessment heuristics**:
 
@@ -247,7 +247,7 @@ Prohibits electronic content from flashing more than three times in any one-seco
 
 **Applies to**: All electronic content with animated, video, or auto-refreshing elements.
 
-**WCAG cross-reference**: [sc-2-3-1](../../wcag-22/references/guideline-2-3.md#sc-2-3-1), [sc-2-3-2](../../wcag-22/references/guideline-2-3.md#sc-2-3-2).
+**WCAG cross-reference**: [sc-2-3-1](wcag-22.md#sc-2-3-1), [sc-2-3-2](wcag-22.md#sc-2-3-2).
 
 **Assessment heuristics**:
 
@@ -264,7 +264,7 @@ Prohibits electronic content from relying on colour alone to convey meaning, ind
 
 **Applies to**: All visual content, including charts, status indicators, links, form validation, and infographics.
 
-**WCAG cross-reference**: [sc-1-4-1](../../wcag-22/references/guideline-1-4.md#sc-1-4-1).
+**WCAG cross-reference**: [sc-1-4-1](wcag-22.md#sc-1-4-1).
 
 **Assessment heuristics**:
 
@@ -281,7 +281,7 @@ Requires non-text content (images, graphics, photographs) to carry a text altern
 
 **Applies to**: All images, icons, charts, and graphical elements in electronic content.
 
-**WCAG cross-reference**: [sc-1-1-1](../../wcag-22/references/guideline-1-1.md#sc-1-1-1).
+**WCAG cross-reference**: [sc-1-1-1](wcag-22.md#sc-1-1-1).
 
 **Assessment heuristics**:
 
@@ -298,7 +298,7 @@ Requires data tables to expose row and column relationships through markup so th
 
 **Applies to**: Data tables in HTML, office documents, and PDF; not required for purely presentational layout tables.
 
-**WCAG cross-reference**: [sc-1-3-1](../../wcag-22/references/guideline-1-3.md#sc-1-3-1).
+**WCAG cross-reference**: [sc-1-3-1](wcag-22.md#sc-1-3-1).
 
 **Assessment heuristics**:
 
@@ -315,7 +315,7 @@ Requires form fields to carry visible, programmatically associated labels and an
 
 **Applies to**: All input forms in electronic content, including web forms, fillable PDF forms, and document templates.
 
-**WCAG cross-reference**: [sc-1-3-1](../../wcag-22/references/guideline-1-3.md#sc-1-3-1), [sc-3-2-2](../../wcag-22/references/guideline-3-2.md#sc-3-2-2), [sc-3-3-2](../../wcag-22/references/guideline-3-3.md#sc-3-3-2).
+**WCAG cross-reference**: [sc-1-3-1](wcag-22.md#sc-1-3-1), [sc-3-2-2](wcag-22.md#sc-3-2-2), [sc-3-3-2](wcag-22.md#sc-3-3-2).
 
 **Assessment heuristics**:
 
@@ -372,7 +372,7 @@ Requires software user interfaces to conform to applicable platform accessibilit
 
 **Applies to**: All user interface code for covered software.
 
-**WCAG cross-reference**: [sc-1-4-3](../../wcag-22/references/guideline-1-4.md#sc-1-4-3), [sc-2-1-1](../../wcag-22/references/guideline-2-1.md#sc-2-1-1).
+**WCAG cross-reference**: [sc-1-4-3](wcag-22.md#sc-1-4-3), [sc-2-1-1](wcag-22.md#sc-2-1-1).
 
 **Assessment heuristics**:
 
@@ -389,7 +389,7 @@ Requires every software function to be operable through a keyboard interface wit
 
 **Applies to**: All keyboard-operable workflows in covered software.
 
-**WCAG cross-reference**: [sc-2-1-1](../../wcag-22/references/guideline-2-1.md#sc-2-1-1), [sc-2-1-2](../../wcag-22/references/guideline-2-1.md#sc-2-1-2).
+**WCAG cross-reference**: [sc-2-1-1](wcag-22.md#sc-2-1-1), [sc-2-1-2](wcag-22.md#sc-2-1-2).
 
 **Assessment heuristics**:
 
@@ -406,7 +406,7 @@ Requires the current keyboard focus to be visibly indicated and to move through 
 
 **Applies to**: All software with keyboard navigation.
 
-**WCAG cross-reference**: [sc-2-4-3](../../wcag-22/references/guideline-2-4.md#sc-2-4-3), [sc-2-4-7](../../wcag-22/references/guideline-2-4.md#sc-2-4-7).
+**WCAG cross-reference**: [sc-2-4-3](wcag-22.md#sc-2-4-3), [sc-2-4-7](wcag-22.md#sc-2-4-7).
 
 **Assessment heuristics**:
 
@@ -423,7 +423,7 @@ Requires software to provide clear status messages, prompts, and result feedback
 
 **Applies to**: All software workflows that produce user-visible status, error, or confirmation messages.
 
-**WCAG cross-reference**: [sc-3-2-1](../../wcag-22/references/guideline-3-2.md#sc-3-2-1), [sc-3-2-2](../../wcag-22/references/guideline-3-2.md#sc-3-2-2), [sc-4-1-3](../../wcag-22/references/guideline-4-1.md#sc-4-1-3).
+**WCAG cross-reference**: [sc-3-2-1](wcag-22.md#sc-3-2-1), [sc-3-2-2](wcag-22.md#sc-3-2-2), [sc-4-1-3](wcag-22.md#sc-4-1-3).
 
 **Assessment heuristics**:
 
@@ -440,7 +440,7 @@ Requires text and meaningful UI elements to meet minimum contrast ratios: 4.5:1 
 
 **Applies to**: All visible UI elements in covered software.
 
-**WCAG cross-reference**: [sc-1-4-3](../../wcag-22/references/guideline-1-4.md#sc-1-4-3).
+**WCAG cross-reference**: [sc-1-4-3](wcag-22.md#sc-1-4-3).
 
 **Assessment heuristics**:
 
@@ -457,7 +457,7 @@ Prohibits software animations, progress indicators, and auto-refreshing content 
 
 **Applies to**: All animated and auto-updating UI elements.
 
-**WCAG cross-reference**: [sc-2-3-1](../../wcag-22/references/guideline-2-3.md#sc-2-3-1), [sc-2-3-2](../../wcag-22/references/guideline-2-3.md#sc-2-3-2).
+**WCAG cross-reference**: [sc-2-3-1](wcag-22.md#sc-2-3-1), [sc-2-3-2](wcag-22.md#sc-2-3-2).
 
 **Assessment heuristics**:
 
@@ -474,7 +474,7 @@ Requires interactive controls (buttons, checkboxes, sliders, menu items) to be o
 
 **Applies to**: All interactive UI controls in covered software.
 
-**WCAG cross-reference**: [sc-2-1-1](../../wcag-22/references/guideline-2-1.md#sc-2-1-1), [sc-2-5-5](../../wcag-22/references/guideline-2-5.md#sc-2-5-5), [sc-3-2-1](../../wcag-22/references/guideline-3-2.md#sc-3-2-1), [sc-3-2-4](../../wcag-22/references/guideline-3-2.md#sc-3-2-4).
+**WCAG cross-reference**: [sc-2-1-1](wcag-22.md#sc-2-1-1), [sc-2-5-5](wcag-22.md#sc-2-5-5), [sc-3-2-1](wcag-22.md#sc-3-2-1), [sc-3-2-4](wcag-22.md#sc-3-2-4).
 
 **Assessment heuristics**:
 
@@ -491,7 +491,7 @@ Requires software to allow customisation of text presentation (line height, lett
 
 **Applies to**: All text-presenting software where user-controlled text properties are technically possible.
 
-**WCAG cross-reference**: [sc-1-4-12](../../wcag-22/references/guideline-1-4.md#sc-1-4-12).
+**WCAG cross-reference**: [sc-1-4-12](wcag-22.md#sc-1-4-12).
 
 **Assessment heuristics**:
 
@@ -508,7 +508,7 @@ Requires software to avoid auto-playing animations that may disorient users with
 
 **Applies to**: All software with animated transitions, parallax effects, or auto-playing motion.
 
-**WCAG cross-reference**: [sc-2-3-3](../../wcag-22/references/guideline-2-3.md#sc-2-3-3).
+**WCAG cross-reference**: [sc-2-3-3](wcag-22.md#sc-2-3-3).
 
 **Assessment heuristics**:
 
@@ -582,7 +582,7 @@ Requires the content and format of documentation to conform to the WCAG 2.0 Leve
 
 **Applies to**: All documentation content delivered to users.
 
-**WCAG cross-reference**: [sc-1-1-1](../../wcag-22/references/guideline-1-1.md#sc-1-1-1), [sc-1-3-1](../../wcag-22/references/guideline-1-3.md#sc-1-3-1), [sc-1-4-3](../../wcag-22/references/guideline-1-4.md#sc-1-4-3), [sc-2-1-1](../../wcag-22/references/guideline-2-1.md#sc-2-1-1), [sc-4-1-2](../../wcag-22/references/guideline-4-1.md#sc-4-1-2).
+**WCAG cross-reference**: [sc-1-1-1](wcag-22.md#sc-1-1-1), [sc-1-3-1](wcag-22.md#sc-1-3-1), [sc-1-4-3](wcag-22.md#sc-1-4-3), [sc-2-1-1](wcag-22.md#sc-2-1-1), [sc-4-1-2](wcag-22.md#sc-4-1-2).
 
 **Assessment heuristics**:
 

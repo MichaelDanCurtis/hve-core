@@ -34,7 +34,7 @@ Scan the repository to identify its technology stack and determine which securit
 
 ## Constants
 
-Skill resolution: Read the applicable security skill by name (e.g., `owasp-top-10`, `owasp-llm`, `owasp-agentic`, `owasp-mcp`, `owasp-infrastructure`, `owasp-cicd`, `secure-by-design`). Resolve accessibility guidance through the consolidated accessibility entrypoint at `.github/skills/accessibility/accessibility/SKILL.md`, then open the matching framework reference under `.github/skills/accessibility/accessibility/references/frameworks/<framework>.md` when needed.
+Skill resolution: Read the applicable security skill by name (e.g., `owasp-top-10`, `owasp-llm`, `owasp-agentic`, `owasp-mcp`, `owasp-infrastructure`, `owasp-cicd`, `secure-by-design`). Resolve accessibility guidance through the consolidated Accessibility skill contract and use the matching framework guidance when needed.
 
 ### Technology Signals
 

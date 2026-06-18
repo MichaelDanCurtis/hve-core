@@ -11,7 +11,7 @@ metadata:
 
 # Accessibility — Skill Entry
 
-This skill is the consolidated entrypoint for accessibility guidance in HVE Core. It links to the framework references, the phase-based playbook references, and the scanner CLI entrypoint.
+This skill is the canonical accessibility reference contract for HVE Core. Agents and instructions invoke this skill by name and rely on it to own framework reference resolution, phase guidance resolution, and the scanner CLI entrypoint.
 
 ## Framework references
 
@@ -35,5 +35,5 @@ This skill is the consolidated entrypoint for accessibility guidance in HVE Core
 ## Usage notes
 
 * Treat this skill as the default accessibility entrypoint for planning and review workflows.
-* Open the reference that matches the current phase or the framework you need to apply.
+* Resolve framework and phase guidance through this skill instead of duplicating its internal reference paths in agents or instructions.
 * Use the scanner CLI when you need normalized findings from an accessibility scan.
