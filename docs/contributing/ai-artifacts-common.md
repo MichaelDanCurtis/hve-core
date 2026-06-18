@@ -680,7 +680,6 @@ See [official documentation](https://example.com) for details.
 
 * Starts with frontmatter (YAML between `---` delimiters)
 * Followed by markdown content
-* Includes attribution in frontmatter `description` field
 * Single newline at EOF
 
 ## RFC 2119 Directive Language
@@ -871,21 +870,6 @@ Extra spaces at the end of lines (except intentional 2-space line breaks). Remov
 ### Skipped Heading Levels
 
 Jumping from H1 to H3 without an H2, breaking document hierarchy. Follow proper heading sequence (H1 → H2 → H3) without skipping levels.
-
-## Attribution Requirements
-
-All AI artifacts MUST include attribution as a suffix in the frontmatter `description` field:
-
-```yaml
-description: 'Tests prompt files in a sandbox environment'
-```
-
-Format: `- Brought to you by organization/repository-name` appended to the description value.
-
-Skill files (`SKILL.md`) additionally include a blockquote attribution footer as the last line of body content:
-
-```markdown
-```
 
 ## GitHub Issue Title Conventions
 

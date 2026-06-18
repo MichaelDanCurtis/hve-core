@@ -324,15 +324,6 @@ All Python code MUST pass:
 * Coverage: Minimum 80% line coverage
 ```
 
-#### 8. Attribution Footer
-
-Always include an attribution footer at the end of the file.
-
-```markdown
----
-
-```
-
 ### XML-Style Block Requirements
 
 See [AI Artifacts Common Standards - XML-Style Block Standards](ai-artifacts-common.md#xml-style-block-standards) for complete rules. Common tags for instructions:

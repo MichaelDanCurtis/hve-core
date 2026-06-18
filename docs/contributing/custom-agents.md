@@ -506,7 +506,7 @@ Report validation status:
 
 ## Research and External Sources
 
-When agents integrate external knowledge, consult authoritative sources and provide minimal, annotated snippets with reference links. See [AI Artifacts Common Standards - Attribution Requirements](ai-artifacts-common.md#attribution-requirements) for guidelines.
+When agents integrate external knowledge, consult authoritative sources and provide minimal, annotated snippets with reference links.
 
 ## Validation Checklist
 
