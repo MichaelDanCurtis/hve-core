@@ -76,6 +76,10 @@ If the PRD surfaced significant architectural decisions worth preserving — for
 
 When the PRD benefits from an architecture or network diagram, use the architecture-diagrams skill: read `.github/skills/hve-core/architecture-diagrams/SKILL.md` with `read_file` and follow its authoring contract, choosing ASCII or Mermaid output for the diagram. That skill is the authoritative source for its own conventions and output format.
 
+## Disclaimer Acknowledgment
+
+Display the PRD Requirements Planning CAUTION block from #file:../../instructions/shared/disclaimer-language.instructions.md verbatim once per session, before any phase work, whenever `state.json.disclaimerShownAt` is `null`. After display, set `disclaimerShownAt` to the current ISO 8601 timestamp and persist `state.json`.
+
 ## File Management
 
 ### PRD Creation
@@ -108,6 +112,7 @@ Maintain state in `.copilot-tracking/prd-sessions/<prd-name>.state.json`:
   "prdFile": "docs/prds/mobile-expense-app.md",
   "lastAccessed": "2025-08-24T10:30:00Z",
   "currentPhase": "requirements-gathering",
+  "disclaimerShownAt": null,
   "phaseSkillsLoaded": ["prd-author#prd-assess", "prd-author#prd-discover"],
   "questionsAsked": [
     "product-name", "target-users", "core-problem", "success-metrics"

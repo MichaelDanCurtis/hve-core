@@ -22,7 +22,7 @@ Planners that emit Phase-final backlog work items all need the same dual-format 
 Callers:
 
 * RAI Planner (`rai-planner` skill `references/backlog-handoff.md`)
-* Security Planner (`.github/instructions/security/backlog-handoff.instructions.md`)
+* Security Planner (`.github/agents/security/security-planner.agent.md`; security-specific handoff details in `.github/skills/project-planning/security-planning/references/backlog-formats.md`)
 * SSSC Planner (`.github/instructions/security/sssc-planner.instructions.md`)
 * Accessibility Planner (`accessibility-planner-playbook` skill `references/backlog-handoff.md`)
 

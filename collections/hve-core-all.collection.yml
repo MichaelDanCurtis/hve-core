@@ -457,16 +457,7 @@ items:
 - path: .github/instructions/rai-planning/rai-license-posture.instructions.md
   kind: instruction
   maturity: experimental
-- path: .github/instructions/security/backlog-handoff.instructions.md
-  kind: instruction
-  maturity: experimental
 - path: .github/instructions/security/identity.instructions.md
-  kind: instruction
-  maturity: experimental
-- path: .github/instructions/security/operational-buckets.instructions.md
-  kind: instruction
-  maturity: experimental
-- path: .github/instructions/security/security-model.instructions.md
   kind: instruction
   maturity: experimental
 - path: .github/instructions/security/sssc-planner.instructions.md
@@ -562,6 +553,9 @@ items:
   maturity: experimental
 - path: .github/skills/project-planning/requirements-author
   kind: skill
+- path: .github/skills/project-planning/security-planning
+  kind: skill
+  maturity: experimental
 - path: .github/skills/rai/rai-standards
   kind: skill
   maturity: experimental

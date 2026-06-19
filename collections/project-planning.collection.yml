@@ -158,16 +158,7 @@ items:
   - path: .github/instructions/security/identity.instructions.md
     kind: instruction
     maturity: experimental
-  - path: .github/instructions/security/operational-buckets.instructions.md
-    kind: instruction
-    maturity: experimental
   - path: .github/instructions/security/standards-mapping.instructions.md
-    kind: instruction
-    maturity: experimental
-  - path: .github/instructions/security/security-model.instructions.md
-    kind: instruction
-    maturity: experimental
-  - path: .github/instructions/security/backlog-handoff.instructions.md
     kind: instruction
     maturity: experimental
   - path: .github/instructions/security/sssc-planner.instructions.md
@@ -225,6 +216,9 @@ items:
     kind: skill
     maturity: experimental
   - path: .github/skills/shared/backlog-templates
+    kind: skill
+    maturity: experimental
+  - path: .github/skills/project-planning/security-planning
     kind: skill
     maturity: experimental
   - path: .github/skills/security/supply-chain-security
