@@ -1,6 +1,6 @@
 ---
 name: accessibility
-description: "Consolidated accessibility skill entrypoint for WCAG 2.2, ARIA Authoring Practices, cognitive accessibility, Section 508, EN 301 549, and the Accessibility Planner playbook."
+description: "Consolidated accessibility skill entrypoint for WCAG 2.2, ARIA Authoring Practices, cognitive accessibility, Section 508, EN 301 549, and the Accessibility Planner workflow."
 license: MIT
 user-invocable: false
 metadata:
