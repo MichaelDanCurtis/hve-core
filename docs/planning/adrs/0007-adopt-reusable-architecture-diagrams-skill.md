@@ -3,7 +3,7 @@ id: "0007"
 title: "Adopt a reusable architecture-diagrams skill for IaC-derived diagrams"
 description: "Adopt a single reusable architecture-diagrams skill as the shared capability for turning infrastructure-as-code sources into ASCII block diagrams or Mermaid flowcharts, invokable from any HVE-Core agent or chat context with the caller choosing the output format."
 author: "HVE Core Maintainers"
-ms.date: "2026-06-18"
+ms.date: "2026-06-19"
 ms.topic: "reference"
 status: "accepted"
 proposed_date: "2026-06-17"
@@ -75,7 +75,7 @@ The framing for this decision came directly from the requesting session:
 
 ## Decision Outcome
 
-We adopt a reusable `architecture-diagrams` skill at [.github/skills/hve-core/architecture-diagrams/SKILL.md](pathname://../../../.github/skills/hve-core/architecture-diagrams/SKILL.md) as the shared capability for IaC-derived diagrams.
+We adopt a reusable `architecture-diagrams` skill at [.github/skills/hve-core/architecture-diagrams/SKILL.md](https://github.com/microsoft/hve-core/blob/main/.github/skills/hve-core/architecture-diagrams/SKILL.md) as the shared capability for IaC-derived diagrams.
 
 | Decision driver               | Reusable shared skill | Dedicated diagram agent | Inline per-agent logic |
 |-------------------------------|-----------------------|-------------------------|------------------------|
@@ -153,7 +153,7 @@ If this decision is reversed, the rollback path is:
 
 1. Remove invocations of the `architecture-diagrams` skill from the consuming agents.
 2. Reintroduce diagram logic inline in the agents that still require it, or replace the skill with a dedicated diagram agent.
-3. Remove the skill at [.github/skills/hve-core/architecture-diagrams/SKILL.md](pathname://../../../.github/skills/hve-core/architecture-diagrams/SKILL.md) once no consumer references it.
+3. Remove the skill at [.github/skills/hve-core/architecture-diagrams/SKILL.md](https://github.com/microsoft/hve-core/blob/main/.github/skills/hve-core/architecture-diagrams/SKILL.md) once no consumer references it.
 4. Document the reversal in a superseding ADR that links back to this one and sets `superseded-by` here.
 
 No data migration is required; removing the skill leaves existing content untouched.
@@ -171,12 +171,12 @@ No data migration is required; removing the skill leaves existing content untouc
 
 The skill consumes infrastructure source files and produces either an ASCII
 block diagram or a Mermaid flowchart at the caller's choice. The capability
-lives at [.github/skills/hve-core/architecture-diagrams/SKILL.md](pathname://../../../.github/skills/hve-core/architecture-diagrams/SKILL.md). Current consumers are
-[.github/agents/project-planning/adr-creation.agent.md](../../../.github/agents/project-planning/adr-creation.agent.md),
-[.github/agents/project-planning/brd-builder.agent.md](../../../.github/agents/project-planning/brd-builder.agent.md),
-[.github/agents/project-planning/prd-builder.agent.md](../../../.github/agents/project-planning/prd-builder.agent.md),
-[.github/agents/project-planning/network-isa95-planner.agent.md](../../../.github/agents/project-planning/network-isa95-planner.agent.md), and
-[.github/agents/project-planning/system-architecture-reviewer.agent.md](../../../.github/agents/project-planning/system-architecture-reviewer.agent.md), each of which reads the
+lives at [.github/skills/hve-core/architecture-diagrams/SKILL.md](https://github.com/microsoft/hve-core/blob/main/.github/skills/hve-core/architecture-diagrams/SKILL.md). Current consumers are
+[.github/agents/project-planning/adr-creation.agent.md](https://github.com/microsoft/hve-core/blob/main/.github/agents/project-planning/adr-creation.agent.md),
+[.github/agents/project-planning/brd-builder.agent.md](https://github.com/microsoft/hve-core/blob/main/.github/agents/project-planning/brd-builder.agent.md),
+[.github/agents/project-planning/prd-builder.agent.md](https://github.com/microsoft/hve-core/blob/main/.github/agents/project-planning/prd-builder.agent.md),
+[.github/agents/project-planning/network-isa95-planner.agent.md](https://github.com/microsoft/hve-core/blob/main/.github/agents/project-planning/network-isa95-planner.agent.md), and
+[.github/agents/project-planning/system-architecture-reviewer.agent.md](https://github.com/microsoft/hve-core/blob/main/.github/agents/project-planning/system-architecture-reviewer.agent.md), each of which reads the
 skill on demand and requests its preferred output format. This is an
 informational, forward-looking adoption: it establishes the shared skill as the
 canonical path for IaC-derived diagrams without requiring migration of existing
