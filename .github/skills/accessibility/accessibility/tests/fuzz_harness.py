@@ -8,10 +8,10 @@ Runs as an Atheris coverage-guided fuzz target when executed directly.
 
 from __future__ import annotations
 
+import importlib
 import sys
 from contextlib import suppress
-
-import scan
+from pathlib import Path
 
 try:
     import atheris
@@ -20,6 +20,13 @@ except ImportError:
     FUZZING = False
 else:
     FUZZING = True
+
+_SKILL_ROOT = Path(__file__).resolve().parent.parent
+_SCRIPTS_DIR = _SKILL_ROOT / "scripts"
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+scan = importlib.import_module("scan")
 
 
 def fuzz_normalize_results(data: bytes) -> None:
@@ -68,7 +75,9 @@ class TestScanFuzzHarness:
 
     def test_normalize_results_handles_non_list_sections(self) -> None:
         with suppress(TypeError):
-            scan.normalize_results({"violations": {"id": "bad"}}, target="https://example.com")
+            scan.normalize_results(
+                {"violations": {"id": "bad"}}, target="https://example.com"
+            )
 
 
 if __name__ == "__main__" and FUZZING:

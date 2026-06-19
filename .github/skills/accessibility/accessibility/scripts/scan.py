@@ -95,9 +95,7 @@ def normalize_results(raw_results: dict[str, Any], target: str) -> dict[str, Any
         "target": target,
         "summary": {
             "violations": len(violations),
-            "passes": (
-                len(passes_payload) if isinstance(passes_payload, list) else 0
-            ),
+            "passes": (len(passes_payload) if isinstance(passes_payload, list) else 0),
             "incomplete": (
                 len(incomplete_payload) if isinstance(incomplete_payload, list) else 0
             ),

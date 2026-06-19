@@ -11,8 +11,9 @@ import pytest
 import scan
 
 
-def test_given_parser_when_target_and_output_provided_then_arguments_are_parsed(
-) -> None:
+def test_given_parser_when_target_and_output_provided_then_arguments_are_parsed() -> (
+    None
+):
     parser = scan.create_parser()
 
     args = parser.parse_args(["https://example.com", "--output", "report.json"])
