@@ -1,6 +1,6 @@
 ---
 name: rai-standards
-description: "Consolidated Responsible AI standards reference: NIST AI RMF 1.0 (7 trustworthiness characteristics, 4 functions, 72 subcategories), the AI STRIDE threat-modeling overlay, EU AI Act risk tiers, and an open-standards catalog with phase mapping"
+description: "Consolidated Responsible AI standards reference: NIST AI RMF 1.0, AI STRIDE threat-modeling overlay, EU AI Act risk tiers, and an open-standards catalog with phase mapping"
 license: mixed
 user-invocable: false
 metadata:

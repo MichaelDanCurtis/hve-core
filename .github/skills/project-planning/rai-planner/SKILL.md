@@ -1,6 +1,6 @@
 ---
 name: rai-planner
-description: "On-demand RAI planner reference pack for Phase 1 capture, Phase 2 risk classification, Phase 5 impact assessment, and Phase 6 review and backlog handoff. Read the matching reference when entering a phase boundary or when you need the detailed guidance for that phase."
+description: "On-demand RAI planner reference pack covering Phase 1 capture, Phase 2 risk classification, Phase 5 impact assessment, and Phase 6 review and backlog handoff."
 license: MIT
 user-invocable: false
 metadata:

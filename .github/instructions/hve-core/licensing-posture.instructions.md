@@ -1,5 +1,5 @@
 ---
-description: "Repository-wide posture for licensing, reproduction, and attribution of third-party standards and reference text in skills and tracking artifacts"
+description: "Repository posture for licensing, reproduction, and attribution of third-party standards in skills and tracking artifacts"
 applyTo: '**/skills/**, **/.copilot-tracking/**'
 ---
 
