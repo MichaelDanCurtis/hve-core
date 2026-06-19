@@ -690,6 +690,7 @@ function Invoke-CollectionValidation {
     $sharedSubdomainFolders = @{
         'shared'        = $true
         'rai-planning'  = $true
+        'rai'           = $true
         'accessibility' = $true
         'jira'          = $true
         'gitlab'        = $true

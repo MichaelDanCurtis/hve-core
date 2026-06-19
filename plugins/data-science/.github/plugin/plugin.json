@@ -5,13 +5,16 @@
   "agents": [
     "agents/data-science/",
     "agents/hve-core/subagents/",
-    "agents/rai-planning/"
+    "agents/rai-planning/",
+    "agents/rai-planning/subagents/"
   ],
   "commands": [
     "commands/data-science/",
     "commands/rai-planning/"
   ],
   "skills": [
+    "skills/project-planning/",
+    "skills/rai/",
     "skills/shared/"
   ]
 }

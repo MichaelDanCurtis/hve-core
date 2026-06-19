@@ -11,6 +11,7 @@
     "agents/project-planning/",
     "agents/project-planning/subagents/",
     "agents/rai-planning/",
+    "agents/rai-planning/subagents/",
     "agents/security/"
   ],
   "commands": [
@@ -23,6 +24,7 @@
     "skills/gitlab/",
     "skills/jira/",
     "skills/project-planning/",
+    "skills/rai/",
     "skills/shared/"
   ]
 }

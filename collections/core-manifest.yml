@@ -337,6 +337,13 @@ agents:
     collections:
     - hve-core
     - hve-core-all
+  .github/agents/hve-core/pr-walkthrough.agent.md:
+    path: .github/agents/hve-core/pr-walkthrough.agent.md
+    maturity: stable
+    collections:
+    - hve-core
+    - hve-core-all
+    - project-planning
   .github/agents/hve-core/prompt-builder.agent.md:
     path: .github/agents/hve-core/prompt-builder.agent.md
     maturity: stable
@@ -521,6 +528,22 @@ agents:
     - project-planning
   .github/agents/rai-planning/rai-planner.agent.md:
     path: .github/agents/rai-planning/rai-planner.agent.md
+    maturity: experimental
+    collections:
+    - data-science
+    - hve-core-all
+    - project-planning
+    - security
+  .github/agents/rai-planning/rai-reviewer.agent.md:
+    path: .github/agents/rai-planning/rai-reviewer.agent.md
+    maturity: experimental
+    collections:
+    - data-science
+    - hve-core-all
+    - project-planning
+    - security
+  .github/agents/rai-planning/subagents/rai-skill-assessor.agent.md:
+    path: .github/agents/rai-planning/subagents/rai-skill-assessor.agent.md
     maturity: experimental
     collections:
     - data-science
@@ -1249,6 +1272,12 @@ instructions:
     collections:
     - hve-core
     - hve-core-all
+  .github/instructions/hve-core/licensing-posture.instructions.md:
+    path: .github/instructions/hve-core/licensing-posture.instructions.md
+    maturity: experimental
+    collections:
+    - hve-core
+    - hve-core-all
   .github/instructions/hve-core/markdown.instructions.md:
     path: .github/instructions/hve-core/markdown.instructions.md
     maturity: experimental
@@ -1327,22 +1356,6 @@ instructions:
     collections:
     - hve-core-all
     - project-planning
-  .github/instructions/rai-planning/rai-backlog-handoff.instructions.md:
-    path: .github/instructions/rai-planning/rai-backlog-handoff.instructions.md
-    maturity: experimental
-    collections:
-    - data-science
-    - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/rai-planning/rai-capture-coaching.instructions.md:
-    path: .github/instructions/rai-planning/rai-capture-coaching.instructions.md
-    maturity: experimental
-    collections:
-    - data-science
-    - hve-core-all
-    - project-planning
-    - security
   .github/instructions/rai-planning/rai-identity.instructions.md:
     path: .github/instructions/rai-planning/rai-identity.instructions.md
     maturity: experimental
@@ -1351,61 +1364,16 @@ instructions:
     - hve-core-all
     - project-planning
     - security
-  .github/instructions/rai-planning/rai-impact-assessment.instructions.md:
-    path: .github/instructions/rai-planning/rai-impact-assessment.instructions.md
+  .github/instructions/rai-planning/rai-license-posture.instructions.md:
+    path: .github/instructions/rai-planning/rai-license-posture.instructions.md
     maturity: experimental
     collections:
     - data-science
-    - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/rai-planning/rai-risk-classification.instructions.md:
-    path: .github/instructions/rai-planning/rai-risk-classification.instructions.md
-    maturity: experimental
-    collections:
-    - data-science
-    - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/rai-planning/rai-security-model.instructions.md:
-    path: .github/instructions/rai-planning/rai-security-model.instructions.md
-    maturity: experimental
-    collections:
-    - data-science
-    - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/rai-planning/rai-standards.instructions.md:
-    path: .github/instructions/rai-planning/rai-standards.instructions.md
-    maturity: experimental
-    collections:
-    - data-science
-    - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/security/backlog-handoff.instructions.md:
-    path: .github/instructions/security/backlog-handoff.instructions.md
-    maturity: experimental
-    collections:
     - hve-core-all
     - project-planning
     - security
   .github/instructions/security/identity.instructions.md:
     path: .github/instructions/security/identity.instructions.md
-    maturity: experimental
-    collections:
-    - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/security/operational-buckets.instructions.md:
-    path: .github/instructions/security/operational-buckets.instructions.md
-    maturity: experimental
-    collections:
-    - hve-core-all
-    - project-planning
-    - security
-  .github/instructions/security/security-model.instructions.md:
-    path: .github/instructions/security/security-model.instructions.md
     maturity: experimental
     collections:
     - hve-core-all
@@ -1436,6 +1404,7 @@ instructions:
     path: .github/instructions/shared/disclaimer-language.instructions.md
     maturity: stable
     collections:
+    - coding-standards
     - data-science
     - design-thinking
     - hve-core-all
@@ -1476,6 +1445,14 @@ instructions:
     - coding-standards
     - data-science
     - hve-core
+    - hve-core-all
+    - project-planning
+    - security
+  .github/instructions/shared/untrusted-content-boundary.instructions.md:
+    path: .github/instructions/shared/untrusted-content-boundary.instructions.md
+    maturity: stable
+    collections:
+    - data-science
     - hve-core-all
     - project-planning
     - security
@@ -1610,12 +1587,35 @@ skills:
     collections:
     - hve-core-all
     - project-planning
+  .github/skills/project-planning/rai-planner:
+    path: .github/skills/project-planning/rai-planner
+    maturity: experimental
+    collections:
+    - data-science
+    - hve-core-all
+    - project-planning
+    - security
   .github/skills/project-planning/requirements-author:
     path: .github/skills/project-planning/requirements-author
     maturity: preview
     collections:
     - hve-core-all
     - project-planning
+  .github/skills/project-planning/security-planning:
+    path: .github/skills/project-planning/security-planning
+    maturity: experimental
+    collections:
+    - hve-core-all
+    - project-planning
+    - security
+  .github/skills/rai/rai-standards:
+    path: .github/skills/rai/rai-standards
+    maturity: experimental
+    collections:
+    - data-science
+    - hve-core-all
+    - project-planning
+    - security
   .github/skills/security/owasp-agentic:
     path: .github/skills/security/owasp-agentic
     maturity: experimental
@@ -1718,6 +1718,7 @@ releases:
     - .github/agents/experimental/subagents/pptx-subagent.agent.md
     - .github/agents/github/github-backlog-manager.agent.md
     - .github/agents/hve-core/memory.agent.md
+    - .github/agents/hve-core/pr-walkthrough.agent.md
     - .github/agents/hve-core/prompt-builder.agent.md
     - .github/agents/hve-core/rpi-agent.agent.md
     - .github/agents/hve-core/subagents/implementation-validator.agent.md
@@ -1762,6 +1763,7 @@ releases:
     - .github/instructions/shared/disclaimer-language.instructions.md
     - .github/instructions/shared/hve-core-location.instructions.md
     - .github/instructions/shared/story-quality.instructions.md
+    - .github/instructions/shared/untrusted-content-boundary.instructions.md
     - .github/prompts/ado/ado-add-work-item.prompt.md
     - .github/prompts/ado/ado-create-pull-request.prompt.md
     - .github/prompts/ado/ado-discover-work-items.prompt.md
@@ -1843,6 +1845,7 @@ releases:
     - .github/agents/hve-core/doc-ops.agent.md
     - .github/agents/hve-core/memory.agent.md
     - .github/agents/hve-core/pr-review.agent.md
+    - .github/agents/hve-core/pr-walkthrough.agent.md
     - .github/agents/hve-core/prompt-builder.agent.md
     - .github/agents/hve-core/rpi-agent.agent.md
     - .github/agents/hve-core/subagents/implementation-validator.agent.md
@@ -1871,6 +1874,8 @@ releases:
     - .github/agents/project-planning/system-architecture-reviewer.agent.md
     - .github/agents/project-planning/ux-ui-designer.agent.md
     - .github/agents/rai-planning/rai-planner.agent.md
+    - .github/agents/rai-planning/rai-reviewer.agent.md
+    - .github/agents/rai-planning/subagents/rai-skill-assessor.agent.md
     - .github/agents/security/security-planner.agent.md
     - .github/agents/security/security-reviewer.agent.md
     - .github/agents/security/sssc-planner.agent.md
@@ -1909,6 +1914,7 @@ releases:
     - .github/instructions/github/github-backlog-update.instructions.md
     - .github/instructions/hve-core/commit-message.instructions.md
     - .github/instructions/hve-core/git-merge.instructions.md
+    - .github/instructions/hve-core/licensing-posture.instructions.md
     - .github/instructions/hve-core/markdown.instructions.md
     - .github/instructions/hve-core/prompt-builder.instructions.md
     - .github/instructions/hve-core/pull-request.instructions.md
@@ -1918,22 +1924,15 @@ releases:
     - .github/instructions/jira/jira-backlog-triage.instructions.md
     - .github/instructions/jira/jira-backlog-update.instructions.md
     - .github/instructions/jira/jira-wit-planning.instructions.md
-    - .github/instructions/rai-planning/rai-backlog-handoff.instructions.md
-    - .github/instructions/rai-planning/rai-capture-coaching.instructions.md
     - .github/instructions/rai-planning/rai-identity.instructions.md
-    - .github/instructions/rai-planning/rai-impact-assessment.instructions.md
-    - .github/instructions/rai-planning/rai-risk-classification.instructions.md
-    - .github/instructions/rai-planning/rai-security-model.instructions.md
-    - .github/instructions/rai-planning/rai-standards.instructions.md
-    - .github/instructions/security/backlog-handoff.instructions.md
+    - .github/instructions/rai-planning/rai-license-posture.instructions.md
     - .github/instructions/security/identity.instructions.md
-    - .github/instructions/security/operational-buckets.instructions.md
-    - .github/instructions/security/security-model.instructions.md
     - .github/instructions/security/standards-mapping.instructions.md
     - .github/instructions/shared/coaching-patterns.instructions.md
     - .github/instructions/shared/disclaimer-language.instructions.md
     - .github/instructions/shared/hve-core-location.instructions.md
     - .github/instructions/shared/story-quality.instructions.md
+    - .github/instructions/shared/untrusted-content-boundary.instructions.md
     - .github/prompts/ado/ado-add-work-item.prompt.md
     - .github/prompts/ado/ado-create-pull-request.prompt.md
     - .github/prompts/ado/ado-discover-work-items.prompt.md
@@ -2012,6 +2011,9 @@ releases:
     - .github/skills/github/gh-code-scanning
     - .github/skills/gitlab/gitlab
     - .github/skills/jira/jira
+    - .github/skills/project-planning/rai-planner
+    - .github/skills/project-planning/security-planning
+    - .github/skills/rai/rai-standards
     - .github/skills/security/owasp-agentic
     - .github/skills/security/owasp-cicd
     - .github/skills/security/owasp-infrastructure

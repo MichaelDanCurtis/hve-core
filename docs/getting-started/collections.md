@@ -3,7 +3,7 @@ title: Collections Overview
 description: Explore the HVE collection system, compare available collections, and choose the right extension for your workflow
 sidebar_position: 3
 author: Microsoft
-ms.date: 2026-03-22
+ms.date: 2026-06-18
 ms.topic: overview
 ---
 
@@ -15,7 +15,7 @@ Two VS Code Marketplace extensions deliver these collections:
 
 ### HVE Core All (`ise-hve-essentials.hve-core-all`)
 
-The complete bundle containing 246 artifacts across all domains. If you want access to everything without choosing individual collections, install this extension. It is the recommended starting point for most users.
+The complete bundle containing 240 artifacts across all domains. If you want access to everything without choosing individual collections, install this extension. It is the recommended starting point for most users.
 
 ### HVE Installer (`ise-hve-essentials.hve-installer`)
 
@@ -54,7 +54,7 @@ The following diagram shows how the domain collections relate to the two marketp
 
 ```mermaid
 graph TD
-    HCA["hve#45;core#45;all<br/>(246 artifacts)"]
+    HCA["hve#45;core#45;all<br/>(240 artifacts)"]
     INS["installer<br/>(2 artifacts)"]
 
     ADO["ado"]
@@ -67,7 +67,6 @@ graph TD
     HC["hve#45;core"]
     JR["jira"]
     PP["project#45;planning"]
-    RP["rai#45;planning"]
     SP["security"]
 
     HCA --> ADO
@@ -80,7 +79,6 @@ graph TD
     HCA --> HC
     HCA --> JR
     HCA --> PP
-    HCA --> RP
     HCA --> SP
 ```
 
