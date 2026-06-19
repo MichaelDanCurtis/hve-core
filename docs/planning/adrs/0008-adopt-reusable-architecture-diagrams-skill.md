@@ -1,5 +1,5 @@
 ---
-id: "0007"
+id: "0008"
 title: "Adopt a reusable architecture-diagrams skill for IaC-derived diagrams"
 description: "Adopt a single reusable architecture-diagrams skill as the shared capability for turning infrastructure-as-code sources into ASCII block diagrams or Mermaid flowcharts, invokable from any HVE-Core agent or chat context with the caller choosing the output format."
 author: "HVE Core Maintainers"
