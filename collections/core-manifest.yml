@@ -457,12 +457,6 @@ agents:
     collections:
     - hve-core-all
     - project-planning
-  .github/agents/project-planning/arch-diagram-builder.agent.md:
-    path: .github/agents/project-planning/arch-diagram-builder.agent.md
-    maturity: experimental
-    collections:
-    - hve-core-all
-    - project-planning
   .github/agents/project-planning/brd-builder.agent.md:
     path: .github/agents/project-planning/brd-builder.agent.md
     maturity: experimental
@@ -1550,6 +1544,12 @@ skills:
     collections:
     - hve-core-all
     - project-planning
+  .github/skills/hve-core/architecture-diagrams:
+    path: .github/skills/hve-core/architecture-diagrams
+    maturity: experimental
+    collections:
+    - hve-core-all
+    - project-planning
   .github/skills/hve-core/vally-tests:
     path: .github/skills/hve-core/vally-tests
     maturity: experimental
@@ -1856,7 +1856,6 @@ releases:
     - .github/agents/jira/jira-prd-to-wit.agent.md
     - .github/agents/project-planning/adr-creation.agent.md
     - .github/agents/project-planning/agile-coach.agent.md
-    - .github/agents/project-planning/arch-diagram-builder.agent.md
     - .github/agents/project-planning/brd-builder.agent.md
     - .github/agents/project-planning/meeting-analyst.agent.md
     - .github/agents/project-planning/network-isa95-planner.agent.md
@@ -2001,6 +2000,7 @@ releases:
     - .github/skills/experimental/vscode-playwright
     - .github/skills/github/gh-code-scanning
     - .github/skills/gitlab/gitlab
+    - .github/skills/hve-core/architecture-diagrams
     - .github/skills/jira/jira
     - .github/skills/project-planning/rai-planner
     - .github/skills/project-planning/security-planning

@@ -1,13 +1,11 @@
 {
   "name": "project-planning",
-  "description": "Preview & Experimental: PRDs, BRDs, ADRs, and architecture diagrams. Unstable; may change or be removed without notice. Feedback: github.com/microsoft/hve-core/issues",
+  "description": "PRDs, BRDs, ADRs, and architecture diagrams",
   "version": "3.3.101",
   "agents": [
     "agents/accessibility/",
-    "agents/accessibility/subagents/",
     "agents/hve-core/",
     "agents/hve-core/subagents/",
-    "agents/jira/",
     "agents/project-planning/",
     "agents/project-planning/subagents/",
     "agents/rai-planning/",
@@ -15,16 +13,16 @@
     "agents/security/"
   ],
   "commands": [
-    "commands/jira/",
     "commands/rai-planning/",
     "commands/security/"
   ],
   "skills": [
     "skills/accessibility/",
-    "skills/gitlab/",
-    "skills/jira/",
+    "skills/experimental/",
+    "skills/hve-core/",
     "skills/project-planning/",
     "skills/rai/",
+    "skills/security/",
     "skills/shared/"
   ]
 }
