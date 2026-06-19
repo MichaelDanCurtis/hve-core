@@ -1,6 +1,7 @@
 ---
 name: Accessibility Reviewer
 description: "Accessibility skill assessment orchestrator for codebase profiling and accessibility findings reporting"
+user-invocable: true
 disable-model-invocation: true
 agents:
   - Codebase Profiler

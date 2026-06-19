@@ -12,7 +12,7 @@ items:
 - path: .github/agents/accessibility/accessibility-reviewer.agent.md
   kind: agent
   maturity: experimental
-- path: .github/agents/accessibility/subagents/accessibility-skill-assessor.agent.md
+- path: .github/agents/accessibility/subagents/accessibility-framework-assessor.agent.md
   kind: agent
   maturity: experimental
 - path: .github/agents/ado/ado-backlog-manager.agent.md
