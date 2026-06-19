@@ -1,13 +1,13 @@
 ---
 title: Architecture Diagrams Skill
-description: Use the portable architecture-diagrams skill to generate ASCII architecture diagrams from infrastructure source files
+description: Use the portable architecture-diagrams skill to generate ASCII or Mermaid architecture diagrams from infrastructure source files
 sidebar_position: 4
 author: Microsoft
-ms.date: 2026-06-18
+ms.date: 2026-06-19
 ms.topic: how-to
 ---
 
-The [architecture-diagrams skill](pathname://../../../.github/skills/hve-core/architecture-diagrams/SKILL.md) is the recommended way to generate ASCII architecture diagrams from infrastructure source files. It is especially useful for ADRs, onboarding guides, and design reviews when you want a quick, text-based view of a system's structure.
+The [architecture-diagrams skill](pathname://../../../.github/skills/hve-core/architecture-diagrams/SKILL.md) is the recommended way to generate ASCII or Mermaid architecture diagrams from infrastructure source files. It is especially useful for ADRs, onboarding guides, and design reviews when you want a quick, text-based view of a system's structure.
 
 ## When to Use This Skill
 
@@ -16,6 +16,7 @@ Use the skill when you need to:
 * inspect Terraform, Bicep, ARM, Kubernetes YAML, Docker Compose, or shell scripts
 * show service boundaries, data flow, ingress paths, and network zones
 * produce a diagram directly in chat without relying on a dedicated agent
+* choose ASCII or Mermaid output to match the document or review format
 
 ## Suggested Workflow
 

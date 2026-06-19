@@ -3,7 +3,7 @@ title: Project Planning Agents
 description: Agents for requirements gathering, architecture decisions, and security planning
 sidebar_position: 1
 author: Microsoft
-ms.date: 2026-06-17
+ms.date: 2026-06-19
 ms.topic: concept
 ---
 
@@ -75,7 +75,7 @@ Select any agent using the agent picker in the Copilot Chat pane. Each agent sta
 |------------------------|-----------------------------|----------------------------------------------------------------------------|
 | New project kickoff    | BRD Builder or PRD Builder  | Capture requirements before making architecture decisions                  |
 | Architecture decisions | ADR Creation Coach          | Evaluate technology choices, design patterns, or infrastructure approaches |
-| Visual documentation   | architecture-diagrams skill | Generate ASCII architecture diagrams for onboarding or reviews             |
+| Visual documentation   | architecture-diagrams skill | Generate ASCII or Mermaid architecture diagrams for onboarding or reviews  |
 | Security review        | Security Planner            | Assess threats and plan mitigations after architecture decisions stabilize |
 
 ### Recommended Sequencing
