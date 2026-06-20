@@ -351,6 +351,27 @@ Describe 'Invoke-CoreManifestValidation' {
         $result.Success | Should -BeFalse
         $result.Errors -join "`n" | Should -Match 'missing.md'
     }
+
+    It 'Fails when an artifact lists the same collection more than once' {
+        $manifest = New-CoreManifestFixture
+        $manifest.agents['.github/agents/test/test.agent.md'].collections = @('test', 'test')
+        Write-CoreManifestFixture -ManifestPath $script:manifestPath -Manifest $manifest
+
+        $result = Invoke-CoreManifestValidation -RepoRoot $script:repoRoot -ManifestPath $script:manifestPath
+        $result.Success | Should -BeFalse
+        $result.Errors -join "`n" | Should -Match "lists collection 'test' more than once"
+    }
+
+    It 'Fails when a release excludePaths entry is not in repo-relative slash form' {
+        $manifest = New-CoreManifestFixture
+        $manifest.releases['test-release'].excludePaths = @('.github\prompts\test\excluded.prompt.md')
+        Write-CoreManifestFixture -ManifestPath $script:manifestPath -Manifest $manifest
+
+        $result = Invoke-CoreManifestValidation -RepoRoot $script:repoRoot -ManifestPath $script:manifestPath
+        $result.Success | Should -BeFalse
+        $result.Errors -join "`n" | Should -Match 'excludePaths entry'
+        $result.Errors -join "`n" | Should -Match 'must use repo-relative slash form'
+    }
 }
 
 Describe 'Export-CoreManifestValidationReport' {
@@ -454,6 +475,30 @@ Describe 'Invoke-CoreManifestValidation maturity dependency rule' {
 
         $result.Success | Should -BeTrue
         $result.ErrorCount | Should -Be 0
+    }
+
+    It 'T4a: warns when an agents reference does not resolve to a manifest artifact' {
+        $manifest = New-CoreManifestFixture
+        Set-CoreManifestAgentReferences -RootPath $script:repoRoot -Path $script:sourceAgent -RequiresAgents @('Nonexistent Agent')
+        Write-CoreManifestFixture -ManifestPath $script:manifestPath -Manifest $manifest
+
+        $result = Invoke-CoreManifestValidation -RepoRoot $script:repoRoot -ManifestPath $script:manifestPath
+
+        $result.Success | Should -BeTrue
+        $result.Warnings -join "`n" | Should -Match "declares agent 'Nonexistent Agent' that does not resolve"
+    }
+
+    It 'T4b: warns when a handoff agent does not resolve to a manifest artifact' {
+        $manifest = New-CoreManifestFixture
+        Set-CoreManifestAgentReferences -RootPath $script:repoRoot -Path $script:sourceAgent -Handoffs @(
+            [ordered]@{ agent = 'Nonexistent Agent'; prompt = 'follow up manually'; label = 'Continue' }
+        )
+        Write-CoreManifestFixture -ManifestPath $script:manifestPath -Manifest $manifest
+
+        $result = Invoke-CoreManifestValidation -RepoRoot $script:repoRoot -ManifestPath $script:manifestPath
+
+        $result.Success | Should -BeTrue
+        $result.Warnings -join "`n" | Should -Match "declares handoff agent 'Nonexistent Agent' that does not resolve"
     }
 
     It 'T5: fails when a stable agent hands off to an experimental agent' {

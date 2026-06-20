@@ -159,9 +159,14 @@ function Invoke-CoreManifestValidation {
                 Add-Error "$sectionName entry '$artifactKey' must reference at least one collection."
             }
 
+            $seenCollectionIds = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
             foreach ($collectionId in $nonEmptyCollections) {
                 if (-not $collectionIds.Contains([string]$collectionId)) {
                     Add-Error "$sectionName entry '$artifactKey' references unknown collection '$collectionId'."
+                }
+
+                if (-not $seenCollectionIds.Add([string]$collectionId)) {
+                    Add-Error "$sectionName entry '$artifactKey' lists collection '$collectionId' more than once."
                 }
             }
 
@@ -220,6 +225,9 @@ function Invoke-CoreManifestValidation {
             if (-not [string]::IsNullOrWhiteSpace($target)) {
                 $edges.Add(@{ Target = $target; EdgeType = 'requires' })
             }
+            else {
+                Add-Warning "$sourcePath declares agent '$agentReference' that does not resolve to a manifest artifact."
+            }
         }
 
         $handoffs = Get-CoreManifestProperty -InputObject $sourceFrontmatter -Name 'handoffs'
@@ -233,6 +241,9 @@ function Invoke-CoreManifestValidation {
                 $target = Resolve-CoreManifestReferenceTarget -Reference ([string]$handoffAgent) -ReferenceKind 'agent' -AgentNameIndex $agentNameIndex -MaturityMap $maturityMap
                 if (-not [string]::IsNullOrWhiteSpace($target)) {
                     $edges.Add(@{ Target = $target; EdgeType = 'handoff-agent' })
+                }
+                else {
+                    Add-Warning "$sourcePath declares handoff agent '$handoffAgent' that does not resolve to a manifest artifact."
                 }
             }
 
@@ -317,9 +328,17 @@ function Invoke-CoreManifestValidation {
 
         $excludedSet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
         foreach ($excludePath in $excludePaths) {
-            if (-not [string]::IsNullOrWhiteSpace([string]$excludePath)) {
-                [void]$excludedSet.Add([string]$excludePath)
+            if ([string]::IsNullOrWhiteSpace([string]$excludePath)) {
+                continue
             }
+
+            $rawExcludePath = [string]$excludePath
+            $normalizedExcludePath = ConvertTo-CoreManifestRelativePath -Path $rawExcludePath
+            if ($rawExcludePath -ne $normalizedExcludePath) {
+                Add-Error "Release '$releaseId' excludePaths entry '$rawExcludePath' must use repo-relative slash form '$normalizedExcludePath'."
+            }
+
+            [void]$excludedSet.Add($normalizedExcludePath)
         }
 
         foreach ($artifactPath in $releaseArtifacts) {
