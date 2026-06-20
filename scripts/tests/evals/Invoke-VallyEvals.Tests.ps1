@@ -79,6 +79,21 @@ Describe 'VallyRunner module' -Tag 'Unit' {
             $result.resultsPath | Should -Match 'results\.jsonl$'
         }
 
+        It 'Treats a score above the configured threshold as passed even when gradeResult.passed is false' {
+            $runDir = Join-Path $script:WorkRoot 'run-threshold'
+            New-Item -ItemType Directory -Path $runDir -Force | Out-Null
+            $record = @{
+                trajectory = @{ stimulus = @{ name = 'tool-trigger' }; output = 'customer-card-render'; metrics = @{ wallTimeMs = 20 } }
+                gradeResult = @{ passed = $false; score = 0.6666666666666666; evidence = '2/3 graders passed' }
+            } | ConvertTo-Json -Depth 6 -Compress
+            Set-Content -LiteralPath (Join-Path $runDir 'results.jsonl') -Value @($record) -Encoding utf8
+
+            $result = Read-VallyResultsJsonl -RunDir $runDir -Threshold 0.6
+            $result.trials | Should -Be 1
+            $result.assertionsPassed | Should -Be 1
+            $result.assertionsFailed | Should -Be 0
+        }
+
         It 'Skips malformed lines without throwing' {
             $runDir = Join-Path $script:WorkRoot 'run-bad'
             New-Item -ItemType Directory -Path $runDir -Force | Out-Null
@@ -639,6 +654,87 @@ stimuli:
         $summary.totals.failedSpecs | Should -Be 1
         ($summary.perArtifact | Where-Object { $_.artifactId -eq 'pr-reference' }).status | Should -Be 'pass'
         ($summary.perArtifact | Where-Object { $_.artifactId -eq 'task-research' }).status | Should -Be 'fail'
+    }
+
+    It 'Filters stimulus artifacts to the requested kind' {
+        $specA = @'
+name: spec-a
+stimuli:
+  - name: s1
+    prompt: hi
+    tags:
+      skill: pr-reference
+'@
+        $specB = @'
+name: spec-b
+stimuli:
+  - name: s1
+    prompt: hi
+    tags:
+      agent: task-research
+'@
+        $artifacts = @(
+            @{ kind = 'skill'; artifactId = 'pr-reference'; path = '.github/skills/shared/pr-reference/SKILL.md'; status = 'M' }
+            @{ kind = 'agent'; artifactId = 'task-research'; path = '.github/agents/hve-core/task-research.agent.md'; status = 'M' }
+        )
+        $fx = New-EvalFixture -Artifacts $artifacts -Specs @(
+            @{ Name = 'spec-a.yaml'; Yaml = $specA },
+            @{ Name = 'spec-b.yaml'; Yaml = $specB }
+        )
+
+        $env:STUB_VALLY_MODE = 'pass'
+        try {
+            & pwsh -NoProfile -File $script:ScriptPath `
+                -ManifestPath $fx.ManifestPath `
+                -EvalRoot $fx.EvalRoot `
+                -LogsDir $fx.LogsDir `
+                -RepoRoot $fx.Root `
+                -VallyCommand $script:StubPath `
+                -Kind skill `
+                -SkipInputModeration `
+                -SkipOutputModeration *> $null
+        }
+        finally {
+            Remove-Item Env:\STUB_VALLY_MODE -ErrorAction SilentlyContinue
+        }
+        $LASTEXITCODE | Should -Be 0
+
+        $summary = Get-Content -LiteralPath $fx.SummaryPath -Raw | ConvertFrom-Json
+        $summary.totals.artifacts | Should -Be 1
+        $summary.perArtifact.Count | Should -Be 1
+        $summary.perArtifact[0].kind | Should -Be 'skill'
+        @($summary.kindFilter) | Should -Be @('skill')
+    }
+
+    It 'Exits 0 with an empty summary when no artifacts match the requested kind' {
+        $spec = @'
+name: skill-cover
+stimuli:
+  - name: s1
+    prompt: hi
+    tags:
+      skill: pr-reference
+'@
+        $artifacts = @(
+            @{ kind = 'skill'; artifactId = 'pr-reference'; path = '.github/skills/shared/pr-reference/SKILL.md'; status = 'M' }
+        )
+        $fx = New-EvalFixture -Artifacts $artifacts -Specs @(@{ Name = 'skill-pr-reference.yaml'; Yaml = $spec })
+
+        & pwsh -NoProfile -File $script:ScriptPath `
+            -ManifestPath $fx.ManifestPath `
+            -EvalRoot $fx.EvalRoot `
+            -LogsDir $fx.LogsDir `
+            -RepoRoot $fx.Root `
+            -VallyCommand $script:StubPath `
+            -Kind prompt `
+            -SkipInputModeration `
+            -SkipOutputModeration *> $null
+        $LASTEXITCODE | Should -Be 0
+
+        $summary = Get-Content -LiteralPath $fx.SummaryPath -Raw | ConvertFrom-Json
+        $summary.totals.artifacts | Should -Be 0
+        $summary.perArtifact.Count | Should -Be 0
+        @($summary.kindFilter) | Should -Be @('prompt')
     }
 
     It 'Does not run baseline equivalence by default for agent artifacts' {

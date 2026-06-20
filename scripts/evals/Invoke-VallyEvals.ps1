@@ -97,6 +97,8 @@ param(
     [string]$ManifestPath,
     [string]$EvalRoot,
     [string]$LogsDir,
+    [ValidateSet('agent','prompt','instruction','skill')]
+    [string[]]$Kind = @(),
     [string]$Model = 'claude-haiku-4.5',
     [string]$VallyCommand = 'vally',
     [string]$EquivalenceDriverPath,
@@ -332,13 +334,34 @@ if ($null -ne $manifest -and $null -ne $manifest.artifacts) {
     $artifacts = @($manifest.artifacts | Where-Object { [string]$_.status -ne 'D' })
 }
 
+# Per-kind shard filter. When -Kind is supplied, the stimulus artifacts[] loop
+# is narrowed to the matching kind(s) only. Baseline equivalence is cross-kind
+# (an instruction/skill change can promote a parent agent), so it stays owned by
+# the shard that includes 'agent' (or by an unfiltered run) and always reads the
+# manifest's full, unfiltered affectedAgents[] set.
+$kindFilter = @($Kind | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) })
+$shardOwnsEquivalence = ($kindFilter.Count -eq 0) -or ($kindFilter -contains 'agent')
+if ($kindFilter.Count -gt 0) {
+    $artifacts = @($artifacts | Where-Object { $kindFilter -contains [string]$_.kind })
+}
+
 $summaryPath = Join-Path -Path $resolvedLogsDir -ChildPath 'eval-summary.json'
 
-if ($artifacts.Count -eq 0) {
+# Equivalence work can remain even when this shard has zero changed stimulus
+# artifacts (e.g. a skill-only PR whose changed skill promotes a parent agent).
+# Only take the empty-summary fast path when no equivalence work is pending.
+$affectedAgentCount = 0
+if ($null -ne $manifest -and $manifest.PSObject.Properties.Name -contains 'affectedAgents' -and $null -ne $manifest.affectedAgents) {
+    $affectedAgentCount = @($manifest.affectedAgents | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }).Count
+}
+$equivalenceWorkPending = $EnableBaselineEquivalence -and $shardOwnsEquivalence -and $affectedAgentCount -gt 0
+
+if ($artifacts.Count -eq 0 -and -not $equivalenceWorkPending) {
     $emptySummary = [ordered]@{
         manifestPath = $resolvedManifest
         evalRoot     = $resolvedEvalRoot
         model        = $Model
+        kindFilter   = @($kindFilter)
         totals       = [ordered]@{
             artifacts        = 0
             specs            = 0
@@ -608,7 +631,7 @@ foreach ($specRel in $uniqueSpecs.Keys) {
 # `affectedAgents` field is precomputed by Get-ChangedAIArtifact.ps1 via the
 # AffectedAgents module, which also refreshes logs/agent-dependency-map.json
 # when stale.
-if ($EnableBaselineEquivalence) {
+if ($EnableBaselineEquivalence -and $shardOwnsEquivalence) {
     $manifestAffected = @()
     if ($null -ne $manifest -and $manifest.PSObject.Properties.Name -contains 'affectedAgents' -and $null -ne $manifest.affectedAgents) {
         $manifestAffected = @($manifest.affectedAgents)
@@ -624,8 +647,10 @@ if ($EnableBaselineEquivalence) {
 
 # Equivalence dispatch (Tier 2 baseline-equivalence). Per DD-01, PR-tier failures
 # are advisory: they surface in summary but do not increment $failedSpecs.
+# Only the agent-owning shard dispatches equivalence so cross-kind promotions are
+# not duplicated across parallel per-kind shards.
 $equivalenceResults = [System.Collections.Generic.List[object]]::new()
-if ($EnableBaselineEquivalence) {
+if ($EnableBaselineEquivalence -and $shardOwnsEquivalence) {
     foreach ($equivKey in $equivalenceSpecs.Keys) {
         $agentSlug = $equivalenceSpecs[$equivKey]
         $equivOutPath = Join-Path -Path $resolvedLogsDir -ChildPath "baseline-equivalence-$agentSlug.json"
@@ -779,6 +804,7 @@ $summary = [ordered]@{
     manifestPath = $resolvedManifest
     evalRoot     = $resolvedEvalRoot
     model        = $Model
+    kindFilter   = @($kindFilter)
     totals       = [ordered]@{
         artifacts        = $perArtifact.Count
         specs            = $perSpec.Count
