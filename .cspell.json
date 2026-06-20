@@ -28,7 +28,8 @@
     "docs/docusaurus/coverage/**",
     "dependency-pinning-artifacts/**",
     "evals/results/**",
-    "vally-results/**"
+    "vally-results/**",
+    "evals/agent-behavior/eval.yaml"
   ],
   "ignoreRegExpList": [
     "/#.*/g",
