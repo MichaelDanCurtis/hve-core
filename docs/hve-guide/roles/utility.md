@@ -50,9 +50,9 @@ documented in code comments.
 
 ### Documentation Operations
 
-The **doc-ops** agent handles documentation updates, link validation, and content maintenance. The `/checkpoint` prompt saves and restores conversation context across sessions using memory files.
+The **documentation** agent handles documentation audit, drift, authoring, and validation through its four modes. The `/checkpoint` prompt saves and restores conversation context across sessions using memory files.
 
-Select **doc-ops** agent:
+Select **documentation** agent:
 
 ```text
 Update documentation for the notification service. The v2.3 release added
@@ -62,7 +62,7 @@ getting started guide.
 ```
 
 ```text
-/doc-ops-update Sync docs with recent changes
+Select documentation agent in drift mode. Sync docs with recent changes.
 ```
 
 ```text
@@ -103,10 +103,10 @@ This fallback activates automatically. No manual configuration is needed.
 
 ### Agents
 
-| Agent       | Category      | Description                                |
-|-------------|---------------|--------------------------------------------|
-| **memory**  | Memory        | Session context and preference persistence |
-| **doc-ops** | Documentation | Documentation operations and maintenance   |
+| Agent             | Category      | Description                                           |
+|-------------------|---------------|-------------------------------------------------------|
+| **memory**        | Memory        | Session context and preference persistence            |
+| **documentation** | Documentation | Documentation audit, drift, authoring, and validation |
 
 ### Prompts
 
@@ -118,7 +118,6 @@ This fallback activates automatically. No manual configuration is needed.
 | pull-request       | Git           | `/pull-request`       | Pull request creation with template support           |
 | git-setup          | Git           | `/git-setup`          | Git configuration and environment setup               |
 | checkpoint         | Documentation | `/checkpoint`         | Save and restore conversation context across sessions |
-| doc-ops-update     | Documentation | `/doc-ops-update`     | Documentation sync and update operations              |
 | ado-get-build-info | Diagnostics   | `/ado-get-build-info` | Azure DevOps build status and log retrieval           |
 
 ### Skills
