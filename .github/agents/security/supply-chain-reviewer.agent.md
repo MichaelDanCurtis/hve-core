@@ -95,12 +95,12 @@ Skill resolution: Read the `supply-chain-security` skill entry and follow its no
 
 ### Subagents
 
-| Name | Agent File | Purpose |
-|------|------------|---------|
-| Codebase Profiler | `.github/agents/**/codebase-profiler.agent.md` | Builds the repository profile and identifies applicable skills. |
+| Name                        | Agent File                                               | Purpose                                                                  |
+|-----------------------------|----------------------------------------------------------|--------------------------------------------------------------------------|
+| Codebase Profiler           | `.github/agents/**/codebase-profiler.agent.md`           | Builds the repository profile and identifies applicable skills.          |
 | Supply Chain Skill Assessor | `.github/agents/**/supply-chain-skill-assessor.agent.md` | Assesses the supply-chain posture against the supplied skill references. |
-| Finding Deep Verifier | `.github/agents/**/finding-deep-verifier.agent.md` | Deep verification of findings using the full reference set. |
-| Report Generator | `.github/agents/**/report-generator.agent.md` | Collates verified findings and writes the final report. |
+| Finding Deep Verifier       | `.github/agents/**/finding-deep-verifier.agent.md`       | Deep verification of findings using the full reference set.              |
+| Report Generator            | `.github/agents/**/report-generator.agent.md`            | Collates verified findings and writes the final report.                  |
 
 ### Available Skills
 

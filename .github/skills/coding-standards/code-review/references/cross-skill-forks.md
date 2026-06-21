@@ -10,13 +10,13 @@ Some review board items warrant a specialist follow-up. The review loop should s
 
 ## Fork catalog
 
-| Board item area | Suggested extension | Gating signal |
-| --- | --- | --- |
-| Authentication, authorization, secrets, or trust boundaries | Security review skill or security collection | Security capability available |
-| Keyboard, focus, semantics, or assistive-technology concerns | Accessibility skill or accessibility collection | Accessibility capability available |
-| GitLab-specific review comments or MR workflows | GitLab skill | GitLab poster capability available |
-| Azure DevOps-specific review comments or work item linking | ADO instructions and templates | ADO review context available |
-| Repository workflow or PR hygiene concerns | GitHub or GitLab review capability | Matching repository capability available |
+| Board item area                                              | Suggested extension                             | Gating signal                            |
+|--------------------------------------------------------------|-------------------------------------------------|------------------------------------------|
+| Authentication, authorization, secrets, or trust boundaries  | Security review skill or security collection    | Security capability available            |
+| Keyboard, focus, semantics, or assistive-technology concerns | Accessibility skill or accessibility collection | Accessibility capability available       |
+| GitLab-specific review comments or MR workflows              | GitLab skill                                    | GitLab poster capability available       |
+| Azure DevOps-specific review comments or work item linking   | ADO instructions and templates                  | ADO review context available             |
+| Repository workflow or PR hygiene concerns                   | GitHub or GitLab review capability              | Matching repository capability available |
 
 ## Gating behavior
 
