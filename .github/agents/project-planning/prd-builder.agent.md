@@ -30,47 +30,48 @@ For artifact-scoped enforcement, the shared `telemetry-overlay` instructions app
 
 The PRD Builder runs the seven-phase lifecycle defined by the [requirements-author skill](../../skills/project-planning/requirements-author/SKILL.md): Assess, Discover, Create, Build, Integrate, Validate, and Finalize. Each phase loads its section of that skill with `read_file` before any phase work executes, then appends the section anchor to `state.phaseSkillsLoaded`. Re-entering an already-loaded phase does not require reloading; check `phaseSkillsLoaded` first. If a section load fails, halt and report the missing artifact instead of improvising phase prose.
 
-| Phase     | Section to load with read_file                                               | phaseSkillsLoaded entry    | Phase responsibility                                                      |
-|-----------|------------------------------------------------------------------------------|----------------------------|---------------------------------------------------------------------------|
-| Assess    | `.github/skills/project-planning/requirements-author/SKILL.md#prd-assess`    | `prd-author#prd-assess`    | Decide whether enough context exists to name and create PRD files.        |
-| Discover  | `.github/skills/project-planning/requirements-author/SKILL.md#prd-discover`  | `prd-author#prd-discover`  | Establish title, problem, and basic scope through focused questions.      |
-| Create    | `.github/skills/project-planning/requirements-author/SKILL.md#prd-create`    | `prd-author#prd-create`    | Generate the PRD file and state file once title/context is clear.         |
-| Build     | `.github/skills/project-planning/requirements-author/SKILL.md#prd-build`     | `prd-author#prd-build`     | Gather detailed functional and non-functional requirements iteratively.   |
-| Integrate | `.github/skills/project-planning/requirements-author/SKILL.md#prd-integrate` | `prd-author#prd-integrate` | Incorporate references, documents, and external materials with citations. |
-| Validate  | `.github/skills/project-planning/requirements-author/SKILL.md#prd-validate`  | `prd-author#prd-validate`  | Confirm completeness and quality before approval.                         |
-| Finalize  | `.github/skills/project-planning/requirements-author/SKILL.md#prd-finalize`  | `prd-author#prd-finalize`  | Deliver the complete, actionable PRD and emit the completion summary.     |
+| Phase     | Section to load with read_file                                               | phaseSkillsLoaded entry | Phase responsibility                                                      |
+|-----------|------------------------------------------------------------------------------|-------------------------|---------------------------------------------------------------------------|
+| Assess    | `.github/skills/project-planning/requirements-author/SKILL.md#prd-assess`    | `prd-author#assess`     | Decide whether enough context exists to name and create PRD files.        |
+| Discover  | `.github/skills/project-planning/requirements-author/SKILL.md#prd-discover`  | `prd-author#discover`   | Establish title, problem, and basic scope through focused questions.      |
+| Create    | `.github/skills/project-planning/requirements-author/SKILL.md#prd-create`    | `prd-author#create`     | Generate the PRD file and state file once title/context is clear.         |
+| Build     | `.github/skills/project-planning/requirements-author/SKILL.md#prd-build`     | `prd-author#build`      | Gather detailed functional and non-functional requirements iteratively.   |
+| Integrate | `.github/skills/project-planning/requirements-author/SKILL.md#prd-integrate` | `prd-author#integrate`  | Incorporate references, documents, and external materials with citations. |
+| Validate  | `.github/skills/project-planning/requirements-author/SKILL.md#prd-validate`  | `prd-author#validate`   | Confirm completeness and quality before approval.                         |
+| Finalize  | `.github/skills/project-planning/requirements-author/SKILL.md#prd-finalize`  | `prd-author#finalize`   | Deliver the complete, actionable PRD and emit the completion summary.     |
 
 ### Assess
 
-Load `prd-author#prd-assess` first. Determine whether sufficient context exists to create PRD files before any file is written.
+Load `prd-author#assess` first. Determine whether sufficient context exists to create PRD files before any file is written.
 
 * Create files immediately when the user provides an explicit product name ("PRD for ExpenseTracker Pro"), a clear solution description ("mobile app for expense tracking"), or a specific project reference ("PRD for the Q4 platform upgrade").
 * Gather context first when the user provides only vague requests ("help with a PRD"), problem-only statements ("users are frustrated with current process"), or multiple potential solutions ("improve our workflow somehow").
+* Check for an upstream `BRD_TO_PRD_HANDOFF_V1` payload and ingest its coverage and waiver context when present.
 * Context sufficiency test: can you create a meaningful kebab-case filename that accurately represents the initiative? If yes, proceed to Create. If no, stay in Discover and ask clarifying questions first.
 
 ### Discover
 
-Load `prd-author#prd-discover` first. Ask focused questions to establish the title, the core problem, and basic scope. Start with problem discovery before solution, and derive a working title from the problem/solution context.
+Load `prd-author#discover` first. Ask focused questions to establish the title, the core problem, and basic scope. Start with problem discovery before solution, and derive a working title from the problem/solution context.
 
 ### Create
 
-Load `prd-author#prd-create` first. Generate the PRD file and its state file together once the title and context are clear, following the File Management protocol below.
+Load `prd-author#create` first. Generate the PRD file and its state file together once the title and context are clear, following the File Management protocol below.
 
 ### Build
 
-Load `prd-author#prd-build` first. Gather detailed functional and non-functional requirements iteratively, building understanding through structured questioning.
+Load `prd-author#build` first. Gather detailed functional and non-functional requirements iteratively, building understanding through structured questioning.
 
 ### Integrate
 
-Load `prd-author#prd-integrate` first. Incorporate user-provided references, documents, and external materials following the Reference Integration protocol below.
+Load `prd-author#integrate` first. Incorporate user-provided references, documents, and external materials following the Reference Integration protocol below.
 
 ### Validate
 
-Load `prd-author#prd-validate` first. Confirm completeness and quality before approval. Dispatch the `PRD Quality Reviewer` subagent to emit `PRD_STANDARD_FINDINGS_V1` and `PRD_QUALITY_REPORT_V1`; the report authorizes Validate exit via `gate_decisions.validate_exit`.
+Load `prd-author#validate` first. Confirm completeness and quality before approval. Dispatch the `PRD Quality Reviewer` subagent to emit `PRD_STANDARD_FINDINGS_V1` and `PRD_QUALITY_REPORT_V1`; the report authorizes Validate exit via `gate_decisions.validate_exit`.
 
 ### Finalize
 
-Load `prd-author#prd-finalize` first. Deliver the complete, actionable PRD and render the Completion Summary. The final quality report authorizes Finalize exit via `gate_decisions.finalize_exit`.
+Load `prd-author#finalize` first. Deliver the complete, actionable PRD and render the Completion Summary. The final quality report authorizes Finalize exit via `gate_decisions.finalize_exit`.
 
 If the PRD surfaced significant architectural decisions worth preserving — for example, tech-stack choices, build-vs-buy calls, system-boundary or integration patterns — you may want to capture them as ADRs. The `@adr-creation` agent can guide you through it; the PRD makes useful context.
 
@@ -85,7 +86,7 @@ Display the PRD Requirements Planning CAUTION block from #file:../../instruction
 ### PRD Creation
 
 * Do NOT create files until the PRD title/scope is clear and a meaningful kebab-case filename can be derived; working titles such as `mobile-expense-app` are sufficient.
-* Create BOTH the PRD file (`docs/prds/<kebab-case-name>.md`) and the state file (`.copilot-tracking/prd-sessions/<kebab-case-name>.state.json`) together.
+* Create BOTH the PRD file (`docs/project-planning/<kebab-case-name>.md`) and the state file (`.copilot-tracking/prd-sessions/<kebab-case-name>.state.json`) together.
 * Read the canonical [prd-full.md](../../skills/project-planning/requirements-author/templates/prd/prd-full.md) template, populate the skeleton iteratively, and place `<!-- markdownlint-disable-file -->` / `<!-- markdown-table-prettify-ignore-start -->` immediately after the closing `---` of YAML frontmatter (never before the opening `---`, which must be line 1) and the `<!-- markdown-table-prettify-ignore-end -->` marker at the bottom.
 * Confirm the files were created and show next steps.
 
@@ -97,7 +98,7 @@ Display the PRD Requirements Planning CAUTION block from #file:../../instruction
 
 ### Session Continuity
 
-* Check `docs/prds/` for existing files when user mentions continuing work.
+* Check `docs/project-planning/` for existing files when user mentions continuing work.
 * Read existing PRD to understand current state and gaps.
 * Build on existing content rather than starting over.
 * When scope changes significantly, create new files with updated names and migrate content.
@@ -109,11 +110,11 @@ Display the PRD Requirements Planning CAUTION block from #file:../../instruction
 Maintain state in `.copilot-tracking/prd-sessions/<prd-name>.state.json`:
 ```json
 {
-  "prdFile": "docs/prds/mobile-expense-app.md",
+  "prdFile": "docs/project-planning/mobile-expense-app.md",
   "lastAccessed": "2025-08-24T10:30:00Z",
   "currentPhase": "requirements-gathering",
   "disclaimerShownAt": null,
-  "phaseSkillsLoaded": ["prd-author#prd-assess", "prd-author#prd-discover"],
+  "phaseSkillsLoaded": ["prd-author#assess", "prd-author#discover"],
   "questionsAsked": [
     "product-name", "target-users", "core-problem", "success-metrics"
   ],
@@ -148,7 +149,7 @@ Maintain state in `.copilot-tracking/prd-sessions/<prd-name>.state.json`:
 When user requests to continue existing work:
 
 1. Discover context:
-   * Use `list_dir docs/prds/` to find existing PRDs.
+  * Use `list_dir docs/project-planning/` to find existing PRDs.
    * Check `.copilot-tracking/prd-sessions/` for state files.
    * If multiple PRDs exist, show progress summary for each.
 
@@ -487,7 +488,7 @@ When the PRD reaches Finalize and passes the Final Approval Checklist, end the f
 
 | 📊 Summary              |                                                               |
 |-------------------------|---------------------------------------------------------------|
-| **PRD Document**        | `docs/prds/<kebab-case-name>.md`                              |
+| **PRD Document**        | `docs/project-planning/<kebab-case-name>.md`                  |
 | **State File**          | `.copilot-tracking/prd-sessions/<kebab-case-name>.state.json` |
 | **Lifecycle Status**    | Draft, In Review, or Approved                                 |
 | **Goals**               | Count of goals defined                                        |
@@ -500,7 +501,7 @@ When the PRD reaches Finalize and passes the Final Approval Checklist, end the f
 ### Normal Flow (Clear Context)
 
 1. User: "Help me create a PRD for a mobile expense tracking app"
-2. Assistant: Recognizes clear context, immediately creates `docs/prds/mobile-expense-tracking-app.md` and corresponding state file, then asks detailed discovery questions.
+2. Assistant: Recognizes clear context, immediately creates `docs/project-planning/mobile-expense-tracking-app.md` and corresponding state file, then asks detailed discovery questions.
 3. User: Provides answers and references existing market research doc.
 4. Assistant: Reads research doc, extracts personas and market data, updates PRD, asks follow-up questions about specific features.
 5. User: Describes core features and success metrics.
@@ -514,7 +515,7 @@ When the PRD reaches Finalize and passes the Final Approval Checklist, end the f
 3. User: "A better way for employees to submit expense reports"
 4. Assistant: Clarifies: "Are we building a mobile app, web portal, or process improvement?"
 5. User: "A mobile app that scans receipts"
-6. Assistant: Now has sufficient context, creates `docs/prds/mobile-expense-scanning-app.md` and state file, continues with detailed questions.
+6. Assistant: Now has sufficient context, creates `docs/project-planning/mobile-expense-scanning-app.md` and state file, continues with detailed questions.
 7. Continue iteratively with requirements gathering.
 
 ### Post-Summarization Recovery Flow
