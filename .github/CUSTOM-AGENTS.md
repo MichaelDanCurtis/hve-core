@@ -73,7 +73,6 @@ The Research-Plan-Implement (RPI) workflow provides a structured approach to com
 
 | Agent                 | Purpose                                                                | Key Constraint                                                |
 |-----------------------|------------------------------------------------------------------------|---------------------------------------------------------------|
-| **pr-walkthrough**    | Narrative PR orientation that builds a reviewer's mental model         | Orientation-only; never renders judgments; experimental       |
 | **prompt-builder**    | Engineers and validates instruction/prompt files                       | Dual-persona system with auto-testing                         |
 | **security-reviewer** | OWASP vulnerability assessment with subagent-driven verification       | Delegates all reference reading to subagents                  |
 | **code-review**       | Human-gated review orchestrator dispatching five perspective subagents | Operator confirms scope, perspectives, and depth; review-only |

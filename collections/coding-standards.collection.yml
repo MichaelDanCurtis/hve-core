@@ -41,6 +41,15 @@ items:
   - path: .github/agents/coding-standards/subagents/code-review-pr.agent.md
     kind: agent
     maturity: experimental
+  - path: .github/agents/coding-standards/subagents/code-review-explainer.agent.md
+    kind: agent
+    maturity: experimental
+  - path: .github/agents/coding-standards/subagents/code-review-walkback.agent.md
+    kind: agent
+    maturity: experimental
+  - path: .github/agents/hve-core/subagents/researcher-subagent.agent.md
+    kind: agent
+    maturity: stable
   # Instructions
   - path: .github/instructions/coding-standards/code-review/diff-computation.instructions.md
     kind: instruction

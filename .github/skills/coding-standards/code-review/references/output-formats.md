@@ -59,6 +59,16 @@ Structure the merged report in this order:
 
 Omit sections that only apply to perspectives that were skipped.
 
+## Narrative and board shapes
+
+For orientation-first reviews, emit a factual walkthrough narrative before the detailed findings register. The walkthrough should be stored in the review folder and should be followed by an enumerated dispatch board that lists review items, their status, and the next action.
+
+Use the following lightweight shapes:
+
+- Narrative walkthrough — factual Register 1 prose with a diff summary, runway summary, and appendices.
+- Dispatch board — an enumerated list or markdown table of board items with id, area, status, register, summary, links, and selectable symbols.
+- Emission record — the selected emission mode, target, status, and a short outcome summary.
+
 ## Persist and present
 
 Do not present the full report until both `review.md` and `metadata.json` have been successfully written to disk.

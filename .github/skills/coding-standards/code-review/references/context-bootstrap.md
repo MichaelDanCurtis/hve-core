@@ -8,6 +8,10 @@ ms.date: 2026-06-18
 
 Before any perspective lanes are dispatched, establish the review context once and use it consistently across the run. This Tier 0 step produces a human-confirmable change brief and a scoped set of hotspot candidates.
 
+## Orientation entry
+
+Start with the orientation floor from [Walkthrough Protocol](walkthrough-protocol.md) before deeper review dispatch. Use the walkthrough to map the diff and runway, then carry the resulting appendices into the dispatch board.
+
 ## Tier 0 procedure
 
 1. Compute the diff once from the selected base branch and capture the changed-file surface.

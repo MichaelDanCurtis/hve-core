@@ -6,7 +6,8 @@
     "agents/accessibility/",
     "agents/accessibility/subagents/",
     "agents/coding-standards/",
-    "agents/coding-standards/subagents/"
+    "agents/coding-standards/subagents/",
+    "agents/hve-core/subagents/"
   ],
   "skills": [
     "skills/coding-standards/",
