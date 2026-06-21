@@ -34,6 +34,68 @@ $validMaturityValues = @('stable', 'preview', 'experimental', 'deprecated', 'rem
 $coreManifestHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath 'Modules/CoreManifestHelpers.psm1'
 Import-Module -Name $coreManifestHelpersPath -Force
 
+function Get-VSCodeAssetFolderSyncErrors {
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$RepoRoot
+    )
+
+    $settingsPath = Join-Path -Path $RepoRoot -ChildPath '.vscode/settings.json'
+    if (-not (Test-Path -Path $settingsPath -PathType Leaf)) {
+        return @("VS Code settings file '.vscode/settings.json' does not exist.")
+    }
+
+    $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json -AsHashtable
+    $locationSections = @(
+        @{ Name = 'instructions'; SettingsKey = 'chat.instructionsFilesLocations'; BasePath = '.github/instructions' },
+        @{ Name = 'agents'; SettingsKey = 'chat.agentFilesLocations'; BasePath = '.github/agents' },
+        @{ Name = 'prompts'; SettingsKey = 'chat.promptFilesLocations'; BasePath = '.github/prompts' },
+        @{ Name = 'skills'; SettingsKey = 'chat.agentSkillsLocations'; BasePath = '.github/skills' }
+    )
+
+    $errors = [System.Collections.Generic.List[string]]::new()
+
+    foreach ($locationSection in $locationSections) {
+        $settingsKey = $locationSection.SettingsKey
+        $basePath = $locationSection.BasePath
+        $configuredLocations = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+
+        if ($settings.ContainsKey($settingsKey) -and $null -ne $settings[$settingsKey]) {
+            foreach ($configuredLocation in $settings[$settingsKey].Keys) {
+                $normalizedLocation = ConvertTo-CoreManifestRelativePath -Path ([string]$configuredLocation)
+                [void]$configuredLocations.Add($normalizedLocation)
+            }
+        }
+
+        $actualLocations = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+        $baseDirectory = Join-Path -Path $RepoRoot -ChildPath $basePath
+        if (Test-Path -Path $baseDirectory -PathType Container) {
+            foreach ($childDirectory in (Get-ChildItem -Path $baseDirectory -Directory -Force)) {
+                $relativePath = ConvertTo-CoreManifestRelativePath -Path ([System.IO.Path]::GetRelativePath($RepoRoot, $childDirectory.FullName).Replace('\\', '/'))
+                [void]$actualLocations.Add($relativePath)
+            }
+        }
+
+        foreach ($configuredLocation in $configuredLocations) {
+            $absoluteConfiguredPath = Join-Path -Path $RepoRoot -ChildPath $configuredLocation
+            if (-not (Test-Path -Path $absoluteConfiguredPath -PathType Container)) {
+                $errors.Add("VS Code settings entry '$configuredLocation' for '$settingsKey' does not exist on disk.")
+            }
+        }
+
+        foreach ($actualLocation in $actualLocations) {
+            if (-not $configuredLocations.Contains($actualLocation)) {
+                $errors.Add("Asset folder '$actualLocation' exists on disk but is not registered in VS Code settings ('$settingsKey').")
+            }
+        }
+    }
+
+    return @($errors)
+}
+
 function Invoke-CoreManifestValidation {
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -73,6 +135,11 @@ function Invoke-CoreManifestValidation {
             Errors       = @($errors)
             Warnings     = @($warnings)
         }
+    }
+
+    $vsCodeAssetFolderErrors = Get-VSCodeAssetFolderSyncErrors -RepoRoot $RepoRoot
+    foreach ($vsCodeAssetFolderError in $vsCodeAssetFolderErrors) {
+        Add-Error $vsCodeAssetFolderError
     }
 
     $requiredSections = @('schemaVersion', 'collections', 'agents', 'prompts', 'instructions', 'skills', 'releases')

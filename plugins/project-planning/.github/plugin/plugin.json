@@ -4,7 +4,6 @@
   "version": "3.3.101",
   "agents": [
     "agents/accessibility/",
-    "agents/accessibility/subagents/",
     "agents/hve-core/",
     "agents/hve-core/subagents/",
     "agents/jira/",

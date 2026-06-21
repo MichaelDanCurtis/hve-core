@@ -213,16 +213,15 @@ agents:
     - project-planning
   .github/agents/accessibility/accessibility-reviewer.agent.md:
     path: .github/agents/accessibility/accessibility-reviewer.agent.md
-    maturity: preview
+    maturity: experimental
     collections:
     - hve-core-all
     - project-planning
-  .github/agents/accessibility/subagents/accessibility-skill-assessor.agent.md:
-    path: .github/agents/accessibility/subagents/accessibility-skill-assessor.agent.md
-    maturity: preview
+  .github/agents/accessibility/subagents/accessibility-framework-assessor.agent.md:
+    path: .github/agents/accessibility/subagents/accessibility-framework-assessor.agent.md
+    maturity: experimental
     collections:
     - hve-core-all
-    - project-planning
   .github/agents/coding-standards/code-review-accessibility.agent.md:
     path: .github/agents/coding-standards/code-review-accessibility.agent.md
     maturity: experimental
@@ -1442,32 +1441,8 @@ instructions:
     - project-planning
     - security
 skills:
-  .github/skills/accessibility/aria-apg:
-    path: .github/skills/accessibility/aria-apg
-    maturity: preview
-    collections:
-    - hve-core-all
-    - project-planning
-  .github/skills/accessibility/coga:
-    path: .github/skills/accessibility/coga
-    maturity: preview
-    collections:
-    - hve-core-all
-    - project-planning
-  .github/skills/accessibility/en-301-549:
-    path: .github/skills/accessibility/en-301-549
-    maturity: preview
-    collections:
-    - hve-core-all
-    - project-planning
-  .github/skills/accessibility/section-508:
-    path: .github/skills/accessibility/section-508
-    maturity: preview
-    collections:
-    - hve-core-all
-    - project-planning
-  .github/skills/accessibility/wcag-22:
-    path: .github/skills/accessibility/wcag-22
+  .github/skills/accessibility/accessibility:
+    path: .github/skills/accessibility/accessibility
     maturity: preview
     collections:
     - hve-core-all
@@ -1563,12 +1538,6 @@ skills:
   .github/skills/jira/jira:
     path: .github/skills/jira/jira
     maturity: stable
-    collections:
-    - hve-core-all
-    - project-planning
-  .github/skills/project-planning/accessibility-planner-playbook:
-    path: .github/skills/project-planning/accessibility-planner-playbook
-    maturity: preview
     collections:
     - hve-core-all
     - project-planning

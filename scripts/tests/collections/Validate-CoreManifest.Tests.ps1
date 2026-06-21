@@ -16,6 +16,7 @@ BeforeAll {
         New-Item -ItemType Directory -Path (Join-Path $RootPath '.github/prompts/test') -Force | Out-Null
         New-Item -ItemType Directory -Path (Join-Path $RootPath '.github/instructions/test') -Force | Out-Null
         New-Item -ItemType Directory -Path (Join-Path $RootPath '.github/skills/test/test-skill') -Force | Out-Null
+        New-Item -ItemType Directory -Path (Join-Path $RootPath '.vscode') -Force | Out-Null
 
         Set-Content -Path (Join-Path $RootPath '.github/agents/test/test.agent.md') -Value "---`ndescription: test agent`n---"
         Set-Content -Path (Join-Path $RootPath '.github/prompts/test/test.prompt.md') -Value "---`ndescription: test prompt`n---"
@@ -23,6 +24,24 @@ BeforeAll {
         Set-Content -Path (Join-Path $RootPath '.github/skills/test/test-skill/SKILL.md') -Value '# Test skill'
         Set-Content -Path (Join-Path $RootPath 'CHANGELOG.md') -Value '# Changelog'
         Set-Content -Path (Join-Path $RootPath 'release-please-config.json') -Value '{}'
+
+        $settings = [ordered]@{
+            'chat.instructionsFilesLocations' = [ordered]@{
+                '.github/instructions/test' = $true
+            }
+            'chat.agentFilesLocations'        = [ordered]@{
+                '.github/agents/test' = $true
+            }
+            'chat.promptFilesLocations'       = [ordered]@{
+                '.github/prompts/test' = $true
+            }
+            'chat.agentSkillsLocations'       = [ordered]@{
+                '.github/skills' = $true
+                '.github/skills/test' = $true
+            }
+        }
+
+        $settings | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $RootPath '.vscode/settings.json')
     }
 
     function New-CoreManifestFixture {
@@ -224,6 +243,7 @@ Describe 'Invoke-CoreManifestValidation' {
     BeforeEach {
         $script:repoRoot = Join-Path $TestDrive 'repo'
         $script:manifestPath = Join-Path $script:repoRoot 'collections/core-manifest.yml'
+        Remove-Item -Path $script:repoRoot -Recurse -Force -ErrorAction SilentlyContinue
         New-CoreManifestTestRepo -RootPath $script:repoRoot
     }
 
@@ -246,6 +266,31 @@ Describe 'Invoke-CoreManifestValidation' {
 
         $result.Success | Should -BeFalse
         $result.Errors -join "`n" | Should -Match "schemaVersion"
+    }
+
+    It 'Fails when an asset folder exists on disk but is missing from VS Code settings' {
+        $manifest = New-CoreManifestFixture
+        Write-CoreManifestFixture -ManifestPath $script:manifestPath -Manifest $manifest
+        New-Item -ItemType Directory -Path (Join-Path $script:repoRoot '.github/instructions/extra') -Force | Out-Null
+
+        $result = Invoke-CoreManifestValidation -RepoRoot $script:repoRoot -ManifestPath $script:manifestPath
+
+        $result.Success | Should -BeFalse
+        $result.Errors -join "`n" | Should -Match '.github/instructions/extra'
+    }
+
+    It 'Fails when VS Code settings reference an asset folder that is missing on disk' {
+        $manifest = New-CoreManifestFixture
+        Write-CoreManifestFixture -ManifestPath $script:manifestPath -Manifest $manifest
+        $settingsPath = Join-Path $script:repoRoot '.vscode/settings.json'
+        $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json -AsHashtable
+        $settings['chat.instructionsFilesLocations']['.github/instructions/missing'] = $true
+        $settings | ConvertTo-Json -Depth 10 | Set-Content -Path $settingsPath
+
+        $result = Invoke-CoreManifestValidation -RepoRoot $script:repoRoot -ManifestPath $script:manifestPath
+
+        $result.Success | Should -BeFalse
+        $result.Errors -join "`n" | Should -Match '.github/instructions/missing'
     }
 
     It 'Fails when an artifact key differs from its path' {
