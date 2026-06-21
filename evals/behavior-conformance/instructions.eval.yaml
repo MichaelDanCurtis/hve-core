@@ -435,7 +435,7 @@ stimuli:
       tier assignment?
     tags:
       category: behavior-conformance
-      instruction: rai-risk-classification
+      instruction: rai-identity
       advisory: "true"
     graders:
       - type: output-matches
@@ -457,7 +457,7 @@ stimuli:
       require?
     tags:
       category: behavior-conformance
-      instruction: backlog-handoff
+      instruction: identity
       advisory: "true"
     graders:
       - type: output-matches
