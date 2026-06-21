@@ -97,6 +97,9 @@ if (-not (Test-Path -LiteralPath $ManifestPath)) {
 if ($Clean -and (Test-Path -LiteralPath $OutputDirectory)) {
     Remove-Item -LiteralPath $OutputDirectory -Recurse -Force
 }
+elseif (Test-Path -LiteralPath $OutputDirectory) {
+    Write-Host "Note: -Clean was not specified; existing files in '$OutputDirectory' are left in place and stale collection files from removed or renamed collections will not be deleted." -ForegroundColor Yellow
+}
 if (-not (Test-Path -LiteralPath $OutputDirectory)) {
     New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
 }

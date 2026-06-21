@@ -12,6 +12,12 @@
     files to align with the picker-name suffix for the target maturity. Rewrites
     are computed against the pre-rename name and applied in a single pass.
 
+    Also synchronizes the target agent's 'maturity:' field in the central
+    collections manifest (collections/core-manifest.yml) so the manifest does not
+    retain a stale maturity tier after the picker name is rewritten. The manifest
+    update is keyed off the agent's manifest 'path:' entry and is skipped when the
+    manifest, the agent entry, or the maturity value cannot be located.
+
     Supports -WhatIf and -Confirm. Body prose mentions of the previous suffixed
     name trigger warnings unless -RewriteProse is supplied, in which case the
     prose mentions are rewritten as well.
@@ -22,6 +28,9 @@
 .PARAMETER RewriteProse
     Rewrite prose mentions of the previous suffixed name in body text. When omitted,
     prose mentions only produce warnings.
+.PARAMETER ManifestPath
+    Path to the central collections manifest. Defaults to collections/core-manifest.yml
+    under RepoRoot. When the manifest is absent the maturity sync is skipped with a warning.
 .PARAMETER DryRun
     Reports planned changes without modifying files. Equivalent to -WhatIf.
 .PARAMETER RepoRoot
@@ -46,6 +55,9 @@ param(
 
     [Parameter()]
     [switch]$RewriteProse,
+
+    [Parameter()]
+    [string]$ManifestPath,
 
     [Parameter()]
     [switch]$DryRun,
@@ -209,6 +221,59 @@ function Update-AgentNameReference {
     }
 }
 
+function Update-CoreManifestAgentMaturity {
+    <#
+    .SYNOPSIS
+        Rewrites a single agent's maturity value in the central collections manifest.
+    .DESCRIPTION
+        Locates the agent entry by its manifest 'path:' value (which is immediately
+        followed by the 'maturity:' line in every manifest agent block) and replaces
+        the maturity value in place. Returns a result hashtable describing the
+        outcome without writing to disk; callers persist the returned content.
+    .PARAMETER Content
+        Full manifest file content to transform.
+    .PARAMETER AgentRelativePath
+        Repository-relative agent path (forward-slash normalized) used as the manifest key.
+    .PARAMETER NewMaturity
+        Target maturity value to write.
+    .OUTPUTS
+        [hashtable] With Updated, OldMaturity, NewMaturity, Content, and Reason keys.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string]$Content,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$AgentRelativePath,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('experimental', 'preview', 'stable')]
+        [string]$NewMaturity
+    )
+
+    $escapedPath = [regex]::Escape($AgentRelativePath)
+    $pattern = "(?m)^(?<pre>[ \t]+path:[ \t]*$escapedPath[ \t]*\r?\n[ \t]+maturity:[ \t]*)(?<mval>\S+)"
+    $match = [regex]::Match($Content, $pattern)
+
+    if (-not $match.Success) {
+        return @{ Updated = $false; OldMaturity = $null; NewMaturity = $NewMaturity; Content = $Content; Reason = 'entry-not-found' }
+    }
+
+    $oldMaturity = $match.Groups['mval'].Value
+    if ($oldMaturity -eq $NewMaturity) {
+        return @{ Updated = $false; OldMaturity = $oldMaturity; NewMaturity = $NewMaturity; Content = $Content; Reason = 'already-aligned' }
+    }
+
+    $replacement = "$($match.Groups['pre'].Value)$NewMaturity"
+    $updated = $Content.Remove($match.Index, $match.Length).Insert($match.Index, $replacement)
+
+    return @{ Updated = $true; OldMaturity = $oldMaturity; NewMaturity = $NewMaturity; Content = $updated; Reason = 'updated' }
+}
+
 function Invoke-AgentPromotion {
     <#
     .SYNOPSIS
@@ -216,7 +281,8 @@ function Invoke-AgentPromotion {
     .DESCRIPTION
         Computes the new picker name from the target agent's existing name and the
         target maturity suffix, then rewrites the target file and every referring
-        agent file under .github/agents. Returns a result hashtable summarizing
+        agent file under .github/agents. Also synchronizes the agent's maturity tier
+        in the central collections manifest. Returns a result hashtable summarizing
         the changes.
     .PARAMETER AgentPath
         Path to the target agent file.
@@ -226,9 +292,12 @@ function Invoke-AgentPromotion {
         Repository root containing .github/agents.
     .PARAMETER RewriteProse
         Rewrite prose mentions of the previous suffixed name.
+    .PARAMETER ManifestPath
+        Path to the central collections manifest. Defaults to
+        collections/core-manifest.yml under RepoRoot.
     .OUTPUTS
         [hashtable] With OldName, NewName, FilesChanged, ReferencesRewritten,
-        and ProseWarnings keys.
+        ProseWarnings, ManifestUpdated, ManifestOldMaturity, and ManifestNewMaturity keys.
     #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     [OutputType([hashtable])]
@@ -246,7 +315,10 @@ function Invoke-AgentPromotion {
         [string]$RepoRoot,
 
         [Parameter()]
-        [switch]$RewriteProse
+        [switch]$RewriteProse,
+
+        [Parameter()]
+        [string]$ManifestPath
     )
 
     $resolvedTarget = Resolve-Path -LiteralPath $AgentPath -ErrorAction Stop
@@ -276,6 +348,10 @@ function Invoke-AgentPromotion {
         ReferencesRewritten = 0
         ProseWarnings       = @()
         NoOp                = $false
+        ManifestUpdated     = $false
+        ManifestOldMaturity = $null
+        ManifestNewMaturity = $TargetMaturity
+        ManifestReason      = $null
     }
 
     if ($oldName -eq $newName) {
@@ -326,6 +402,40 @@ function Invoke-AgentPromotion {
         }
     }
 
+    $resolvedManifestPath = if ([string]::IsNullOrWhiteSpace($ManifestPath)) {
+        Join-Path $RepoRoot 'collections/core-manifest.yml'
+    }
+    else {
+        $ManifestPath
+    }
+
+    if (-not (Test-Path -LiteralPath $resolvedManifestPath)) {
+        $result.ManifestReason = 'manifest-not-found'
+        Write-Warning "Collections manifest '$resolvedManifestPath' not found; skipping maturity sync."
+    }
+    else {
+        $agentRelativePath = [System.IO.Path]::GetRelativePath($RepoRoot, $targetPath) -replace '\\', '/'
+        $manifestContent = Get-Content -LiteralPath $resolvedManifestPath -Raw
+        $manifestResult = Update-CoreManifestAgentMaturity -Content $manifestContent `
+            -AgentRelativePath $agentRelativePath `
+            -NewMaturity $TargetMaturity
+
+        $result.ManifestOldMaturity = $manifestResult.OldMaturity
+        $result.ManifestReason = $manifestResult.Reason
+
+        if ($manifestResult.Updated) {
+            $manifestRelPath = [System.IO.Path]::GetRelativePath($RepoRoot, $resolvedManifestPath) -replace '\\', '/'
+            $description = "Update maturity '$($manifestResult.OldMaturity)' -> '$TargetMaturity' for $agentRelativePath in $manifestRelPath"
+            if ($PSCmdlet.ShouldProcess($resolvedManifestPath, $description)) {
+                Set-Content -LiteralPath $resolvedManifestPath -Value $manifestResult.Content -Encoding utf8NoBOM -NoNewline
+            }
+            $result.ManifestUpdated = $true
+        }
+        elseif ($manifestResult.Reason -eq 'entry-not-found') {
+            Write-Warning "Agent '$agentRelativePath' not found in collections manifest; skipping maturity sync."
+        }
+    }
+
     return $result
 }
 
@@ -351,6 +461,7 @@ if ($MyInvocation.InvocationName -ne '.') {
             -TargetMaturity $TargetMaturity `
             -RepoRoot $RepoRoot `
             -RewriteProse:$RewriteProse `
+            -ManifestPath $ManifestPath `
             -WhatIf:$WhatIfPreference `
             -Confirm:$ConfirmPreference
 
@@ -365,6 +476,15 @@ if ($MyInvocation.InvocationName -ne '.') {
         Write-Host "  New name:             $($result.NewName)"
         Write-Host "  Files changed:        $($result.FilesChanged)"
         Write-Host "  References rewritten: $($result.ReferencesRewritten)"
+        if ($result.ManifestUpdated) {
+            Write-Host "  Manifest maturity:    $($result.ManifestOldMaturity) -> $($result.ManifestNewMaturity)"
+        }
+        elseif ($result.ManifestReason -eq 'entry-not-found') {
+            Write-Host "  Manifest maturity:    skipped (agent not found in manifest)" -ForegroundColor Yellow
+        }
+        elseif ($result.ManifestReason -eq 'manifest-not-found') {
+            Write-Host "  Manifest maturity:    skipped (manifest not found)" -ForegroundColor Yellow
+        }
 
         if ($result.ProseWarnings.Count -gt 0) {
             Write-Host ''

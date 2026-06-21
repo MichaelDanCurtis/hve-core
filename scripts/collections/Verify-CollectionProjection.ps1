@@ -187,7 +187,7 @@ foreach ($id in $collectionIds) {
         CollectionId = $id
         Kind = 'yaml'
         Path = "$id.collection.yml"
-        Status = if ($yamlEmpty) { 'Error' } else { 'Match' }
+        Status = if ($yamlEmpty) { 'Error' } else { 'Rendered' }
         Message = if ($yamlEmpty) { 'Projected YAML is empty.' } else { '' }
         Diff = ''
     })
@@ -196,14 +196,14 @@ foreach ($id in $collectionIds) {
         CollectionId = $id
         Kind = 'markdown'
         Path = "$id.collection.md"
-        Status = if ($mdEmpty) { 'Error' } else { 'Match' }
+        Status = if ($mdEmpty) { 'Error' } else { 'Rendered' }
         Message = if ($mdEmpty) { 'Projected Markdown is empty.' } else { '' }
         Diff = ''
     })
 }
 
-$matchResults = @($results | Where-Object { $_.Status -eq 'Match' })
-$failures = @($results | Where-Object { $_.Status -ne 'Match' })
+$matchResults = @($results | Where-Object { $_.Status -eq 'Rendered' })
+$failures = @($results | Where-Object { $_.Status -ne 'Rendered' })
 
 foreach ($result in $results) {
     $relative = $result.Path
@@ -212,6 +212,7 @@ foreach ($result in $results) {
     }
 
     switch ($result.Status) {
+        'Rendered' { Write-Host "  [OK]       $relative" -ForegroundColor Green }
         'Match'    { Write-Host "  [OK]       $relative" -ForegroundColor Green }
         'Mismatch' { Write-Host "  [MISMATCH] $relative" -ForegroundColor Red }
         'Missing'  { Write-Host "  [MISSING]  $relative" -ForegroundColor Red }
@@ -420,7 +421,7 @@ if (-not $SkipPluginParity) {
 }
 
 $allResults = @($results) + @($pluginResults)
-$allFailures = @($allResults | Where-Object { $_.Status -ne 'Match' })
+$allFailures = @($allResults | Where-Object { $_.Status -notin @('Match', 'Rendered') })
 
 $report = [ordered]@{
     timestamp = (Get-Date).ToString('o')

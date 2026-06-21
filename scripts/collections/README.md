@@ -13,6 +13,7 @@ and plugin generation.
 |----------------------------------|-------------------------------------|--------------------------------------------------------------|
 | Validate-CoreManifest.ps1        | `npm run lint:collections-metadata` | Validate the canonical collection manifest source            |
 | Validate-Collections.ps1         | `npm run lint:collections-metadata` | Validate generated collection manifests                      |
+| Promote-Agent.ps1                | `npm run promote:agent`             | Promote an agent between maturity tiers and sync the manifest |
 | Modules/CoreManifestHelpers.psm1 | (library)                           | Core manifest parsing, normalization, and generation helpers |
 | Modules/CollectionHelpers.psm1   | (library)                           | YAML parsing, frontmatter, and collection helpers            |
 
@@ -30,6 +31,46 @@ Plugins (the `plugins/<id>/` committed tree and the `.github/plugin/marketplace.
 entry) ship the PreRelease description text only. The `.vsix` extension package
 ships either Stable or PreRelease text depending on which channel was packaged.
 `descriptions.prerelease` is required for any collection that ships a plugin.
+
+## Promoting an Agent Between Maturity Tiers
+
+`Promote-Agent.ps1` moves an agent between the `experimental`, `preview`, and
+`stable` maturity tiers and keeps every dependent reference and the central
+manifest aligned with the new tier.
+
+Run it through the npm wrapper:
+
+```bash
+npm run promote:agent -- -AgentPath .github/agents/security/security-planner.agent.md -TargetMaturity preview
+```
+
+The script performs these actions in a single pass:
+
+* Rewrites the target agent's `name:` frontmatter to use the picker-name suffix
+  for the target tier (`experimental` appends `(exp)`, `preview` appends
+  `(pre)`, `stable` removes the suffix).
+* Rewrites every incoming reference to the agent (`agents:` list entries and
+  `handoffs.agent:` values) across all `.github/agents/**/*.agent.md` files so
+  the suffixed picker names stay consistent.
+* Synchronizes the agent's `maturity:` field in `collections/core-manifest.yml`
+  so the manifest does not retain a stale maturity tier. The update is keyed off
+  the agent's manifest `path:` entry and is skipped with a warning when the
+  manifest, the agent entry, or the maturity value cannot be located. Only the
+  promoted agent's maturity is changed; dependent assets are not auto-promoted.
+
+Useful switches:
+
+* `-WhatIf` (or `-DryRun`) reports the planned file and manifest changes without
+  writing anything.
+* `-RewriteProse` also rewrites body-prose mentions of the previous suffixed
+  name; without it, prose mentions only produce warnings.
+* `-ManifestPath` overrides the manifest location (defaults to
+  `collections/core-manifest.yml` under the repository root).
+
+When the promotion changes manifest content, regenerate the collection and
+extension outputs as described in the repository workflow
+(`npm run plugin:generate`, `npm run extension:prepare`, and
+`npm run extension:prepare:prerelease`).
 
 ## Adding a New Collection
 

@@ -293,6 +293,32 @@ Describe 'Invoke-CoreManifestValidation' {
         $result.Errors -join "`n" | Should -Match '.github/instructions/missing'
     }
 
+    It 'Does not require a nested agent subagents folder to be registered in VS Code settings' {
+        $manifest = New-CoreManifestFixture
+        Write-CoreManifestFixture -ManifestPath $script:manifestPath -Manifest $manifest
+        $subagentsDir = Join-Path $script:repoRoot '.github/agents/test/subagents'
+        New-Item -ItemType Directory -Path $subagentsDir -Force | Out-Null
+        Set-Content -Path (Join-Path $subagentsDir 'test-sub.agent.md') -Value "---`ndescription: test subagent`n---"
+
+        $result = Invoke-CoreManifestValidation -RepoRoot $script:repoRoot -ManifestPath $script:manifestPath
+
+        $result.Success | Should -BeTrue
+        $result.Errors -join "`n" | Should -Not -Match '.github/agents/test/subagents'
+    }
+
+    It 'Does not require a nested agent folder that contains no agent files' {
+        $manifest = New-CoreManifestFixture
+        Write-CoreManifestFixture -ManifestPath $script:manifestPath -Manifest $manifest
+        $assetsDir = Join-Path $script:repoRoot '.github/agents/test/assets'
+        New-Item -ItemType Directory -Path $assetsDir -Force | Out-Null
+        Set-Content -Path (Join-Path $assetsDir 'diagram.md') -Value '# Not an agent'
+
+        $result = Invoke-CoreManifestValidation -RepoRoot $script:repoRoot -ManifestPath $script:manifestPath
+
+        $result.Success | Should -BeTrue
+        $result.Errors -join "`n" | Should -Not -Match '.github/agents/test/assets'
+    }
+
     It 'Fails when an artifact key differs from its path' {
         $manifest = New-CoreManifestFixture
         $manifest.agents['.github/agents/test/test.agent.md'].path = '.github/agents/test/other.agent.md'
@@ -577,6 +603,20 @@ Describe 'Invoke-CoreManifestValidation maturity dependency rule' {
         $result.Errors | Should -Contain (Format-CoreManifestMaturityViolation -SourcePath $script:sourceAgent -SourceMaturity 'stable' -TargetPath '.github/prompts/test/expprompt.prompt.md' -TargetMaturity 'experimental' -EdgeType 'handoff-prompt')
     }
 
+    It 'T6b: warns when a slash-command handoff prompt does not resolve to a manifest artifact' {
+        $manifest = New-CoreManifestFixture
+        Add-CoreManifestAgent -RootPath $script:repoRoot -Manifest $manifest -Path '.github/agents/test/stable.agent.md' -Name 'Stable Agent' -Maturity 'stable'
+        Set-CoreManifestAgentReferences -RootPath $script:repoRoot -Path $script:sourceAgent -Handoffs @(
+            [ordered]@{ agent = 'Stable Agent'; prompt = '/nonexistent-prompt'; label = 'Run' }
+        )
+        Write-CoreManifestFixture -ManifestPath $script:manifestPath -Manifest $manifest
+
+        $result = Invoke-CoreManifestValidation -RepoRoot $script:repoRoot -ManifestPath $script:manifestPath
+
+        $result.Success | Should -BeTrue
+        $result.Warnings -join "`n" | Should -Match "declares handoff prompt '/nonexistent-prompt' that does not resolve to a manifest artifact"
+    }
+
     It 'T7: skips a free-text (non-slash) prompt handoff' {
         $manifest = New-CoreManifestFixture
         Add-CoreManifestAgent -RootPath $script:repoRoot -Manifest $manifest -Path '.github/agents/test/stable.agent.md' -Name 'Stable Agent' -Maturity 'stable'
@@ -766,5 +806,47 @@ Describe 'Resolve-CoreManifestEmbeddedToken' {
     It 'T23: emits a verbose message for a malformed glob whose final segment is still a glob' {
         $messages = Resolve-CoreManifestEmbeddedToken -Token '.github/agents/test/*' -MaturityMap $script:maturityMap -Verbose 4>&1
         @($messages | Where-Object { $_ -is [System.Management.Automation.VerboseRecord] }) | Should -Not -BeNullOrEmpty
+    }
+}
+
+Describe 'Format-VSCodeAssetFolderSyncRemediation' {
+    It 'T24: lists an unregistered folder under the add-entry guidance' {
+        $output = Format-VSCodeAssetFolderSyncRemediation -AssetFolderErrors @(
+            "Asset folder '.github/agents/test/subagents' exists on disk but is not registered in VS Code settings ('chat.agentFilesLocations')."
+        )
+
+        $output | Should -Match 'ACTION REQUIRED'
+        $output | Should -Match 'Add a "<path>": true entry'
+        $output | Should -Match '\.github/agents/test/subagents  ->  chat\.agentFilesLocations'
+        $output | Should -Not -Match 'Remove \(or correct\) the stale settings entry'
+    }
+
+    It 'T25: lists a stale settings entry under the remove guidance' {
+        $output = Format-VSCodeAssetFolderSyncRemediation -AssetFolderErrors @(
+            "VS Code settings entry '.github/agents/gone' for 'chat.agentFilesLocations' does not exist on disk."
+        )
+
+        $output | Should -Match 'Remove \(or correct\) the stale settings entry'
+        $output | Should -Match '.github/agents/gone  ->  chat\.agentFilesLocations'
+        $output | Should -Not -Match 'Add a "<path>": true entry'
+    }
+
+    It 'T26: includes both add and remove sections when both error kinds are present' {
+        $output = Format-VSCodeAssetFolderSyncRemediation -AssetFolderErrors @(
+            "Asset folder '.github/agents/test/subagents' exists on disk but is not registered in VS Code settings ('chat.agentFilesLocations').",
+            "VS Code settings entry '.github/agents/gone' for 'chat.agentFilesLocations' does not exist on disk."
+        )
+
+        $output | Should -Match 'Add a "<path>": true entry'
+        $output | Should -Match 'Remove \(or correct\) the stale settings entry'
+    }
+
+    It 'T27: emits the static header and copy markers even with no recognized errors' {
+        $output = Format-VSCodeAssetFolderSyncRemediation -AssetFolderErrors @()
+
+        $output | Should -Match '----- COPY BELOW -----'
+        $output | Should -Match '----- COPY ABOVE -----'
+        $output | Should -Not -Match 'Add a "<path>": true entry'
+        $output | Should -Not -Match 'Remove \(or correct\) the stale settings entry'
     }
 }

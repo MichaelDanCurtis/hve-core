@@ -1,7 +1,7 @@
 schemaVersion: "1.0"
 collections:
   ado:
-    path: collections/ado.collection.yml
+    path: plugins/ado/.github/plugin/plugin.json
     name: Azure DevOps Integration
     display:
       ordering: manual
@@ -18,7 +18,7 @@ collections:
       - channel: prerelease
         text: 'Preview: Azure DevOps work item management, build monitoring, and PR creation. Unstable; may change or be removed without notice. Feedback: github.com/microsoft/hve-core/issues'
   coding-standards:
-    path: collections/coding-standards.collection.yml
+    path: plugins/coding-standards/.github/plugin/plugin.json
     name: Coding Standards
     display:
       ordering: alpha
@@ -42,7 +42,7 @@ collections:
       - channel: prerelease
         text: 'Preview & Experimental: Coding standards and pre-PR review agents for seven languages. Unstable; may change or be removed without notice. Feedback: github.com/microsoft/hve-core/issues'
   data-science:
-    path: collections/data-science.collection.yml
+    path: plugins/data-science/.github/plugin/plugin.json
     name: Data Science
     display:
       ordering: manual
@@ -66,7 +66,7 @@ collections:
       - channel: prerelease
         text: 'Preview & Experimental: Eval datasets, data specs, Jupyter notebooks, and Streamlit dashboards. Unstable; may change or be removed without notice. Feedback: github.com/microsoft/hve-core/issues'
   design-thinking:
-    path: collections/design-thinking.collection.yml
+    path: plugins/design-thinking/.github/plugin/plugin.json
     name: Design Thinking
     display:
       ordering: alpha
@@ -82,7 +82,7 @@ collections:
       - channel: prerelease
         text: 'Preview: Design Thinking coaching identity and methodology across nine methods. Unstable; may change or be removed without notice. Feedback: github.com/microsoft/hve-core/issues'
   github:
-    path: collections/github.collection.yml
+    path: plugins/github/.github/plugin/plugin.json
     name: GitHub Backlog Management
     display:
       ordering: manual
@@ -99,7 +99,7 @@ collections:
       - channel: prerelease
         text: 'Preview: GitHub issue discovery, triage, sprint planning, and backlog execution. Unstable; may change or be removed without notice. Feedback: github.com/microsoft/hve-core/issues'
   hve-core-all:
-    path: collections/hve-core-all.collection.yml
+    path: plugins/hve-core-all/.github/plugin/plugin.json
     name: HVE Core All
     display:
       ordering: alpha
@@ -122,7 +122,7 @@ collections:
       - channel: prerelease
         text: 'Preview & Experimental: Full bundle of all HVE Core agents, prompts, instructions, and skills. Unstable; may change or be removed without notice. Feedback: github.com/microsoft/hve-core/issues'
   hve-core:
-    path: collections/hve-core.collection.yml
+    path: plugins/hve-core/.github/plugin/plugin.json
     name: HVE Core Workflow
     display:
       ordering: manual
@@ -145,7 +145,7 @@ collections:
       - channel: prerelease
         text: 'Preview & Experimental: HVE Core RPI workflow with Git commit, merge, setup, and PR prompts. Unstable; may change or be removed without notice. Feedback: github.com/microsoft/hve-core/issues'
   project-planning:
-    path: collections/project-planning.collection.yml
+    path: plugins/project-planning/.github/plugin/plugin.json
     name: Project Planning
     display:
       ordering: manual
@@ -167,7 +167,7 @@ collections:
       - channel: prerelease
         text: 'Preview & Experimental: PRDs, BRDs, ADRs, and architecture diagrams. Unstable; may change or be removed without notice. Feedback: github.com/microsoft/hve-core/issues'
   security:
-    path: collections/security.collection.yml
+    path: plugins/security/.github/plugin/plugin.json
     name: Security
     display:
       ordering: manual

@@ -148,6 +148,8 @@ Characteristics:
 * Referenced using glob paths like `.github/agents/**/name.agent.md` so resolution works regardless of whether the subagent is at the root or in the `subagents/` folder.
 * Cannot run their own subagents; only the parent agent orchestrates subagent calls.
 
+When you add a new asset folder under `.github/agents/`, `.github/instructions/`, `.github/prompts/`, or `.github/skills/` (including a nested `subagents/` folder), register it in `.vscode/settings.json` under the matching `chat.*FilesLocations` / `chat.agentSkillsLocations` key so VS Code discovers it. The `npm run lint:core-manifest` check hard-fails locally and in CI when a folder is unregistered and prints a paste-ready agent prompt describing the exact fix.
+
 Create subagents when a parent agent needs to parallelize work or delegate a specialized, repeatable task. When the workflow is linear and does not benefit from isolated execution, keep the logic within the parent agent or use a prompt file.
 
 Subagents follow the same authoring standards as other agent files. Include a Response Format section defining the structured output the subagent returns to its parent.

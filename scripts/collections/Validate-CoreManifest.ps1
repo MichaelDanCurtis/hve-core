@@ -50,10 +50,10 @@ function Get-VSCodeAssetFolderSyncErrors {
 
     $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json -AsHashtable
     $locationSections = @(
-        @{ Name = 'instructions'; SettingsKey = 'chat.instructionsFilesLocations'; BasePath = '.github/instructions' },
-        @{ Name = 'agents'; SettingsKey = 'chat.agentFilesLocations'; BasePath = '.github/agents' },
-        @{ Name = 'prompts'; SettingsKey = 'chat.promptFilesLocations'; BasePath = '.github/prompts' },
-        @{ Name = 'skills'; SettingsKey = 'chat.agentSkillsLocations'; BasePath = '.github/skills' }
+        @{ Name = 'instructions'; SettingsKey = 'chat.instructionsFilesLocations'; BasePath = '.github/instructions'; Recurse = $false; FilePattern = $null },
+        @{ Name = 'agents'; SettingsKey = 'chat.agentFilesLocations'; BasePath = '.github/agents'; Recurse = $false; FilePattern = '*.agent.md' },
+        @{ Name = 'prompts'; SettingsKey = 'chat.promptFilesLocations'; BasePath = '.github/prompts'; Recurse = $false; FilePattern = $null },
+        @{ Name = 'skills'; SettingsKey = 'chat.agentSkillsLocations'; BasePath = '.github/skills'; Recurse = $false; FilePattern = $null }
     )
 
     $errors = [System.Collections.Generic.List[string]]::new()
@@ -73,7 +73,22 @@ function Get-VSCodeAssetFolderSyncErrors {
         $actualLocations = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
         $baseDirectory = Join-Path -Path $RepoRoot -ChildPath $basePath
         if (Test-Path -Path $baseDirectory -PathType Container) {
-            foreach ($childDirectory in (Get-ChildItem -Path $baseDirectory -Directory -Force)) {
+            $childDirectories = if ($locationSection.Recurse) {
+                Get-ChildItem -Path $baseDirectory -Directory -Recurse -Force
+            }
+            else {
+                Get-ChildItem -Path $baseDirectory -Directory -Force
+            }
+
+            foreach ($childDirectory in $childDirectories) {
+                if (-not [string]::IsNullOrWhiteSpace($locationSection.FilePattern)) {
+                    $assetFile = Get-ChildItem -Path $childDirectory.FullName -Filter $locationSection.FilePattern -File -Force |
+                        Select-Object -First 1
+                    if ($null -eq $assetFile) {
+                        continue
+                    }
+                }
+
                 $relativePath = ConvertTo-CoreManifestRelativePath -Path ([System.IO.Path]::GetRelativePath($RepoRoot, $childDirectory.FullName).Replace('\\', '/'))
                 [void]$actualLocations.Add($relativePath)
             }
@@ -94,6 +109,67 @@ function Get-VSCodeAssetFolderSyncErrors {
     }
 
     return @($errors)
+}
+
+function Format-VSCodeAssetFolderSyncRemediation {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [string[]]$AssetFolderErrors
+    )
+
+    $unregistered = [System.Collections.Generic.List[string]]::new()
+    $stale = [System.Collections.Generic.List[string]]::new()
+
+    foreach ($assetFolderError in $AssetFolderErrors) {
+        if ($assetFolderError -match "^Asset folder '([^']+)' exists on disk but is not registered in VS Code settings \('([^']+)'\)\.$") {
+            $unregistered.Add("$($Matches[1])  ->  $($Matches[2])")
+        }
+        elseif ($assetFolderError -match "^VS Code settings entry '([^']+)' for '([^']+)' does not exist on disk\.$") {
+            $stale.Add("$($Matches[1])  ->  $($Matches[2])")
+        }
+    }
+
+    $lines = [System.Collections.Generic.List[string]]::new()
+    $lines.Add('')
+    $lines.Add('========================================================================')
+    $lines.Add('ACTION REQUIRED: .github asset folders are out of sync with .vscode/settings.json')
+    $lines.Add('========================================================================')
+    $lines.Add('Copilot and VS Code discover assets recursively beneath each registered folder,')
+    $lines.Add('so register the top-level collection folder; nested subfolders are found automatically.')
+    $lines.Add('')
+    $lines.Add('Paste the prompt below into Copilot Chat to fix the drift:')
+    $lines.Add('')
+    $lines.Add('----- COPY BELOW -----')
+    $lines.Add('Update .vscode/settings.json so the HVE Core asset-folder registrations match')
+    $lines.Add('what exists on disk, keeping each settings object alphabetically sorted. Then')
+    $lines.Add('re-run `npm run lint:core-manifest` to confirm the sync check passes.')
+
+    if ($unregistered.Count -gt 0) {
+        $lines.Add('')
+        $lines.Add('Add a "<path>": true entry under the named settings key for each folder:')
+        foreach ($entry in $unregistered) {
+            $lines.Add("  - $entry")
+        }
+    }
+
+    if ($stale.Count -gt 0) {
+        $lines.Add('')
+        $lines.Add('Remove (or correct) the stale settings entry for each folder no longer on disk:')
+        foreach ($entry in $stale) {
+            $lines.Add("  - $entry")
+        }
+    }
+
+    $lines.Add('')
+    $lines.Add('If a new folder is a collection, also register it in collections/core-manifest.yml')
+    $lines.Add('and run `npm run plugin:generate` plus `npm run extension:prepare`.')
+    $lines.Add('----- COPY ABOVE -----')
+    $lines.Add('')
+
+    return ($lines -join [System.Environment]::NewLine)
 }
 
 function Invoke-CoreManifestValidation {
@@ -320,6 +396,9 @@ function Invoke-CoreManifestValidation {
                 if (-not [string]::IsNullOrWhiteSpace($target)) {
                     $edges.Add(@{ Target = $target; EdgeType = 'handoff-prompt' })
                 }
+                else {
+                    Add-Warning "$sourcePath declares handoff prompt '$handoffPrompt' that does not resolve to a manifest artifact."
+                }
             }
         }
 
@@ -508,6 +587,11 @@ if ($MyInvocation.InvocationName -ne '.') {
         Export-CoreManifestValidationReport -ValidationResult $result -OutputPath $OutputPath
 
         if (-not $result.Success) {
+            $assetFolderErrors = @($result.Errors | Where-Object { $_ -match 'VS Code settings' })
+            if ($assetFolderErrors.Count -gt 0) {
+                Write-Host (Format-VSCodeAssetFolderSyncRemediation -AssetFolderErrors $assetFolderErrors)
+            }
+
             throw "Validation failed with $($result.ErrorCount) error(s)."
         }
 
