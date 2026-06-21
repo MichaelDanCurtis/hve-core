@@ -16,12 +16,12 @@ capability prose inline.
 
 The Documentation agent should load the relevant skill sections by mode:
 
-| Mode | Primary load targets | Notes |
-|------|----------------------|-------|
-| `audit` | `references/conventions.md`, `references/coverage-method.md`, `references/validation-toolchain.md`, `references/content-sensitivity.md` | Replaces the former Doc Ops workflow with a skill-driven audit loop. |
-| `drift` | `references/conventions.md`, `references/code-doc-mapping.md`, `references/content-sensitivity.md` | Uses the repo-local mapping table and drift heuristics. |
-| `validate` | `references/validation-toolchain.md`, `references/accessibility-checks.md`, `references/content-sensitivity.md`, `references/rai-guardrails.md` | Runs docs validation and escalates formal review when needed. |
-| `author` | `templates/guide.md`, `templates/reference.md`, `references/conventions.md`, `references/accessibility-checks.md`, `references/content-sensitivity.md`, `references/rai-guardrails.md` | Produces narrative or reference docs with the repository's documented conventions. |
+| Mode       | Primary load targets                                                                                                                                                                   | Notes                                                                              |
+|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| `audit`    | `references/conventions.md`, `references/coverage-method.md`, `references/validation-toolchain.md`, `references/content-sensitivity.md`                                                | Replaces the former Doc Ops workflow with a skill-driven audit loop.               |
+| `drift`    | `references/conventions.md`, `references/code-doc-mapping.md`, `references/content-sensitivity.md`                                                                                     | Uses the repo-local mapping table and drift heuristics.                            |
+| `validate` | `references/validation-toolchain.md`, `references/accessibility-checks.md`, `references/content-sensitivity.md`, `references/rai-guardrails.md`                                        | Runs docs validation and escalates formal review when needed.                      |
+| `author`   | `templates/guide.md`, `templates/reference.md`, `references/conventions.md`, `references/accessibility-checks.md`, `references/content-sensitivity.md`, `references/rai-guardrails.md` | Produces narrative or reference docs with the repository's documented conventions. |
 
 ## Non-goals
 

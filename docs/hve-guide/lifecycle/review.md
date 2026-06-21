@@ -3,7 +3,7 @@ title: "Stage 7: Review"
 description: Validate implementations through code review, PR management, and quality assessment
 sidebar_position: 8
 author: Microsoft
-ms.date: 2026-02-18
+ms.date: 2026-06-21
 ms.topic: how-to
 keywords:
   - ai-assisted project lifecycle

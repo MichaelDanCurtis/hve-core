@@ -45,12 +45,12 @@ Use the skill section for the selected mode and avoid embedding capability prose
 
 If the request includes a formal assessment intent, route it to the matching planner instead of resolving it inline.
 
-| Trigger | Route to |
-| --- | --- |
-| Formal accessibility assessment | Accessibility Planner |
-| Formal RAI evaluation | RAI Planner |
+| Trigger                                     | Route to                                                  |
+|---------------------------------------------|-----------------------------------------------------------|
+| Formal accessibility assessment             | Accessibility Planner                                     |
+| Formal RAI evaluation                       | RAI Planner                                               |
 | Regulated PII exposure or NDA-bound content | RAI Planner (data handling) or Security Planner (secrets) |
-| Formal security assessment | Security Planner |
+| Formal security assessment                  | Security Planner                                          |
 
 Do not author standards logic or assessment content in this agent. Summarize the request and hand off the user to the planner with the relevant context.
 
