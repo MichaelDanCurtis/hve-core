@@ -39,45 +39,50 @@ Orchestrate supply-chain posture assessment by delegating to subagents. Profile 
 
 ## Subagent Response Contracts
 
+Required fields the orchestrator extracts from each subagent response.
+
 ### Codebase Profiler
 
-Required fields:
-
-* `**Repository:**` extracted as `repo_name` for report metadata and completion messaging.
-* `**Mode:**` echoing the active scanning mode.
-* `**Primary Languages:**` and `**Frameworks:**` passed as technology context to downstream subagents.
-* `### Applicable Skills` intersected with available skills to determine assessment targets.
-* Full profile text passed verbatim to `Supply Chain Skill Assessor` and `Finding Deep Verifier` as `codebase_profile`.
+| Field                    | Usage                                                                                           |
+|--------------------------|-------------------------------------------------------------------------------------------------|
+| `**Repository:**`        | Extracted as `repo_name` for report metadata and completion messaging.                          |
+| `**Mode:**`              | Scanning mode echo.                                                                             |
+| `**Primary Languages:**` | Technology context passed to downstream subagents.                                              |
+| `**Frameworks:**`        | Technology context passed to downstream subagents.                                              |
+| `### Applicable Skills`  | YAML list intersected with Available Skills to determine assessment targets.                    |
+| Full profile text        | Passed verbatim to Supply Chain Skill Assessor and Finding Deep Verifier as `codebase_profile`. |
 
 ### Supply Chain Skill Assessor
 
-Required fields:
-
-* Skill metadata (`**Skill:**`, `**Framework:**`, `**Version:**`, `**Reference:**`) carried through to `Report Generator` for per-skill context.
-* Findings table rows with ID, Title, Status, Severity, Location, Finding, and Recommendation.
-* Detailed remediation or mitigation guidance for FAIL and PARTIAL findings.
+| Field                                                                             | Usage                                                                                                                                                                                               |
+|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Skill metadata (`**Skill:**`, `**Framework:**`, `**Version:**`, `**Reference:**`) | Carried through to Report Generator for per-skill context.                                                                                                                                          |
+| Findings table (ID, Title, Status, Severity, Location, Finding, Recommendation)   | Each row extracted and classified by Status. FAIL and PARTIAL rows serialized into Finding Serialization Format for verification. PASS and NOT_ASSESSED rows passed through with verdict UNCHANGED. |
+| Detailed remediation or mitigation guidance per FAIL or PARTIAL item              | Carried through to Report Generator for severity-grouped remediation guidance.                                                                                                                      |
 
 ### Finding Deep Verifier
 
-Required fields per finding verdict block:
+One verdict block per finding. Required fields per block:
 
-* `**Verdict:**` one of `CONFIRMED`, `DISPROVED`, or `DOWNGRADED`.
-* `**Verified Status:**` updated status after adversarial review.
-* `**Verified Severity:**` updated severity after adversarial review.
-* Full verdict block appended to the verified findings collection.
+| Field                    | Usage                                                                          |
+|--------------------------|--------------------------------------------------------------------------------|
+| `**Verdict:**`           | CONFIRMED, DISPROVED, or DOWNGRADED. Drives verification summary counts.       |
+| `**Verified Status:**`   | Updated status after adversarial review.                                       |
+| `**Verified Severity:**` | Updated severity after adversarial review. Drives severity breakdown counts.   |
+| Full verdict block       | Added verbatim to the verified findings collection passed to Report Generator. |
 
 ### Report Generator
 
-Required fields:
-
-* Report file path.
-* Report format used.
-* Mode applied.
-* Severity breakdown counts.
-* Summary counts.
-* Verification counts for audit and diff mode.
-* Generation status.
-* Clarifying questions when inputs are ambiguous.
+| Field                                | Usage                                                                                            |
+|--------------------------------------|--------------------------------------------------------------------------------------------------|
+| Report file path                     | Inserted into the completion summary as the report path.                                         |
+| Report format used                   | Confirms which template was applied.                                                             |
+| Mode                                 | Scanning mode that determined the report format.                                                 |
+| Severity breakdown counts            | Populates severity counts in the completion message.                                             |
+| Summary counts                       | Populates the status count fields in the completion message.                                     |
+| Verification counts (audit and diff) | Populates verification fields in the audit/diff completion message.                              |
+| Generation status                    | Indicates whether report generation completed successfully.                                      |
+| Clarifying questions                 | Questions surfaced when inputs are ambiguous or missing. Handled by orchestrator retry protocol. |
 
 ## Orchestrator Constants
 
@@ -129,11 +134,22 @@ When a subdirectory focus is provided (audit only), append: "Subdirectory Focus:
 * `audit`: "Perform deep adversarial verification of all findings listed below for this supply-chain assessment. Verify every finding in this list within this single invocation.\n\nSkill: {skill_name}\n\nCodebase Profile:\n{codebase_profile}\n\nFindings to verify:\n{findings}\n\nReturn one Deep Verification Verdict block per finding."
 * `diff`: "Perform deep adversarial verification of all findings listed below for this supply-chain assessment. Verify every finding in this list within this single invocation. These findings originate from a diff-scoped scan. Search the full repository for evidence, including unchanged code.\n\nSkill: {skill_name}\n\nCodebase Profile:\n{codebase_profile}\n\nChanged Files:\n{changed_files_list}\n\nFindings to verify:\n{findings}\n\nReturn one Deep Verification Verdict block per finding."
 
+`{findings}` uses the Finding Serialization Format from the `security-reviewer-formats` skill (see `references/finding-formats.md` in that skill).
+
 ### Report Generator Prompts
 
 * `audit`: "Generate the supply-chain posture assessment report following the appropriate report format.\n\nVerified Findings:\n{verified_findings}\n\nRepository: {repo_name}\nDate: {report_date}\nSkills assessed: {applicable_skills}\n\nUse Domain: security for report generation and keep the report body focused on supply-chain terminology."
 * `diff`: "Generate the supply-chain posture assessment report for the changed files only.\n\nMode: diff\nVerified Findings:\n{verified_findings}\n\nRepository: {repo_name}\nDate: {report_date}\nSkills assessed: {applicable_skills}\n\nChanged Files:\n{changed_files_list}\n\nUse Domain: security for report generation and include the changed files appendix while keeping the report body focused on supply-chain terminology."
 * `plan`: "Generate the supply-chain pre-implementation risk assessment following the plan-mode report format.\n\nMode: plan\nPlan Findings:\n{plan_findings}\n\nRepository: {repo_name}\nDate: {report_date}\nSkills assessed: {applicable_skills}\nPlan Source: {plan_document_path}\n\nUse Domain: security for report generation and keep the report body focused on supply-chain terminology."
+
+## Format Specifications
+
+Read the `security-reviewer-formats` skill for the format templates used by the shared subagents. Follow its normative reference links to load the required format files.
+
+* Report Formats (`references/report-formats.md`) — report templates, diff mode qualifiers, and plan-mode template.
+* Finding Formats (`references/finding-formats.md`) — Finding Serialization Format and Verified Findings Collection Format.
+* Completion Formats (`references/completion-formats.md`) — Scan Status, Scan Completion, and Minimal Profile Stub formats.
+* Severity Definitions (`references/severity-definitions.md`) — Standard severity level definitions.
 
 ## Required Steps
 
@@ -143,7 +159,7 @@ When a subdirectory focus is provided (audit only), append: "Subdirectory Focus:
 2. Determine the scanning mode. When mode is explicitly provided, use it. If the value is not `audit`, `diff`, or `plan`, report the invalid mode and stop.
 3. Display a status update: phase "Setup", message "Starting supply-chain posture assessment in {mode} mode".
 4. Resolve mode-specific inputs before proceeding.
-   * For `diff`, generate a PR reference and resolve the changed files list. Exclude non-assessable files and keep the filtered list for assessment.
+   * For `diff`, generate a PR reference using the `pr-reference` skill and resolve the changed files list. Exclude binary and image files. Retain supply-chain-relevant configuration in scope (CI/CD workflow files, dependency manifests, lockfiles, SBOM documents, and signing or provenance configuration), since these carry the primary supply-chain evidence. Keep the filtered list for assessment and retain the unfiltered list for the report's changed files appendix.
    * For `plan`, resolve the plan document from the explicit path or the available context. If no plan document can be resolved, ask the user for the path and wait.
 
 ### Step 1: Profile Codebase
@@ -164,8 +180,9 @@ When a subdirectory focus is provided (audit only), append: "Subdirectory Focus:
 ### Step 3: Verify Findings
 
 * For `plan` mode, skip verification and pass findings through unchanged.
-* For `audit` and `diff` mode, run `Finding Deep Verifier` once per skill for all FAIL and PARTIAL findings in a single call.
+* For `audit` and `diff` mode, serialize each FAIL and PARTIAL finding into the Finding Serialization Format from the `security-reviewer-formats` skill (`references/finding-formats.md`), then run `Finding Deep Verifier` once per skill for all FAIL and PARTIAL findings in a single call.
 * Pass through PASS and NOT_ASSESSED findings unchanged with verdict `UNCHANGED`.
+* When mode is `diff`, verification runs against the full repository, not just changed files, to avoid false positives from mitigations present in unchanged code.
 
 ### Step 4: Generate Report
 
@@ -178,12 +195,13 @@ When a subdirectory focus is provided (audit only), append: "Subdirectory Focus:
 
 * Display the completion summary with counts, assessed skills, and the report path.
 * Include excluded skills and their reasons when any skill invocation failed.
+* After the completion summary, display the SSSC Planning CAUTION block from #file:../../instructions/shared/disclaimer-language.instructions.md verbatim under a distinct **Professional Review Disclaimer** heading so it is not mistaken for a CAUTION finding-status row. Emit this disclaimer on every report output; this reviewer is stateless and does not track disclaimer cadence.
 
 ## Required Protocol
 
 1. Follow all Required Steps in order from Pre-requisite through Step 5.
 2. Mode determines which steps execute and how subagents are invoked. When mode is not specified, default to `audit`.
-3. Read the supply-chain skill entry and its referenced documents rather than inlining analysis templates directly in the orchestrator.
+3. Do not read supply-chain reference files directly; delegate all reference reading to subagents.
 4. Display status updates at phase transitions.
 5. After each subagent invocation, handle clarifying questions before proceeding.
 6. If a subagent response is incomplete or malformed, retry once. If it still fails, exclude that skill from subsequent steps and record the reason.
