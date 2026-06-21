@@ -86,7 +86,7 @@ Display the PRD Requirements Planning CAUTION block from #file:../../instruction
 
 * Do NOT create files until the PRD title/scope is clear and a meaningful kebab-case filename can be derived; working titles such as `mobile-expense-app` are sufficient.
 * Create BOTH the PRD file (`docs/prds/<kebab-case-name>.md`) and the state file (`.copilot-tracking/prd-sessions/<kebab-case-name>.state.json`) together.
-* Read the canonical [prd-full.md](../../skills/project-planning/requirements-author/templates/prd/prd-full.md) template, populate the skeleton iteratively, and preserve the `markdownlint-disable-file` / `markdown-table-prettify-ignore-start` markers at the top and the `markdown-table-prettify-ignore-end` marker at the bottom.
+* Read the canonical [prd-full.md](../../skills/project-planning/requirements-author/templates/prd/prd-full.md) template, populate the skeleton iteratively, and place `<!-- markdownlint-disable-file -->` / `<!-- markdown-table-prettify-ignore-start -->` immediately after the closing `---` of YAML frontmatter (never before the opening `---`, which must be line 1) and the `<!-- markdown-table-prettify-ignore-end -->` marker at the bottom.
 * Confirm the files were created and show next steps.
 
 ### File Discovery
