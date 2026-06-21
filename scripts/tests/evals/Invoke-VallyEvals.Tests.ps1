@@ -512,7 +512,8 @@ stimuli:
                 -EvalRoot $fx.EvalRoot `
                 -LogsDir $fx.LogsDir `
                 -RepoRoot $fx.Root `
-                -VallyCommand $script:StubPath *> $null
+                -VallyCommand $script:StubPath `
+                -SkipInputModeration -SkipOutputModeration *> $null
         }
         finally {
             Remove-Item Env:\STUB_VALLY_MODE -ErrorAction SilentlyContinue

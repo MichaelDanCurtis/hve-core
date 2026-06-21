@@ -391,12 +391,12 @@ $equivalenceSpecs = @{}
 $missingSpecs   = [System.Collections.Generic.List[hashtable]]::new()
 
 foreach ($artifact in $artifacts) {
-    $kind       = [string]$artifact.kind
-    $artifactId = [string]$artifact.artifactId
-    $specs      = Test-StimulusCoverage -Index $index -Kind $kind -ArtifactId $artifactId
+    $artifactKind = [string]$artifact.kind
+    $artifactId   = [string]$artifact.artifactId
+    $specs        = Test-StimulusCoverage -Index $index -Kind $artifactKind -ArtifactId $artifactId
 
     if ($specs.Count -eq 0) {
-        $missingSpecs.Add(@{ kind = $kind; artifactId = $artifactId; path = [string]$artifact.path })
+        $missingSpecs.Add(@{ kind = $artifactKind; artifactId = $artifactId; path = [string]$artifact.path })
         continue
     }
 
@@ -406,7 +406,7 @@ foreach ($artifact in $artifacts) {
         }
     }
 
-    if ($EnableBaselineEquivalence -and $kind -eq 'agent') {
+    if ($EnableBaselineEquivalence -and $artifactKind -eq 'agent') {
         $equivKey = "equivalence:$artifactId"
         if (-not $equivalenceSpecs.ContainsKey($equivKey)) {
             $equivalenceSpecs[$equivKey] = $artifactId
@@ -414,7 +414,7 @@ foreach ($artifact in $artifacts) {
     }
 
     $artifactPlan.Add(@{
-        kind        = $kind
+        kind        = $artifactKind
         artifactId  = $artifactId
         path        = [string]$artifact.path
         status      = [string]$artifact.status
