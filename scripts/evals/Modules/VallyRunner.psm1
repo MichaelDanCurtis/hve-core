@@ -176,7 +176,10 @@ function Read-VallyResultsJsonl {
         $trials++
 
         $trialPassed = $false
-        $gradeResult = $obj.gradeResult
+        $gradeResult = $null
+        if ($obj.PSObject.Properties['gradeResult']) {
+            $gradeResult = $obj.gradeResult
+        }
         $hasScore = $false
         $scoreValue = $null
         if ($gradeResult -and $gradeResult.PSObject.Properties['score'] -and $null -ne $gradeResult.score) {

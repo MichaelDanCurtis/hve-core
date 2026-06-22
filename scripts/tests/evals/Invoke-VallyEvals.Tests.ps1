@@ -94,6 +94,23 @@ Describe 'VallyRunner module' -Tag 'Unit' {
             $result.assertionsFailed | Should -Be 0
         }
 
+        It 'Treats a record without gradeResult as a failed trial' {
+            $runDir = Join-Path $script:WorkRoot 'run-missing-grade'
+            New-Item -ItemType Directory -Path $runDir -Force | Out-Null
+            $record = @{
+                trajectory = @{ stimulus = @{ name = 'missing-grade' }; output = 'ungrounded-output'; metrics = @{ wallTimeMs = 12 } }
+            } | ConvertTo-Json -Depth 6 -Compress
+            Set-Content -LiteralPath (Join-Path $runDir 'results.jsonl') -Value @($record) -Encoding utf8
+
+            $result = Read-VallyResultsJsonl -RunDir $runDir
+            $result.trials | Should -Be 1
+            $result.assertionsPassed | Should -Be 0
+            $result.assertionsFailed | Should -Be 1
+            $result.durationMs | Should -Be 12
+            $result.perStimulus['missing-grade'].trials | Should -Be 1
+            $result.perStimulus['missing-grade'].assertionsFailed | Should -Be 1
+        }
+
         It 'Skips malformed lines without throwing' {
             $runDir = Join-Path $script:WorkRoot 'run-bad'
             New-Item -ItemType Directory -Path $runDir -Force | Out-Null
