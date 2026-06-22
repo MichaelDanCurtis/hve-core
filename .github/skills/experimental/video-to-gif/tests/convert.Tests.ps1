@@ -11,6 +11,12 @@ BeforeAll {
     Mock Write-Error {}
 }
 
+AfterAll {
+    # Remove the ffmpeg/ffprobe stubs so they do not leak into later test suites
+    Remove-Item -Path 'Function:\ffmpeg' -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path 'Function:\ffprobe' -Force -ErrorAction SilentlyContinue
+}
+
 Describe 'Format-FileSize' -Tag 'Unit' {
     It 'Formats bytes values below one kilobyte' {
         Format-FileSize -Bytes 512 | Should -Be '512 bytes'
