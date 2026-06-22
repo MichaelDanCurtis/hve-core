@@ -12,7 +12,7 @@ items:
 - path: .github/agents/accessibility/accessibility-reviewer.agent.md
   kind: agent
   maturity: experimental
-- path: .github/agents/accessibility/subagents/accessibility-skill-assessor.agent.md
+- path: .github/agents/accessibility/subagents/accessibility-framework-assessor.agent.md
   kind: agent
   maturity: experimental
 - path: .github/agents/ado/ado-backlog-manager.agent.md
@@ -60,6 +60,9 @@ items:
   kind: agent
 - path: .github/agents/hve-core/pr-review.agent.md
   kind: agent
+- path: .github/agents/hve-core/pr-walkthrough.agent.md
+  kind: agent
+  maturity: experimental
 - path: .github/agents/hve-core/prompt-builder.agent.md
   kind: agent
 - path: .github/agents/hve-core/rpi-agent.agent.md
@@ -98,8 +101,6 @@ items:
 - path: .github/agents/project-planning/adr-creation.agent.md
   kind: agent
 - path: .github/agents/project-planning/agile-coach.agent.md
-  kind: agent
-- path: .github/agents/project-planning/arch-diagram-builder.agent.md
   kind: agent
 - path: .github/agents/project-planning/brd-builder.agent.md
   kind: agent
@@ -485,19 +486,7 @@ items:
   kind: instruction
 - path: .github/skills/design-thinking/dt-methods/references/dt-coach-telemetry.instructions.md
   kind: instruction
-- path: .github/skills/accessibility/aria-apg
-  kind: skill
-  maturity: experimental
-- path: .github/skills/accessibility/coga
-  kind: skill
-  maturity: experimental
-- path: .github/skills/accessibility/en-301-549
-  kind: skill
-  maturity: experimental
-- path: .github/skills/accessibility/section-508
-  kind: skill
-  maturity: experimental
-- path: .github/skills/accessibility/wcag-22
+- path: .github/skills/accessibility/accessibility
   kind: skill
   maturity: experimental
 - path: .github/skills/coding-standards/python-foundational
@@ -534,6 +523,9 @@ items:
   maturity: experimental
 - path: .github/skills/gitlab/gitlab
   kind: skill
+- path: .github/skills/hve-core/architecture-diagrams
+  kind: skill
+  maturity: experimental
 - path: .github/skills/hve-core/vally-tests
   kind: skill
   maturity: experimental
@@ -541,9 +533,6 @@ items:
   kind: skill
 - path: .github/skills/jira/jira
   kind: skill
-- path: .github/skills/project-planning/accessibility-planner-playbook
-  kind: skill
-  maturity: experimental
 - path: .github/skills/project-planning/adr-author
   kind: skill
   maturity: experimental

@@ -21,6 +21,7 @@ HVE Core provides the flagship RPI (Research, Plan, Implement, Review) workflow 
 | **phase-implementor**        | Executes a single implementation phase from a plan with full codebase access and change tracking                                         |
 | **plan-validator**           | Validates implementation plans against research documents with severity-graded findings                                                  |
 | **pr-review**                | Pull Request review assistant for code quality, security, and convention compliance                                                      |
+| **pr-walkthrough**           | Narrative-driven PR orientation surfacing design forks, implicit bets, and architectural shape for reviewer judgment.                    |
 | **prompt-builder**           | Prompt engineering assistant for creating and validating prompts, agents, and instructions                                               |
 | **prompt-evaluator**         | Evaluates prompt execution results against Prompt Quality Criteria with severity-graded findings and remediation guidance                |
 | **prompt-tester**            | Tests prompt files by following them literally in a sandbox, without interpreting beyond face value                                      |
