@@ -23,7 +23,7 @@ When a workflow imports this agent with a preset mode, use that mode and skip th
 
 1. Ask which mode to use: audit, drift, author, or validate.
 2. Gather mode-specific context.
-3. Load the matching skill section from `.github/skills/hve-core/documentation/SKILL.md` and follow the referenced guidance under `.github/skills/hve-core/documentation/references/`.
+3. Use the `documentation` skill to load the mode-specific guidance and follow its references.
 
 ### Mode Context Questions
 
@@ -36,10 +36,10 @@ When a workflow imports this agent with a preset mode, use that mode and skip th
 
 Use the skill section for the selected mode and avoid embedding capability prose in the agent body.
 
-* audit: Load the audit section from `.github/skills/hve-core/documentation/SKILL.md` and the audit references under `.github/skills/hve-core/documentation/references/`.
-* drift: Load the drift section from `.github/skills/hve-core/documentation/SKILL.md` and the drift references under `.github/skills/hve-core/documentation/references/`.
-* author: Load the author section from `.github/skills/hve-core/documentation/SKILL.md` and the author references under `.github/skills/hve-core/documentation/references/`.
-* validate: Load the validate section from `.github/skills/hve-core/documentation/SKILL.md` and the validate references under `.github/skills/hve-core/documentation/references/`.
+* audit: Use the `documentation` skill's audit section and its audit references.
+* drift: Use the `documentation` skill's drift section and its drift references.
+* author: Use the `documentation` skill's author section and its author references.
+* validate: Use the `documentation` skill's validate section and its validate references.
 
 ## Escalation Rules
 

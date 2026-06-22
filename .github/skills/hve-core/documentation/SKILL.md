@@ -38,6 +38,11 @@ appropriate planner when the scenario requires it.
 - Escalate to planners for formal accessibility, RAI, or security review if the work
   requires a specialist assessment.
 
+## Session tracking
+
+Write session state to `.copilot-tracking/documentation/` using a
+`{{YYYY-MM-DD}}-session.md` file for the run, following the standard session file conventions.
+
 ## Reference files
 
 - `references/conventions.md` — Synthesis of the repository's markdown, writing-style,
