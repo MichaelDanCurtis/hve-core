@@ -96,6 +96,9 @@ jobs:
                   New-Item -ItemType File -Path $env:GITHUB_OUTPUT -Force | Out-Null
                 }
                 "coverage=$($summary.CoveragePercent)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+                if ($summary.CoverageTarget) {
+                  "coverage_target=$($summary.CoverageTarget)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+                }
               }
             }
           }
@@ -143,16 +146,26 @@ jobs:
             exit 0
           }
           $percentage = [double]$coverageValue
-          $threshold = 18  # Informational baseline
+          $targetValue = '${{ steps.pester.outputs.coverage_target }}'
+          if ([string]::IsNullOrWhiteSpace($targetValue)) {
+            # Fall back to the authoritative target in scripts/tests/pester.config.ps1
+            $targetValue = 80
+          }
+          $threshold = [double]$targetValue
 
           Write-Host "Coverage: $percentage%"
-          Write-Host "Baseline threshold: $threshold%"
+          Write-Host "Required threshold: $threshold%"
 
           if ($percentage -lt $threshold) {
-            Write-Warning "Coverage $percentage% is below baseline $threshold% - informational only"
-          } else {
-            Write-Host "Coverage meets or exceeds baseline threshold" -ForegroundColor Green
+            if ('${{ inputs.soft-fail }}' -eq 'true') {
+              Write-Warning "Coverage $percentage% is below threshold $threshold% - soft-fail, not blocking"
+              exit 0
+            }
+            Write-Error "Coverage $percentage% is below required threshold $threshold%"
+            exit 1
           }
+
+          Write-Host "Coverage meets or exceeds the required threshold" -ForegroundColor Green
 
       - name: Check results
         if: "!inputs.soft-fail && (!inputs.changed-files-only || env.HAS_CHANGES == 'true')"
