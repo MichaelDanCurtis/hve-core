@@ -33,15 +33,16 @@ The security scripts share common modules and follow a consistent pattern:
 
 ### `Test-DependencyPinning.ps1`
 
-Verifies dependency pinning compliance for all dependencies in GitHub Actions workflows.
+Verifies dependency pinning compliance for all dependencies in GitHub Actions
+workflows and composite actions.
 
 Purpose: Detect unpinned or improperly pinned dependencies to maintain
 supply chain security.
 
 #### Features
 
-* Scans workflow files for GitHub Actions, Docker images, and other dependency
-  types
+* Scans workflow files and composite actions (`.github/actions/`) for GitHub
+  Actions, Docker images, and other dependency types
 * Categorizes violations by type (Unpinned, Stale, VersionMismatch,
   MissingVersionComment)
 * Outputs results in JSON, SARIF, CSV, Markdown, or table format
@@ -76,7 +77,8 @@ supply chain security.
 ### `Test-SHAStaleness.ps1`
 
 Monitors SHA-pinned dependencies for staleness by checking whether newer
-versions are available.
+versions are available. Scans both `.github/workflows/` and
+`.github/actions/` (composite actions) for SHA-pinned references.
 
 Purpose: Identify pinned dependencies that have fallen behind upstream
 releases.

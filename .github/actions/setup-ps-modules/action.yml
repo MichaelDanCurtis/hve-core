@@ -1,0 +1,40 @@
+name: Setup PowerShell Modules
+description: Installs pinned PowerShell modules with caching and retry on PSGallery failures
+
+runs:
+  using: composite
+  steps:
+    - name: Cache PowerShell modules
+      id: ps-cache
+      uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+      with:
+        path: ~/.local/share/powershell/Modules
+        key: ps-modules-${{ runner.os }}-${{ hashFiles('scripts/security/ps-module-versions.json') }}
+
+    - name: Install PowerShell modules
+      if: steps.ps-cache.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: |
+        $configPath = Join-Path $env:GITHUB_WORKSPACE 'scripts/security/ps-module-versions.json'
+        $config = Get-Content -Raw $configPath | ConvertFrom-Json
+        $maxAttempts = 3
+
+        foreach ($prop in $config.modules.PSObject.Properties) {
+          $name = $prop.Name
+          $version = $prop.Value.version
+
+          for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+            try {
+              Install-Module -Name $name -RequiredVersion $version -Force -Scope CurrentUser -ErrorAction Stop
+              Write-Host "Installed $name $version (attempt $attempt)"
+              break
+            } catch {
+              if ($attempt -eq $maxAttempts) {
+                throw "Failed to install $name $version after $maxAttempts attempts: $_"
+              }
+              $delay = [math]::Pow(2, $attempt) * 5
+              Write-Warning "Attempt $attempt/$maxAttempts failed for ${name}: $($_.Exception.Message). Retrying in ${delay}s..."
+              Start-Sleep -Seconds $delay
+            }
+          }
+        }
