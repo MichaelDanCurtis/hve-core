@@ -106,7 +106,7 @@ Use this edition when you want access to everything without choosing a focused c
 | **ado-triage-work-items**                       | Triage untriaged Azure DevOps work items with field classification, iteration assignment, and duplicate detection                            |
 | **ado-update-wit-items**                        | Update Azure DevOps work items from planning files                                                                                           |
 | **checkpoint**                                  | Save or restore conversation context using memory files                                                                                      |
-| **code-review-full**                            | Run both functional and standards code reviews on the current branch in a single pass                                                        |
+| **code-review-full**                            | Run functional, standards, and accessibility code reviews on the current branch in a single pass                                             |
 | **code-review-functional**                      | Pre-PR branch diff review for functional correctness, error handling, edge cases, and testing gaps                                           |
 | **cspell-config**                               | Create or update the project cspell configuration with project words and ignores                                                             |
 | **doc-ops-update**                              | Run the doc-ops agent for documentation quality assurance and updates                                                                        |

@@ -1,5 +1,5 @@
 ---
-name: Code Review Functional (exp)
+name: Code Review Functional (pre)
 description: 'Pre-PR branch diff reviewer for functional correctness, error handling, edge cases, and testing gaps'
 ---
 

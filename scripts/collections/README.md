@@ -9,13 +9,13 @@ and plugin generation.
 
 ## Scripts
 
-| Script                           | npm Command                         | Description                                                  |
-|----------------------------------|-------------------------------------|--------------------------------------------------------------|
-| Validate-CoreManifest.ps1        | `npm run lint:collections-metadata` | Validate the canonical collection manifest source            |
-| Validate-Collections.ps1         | `npm run lint:collections-metadata` | Validate generated collection manifests                      |
+| Script                           | npm Command                         | Description                                                   |
+|----------------------------------|-------------------------------------|---------------------------------------------------------------|
+| Validate-CoreManifest.ps1        | `npm run lint:collections-metadata` | Validate the canonical collection manifest source             |
+| Validate-Collections.ps1         | `npm run lint:collections-metadata` | Validate generated collection manifests                       |
 | Promote-Agent.ps1                | `npm run promote:agent`             | Promote an agent between maturity tiers and sync the manifest |
-| Modules/CoreManifestHelpers.psm1 | (library)                           | Core manifest parsing, normalization, and generation helpers |
-| Modules/CollectionHelpers.psm1   | (library)                           | YAML parsing, frontmatter, and collection helpers            |
+| Modules/CoreManifestHelpers.psm1 | (library)                           | Core manifest parsing, normalization, and generation helpers  |
+| Modules/CollectionHelpers.psm1   | (library)                           | YAML parsing, frontmatter, and collection helpers             |
 
 ## Prerequisites
 

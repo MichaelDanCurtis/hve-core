@@ -6,7 +6,7 @@ tools:
   - search
   - edit/createFile
 handoffs:
-  - agent: DT Coach (exp)
+  - agent: DT Coach
     label: Start a DT project
     prompt: /dt-start-project
 ---

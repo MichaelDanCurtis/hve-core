@@ -20,13 +20,13 @@ tags:
 items:
 - path: .github/agents/hve-core/doc-ops.agent.md
   kind: agent
-  maturity: experimental
+  maturity: preview
 - path: .github/agents/hve-core/memory.agent.md
   kind: agent
   maturity: stable
 - path: .github/agents/hve-core/pr-review.agent.md
   kind: agent
-  maturity: experimental
+  maturity: preview
 - path: .github/agents/hve-core/pr-walkthrough.agent.md
   kind: agent
   maturity: stable
@@ -80,19 +80,19 @@ items:
   maturity: stable
 - path: .github/prompts/hve-core/doc-ops-update.prompt.md
   kind: prompt
-  maturity: experimental
+  maturity: preview
 - path: .github/prompts/hve-core/git-commit-message.prompt.md
   kind: prompt
-  maturity: experimental
+  maturity: stable
 - path: .github/prompts/hve-core/git-commit.prompt.md
   kind: prompt
-  maturity: experimental
+  maturity: stable
 - path: .github/prompts/hve-core/git-merge.prompt.md
   kind: prompt
-  maturity: experimental
+  maturity: stable
 - path: .github/prompts/hve-core/git-setup.prompt.md
   kind: prompt
-  maturity: experimental
+  maturity: stable
 - path: .github/prompts/hve-core/prompt-analyze.prompt.md
   kind: prompt
   maturity: stable
@@ -104,7 +104,7 @@ items:
   maturity: stable
 - path: .github/prompts/hve-core/pull-request.prompt.md
   kind: prompt
-  maturity: experimental
+  maturity: preview
 - path: .github/prompts/hve-core/rpi.prompt.md
   kind: prompt
   maturity: stable
@@ -128,19 +128,19 @@ items:
   maturity: stable
 - path: .github/instructions/hve-core/git-merge.instructions.md
   kind: instruction
-  maturity: experimental
+  maturity: stable
 - path: .github/instructions/hve-core/licensing-posture.instructions.md
   kind: instruction
   maturity: experimental
 - path: .github/instructions/hve-core/markdown.instructions.md
   kind: instruction
-  maturity: experimental
+  maturity: stable
 - path: .github/instructions/hve-core/prompt-builder.instructions.md
   kind: instruction
   maturity: stable
 - path: .github/instructions/hve-core/pull-request.instructions.md
   kind: instruction
-  maturity: experimental
+  maturity: preview
 - path: .github/instructions/hve-core/writing-style.instructions.md
   kind: instruction
   maturity: stable

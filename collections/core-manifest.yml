@@ -224,25 +224,25 @@ agents:
     - hve-core-all
   .github/agents/coding-standards/code-review-accessibility.agent.md:
     path: .github/agents/coding-standards/code-review-accessibility.agent.md
-    maturity: experimental
+    maturity: preview
     collections:
     - coding-standards
     - hve-core-all
   .github/agents/coding-standards/code-review-full.agent.md:
     path: .github/agents/coding-standards/code-review-full.agent.md
-    maturity: experimental
+    maturity: preview
     collections:
     - coding-standards
     - hve-core-all
   .github/agents/coding-standards/code-review-functional.agent.md:
     path: .github/agents/coding-standards/code-review-functional.agent.md
-    maturity: experimental
+    maturity: preview
     collections:
     - coding-standards
     - hve-core-all
   .github/agents/coding-standards/code-review-standards.agent.md:
     path: .github/agents/coding-standards/code-review-standards.agent.md
-    maturity: experimental
+    maturity: preview
     collections:
     - coding-standards
     - hve-core-all
@@ -278,7 +278,7 @@ agents:
     - hve-core-all
   .github/agents/design-thinking/dt-coach.agent.md:
     path: .github/agents/design-thinking/dt-coach.agent.md
-    maturity: experimental
+    maturity: stable
     collections:
     - design-thinking
     - hve-core-all
@@ -311,7 +311,7 @@ agents:
     - hve-core-all
   .github/agents/hve-core/doc-ops.agent.md:
     path: .github/agents/hve-core/doc-ops.agent.md
-    maturity: experimental
+    maturity: preview
     collections:
     - hve-core
     - hve-core-all
@@ -323,7 +323,7 @@ agents:
     - hve-core-all
   .github/agents/hve-core/pr-review.agent.md:
     path: .github/agents/hve-core/pr-review.agent.md
-    maturity: experimental
+    maturity: preview
     collections:
     - hve-core
     - hve-core-all
@@ -635,13 +635,13 @@ prompts:
     - hve-core-all
   .github/prompts/coding-standards/code-review-full.prompt.md:
     path: .github/prompts/coding-standards/code-review-full.prompt.md
-    maturity: experimental
+    maturity: preview
     collections:
     - coding-standards
     - hve-core-all
   .github/prompts/coding-standards/code-review-functional.prompt.md:
     path: .github/prompts/coding-standards/code-review-functional.prompt.md
-    maturity: experimental
+    maturity: preview
     collections:
     - coding-standards
     - hve-core-all
@@ -795,31 +795,31 @@ prompts:
     - hve-core-all
   .github/prompts/hve-core/doc-ops-update.prompt.md:
     path: .github/prompts/hve-core/doc-ops-update.prompt.md
-    maturity: experimental
+    maturity: preview
     collections:
     - hve-core
     - hve-core-all
   .github/prompts/hve-core/git-commit-message.prompt.md:
     path: .github/prompts/hve-core/git-commit-message.prompt.md
-    maturity: experimental
+    maturity: stable
     collections:
     - hve-core
     - hve-core-all
   .github/prompts/hve-core/git-commit.prompt.md:
     path: .github/prompts/hve-core/git-commit.prompt.md
-    maturity: experimental
+    maturity: stable
     collections:
     - hve-core
     - hve-core-all
   .github/prompts/hve-core/git-merge.prompt.md:
     path: .github/prompts/hve-core/git-merge.prompt.md
-    maturity: experimental
+    maturity: stable
     collections:
     - hve-core
     - hve-core-all
   .github/prompts/hve-core/git-setup.prompt.md:
     path: .github/prompts/hve-core/git-setup.prompt.md
-    maturity: experimental
+    maturity: stable
     collections:
     - hve-core
     - hve-core-all
@@ -843,7 +843,7 @@ prompts:
     - hve-core-all
   .github/prompts/hve-core/pull-request.prompt.md:
     path: .github/prompts/hve-core/pull-request.prompt.md
-    maturity: experimental
+    maturity: preview
     collections:
     - hve-core
     - hve-core-all
@@ -1080,86 +1080,86 @@ instructions:
     - hve-core-all
   .github/instructions/coding-standards/bash/bash.instructions.md:
     path: .github/instructions/coding-standards/bash/bash.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/bicep/bicep.instructions.md:
     path: .github/instructions/coding-standards/bicep/bicep.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/code-review/diff-computation.instructions.md:
     path: .github/instructions/coding-standards/code-review/diff-computation.instructions.md
-    maturity: experimental
+    maturity: preview
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/code-review/review-artifacts.instructions.md:
     path: .github/instructions/coding-standards/code-review/review-artifacts.instructions.md
-    maturity: experimental
+    maturity: preview
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/csharp/csharp-tests.instructions.md:
     path: .github/instructions/coding-standards/csharp/csharp-tests.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/csharp/csharp.instructions.md:
     path: .github/instructions/coding-standards/csharp/csharp.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/powershell/pester.instructions.md:
     path: .github/instructions/coding-standards/powershell/pester.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/powershell/powershell.instructions.md:
     path: .github/instructions/coding-standards/powershell/powershell.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/python-script.instructions.md:
     path: .github/instructions/coding-standards/python-script.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - data-science
     - hve-core-all
   .github/instructions/coding-standards/python-tests.instructions.md:
     path: .github/instructions/coding-standards/python-tests.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/rust/rust-tests.instructions.md:
     path: .github/instructions/coding-standards/rust/rust-tests.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/rust/rust.instructions.md:
     path: .github/instructions/coding-standards/rust/rust.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/terraform/terraform.instructions.md:
     path: .github/instructions/coding-standards/terraform/terraform.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - hve-core-all
   .github/instructions/coding-standards/uv-projects.instructions.md:
     path: .github/instructions/coding-standards/uv-projects.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - coding-standards
     - data-science
@@ -1252,7 +1252,7 @@ instructions:
     - hve-core-all
   .github/instructions/hve-core/git-merge.instructions.md:
     path: .github/instructions/hve-core/git-merge.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - hve-core
     - hve-core-all
@@ -1264,7 +1264,7 @@ instructions:
     - hve-core-all
   .github/instructions/hve-core/markdown.instructions.md:
     path: .github/instructions/hve-core/markdown.instructions.md
-    maturity: experimental
+    maturity: stable
     collections:
     - hve-core
     - hve-core-all
@@ -1276,7 +1276,7 @@ instructions:
     - hve-core-all
   .github/instructions/hve-core/pull-request.instructions.md:
     path: .github/instructions/hve-core/pull-request.instructions.md
-    maturity: experimental
+    maturity: preview
     collections:
     - hve-core
     - hve-core-all

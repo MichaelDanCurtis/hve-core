@@ -28,7 +28,7 @@ Enforce language-specific coding conventions and best practices across your proj
 
 | Name                       | Description                                                                                        |
 |----------------------------|----------------------------------------------------------------------------------------------------|
-| **code-review-full**       | Run both functional and standards code reviews on the current branch in a single pass              |
+| **code-review-full**       | Run functional, standards, and accessibility code reviews on the current branch in a single pass   |
 | **code-review-functional** | Pre-PR branch diff review for functional correctness, error handling, edge cases, and testing gaps |
 
 ### Instructions

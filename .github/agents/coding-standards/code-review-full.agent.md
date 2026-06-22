@@ -1,11 +1,11 @@
 ---
-name: Code Review Full (exp)
+name: Code Review Full (pre)
 description: "Orchestrator that runs functional, standards, and accessibility code reviews via subagents and produces a merged report"
 disable-model-invocation: true
 agents:
-  - Code Review Functional (exp)
-  - Code Review Standards (exp)
-  - Code Review Accessibility (exp)
+  - Code Review Functional (pre)
+  - Code Review Standards (pre)
+  - Code Review Accessibility (pre)
 ---
 
 # Code Review Full Agent
