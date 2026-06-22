@@ -407,24 +407,6 @@ stimuli:
         config:
           pattern: "(?i)cspell|dictionary|word|spelling|config"
 
-  - name: prompt-doc-ops-update-conformance
-    prompt: |
-      Invoke the `doc-ops-update` prompt with minimal arguments and explain how it
-      coordinates the workflow.
-    tags:
-      category: behavior-conformance
-      prompt: doc-ops-update
-      advisory: "true"
-    graders:
-      - type: output-matches
-        name: agent-attribution
-        config:
-          pattern: "(?i)doc[-\\s]*ops|documentation"
-      - type: output-matches
-        name: scope-language
-        config:
-          pattern: "(?i)doc|markdown|coverage|update"
-
   - name: prompt-dt-canonical-deck-conformance
     prompt: |
       Invoke the `dt-canonical-deck` prompt with minimal arguments and explain how it

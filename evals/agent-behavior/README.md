@@ -151,7 +151,7 @@ stimuli:
 
 Agents that analyze code, diffs, or artifacts and surface issues, risks, or recommendations.
 
-**Members (11):** code-review-accessibility, code-review-full, code-review-functional, code-review-standards, dependency-reviewer, doc-update-checker, pr-review, rai-reviewer, accessibility-reviewer, security-reviewer, task-reviewer
+**Members (10):** code-review-accessibility, code-review-full, code-review-functional, code-review-standards, dependency-reviewer, pr-review, rai-reviewer, accessibility-reviewer, security-reviewer, task-reviewer
 
 **Required Graders:**
 
@@ -289,7 +289,7 @@ stimuli:
 
 Agents that sequence work, plan tasks, coach the user through a process, or orchestrate multi-phase workflows.
 
-**Members (15):** accessibility-planner, agentic-workflows, doc-ops, dt-coach, dt-learning-tutor, experiment-designer, memory, pptx, prompt-builder, rai-planner, rpi-agent, security-planner, sssc-planner, task-challenger, task-planner
+**Members (15):** accessibility-planner, agentic-workflows, documentation, dt-coach, dt-learning-tutor, experiment-designer, memory, pptx, prompt-builder, rai-planner, rpi-agent, security-planner, sssc-planner, task-challenger, task-planner
 
 **Required Graders:**
 
@@ -299,7 +299,7 @@ Agents that sequence work, plan tasks, coach the user through a process, or orch
 
 **Optional Graders:**
 
-* `header-present` - Only `doc-ops` and `task-planner` declare `Start responses with:` directives. Others omit this grader.
+* `header-present` - Only `task-planner` declares a `Start responses with:` directive. Others omit this grader.
 
 #### Worked Example: task-planner
 
@@ -361,8 +361,7 @@ The inventory lists every user-invocable hve-core parent agent and its class ass
 | code-review-functional       | code-reviewer    | light     | [.github/agents/coding-standards/code-review-functional.agent.md](../../.github/agents/coding-standards/code-review-functional.agent.md)             |
 | code-review-standards        | code-reviewer    | light     | [.github/agents/coding-standards/code-review-standards.agent.md](../../.github/agents/coding-standards/code-review-standards.agent.md)               |
 | dependency-reviewer          | code-reviewer    | light     | [.github/agents/dependency-reviewer.agent.md](../../.github/agents/dependency-reviewer.agent.md)                                                     |
-| doc-ops                      | planner-coach    | light     | [.github/agents/hve-core/doc-ops.agent.md](../../.github/agents/hve-core/doc-ops.agent.md)                                                           |
-| doc-update-checker           | code-reviewer    | light     | [.github/agents/doc-update-checker.agent.md](../../.github/agents/doc-update-checker.agent.md)                                                       |
+| documentation                | planner-coach    | light     | [.github/agents/hve-core/documentation.agent.md](../../.github/agents/hve-core/documentation.agent.md)                                               |
 | dt-coach                     | planner-coach    | light     | [.github/agents/design-thinking/dt-coach.agent.md](../../.github/agents/design-thinking/dt-coach.agent.md)                                           |
 | dt-learning-tutor            | planner-coach    | light     | [.github/agents/design-thinking/dt-learning-tutor.agent.md](../../.github/agents/design-thinking/dt-learning-tutor.agent.md)                         |
 | eval-dataset-creator         | code-implementor | light     | [.github/agents/data-science/eval-dataset-creator.agent.md](../../.github/agents/data-science/eval-dataset-creator.agent.md)                         |

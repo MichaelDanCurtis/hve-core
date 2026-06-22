@@ -115,8 +115,7 @@ relies on shared corpus coverage rather than per-agent backlinks. New agents lan
 | code-review-functional       | coding-standards | [surface-signatures/code-review-functional.yml](surface-signatures/code-review-functional.yml)             | 2                 | authoritative |
 | code-review-standards        | coding-standards | [surface-signatures/code-review-standards.yml](surface-signatures/code-review-standards.yml)               | 1                 | authoritative |
 | dependency-reviewer          | root             | [surface-signatures/dependency-reviewer.yml](surface-signatures/dependency-reviewer.yml)                   | 1                 | authoritative |
-| doc-ops                      | hve-core         | [surface-signatures/doc-ops.yml](surface-signatures/doc-ops.yml)                                           | 4                 | authoritative |
-| doc-update-checker           | root             | [surface-signatures/doc-update-checker.yml](surface-signatures/doc-update-checker.yml)                     | 1                 | authoritative |
+| documentation                | hve-core         | [surface-signatures/documentation.yml](surface-signatures/documentation.yml)                               | 4                 | authoritative |
 | dt-coach                     | design-thinking  | [surface-signatures/dt-coach.yml](surface-signatures/dt-coach.yml)                                         | 0                 | authoritative |
 | dt-learning-tutor            | design-thinking  | [surface-signatures/dt-learning-tutor.yml](surface-signatures/dt-learning-tutor.yml)                       | 0                 | authoritative |
 | eval-dataset-creator         | data-science     | [surface-signatures/eval-dataset-creator.yml](surface-signatures/eval-dataset-creator.yml)                 | 0                 | authoritative |
@@ -175,7 +174,7 @@ The `rai-planner` row shows stimulus coverage `0` because its responsible-AI ris
 The `agentic-workflows` row shows stimulus coverage `0` because its cross-cutting domain (workflow orchestration) does not map to any of the v1 stimulus categories. It is covered indirectly through dependency-map dispatch and through its own surface-signature regex on every baseline-equivalence run.
 
 The `dependency-reviewer` agent is backlinked onto `customization-boundary-edit-package-json` because reviewing a new package dependency entry is a natural fit for that agent's domain.
-The `doc-update-checker` agent is backlinked onto `customization-boundary-edit-readme` because verifying a README modification is a natural fit for that agent's documentation-coverage focus.
+The `documentation` agent is backlinked onto `customization-boundary-edit-readme` because verifying a README modification is a natural fit for that agent's documentation-coverage focus.
 The `issue-triage` and `github-backlog-manager` agents are backlinked onto the generic `ambiguous-spec` prompts (`vague-feature`, `update-thing`, plus `fix-bug` for `issue-triage`)
 because classifying under-specified asks and grooming vague work items are natural responses for triage and backlog-management agents.
 
