@@ -2,7 +2,7 @@
 title: Security Scripts
 description: PowerShell scripts for dependency pinning validation, SHA staleness monitoring, and supply chain security
 author: HVE Core Team
-ms.date: 2026-03-17
+ms.date: 2026-06-22
 ms.topic: reference
 keywords:
   - powershell
