@@ -18,7 +18,7 @@ tags:
 - merge
 - pull-request
 items:
-- path: .github/agents/hve-core/doc-ops.agent.md
+- path: .github/agents/hve-core/documentation.agent.md
   kind: agent
   maturity: preview
 - path: .github/agents/hve-core/memory.agent.md
@@ -78,9 +78,6 @@ items:
 - path: .github/prompts/hve-core/checkpoint.prompt.md
   kind: prompt
   maturity: stable
-- path: .github/prompts/hve-core/doc-ops-update.prompt.md
-  kind: prompt
-  maturity: preview
 - path: .github/prompts/hve-core/git-commit-message.prompt.md
   kind: prompt
   maturity: stable
@@ -149,6 +146,9 @@ items:
   maturity: stable
 - path: .github/instructions/shared/telemetry-overlay.instructions.md
   kind: instruction
+  maturity: preview
+- path: .github/skills/hve-core/documentation
+  kind: skill
   maturity: preview
 - path: .github/skills/shared/pr-reference
   kind: skill

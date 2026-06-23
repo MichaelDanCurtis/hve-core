@@ -309,8 +309,8 @@ agents:
     collections:
     - github
     - hve-core-all
-  .github/agents/hve-core/doc-ops.agent.md:
-    path: .github/agents/hve-core/doc-ops.agent.md
+  .github/agents/hve-core/documentation.agent.md:
+    path: .github/agents/hve-core/documentation.agent.md
     maturity: preview
     collections:
     - hve-core
@@ -790,12 +790,6 @@ prompts:
   .github/prompts/hve-core/checkpoint.prompt.md:
     path: .github/prompts/hve-core/checkpoint.prompt.md
     maturity: stable
-    collections:
-    - hve-core
-    - hve-core-all
-  .github/prompts/hve-core/doc-ops-update.prompt.md:
-    path: .github/prompts/hve-core/doc-ops-update.prompt.md
-    maturity: preview
     collections:
     - hve-core
     - hve-core-all
@@ -1525,6 +1519,12 @@ skills:
     collections:
     - hve-core-all
     - project-planning
+  .github/skills/hve-core/documentation:
+    path: .github/skills/hve-core/documentation
+    maturity: preview
+    collections:
+    - hve-core
+    - hve-core-all
   .github/skills/hve-core/vally-tests:
     path: .github/skills/hve-core/vally-tests
     maturity: experimental
@@ -1802,7 +1802,7 @@ releases:
     - .github/agents/experimental/pptx.agent.md
     - .github/agents/experimental/subagents/pptx-subagent.agent.md
     - .github/agents/github/github-backlog-manager.agent.md
-    - .github/agents/hve-core/doc-ops.agent.md
+    - .github/agents/hve-core/documentation.agent.md
     - .github/agents/hve-core/memory.agent.md
     - .github/agents/hve-core/pr-review.agent.md
     - .github/agents/hve-core/pr-walkthrough.agent.md
@@ -1927,7 +1927,6 @@ releases:
     - .github/prompts/github/github-suggest.prompt.md
     - .github/prompts/github/github-triage-issues.prompt.md
     - .github/prompts/hve-core/checkpoint.prompt.md
-    - .github/prompts/hve-core/doc-ops-update.prompt.md
     - .github/prompts/hve-core/git-commit-message.prompt.md
     - .github/prompts/hve-core/git-commit.prompt.md
     - .github/prompts/hve-core/git-merge.prompt.md
@@ -1970,6 +1969,7 @@ releases:
     - .github/skills/github/gh-code-scanning
     - .github/skills/gitlab/gitlab
     - .github/skills/hve-core/architecture-diagrams
+    - .github/skills/hve-core/documentation
     - .github/skills/jira/jira
     - .github/skills/project-planning/rai-planner
     - .github/skills/project-planning/security-planning
