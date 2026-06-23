@@ -278,7 +278,9 @@ function Invoke-PSModuleInstall {
 
 if ($MyInvocation.InvocationName -ne '.') {
     try {
-        Invoke-PSModuleInstall -ConfigPath $ConfigPath -Scope $Scope -Repository $Repository `
+        $resolvedConfig = Resolve-ConfigPath -Explicit $ConfigPath
+        $resolvedScope = Resolve-Scope -Explicit $Scope
+        Invoke-PSModuleInstall -ConfigPath $resolvedConfig -Scope $resolvedScope -Repository $Repository `
             -MaxAttempts $MaxAttempts -BaseDelaySeconds $BaseDelaySeconds `
             -Import:$Import -Force:$Force
         exit 0
