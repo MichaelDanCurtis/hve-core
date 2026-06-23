@@ -47,6 +47,8 @@ jobs:
 
       - name: Setup PowerShell modules
         uses: ./.github/actions/setup-ps-modules
+        with:
+          import: 'true'
 
       - name: Get changed PowerShell files
         id: changed-files

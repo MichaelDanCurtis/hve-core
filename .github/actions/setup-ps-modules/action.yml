@@ -50,11 +50,3 @@ runs:
           Import-Module -Name $prop.Name -RequiredVersion $prop.Value.version -Force -ErrorAction Stop
           Write-Host "Imported $($prop.Name) $($prop.Value.version)"
         }
-
-    - name: Import Pester at pinned version
-      shell: pwsh
-      run: |
-        $config = Get-Content -Raw (Join-Path $env:GITHUB_WORKSPACE 'scripts/security/ps-module-versions.json') | ConvertFrom-Json
-        if ($config.modules.PSObject.Properties.Name -contains 'Pester') {
-          Import-Module Pester -RequiredVersion $config.modules.Pester.version -Force
-        }
