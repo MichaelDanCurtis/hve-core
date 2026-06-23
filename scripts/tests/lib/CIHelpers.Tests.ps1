@@ -688,7 +688,7 @@ Describe 'Write-CIAnnotations' -Tag 'Unit' {
                 )
             }
 
-            $output = Write-CIAnnotations -Summary $summary
+            $output = Invoke-HostOutput { Write-CIAnnotations -Summary $summary }
             $output | Should -Contain '::error file=docs/guide.md,line=2::Fallback path'
         }
     }
