@@ -1,6 +1,7 @@
 ---
 name: Content Policy Citation
-description: "Citation discretion rules for the CI agentic PR-review workflow when emitting PR comments, PR descriptions, or other public output that flags suspected content-policy concerns - Brought to you by microsoft/hve-core"
+description: "Citation discretion rules for the CI agentic PR-review workflow when emitting PR comments, PR descriptions, or other public output that flags suspected content-policy concerns"
+disable-model-invocation: true
 ---
 
 # Content Policy Citation

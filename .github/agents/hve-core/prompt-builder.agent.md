@@ -7,6 +7,7 @@ agents:
   - Prompt Evaluator
   - Prompt Updater
   - Researcher Subagent
+  - Vally Test Author
 handoffs:
   - label: "💡 Update/Create"
     agent: Prompt Builder

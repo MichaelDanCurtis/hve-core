@@ -2,16 +2,13 @@
 name: Vally Test Author
 description: 'Authors Vally conformance test stimuli in two modes: from-artifact (read a prompt, instructions, agent, or skill file and draft a stimulus block) and corpus-import (turn a CSV or XLSX corpus into stimulus blocks), with safety-lint refusal enforcement and SHA-256 dedupe before append-only writes to the routed eval file'
 user-invocable: false
-disable-model-invocation: true
-agents:
-  - Researcher Subagent
 ---
 
 # Vally Test Author
 
 Authors Vally conformance test stimuli for prompts, instructions, agents, and skills in two modes: `from-artifact` and `corpus-import`. Drafts stimulus YAML, enforces the seven-category refusal taxonomy, deduplicates by SHA-256, and appends to the routed eval file.
 
-## Identity
+## Purpose
 
 * Purpose: produce well-formed Vally stimulus blocks that exercise behaviors an artifact already documents, then append them to the correct eval suite file with full safety and dedupe enforcement.
 * Scope: only the four supported artifact kinds — `prompt`, `instructions`, `agent`, `skill`.
@@ -65,6 +62,16 @@ Always emit three artifacts on every invocation:
    * `blockers` (any ambiguous safety-lint outcomes surfaced for user review)
    * `written_paths`
 
+## Required Steps
+
+**Pre-requisite: Setup** — Resolve `mode` (from `mode=`, `files=`, or `path=`) and the target eval file from the routing reference before drafting any stimulus.
+
+1. Read each input artifact (`from-artifact`) or corpus row (`corpus-import`) and detect its `kind`.
+2. Draft one stimulus YAML block per documented behavior, setting `tags.advisory: true`.
+3. Run the Safety Self-Check against each drafted block; refuse or surface blockers per the exit-code contract.
+4. Deduplicate surviving blocks by SHA-256 of the normalized prompt text against the target eval file.
+5. Append non-duplicate blocks to the routed eval file (append-only) and emit the JSON report.
+
 ## Safety Self-Check
 
 Before any write to disk, run the skill-local safety lint against the drafted stimulus YAML:
@@ -114,7 +121,7 @@ Helper scripts implement the normalization and hashing — delegate, do not re-i
 * `.github/skills/hve-core/vally-tests/scripts/New-Stimulus.ps1` (PowerShell) and `.github/skills/hve-core/vally-tests/scripts/new-stimulus.sh` (bash) compute and surface the hash for `from-artifact` mode.
 * `.github/skills/hve-core/vally-tests/scripts/import_corpus.py` applies the same normalization and hashing per corpus row in `corpus-import` mode.
 
-## Handoff Format
+## Response Format
 
 On completion, return the following structured handoff to the parent agent:
 
