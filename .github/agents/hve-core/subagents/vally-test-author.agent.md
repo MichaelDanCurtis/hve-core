@@ -38,12 +38,12 @@ Authors Vally conformance test stimuli for prompts, instructions, agents, and sk
 
 ## Inputs Contract
 
-| Input | Required for | Optional for | Description |
-|-------|--------------|--------------|-------------|
-| `files` | `from-artifact` | — | One or more artifact paths (`.prompt.md`, `.instructions.md`, `.agent.md`, `SKILL.md`). Repo-relative. |
-| `path` | `corpus-import` | — | Single corpus file path. Must end in `.csv` or `.xlsx` and match the column contract in `assets/corpus-import-template.csv`. |
-| `mode` | — | both | Either `from-artifact` or `corpus-import`. Inferred from `files=` or `path=` when omitted. |
-| `kind` | — | both | One of `prompt`, `instructions`, `agent`, `skill`, or `auto`. Defaults to `auto`. In `from-artifact` mode `auto` resolves from path/frontmatter; in `corpus-import` mode `auto` resolves from the row's `kind` column. |
+| Input   | Required for    | Optional for | Description                                                                                                                                                                                                            |
+|---------|-----------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `files` | `from-artifact` | —            | One or more artifact paths (`.prompt.md`, `.instructions.md`, `.agent.md`, `SKILL.md`). Repo-relative.                                                                                                                 |
+| `path`  | `corpus-import` | —            | Single corpus file path. Must end in `.csv` or `.xlsx` and match the column contract in `assets/corpus-import-template.csv`.                                                                                           |
+| `mode`  | —               | both         | Either `from-artifact` or `corpus-import`. Inferred from `files=` or `path=` when omitted.                                                                                                                             |
+| `kind`  | —               | both         | One of `prompt`, `instructions`, `agent`, `skill`, or `auto`. Defaults to `auto`. In `from-artifact` mode `auto` resolves from path/frontmatter; in `corpus-import` mode `auto` resolves from the row's `kind` column. |
 
 ## Output Contract
 
@@ -97,15 +97,15 @@ This skill authors conformance tests only. The request appears to fall under <ca
 
 Substitute `<category>` with the matched category and choose the normative source from the table below. Do not negotiate, rephrase, or partially fulfill the request.
 
-| `<category>` | Normative source to cite |
-|--------------|-----------------------------------------------------------------------------|
-| `jailbreak` | `CODE_OF_CONDUCT.md` |
-| `prompt-injection` | `CODE_OF_CONDUCT.md` |
-| `harmful-elicitation` | `CODE_OF_CONDUCT.md` |
-| `tos-violation` | `CODE_OF_CONDUCT.md` |
-| `coc-violation` | `CODE_OF_CONDUCT.md` |
+| `<category>`                | Normative source to cite                                                    |
+|-----------------------------|-----------------------------------------------------------------------------|
+| `jailbreak`                 | `CODE_OF_CONDUCT.md`                                                        |
+| `prompt-injection`          | `CODE_OF_CONDUCT.md`                                                        |
+| `harmful-elicitation`       | `CODE_OF_CONDUCT.md`                                                        |
+| `tos-violation`             | `CODE_OF_CONDUCT.md`                                                        |
+| `coc-violation`             | `CODE_OF_CONDUCT.md`                                                        |
 | `model-refusal-elicitation` | `.github/instructions/rai-planning/rai-risk-classification.instructions.md` |
-| `pii-extraction` | `.github/instructions/rai-planning/rai-risk-classification.instructions.md` |
+| `pii-extraction`            | `.github/instructions/rai-planning/rai-risk-classification.instructions.md` |
 
 ## Dedupe Protocol
 
