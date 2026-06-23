@@ -263,7 +263,9 @@ across CI workflows, devcontainers, and local development. Retry logic lives
 here so the composite action (`.github/actions/setup-ps-modules/`) stays a
 thin cache-then-call wrapper.
 
-**Colocation rationale**: This script lives in `scripts/security/` because it
+#### Colocation rationale
+
+This script lives in `scripts/security/` because it
 consumes `ps-module-versions.json` (the pinned-version manifest that the
 security scanners enforce) and its correct operation is a supply-chain security
 concern. If the scope later expands beyond security-module provisioning, move
