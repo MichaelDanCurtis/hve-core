@@ -31,15 +31,15 @@ The security scripts share common modules and follow a consistent pattern:
 
 ## Scripts
 
-* [`Test-DependencyPinning.ps1`](#test-dependencypinningps1) — dependency pinning compliance
-* [`Test-SHAStaleness.ps1`](#test-shastalenessps1) — SHA freshness monitoring
-* [`Test-ActionVersionConsistency.ps1`](#test-actionversionconsistencyps1) — action version alignment
-* [`Update-ActionSHAPinning.ps1`](#update-actionshapinningps1) — auto-remediation of SHA pins
-* [`Invoke-PipAudit.ps1`](#invoke-pipauditps1) — Python dependency audit
-* [`Test-WorkflowPermissions.ps1`](#test-workflowpermissionsps1) — workflow permissions validation
-* [`Install-PSModules.ps1`](#install-psmodulesps1) — centralized PS module install with retry
-* [`Modules/SecurityClasses.psm1`](#modulessecurityclassespsm1) — shared data types
-* [`Modules/SecurityHelpers.psm1`](#modulessecurityhelperspsm1) — shared utilities
+* [`Test-DependencyPinning.ps1`](#test-dependencypinningps1): dependency pinning compliance
+* [`Test-SHAStaleness.ps1`](#test-shastalenessps1): SHA freshness monitoring
+* [`Test-ActionVersionConsistency.ps1`](#test-actionversionconsistencyps1): action version alignment
+* [`Update-ActionSHAPinning.ps1`](#update-actionshapinningps1): auto-remediation of SHA pins
+* [`Invoke-PipAudit.ps1`](#invoke-pipauditps1): Python dependency audit
+* [`Test-WorkflowPermissions.ps1`](#test-workflowpermissionsps1): workflow permissions validation
+* [`Install-PSModules.ps1`](#install-psmodulesps1): centralized PS module install with retry
+* [`Modules/SecurityClasses.psm1`](#modulessecurityclassespsm1): shared data types
+* [`Modules/SecurityHelpers.psm1`](#modulessecurityhelperspsm1): shared utilities
 
 ### `Test-DependencyPinning.ps1`
 
