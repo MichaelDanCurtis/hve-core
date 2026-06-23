@@ -278,11 +278,13 @@ Python skills include a `pyproject.toml` validated by `validate:skills` via `Tes
 Workflows install PowerShell modules via the composite action
 `.github/actions/setup-ps-modules/action.yml`. This action caches modules
 keyed on `scripts/security/ps-module-versions.json` and retries installation
-with exponential backoff on PSGallery failures. Do not use inline
-`Install-Module` steps in workflows; use the composite action instead. The
-`copilot-setup-steps.yml` workflow calls
+with exponential backoff on PSGallery failures. The action always installs to
+`CurrentUser` scope because the cache path is hardcoded to the CurrentUser
+module location. Do not use inline `Install-Module` steps in workflows; use
+the composite action instead. The `copilot-setup-steps.yml` workflow calls
 `scripts/security/Install-PSModules.ps1` directly with `-Scope AllUsers`
-because the composite action's cache path does not match the AllUsers scope.
+because AllUsers requires a different module path that the action does not
+cache.
 
 ### Environment Synchronization
 

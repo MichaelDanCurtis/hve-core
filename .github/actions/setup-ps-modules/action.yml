@@ -2,10 +2,6 @@ name: Setup PowerShell Modules
 description: Installs pinned PowerShell modules with caching and retry on PSGallery failures
 
 inputs:
-  scope:
-    description: 'Install scope for modules (CurrentUser or AllUsers)'
-    required: false
-    default: 'CurrentUser'
   import:
     description: 'Import modules into the session after install'
     required: false
@@ -35,7 +31,7 @@ runs:
       run: |
         $scriptPath = Join-Path $env:GITHUB_WORKSPACE 'scripts/security/Install-PSModules.ps1'
         $installArgs = @{
-          Scope = '${{ inputs.scope }}'
+          Scope = 'CurrentUser'
         }
         if ('${{ inputs.force }}' -eq 'true') { $installArgs['Force'] = $true }
         & $scriptPath @installArgs
