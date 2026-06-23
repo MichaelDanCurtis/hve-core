@@ -26,7 +26,6 @@ runs:
         key: ps-modules-${{ runner.os }}-${{ hashFiles('scripts/security/ps-module-versions.json') }}${{ inputs.cache-key-suffix && format('-{0}', inputs.cache-key-suffix) || '' }}
 
     - name: Install PowerShell modules
-      if: steps.ps-cache.outputs.cache-hit != 'true' || inputs.force == 'true'
       shell: pwsh
       run: |
         $scriptPath = Join-Path $env:GITHUB_WORKSPACE 'scripts/security/Install-PSModules.ps1'

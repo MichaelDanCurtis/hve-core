@@ -31,6 +31,11 @@ Describe 'setup-ps-modules composite action' -Tag 'Unit' {
         It 'Does not reference inputs.scope' {
             $script:ActionRaw | Should -Not -Match 'inputs\.scope'
         }
+
+        It 'Runs unconditionally without a cache-hit gate' {
+            $installStep = $script:ActionYaml.runs.steps | Where-Object { $_.name -eq 'Install PowerShell modules' }
+            $installStep.Keys | Should -Not -Contain 'if'
+        }
     }
 
     Context 'cache path' {
