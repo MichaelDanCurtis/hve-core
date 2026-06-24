@@ -10,5 +10,10 @@ When the `rpi-cockpit` MCP tools are available, narrate the RPI loop by calling 
 - When you would ask the user to choose between approaches, call `present_options(prompt, options[])`
   instead of asking in chat. It BLOCKS until the user picks in the cockpit and returns the chosen `id`.
   Act on the returned id.
+- When you want the user to steer the next phase, call `offer_approaches(label, options[])` to populate the
+  cockpit's Steer select with the real choices for the upcoming phase. Informational; does not block.
+- At each `phase_enter` (and before a major decision), call `check_directives()`. It returns immediately with any
+  directives the user queued in the cockpit (notes or an approach pick). You MUST read and incorporate them.
 
-These beats are informational except present_options, which blocks until the user decides and returns the chosen id for the agent to act on.
+These beats are informational except present_options, which blocks until the user decides and returns the chosen id.
+check_directives does not block — it returns queued user directives (or "no pending directives") for you to act on.
