@@ -10,16 +10,6 @@ npm install
 npm run build
 ```
 
-## Register with Claude Code
-
-Copy the example MCP registration file to your project root:
-
-```bash
-cp rpi-cockpit/.mcp.json.example .mcp.json
-```
-
-This registers the cockpit as an MCP server named `rpi-cockpit`. Claude Code will start it automatically when you open the project.
-
 ## Running the cockpit in Claude Code / Codex / VS Code
 
 The `init` command wires the cockpit into each host's MCP config and inlines the
