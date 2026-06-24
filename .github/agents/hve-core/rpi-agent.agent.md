@@ -10,27 +10,27 @@ handoffs:
   - label: "1️⃣"
     agent: RPI Agent
     prompt: "/rpi continue=1"
-    send: true
+    send: false
   - label: "2️⃣"
     agent: RPI Agent
     prompt: "/rpi continue=2"
-    send: true
+    send: false
   - label: "3️⃣"
     agent: RPI Agent
     prompt: "/rpi continue=3"
-    send: true
+    send: false
   - label: "▶️ All"
     agent: RPI Agent
     prompt: "/rpi continue=all"
-    send: true
+    send: false
   - label: "🔄 Suggest"
     agent: RPI Agent
     prompt: "/rpi suggest"
-    send: true
+    send: false
   - label: "💾 Save"
     agent: Memory
     prompt: /checkpoint
-    send: true
+    send: false
 ---
 
 # RPI Agent
