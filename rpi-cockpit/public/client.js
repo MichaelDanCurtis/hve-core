@@ -33,8 +33,8 @@ function render(v) {
   if (host) { host.textContent = `via MCP · ${v.host}`; host.hidden = !v.host; }
 
   setHtml("steps", v.steps.map((st, i) =>
-    `<div class="step ${st.status}"><div class="ring">${st.status === "done" ? "✓" : i + 1}</div>
-      <div><div class="lbl">${i + 1} · ${LABEL[st.phase]}</div></div></div>`).join(""));
+    `<div class="step ${esc(st.status)}"><div class="ring">${st.status === "done" ? "✓" : i + 1}</div>
+      <div><div class="lbl">${i + 1} · ${LABEL[st.phase] ?? esc(st.phase)}</div></div></div>`).join(""));
 
   setHtml("subagents", v.subagents.length
     ? v.subagents.map((a) =>
@@ -98,7 +98,7 @@ document.addEventListener("click", (e) => {
 function sendMsg(m) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(m)); }
 const setText = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
 const setHtml = (id, h) => { const el = document.getElementById(id); if (el) el.innerHTML = h; };
-const initials = (n) => n.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+const initials = (n) => (n || "?").split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const kindCls = (k) => k.indexOf("directive") === 0 ? "s2" : k === "validate" ? "ok" : "";
 
