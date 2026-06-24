@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "entries": {
+    "79a93d4a2f8f50b95f852280616242fee1855dc99a3c75211917f55e72e95fae": {
+      "last_emitted_at_ms": 1782342716552,
+      "message": "Use parallel execution for independent tasks. Use run_in_background for long operations (npm install, builds, tests)."
+    },
+    "445ed27a3872b681d98190bae61ccb84954e1bc4e140df5370be958dee776b3a": {
+      "last_emitted_at_ms": 1782342648139,
+      "message": "Verify changes work after editing. Test functionality before marking complete."
+    },
+    "466399dafa2d20f60587180bad0a07358eb7f2bce724df0ff682f038ad33f5ad": {
+      "last_emitted_at_ms": 1782342636811,
+      "message": "Read multiple files in parallel when possible for faster analysis."
+    },
+    "4f7a67fba0a8473e9883d9e8dffbb2d72e00a4a1eeb4fa80cb14213b167dc90f": {
+      "last_emitted_at_ms": 1782339854421,
+      "message": "Mark todos in_progress BEFORE starting, completed IMMEDIATELY after finishing."
+    },
+    "b82f40f305e910c2f9a2e035182f43c5c72f1c53e810ba7582e3abd76b3367f7": {
+      "last_emitted_at_ms": 1782339793363,
+      "message": "Spawning agent: general-purpose (sonnet) | Task: Re-review Task 8 fixes"
+    }
+  },
+  "updated_at": "2026-06-24T23:11:56.552Z"
+}

@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd /Volumes/Main\\\\ External/Development/hve-core/rpi-cockpit && npx vitest run tests/server.test.ts 2>&1\",\"timeout\":60000,\"description\":\"Run server tests to confirm new tests fail\"}",
+  "error": "Exit code 1\n\n RUN  v2.1.9 /Volumes/Main External/Development/hve-core/rpi-cockpit\n\n ❯ tests/server.test.ts (4 tests | 2 failed) 20140ms\n   × server > includes a view model in the pushed frame 10008ms\n     → Cannot read properties of undefined (reading 'started')\n     → Hook timed out in 10000ms.\nIf this is a long-running hook, pass a timeout value as the last argument or configure it globally with \"hookTimeout\".\n   × server > enqueues a directive from an inbound steer frame 10040ms\n     → expect...",
+  "timestamp": "2026-06-24T22:07:50.367Z",
+  "retry_count": 1
+}

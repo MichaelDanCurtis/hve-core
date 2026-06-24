@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "entries": {
+    "445ed27a3872b681d98190bae61ccb84954e1bc4e140df5370be958dee776b3a": {
+      "last_emitted_at_ms": 1782342549983,
+      "message": "Verify changes work after editing. Test functionality before marking complete."
+    },
+    "4f7a67fba0a8473e9883d9e8dffbb2d72e00a4a1eeb4fa80cb14213b167dc90f": {
+      "last_emitted_at_ms": 1782342447895,
+      "message": "Mark todos in_progress BEFORE starting, completed IMMEDIATELY after finishing."
+    },
+    "79a93d4a2f8f50b95f852280616242fee1855dc99a3c75211917f55e72e95fae": {
+      "last_emitted_at_ms": 1782342364200,
+      "message": "Use parallel execution for independent tasks. Use run_in_background for long operations (npm install, builds, tests)."
+    },
+    "ec0a526f85238b587e7412b5b45bb366189bd3c44ccbb33a77b7ca071af424b0": {
+      "last_emitted_at_ms": 1782340487146,
+      "message": "Spawning agent: general-purpose (opus) | Task: Final whole-branch review"
+    },
+    "466399dafa2d20f60587180bad0a07358eb7f2bce724df0ff682f038ad33f5ad": {
+      "last_emitted_at_ms": 1782340450390,
+      "message": "Read multiple files in parallel when possible for faster analysis."
+    },
+    "d9aa9138d25effa9864a16e425a32e9bc1b037062a8932aba4e562c464699939": {
+      "last_emitted_at_ms": 1782339975732,
+      "message": "Spawning agent: general-purpose (sonnet) | Task: Review Task 9 (spec + quality)"
+    },
+    "6b6d266a6371b16bd9f87e4d561f96b7ed4c82d7a2a94ae27018a8a5a4bd849d": {
+      "last_emitted_at_ms": 1782339875576,
+      "message": "Spawning agent: general-purpose (sonnet) | Task: Implement Task 9: contract"
+    },
+    "46fa46ebfb67fd23565a7ef19d7620d2d7c72550abc9a93d4eb8cddb98d4b850": {
+      "last_emitted_at_ms": 1782339574857,
+      "message": "Spawning agent: general-purpose (sonnet) | Task: Review Task 8 (spec + quality)"
+    },
+    "c3f962ae1873f2d04defe0dbc2d916ff94c089615fa8828e3302e165096f8e44": {
+      "last_emitted_at_ms": 1782339410225,
+      "message": "Spawning agent: general-purpose (sonnet) | Task: Implement Task 8: client"
+    },
+    "0e00e4cbee1a7205e67fe99a86eedbcc0a8fba043ccba8c2f463ddcad339b4e4": {
+      "last_emitted_at_ms": 1782339301349,
+      "message": "Spawning agent: general-purpose (sonnet) | Task: Review Task 7 (spec + quality)"
+    },
+    "3883839fa8bcacea12a6b3779c053ccaffbe7fd3dd47fd53d1903565c424eaf4": {
+      "last_emitted_at_ms": 1782339127601,
+      "message": "Spawning agent: general-purpose (sonnet) | Task: Implement Task 7: markup"
+    },
+    "162ee9c8157903b146fe7b7fbf48115df27b590cf4d3aa505466713db8a8ea79": {
+      "last_emitted_at_ms": 1782339003261,
+      "message": "Spawning agent: general-purpose (sonnet) | Task: Review Task 6 (spec + quality)"
+    }
+  },
+  "updated_at": "2026-06-24T23:09:09.983Z"
+}
