@@ -38,4 +38,13 @@ export const handlers = {
   },
   present_options: (b: Bridge, a: { prompt: string; options: OptionItem[] }) =>
     b.presentOptions(a.prompt, a.options, decisionTimeoutMs()),
+  offer_approaches: (b: Bridge, a: { label: string; options: OptionItem[] }) => {
+    b.offerApproaches(a.label, a.options);
+    return `offered ${a.options.length} approaches`;
+  },
+  check_directives: (b: Bridge) => {
+    const drained = b.drainDirectives();
+    if (drained.length === 0) return "no pending directives";
+    return drained.map((d) => (d.kind === "note" ? `note: ${d.text}` : `approach: ${d.label}`)).join("\n");
+  },
 };

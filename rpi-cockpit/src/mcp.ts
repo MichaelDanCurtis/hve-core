@@ -53,6 +53,18 @@ export function buildMcpServer(bridge: Bridge): McpServer {
     async (a) => text(await handlers.present_options(bridge, a)),
   );
 
+  server.registerTool(
+    "offer_approaches",
+    { description: "Offer the user a structured choice for the next phase (populates the cockpit's Steer select).", inputSchema: { label: z.string(), options: z.array(OptionItem).min(1) } },
+    async (a) => text(handlers.offer_approaches(bridge, a)),
+  );
+
+  server.registerTool(
+    "check_directives",
+    { description: "Pull any user directives queued from the cockpit. Returns them as text; you MUST read and act on the result. Call at each phase_enter.", inputSchema: {} },
+    async () => text(handlers.check_directives(bridge)),
+  );
+
   return server;
 }
 

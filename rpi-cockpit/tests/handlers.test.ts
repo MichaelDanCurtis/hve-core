@@ -30,4 +30,19 @@ describe("handlers", () => {
     expect(choice).toBe("b");
     expect(b.state.pendingDecision).toBeNull();
   });
+
+  it("offer_approaches populates the steer menu", () => {
+    const b = new Bridge();
+    const out = handlers.offer_approaches(b, { label: "Pick", options: [{ id: "a", title: "A" }] });
+    expect(b.state.steerMenu).toMatchObject({ label: "Pick" });
+    expect(out).toContain("1");
+  });
+
+  it("check_directives returns queued directives then drains", () => {
+    const b = new Bridge();
+    expect(handlers.check_directives(b)).toBe("no pending directives");
+    b.enqueueDirective({ kind: "note", text: "focus on errors" });
+    expect(handlers.check_directives(b)).toBe("note: focus on errors");
+    expect(handlers.check_directives(b)).toBe("no pending directives");
+  });
 });
