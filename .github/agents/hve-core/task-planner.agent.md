@@ -56,7 +56,7 @@ Subagents can run in parallel when investigating independent topics or validatin
 
 ## Cockpit narration
 
-When the `rpi-cockpit` MCP tools are available, narrate planning progress to the RPI Cockpit following `.github/instructions/hve-core/rpi-cockpit-narration.instructions.md`. Skip silently when the tools are not connected. Map the beats as follows:
+When the `rpi-cockpit` MCP tools are available, narrate planning progress to the RPI Cockpit following `rpi-cockpit/agents/cockpit-instructions.md`. Skip silently when the tools are not connected. Map the beats as follows:
 
 * Call `phase_enter("plan")` when planning starts.
 * Wrap every `Researcher Subagent` and `Plan Validator` dispatch with `subagent_start(name, role)` before and `subagent_stop(name, result)` after.

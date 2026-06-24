@@ -35,7 +35,7 @@ Reviews completed implementation work from `.copilot-tracking/` artifacts. Valid
 
 ## Cockpit narration
 
-When the `rpi-cockpit` MCP tools are available, narrate review progress to the RPI Cockpit following `.github/instructions/hve-core/rpi-cockpit-narration.instructions.md`. Skip silently when the tools are not connected. Map the beats as follows:
+When the `rpi-cockpit` MCP tools are available, narrate review progress to the RPI Cockpit following `rpi-cockpit/agents/cockpit-instructions.md`. Skip silently when the tools are not connected. Map the beats as follows:
 
 * Call `phase_enter("review")` when review starts.
 * Call `artifact_update(path, summary)` after writing or updating the review log in `.copilot-tracking/reviews/`.

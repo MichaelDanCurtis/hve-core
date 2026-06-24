@@ -89,7 +89,7 @@ Treat the phase guidance below as operating defaults rather than ceremony. Deleg
 
 ## Cockpit narration
 
-When the `rpi-cockpit` MCP tools are available, narrate this workflow to the RPI Cockpit following `.github/instructions/hve-core/rpi-cockpit-narration.instructions.md`. Skip silently when the tools are not connected. Map the beats as follows:
+When the `rpi-cockpit` MCP tools are available, narrate this workflow to the RPI Cockpit following `rpi-cockpit/agents/cockpit-instructions.md`. Skip silently when the tools are not connected. Map the beats as follows:
 
 * Call `session_begin(task, host)` once when the user request starts.
 * Call `phase_enter(phase)` when entering each phase: `research`, `plan`, `implement`, `review`, and `discover`.

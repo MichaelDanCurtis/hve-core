@@ -48,7 +48,7 @@ Subagents can run in parallel when investigating independent topics or sources.
 
 ## Cockpit narration
 
-When the `rpi-cockpit` MCP tools are available, narrate research progress to the RPI Cockpit following `.github/instructions/hve-core/rpi-cockpit-narration.instructions.md`. Skip silently when the tools are not connected. Map the beats as follows:
+When the `rpi-cockpit` MCP tools are available, narrate research progress to the RPI Cockpit following `rpi-cockpit/agents/cockpit-instructions.md`. Skip silently when the tools are not connected. Map the beats as follows:
 
 * Call `phase_enter("research")` when research starts.
 * Wrap every `Researcher Subagent` dispatch with `subagent_start(name, role)` before and `subagent_stop(name, result)` after.
