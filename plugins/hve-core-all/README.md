@@ -85,6 +85,7 @@ Use this edition when you want access to everything without choosing a focused c
 | **task-reviewer**                    | Reviews completed implementation work for accuracy, completeness, and convention compliance                                                                                                                                                                                                                                                  |
 | **test-streamlit-dashboard**         | Automated testing for Streamlit dashboards using Playwright with issue tracking and reporting                                                                                                                                                                                                                                                |
 | **ux-ui-designer**                   | UX research specialist for Jobs-to-be-Done analysis, user journey mapping, and accessibility requirements                                                                                                                                                                                                                                    |
+| **vally-test-author**                | Authors Vally conformance test stimuli in two modes: from-artifact (read a prompt, instructions, agent, or skill file and draft a stimulus block) and corpus-import (turn a CSV or XLSX corpus into stimulus blocks), with safety-lint refusal enforcement and SHA-256 dedupe before append-only writes to the routed eval file              |
 
 ### Prompts
 
@@ -118,6 +119,7 @@ Use this edition when you want access to everything without choosing a focused c
 | **dt-method-next**                              | Assess DT project state and recommend next method with sequencing validation                                                                 |
 | **dt-resume-coaching**                          | Resume a Design Thinking coaching session - reads coaching state and re-establishes context                                                  |
 | **dt-start-project**                            | Start a new Design Thinking coaching project with state initialization and first coaching interaction                                        |
+| **evals-import**                                | Imports a CSV or XLSX corpus into Vally eval suites with safety lint and dedupe                                                              |
 | **git-commit**                                  | Stage all changes, generate a conventional commit message, and commit                                                                        |
 | **git-commit-message**                          | Generate a conventional commit message from all branch changes                                                                               |
 | **git-merge**                                   | Coordinate Git merge, rebase, and rebase --onto workflows with conflict handling                                                             |
@@ -160,6 +162,7 @@ Use this edition when you want access to everything without choosing a focused c
 | **task-plan**                                   | Initiate implementation planning from user context or research documents                                                                     |
 | **task-research**                               | Initiate research for implementation planning from user requirements                                                                         |
 | **task-review**                                 | Initiate implementation review from user context or artifact discovery                                                                       |
+| **vally-test-write**                            | Authors Vally conformance test stimuli for an existing prompt, instructions, agent, or skill artifact                                        |
 
 ### Instructions
 

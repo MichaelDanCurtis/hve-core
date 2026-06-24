@@ -30,6 +30,13 @@ if ($args.Count -eq 0 -or $args[0] -ne 'eval') {
     exit 64
 }
 
+# Optional argv capture: when STUB_VALLY_ARGV_OUT is set, record the full
+# invocation argv (one token per line) so tests can assert pass-through of
+# flags such as --tag. Opt-in to keep default behavior unchanged.
+if ($env:STUB_VALLY_ARGV_OUT) {
+    Set-Content -LiteralPath $env:STUB_VALLY_ARGV_OUT -Value $args -Encoding utf8
+}
+
 $specPath  = $null
 $outputDir = $null
 for ($i = 1; $i -lt $args.Count; $i++) {

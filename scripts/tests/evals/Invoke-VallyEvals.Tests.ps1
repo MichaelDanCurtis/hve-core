@@ -184,6 +184,57 @@ Describe 'VallyRunner module' -Tag 'Unit' {
             $result.exitCode | Should -Be 0
             Test-Path -LiteralPath $logPath | Should -BeTrue
         }
+
+        It 'Forwards -Tag to the vally CLI as --tag and echoes it in the result' {
+            $outDir   = Join-Path $script:WorkRoot 'spec-tag'
+            $argvPath = Join-Path $script:WorkRoot 'spec-tag-argv.txt'
+            $env:STUB_VALLY_MODE = 'pass'
+            $env:STUB_VALLY_ARGV_OUT = $argvPath
+            try {
+                $result = Invoke-VallySpec `
+                    -SpecPath (Join-Path $script:WorkRoot 'fake.yaml') `
+                    -OutputDir $outDir `
+                    -Model 'claude-opus-4.7' `
+                    -VallyCommand $script:StubPath `
+                    -Tag 'agent=alpha'
+            }
+            finally {
+                Remove-Item Env:\STUB_VALLY_MODE -ErrorAction SilentlyContinue
+                Remove-Item Env:\STUB_VALLY_ARGV_OUT -ErrorAction SilentlyContinue
+            }
+
+            $result.exitCode | Should -Be 0
+            $result.tag | Should -Be 'agent=alpha'
+
+            $argv = Get-Content -LiteralPath $argvPath
+            $tagIndex = [array]::IndexOf($argv, '--tag')
+            $tagIndex | Should -BeGreaterThan -1
+            $argv[$tagIndex + 1] | Should -Be 'agent=alpha'
+        }
+
+        It 'Omits --tag and leaves the result tag empty when -Tag is not supplied' {
+            $outDir   = Join-Path $script:WorkRoot 'spec-notag'
+            $argvPath = Join-Path $script:WorkRoot 'spec-notag-argv.txt'
+            $env:STUB_VALLY_MODE = 'pass'
+            $env:STUB_VALLY_ARGV_OUT = $argvPath
+            try {
+                $result = Invoke-VallySpec `
+                    -SpecPath (Join-Path $script:WorkRoot 'fake.yaml') `
+                    -OutputDir $outDir `
+                    -Model 'claude-opus-4.7' `
+                    -VallyCommand $script:StubPath
+            }
+            finally {
+                Remove-Item Env:\STUB_VALLY_MODE -ErrorAction SilentlyContinue
+                Remove-Item Env:\STUB_VALLY_ARGV_OUT -ErrorAction SilentlyContinue
+            }
+
+            $result.exitCode | Should -Be 0
+            $result.tag | Should -BeNullOrEmpty
+
+            $argv = Get-Content -LiteralPath $argvPath
+            $argv | Should -Not -Contain '--tag'
+        }
     }
 
     Context 'Test-SpecInputModeration (exit-code classification)' {
@@ -398,6 +449,123 @@ Describe 'VallyRunner module' -Tag 'Unit' {
             $result.flagged | Should -BeFalse
         }
     }
+
+    Context 'Get-VallySpecRunPlan' {
+        It 'Runs a single-backlink spec untagged with runKey equal to specRel' {
+            $plan = Get-VallySpecRunPlan `
+                -Artifact @(
+                    @{ kind = 'agent'; artifactId = 'solo'; path = 'a.md'; status = 'modified'; specs = @('specs/solo.yaml') }
+                ) `
+                -SpecBacklinkCount @{ 'specs/solo.yaml' = 1 } `
+                -IndexRoot $script:WorkRoot
+
+            $plan.uniqueSpecRuns.Keys | Should -Be 'specs/solo.yaml'
+            $plan.uniqueSpecRuns['specs/solo.yaml'].tag | Should -BeNullOrEmpty
+            $plan.uniqueSpecRuns['specs/solo.yaml'].specRel | Should -Be 'specs/solo.yaml'
+            $plan.uniqueSpecRuns['specs/solo.yaml'].specAbs | Should -Be (Join-Path -Path $script:WorkRoot -ChildPath 'specs/solo.yaml')
+            $plan.artifactPlan.Count | Should -Be 1
+            $plan.artifactPlan[0].specRuns | Should -Be 'specs/solo.yaml'
+            $plan.missingSpecs.Count | Should -Be 0
+        }
+
+        It 'Tags each artifact and emits one run per artifact when a spec is backlinked twice' {
+            $plan = Get-VallySpecRunPlan `
+                -Artifact @(
+                    @{ kind = 'agent'; artifactId = 'alpha'; path = 'alpha.md'; status = 'modified'; specs = @('specs/shared.yaml') }
+                    @{ kind = 'prompt'; artifactId = 'beta'; path = 'beta.md'; status = 'modified'; specs = @('specs/shared.yaml') }
+                ) `
+                -SpecBacklinkCount @{ 'specs/shared.yaml' = 2 } `
+                -IndexRoot $script:WorkRoot
+
+            $plan.uniqueSpecRuns.Count | Should -Be 2
+            $plan.uniqueSpecRuns.ContainsKey('specs/shared.yaml|agent=alpha') | Should -BeTrue
+            $plan.uniqueSpecRuns.ContainsKey('specs/shared.yaml|prompt=beta') | Should -BeTrue
+            $plan.uniqueSpecRuns['specs/shared.yaml|agent=alpha'].tag | Should -Be 'agent=alpha'
+            $plan.uniqueSpecRuns['specs/shared.yaml|prompt=beta'].tag | Should -Be 'prompt=beta'
+            $plan.artifactPlan[0].specRuns | Should -Be 'specs/shared.yaml|agent=alpha'
+            $plan.artifactPlan[1].specRuns | Should -Be 'specs/shared.yaml|prompt=beta'
+        }
+
+        It 'Deduplicates an identical runKey across artifacts into a single unique run' {
+            $plan = Get-VallySpecRunPlan `
+                -Artifact @(
+                    @{ kind = 'agent'; artifactId = 'same'; path = 'a.md'; status = 'modified'; specs = @('specs/x.yaml') }
+                    @{ kind = 'agent'; artifactId = 'same'; path = 'a.md'; status = 'modified'; specs = @('specs/x.yaml') }
+                ) `
+                -SpecBacklinkCount @{ 'specs/x.yaml' = 1 } `
+                -IndexRoot $script:WorkRoot
+
+            $plan.uniqueSpecRuns.Count | Should -Be 1
+            $plan.uniqueSpecRuns.Keys | Should -Be 'specs/x.yaml'
+        }
+
+        It 'Collects artifacts with no covering spec into missingSpecs and excludes them from the plan' {
+            $plan = Get-VallySpecRunPlan `
+                -Artifact @(
+                    @{ kind = 'agent'; artifactId = 'covered'; path = 'c.md'; status = 'modified'; specs = @('specs/c.yaml') }
+                    @{ kind = 'agent'; artifactId = 'orphan'; path = 'o.md'; status = 'modified'; specs = @() }
+                ) `
+                -SpecBacklinkCount @{ 'specs/c.yaml' = 1 } `
+                -IndexRoot $script:WorkRoot
+
+            $plan.missingSpecs.Count | Should -Be 1
+            $plan.missingSpecs[0].artifactId | Should -Be 'orphan'
+            $plan.missingSpecs[0].path | Should -Be 'o.md'
+            $plan.artifactPlan.Count | Should -Be 1
+            $plan.artifactPlan[0].artifactId | Should -Be 'covered'
+        }
+
+        It 'Returns empty collections for an empty artifact set' {
+            $plan = Get-VallySpecRunPlan `
+                -Artifact @() `
+                -SpecBacklinkCount @{} `
+                -IndexRoot $script:WorkRoot
+
+            $plan.uniqueSpecRuns.Count | Should -Be 0
+            $plan.artifactPlan.Count | Should -Be 0
+            $plan.missingSpecs.Count | Should -Be 0
+        }
+    }
+
+    Context 'Get-VallySpecBacklinkCount' {
+        It 'Returns an empty map when the index has no coverage key' {
+            $counts = Get-VallySpecBacklinkCount -Index @{ root = $script:WorkRoot }
+            $counts.Count | Should -Be 0
+        }
+
+        It 'Returns an empty map when coverage is null' {
+            $counts = Get-VallySpecBacklinkCount -Index @{ coverage = $null }
+            $counts.Count | Should -Be 0
+        }
+
+        It 'Counts a single coverage key as one backlink' {
+            $counts = Get-VallySpecBacklinkCount -Index @{
+                coverage = @{ 'skill:pr-reference' = @('specs/solo.yaml') }
+            }
+            $counts['specs/solo.yaml'] | Should -Be 1
+        }
+
+        It 'Tallies a spec backlinked by multiple coverage keys' {
+            $counts = Get-VallySpecBacklinkCount -Index @{
+                coverage = @{
+                    'skill:pr-reference' = @('specs/shared.yaml')
+                    'agent:task-research' = @('specs/shared.yaml')
+                }
+            }
+            $counts['specs/shared.yaml'] | Should -Be 2
+        }
+
+        It 'Counts each spec independently when a coverage key maps to several specs' {
+            $counts = Get-VallySpecBacklinkCount -Index @{
+                coverage = @{
+                    'agent:multi' = @('specs/a.yaml', 'specs/b.yaml')
+                    'agent:other' = @('specs/b.yaml')
+                }
+            }
+            $counts['specs/a.yaml'] | Should -Be 1
+            $counts['specs/b.yaml'] | Should -Be 2
+        }
+    }
 }
 
 Describe 'Invoke-VallyEvals.ps1 entry script' -Tag 'Integration' {
@@ -558,13 +726,17 @@ stimuli:
         )
         $fx = New-EvalFixture -Artifacts $artifacts -Specs @(@{ Name = 'unrelated.yaml'; Yaml = $spec })
 
-        & pwsh -NoProfile -File $script:ScriptPath `
+        $output = & pwsh -NoProfile -File $script:ScriptPath `
             -ManifestPath $fx.ManifestPath `
             -EvalRoot $fx.EvalRoot `
             -LogsDir $fx.LogsDir `
             -RepoRoot $fx.Root `
-            -VallyCommand $script:StubPath *> $null
+            -VallyCommand $script:StubPath 2>&1
         $LASTEXITCODE | Should -Be 2
+
+        $joined = $output -join "`n"
+        $joined | Should -Match '::error file=.+orphan\.prompt\.md::No eval spec resolves prompt:orphan'
+        $joined | Should -Match '::error::Cannot execute evals: 1 artifact\(s\) have no covering spec\.'
     }
 
     It 'Skips deleted artifacts and exits 0 when none remain' {
@@ -585,7 +757,7 @@ stimuli:
         $summary.totals.artifacts | Should -Be 0
     }
 
-    It 'Runs a shared spec only once when multiple artifacts map to it' {
+    It 'Runs a shared spec once per artifact with a tag filter when multiple artifacts map to it' {
         $spec = @'
 name: shared
 stimuli:
@@ -622,8 +794,13 @@ stimuli:
 
         $summary = Get-Content -LiteralPath $fx.SummaryPath -Raw | ConvertFrom-Json
         $summary.totals.artifacts | Should -Be 2
-        $summary.totals.specs | Should -Be 1
-        $summary.perSpec.Count | Should -Be 1
+
+        # A spec backlinked by two artifacts runs once per artifact with a
+        # `kind=slug` tag filter so each artifact is scored only on its own stimuli.
+        $summary.totals.specs | Should -Be 2
+        $summary.perSpec.Count | Should -Be 2
+        ($summary.perSpec.specPath | Sort-Object -Unique) | Should -Be 'shared.yaml'
+        ($summary.perSpec.tag | Sort-Object) | Should -Be @('agent=task-research', 'skill=pr-reference')
     }
 
     It 'Honors per-spec modes via STUB_VALLY_MODES_JSON for mixed outcomes' {

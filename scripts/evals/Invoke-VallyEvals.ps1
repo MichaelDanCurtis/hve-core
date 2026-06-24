@@ -381,46 +381,46 @@ if ($artifacts.Count -eq 0 -and -not $equivalenceWorkPending) {
 
 $index = New-StimulusIndex -EvalRoot $resolvedEvalRoot
 
+# Backlink count per spec: how many distinct artifacts (coverage keys) the index
+# maps to each spec. A spec backlinked by more than one artifact runs once PER
+# artifact with a `--tag kind=slug` filter so each artifact is scored only on its
+# own stimuli instead of inheriting another artifact's results.
+$specBacklinkCount = Get-VallySpecBacklinkCount -Index $index
+
 if (-not $EquivalenceDriverPath) {
     $EquivalenceDriverPath = Join-Path -Path $resolvedRoot -ChildPath 'scripts/evals/Invoke-BaselineEquivalence.ps1'
 }
 
-$artifactPlan   = [System.Collections.Generic.List[hashtable]]::new()
-$uniqueSpecs    = @{}
 $equivalenceSpecs = @{}
-$missingSpecs   = [System.Collections.Generic.List[hashtable]]::new()
 
+# Resolve covering specs per artifact, then delegate run-plan keying to the
+# VallyRunner helper so the tag-aware runKey logic stays unit-testable.
+$artifactDescriptors = [System.Collections.Generic.List[hashtable]]::new()
 foreach ($artifact in $artifacts) {
     $artifactKind = [string]$artifact.kind
     $artifactId   = [string]$artifact.artifactId
     $specs        = Test-StimulusCoverage -Index $index -Kind $artifactKind -ArtifactId $artifactId
 
-    if ($specs.Count -eq 0) {
-        $missingSpecs.Add(@{ kind = $artifactKind; artifactId = $artifactId; path = [string]$artifact.path })
-        continue
-    }
-
-    foreach ($specRel in $specs) {
-        if (-not $uniqueSpecs.ContainsKey($specRel)) {
-            $uniqueSpecs[$specRel] = Join-Path -Path $index.root -ChildPath $specRel
-        }
-    }
-
-    if ($EnableBaselineEquivalence -and $artifactKind -eq 'agent') {
-        $equivKey = "equivalence:$artifactId"
-        if (-not $equivalenceSpecs.ContainsKey($equivKey)) {
-            $equivalenceSpecs[$equivKey] = $artifactId
-        }
-    }
-
-    $artifactPlan.Add(@{
+    $artifactDescriptors.Add(@{
         kind        = $artifactKind
         artifactId  = $artifactId
         path        = [string]$artifact.path
         status      = [string]$artifact.status
         specs       = @($specs)
     })
+
+    if ($EnableBaselineEquivalence -and $artifactKind -eq 'agent' -and $specs.Count -gt 0) {
+        $equivKey = "equivalence:$artifactId"
+        if (-not $equivalenceSpecs.ContainsKey($equivKey)) {
+            $equivalenceSpecs[$equivKey] = $artifactId
+        }
+    }
 }
+
+$runPlan        = Get-VallySpecRunPlan -Artifact $artifactDescriptors.ToArray() -SpecBacklinkCount $specBacklinkCount -IndexRoot $index.root
+$uniqueSpecRuns = $runPlan.uniqueSpecRuns
+$artifactPlan   = $runPlan.artifactPlan
+$missingSpecs   = $runPlan.missingSpecs
 
 if ($missingSpecs.Count -gt 0) {
     foreach ($m in $missingSpecs) {
@@ -439,9 +439,12 @@ $moderationScript = Join-Path -Path $resolvedRoot -ChildPath 'scripts/evals/Invo
 $specResults = @{}
 $failedSpecs = 0
 
-foreach ($specRel in $uniqueSpecs.Keys) {
-    $specAbs = $uniqueSpecs[$specRel]
-    $specKey = ConvertTo-SafeKey -Value $specRel
+foreach ($runKey in $uniqueSpecRuns.Keys) {
+    $run     = $uniqueSpecRuns[$runKey]
+    $specRel = $run.specRel
+    $specAbs = $run.specAbs
+    $tag     = $run.tag
+    $specKey = ConvertTo-SafeKey -Value $runKey
     $specOut = Join-Path -Path $runsRoot -ChildPath $specKey
     $specLog = Join-Path -Path $resolvedLogsDir -ChildPath "vally-eval-$specKey.log"
 
@@ -463,8 +466,10 @@ foreach ($specRel in $uniqueSpecs.Keys) {
 
         if ($inputModeration.flagged) {
             Write-Host "::error file=$specRel::Content moderation flagged $($inputModeration.flaggedCount) input prompt(s); eval blocked"
-            $specResults[$specRel] = @{
+            $specResults[$runKey] = @{
                 specPath         = $specAbs
+                specRel          = $specRel
+                tag              = $tag
                 exitCode         = 0
                 runDir           = $null
                 assertionsPassed = 0
@@ -481,8 +486,10 @@ foreach ($specRel in $uniqueSpecs.Keys) {
         }
         elseif ($inputModeration.error) {
             Write-Host "::error file=$specRel::Input content moderation could not run (infrastructure error); eval blocked"
-            $specResults[$specRel] = @{
+            $specResults[$runKey] = @{
                 specPath         = $specAbs
+                specRel          = $specRel
+                tag              = $tag
                 exitCode         = 0
                 runDir           = $null
                 assertionsPassed = 0
@@ -499,13 +506,17 @@ foreach ($specRel in $uniqueSpecs.Keys) {
         }
     }
 
-    Write-Host "Running: vally eval --eval-spec $specRel --model $Model" -ForegroundColor Cyan
+    $tagBanner = if (-not [string]::IsNullOrWhiteSpace($tag)) { " --tag $tag" } else { '' }
+    Write-Host "Running: vally eval --eval-spec $specRel --model $Model$tagBanner" -ForegroundColor Cyan
     $result = Invoke-VallySpec `
         -SpecPath $specAbs `
         -OutputDir $specOut `
         -Model $Model `
         -VallyCommand $VallyCommand `
-        -LogPath $specLog
+        -LogPath $specLog `
+        -Tag $tag
+    $result['specRel'] = $specRel
+    $result['tag'] = $tag
 
     # Post-eval content moderation (output)
     $outputModeration = @{ flagged = $false; flaggedCount = 0; outputPath = $null; error = $false }
@@ -577,7 +588,7 @@ foreach ($specRel in $uniqueSpecs.Keys) {
             }
         }
 
-        $specResults[$specRel] = $result
+        $specResults[$runKey] = $result
 
         $promote = $authoritativeFailed -gt 0 -or $outputModeration.flagged -or $outputModeration.error
         if (-not $promote -and $result.exitCode -ne 0 -and $advisoryFailed -eq 0 -and $authoritativeFailed -eq 0) {
@@ -608,7 +619,7 @@ foreach ($specRel in $uniqueSpecs.Keys) {
             $result['status'] = if ($result.exitCode -ne 0 -or $result.assertionsFailed -gt 0) { 'fail' } else { 'pass' }
         }
 
-        $specResults[$specRel] = $result
+        $specResults[$runKey] = $result
 
         if ($result.exitCode -ne 0 -or $result.assertionsFailed -gt 0 -or $outputModeration.flagged -or $outputModeration.error) {
             if ($isAdvisory -and -not $outputModeration.error) {
@@ -712,19 +723,20 @@ foreach ($plan in $artifactPlan) {
     $specBreakdown     = [System.Collections.Generic.List[object]]::new()
     $allSpecsRan       = $true
 
-    foreach ($specRel in $plan.specs) {
-        if (-not $specResults.ContainsKey($specRel)) {
+    foreach ($runKey in $plan.specRuns) {
+        if (-not $specResults.ContainsKey($runKey)) {
             $allSpecsRan = $false
             continue
         }
-        $r = $specResults[$specRel]
+        $r = $specResults[$runKey]
         $artifactPassed     += [int]$r.assertionsPassed
         $artifactFailed     += [int]$r.assertionsFailed
         $artifactDurationMs += [int]$r.durationMs
         if ($r.exitCode -ne 0 -and $artifactExitCode -eq 0) { $artifactExitCode = $r.exitCode }
 
         $specBreakdown.Add([ordered]@{
-            specPath         = $specRel
+            specPath         = $r.specRel
+            tag              = $r.tag
             exitCode         = $r.exitCode
             assertionsPassed = $r.assertionsPassed
             assertionsFailed = $r.assertionsFailed
@@ -769,10 +781,11 @@ foreach ($plan in $artifactPlan) {
 }
 
 $perSpec = [System.Collections.Generic.List[object]]::new()
-foreach ($specRel in $specResults.Keys) {
-    $r = $specResults[$specRel]
+foreach ($runKey in $specResults.Keys) {
+    $r = $specResults[$runKey]
     $record = [ordered]@{
-        specPath         = $specRel
+        specPath         = if ($r.ContainsKey('specRel')) { $r.specRel } else { $runKey }
+        tag              = if ($r.ContainsKey('tag')) { $r.tag } else { '' }
         exitCode         = $r.exitCode
         assertionsPassed = $r.assertionsPassed
         assertionsFailed = $r.assertionsFailed
