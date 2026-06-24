@@ -10,15 +10,15 @@ handoffs:
   - label: "🔬 Research More"
     agent: Task Researcher
     prompt: /task-research
-    send: true
+    send: false
   - label: "📋 Revise Plan"
     agent: Task Planner
     prompt: /task-plan
-    send: true
+    send: false
   - label: "⚡ Implement Immediately"
     agent: Task Implementor
     prompt: /task-implement Address the findings found in the review document
-    send: true
+    send: false
 ---
 
 # Implementation Reviewer

@@ -8,7 +8,7 @@ handoffs:
   - label: "📋 Create Plan"
     agent: Task Planner
     prompt: /task-plan
-    send: true
+    send: false
   - label: "🔬 Deeper Research"
     agent: Task Researcher
     prompt: /task-research continue deeper research based on potential next research items

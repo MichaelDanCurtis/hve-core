@@ -9,7 +9,7 @@ handoffs:
   - label: "✅ Review"
     agent: Task Reviewer
     prompt: /task-review
-    send: true
+    send: false
 ---
 
 # Task Implementor

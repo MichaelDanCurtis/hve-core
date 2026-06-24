@@ -9,7 +9,7 @@ handoffs:
   - label: "⚡ Implement"
     agent: Task Implementor
     prompt: /task-implement
-    send: true
+    send: false
 ---
 
 # Task Planner
