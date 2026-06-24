@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "rpi-cockpit": {
+      "command": "node",
+      "args": ["rpi-cockpit/dist/index.js"]
+    }
+  }
+}
