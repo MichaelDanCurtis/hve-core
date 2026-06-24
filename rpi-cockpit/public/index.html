@@ -112,6 +112,8 @@
   .check.run{color:var(--brand);background:var(--brand-2)}
   [data-theme="b"] .check.run{color:#9CDCFE}
   .check.wait{color:var(--text-3)}
+  .check.fail{color:#b3261e;background:#fce8e6;border-color:#f3c0bb}
+  [data-theme="b"] .check.fail{color:#f2b8b5;background:#3a1714;border-color:#5c2622}
 
   .decide{border:1.5px solid var(--brand);border-radius:var(--radius);box-shadow:var(--shadow-8);overflow:hidden;margin-top:6px;background:var(--layer);-webkit-backdrop-filter:var(--card-blur);backdrop-filter:var(--card-blur)}
   .decide-head{background:var(--brand);color:#fff;padding:11px 16px;display:flex;align-items:center;gap:10px}
@@ -178,12 +180,7 @@
       </div>
 
       <div class="sec">Validation gate</div>
-      <div class="gate">
-        <span class="check ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>lint</span>
-        <span class="check ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>types</span>
-        <span class="check run"><span class="dot"></span>tests</span>
-        <span class="check wait">○ build</span>
-      </div>
+      <div class="gate" id="gate"></div>
 
       <div id="decision"></div>
     </section>

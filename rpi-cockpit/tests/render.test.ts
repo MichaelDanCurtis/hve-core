@@ -16,4 +16,8 @@ describe("toViewModel", () => {
     const s = { ...initialState(), pendingDecision: { id: "d1", prompt: "pick", options: [{ id: "a", title: "A" }] } };
     expect(toViewModel(s).decision?.id).toBe("d1");
   });
+  it("exposes validations as check/status pairs", () => {
+    const s = applyBeat(initialState(), { type: "validate", check: "tests", status: "fail" }, 1);
+    expect(toViewModel(s).validations).toContainEqual({ check: "tests", status: "fail" });
+  });
 });

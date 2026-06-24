@@ -35,8 +35,10 @@ export async function startServer(bridge: Bridge, port = 4399) {
       let msg: unknown;
       try { msg = JSON.parse(String(data)); } catch { return; }
       if (msg && typeof msg === "object" && (msg as { type?: string }).type === "decide") {
-        const m = msg as { id: string; choiceId: string };
-        bridge.resolveDecision(m.id, m.choiceId);
+        const m = msg as { id?: unknown; choiceId?: unknown };
+        if (typeof m.id === "string" && typeof m.choiceId === "string") {
+          bridge.resolveDecision(m.id, m.choiceId);
+        }
       }
     });
   });

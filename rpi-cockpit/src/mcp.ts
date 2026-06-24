@@ -49,7 +49,7 @@ export function buildMcpServer(bridge: Bridge): McpServer {
 
   server.registerTool(
     "present_options",
-    { description: "Ask the user to choose; blocks until they pick.", inputSchema: { prompt: z.string(), options: z.array(OptionItem) } },
+    { description: "Ask the user to choose; blocks until they pick.", inputSchema: { prompt: z.string(), options: z.array(OptionItem).min(1) } },
     async (a) => text(await handlers.present_options(bridge, a)),
   );
 

@@ -22,8 +22,8 @@ export class Bridge extends EventEmitter {
       if (timeoutMs > 0) {
         setTimeout(() => {
           if (this.pending.has(id)) {
-            const fallback = options.find((o) => o.recommended)?.id ?? options[0].id;
-            this.resolveDecision(id, fallback);
+            const fallback = options.find((o) => o.recommended)?.id ?? options[0]?.id;
+            if (fallback !== undefined) this.resolveDecision(id, fallback);
           }
         }, timeoutMs);
       }

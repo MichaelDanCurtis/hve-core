@@ -25,6 +25,13 @@ function render(s) {
   const dec = document.getElementById("decision");
   if (dec) dec.innerHTML = s.pendingDecision ? decisionHtml(s.pendingDecision) : "";
 
+  const gate = document.getElementById("gate");
+  if (gate) gate.innerHTML = Object.entries(s.validations || {}).map(([check, status]) => {
+    const cls = status === "ok" ? "ok" : status === "running" ? "run" : status === "fail" ? "fail" : "wait";
+    const mark = status === "ok" ? "✓" : status === "running" ? "●" : status === "fail" ? "✕" : "○";
+    return `<span class="check ${cls}">${mark} ${escapeHtml(check)}</span>`;
+  }).join("");
+
   const stream = document.querySelector(".stream");
   if (stream) stream.innerHTML = s.log.slice(-12).map((l) =>
     `<div class="evt"><span class="ts">${new Date(l.t).toLocaleTimeString().slice(0, 5)}</span>
