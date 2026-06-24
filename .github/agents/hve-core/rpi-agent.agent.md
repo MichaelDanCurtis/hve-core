@@ -96,7 +96,7 @@ When the `rpi-cockpit` MCP tools are available, narrate this workflow to the RPI
 * Wrap every `Researcher Subagent` and `Phase Implementor` dispatch with `subagent_start(name, role)` before and `subagent_stop(name, result)` after.
 * Call `validate(check, status)` for each check run in the Phase 3 validation gate.
 * Call `artifact_update(path, summary)` after writing or updating each `.copilot-tracking/` artifact.
-* In Phase 5, present the Suggested Next Work list through `present_options(prompt, options[])` so the user can pick the next item in the cockpit, then act on the returned id.
+* In Phase 5, surface the Suggested Next Work list through `present_options(prompt, options[])` so the user can choose the next item in the cockpit. Act only on an explicit user selection; if no selection is made, stop and yield to the user rather than auto-starting the next cycle.
 
 ## Context Discipline
 
