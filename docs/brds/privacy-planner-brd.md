@@ -54,15 +54,15 @@ The driver is an internal capability gap rather than an external regulatory dead
 
 ## Stakeholders
 
-| Stakeholder | Role | Power | Interest | Engagement Strategy |
-|-------------|------|-------|----------|---------------------|
-| Data-handling practitioners (DS / security / eng) | Primary users | Medium | High | Manage closely; primary feedback loop on usability and findings quality |
-| Security Planner (sibling) | Consumer/producer of `cross_planner_refs` | Medium | High | Keep informed; align on handoff contract |
-| RAI Planner (closest sibling) | Shares P2 classification + P5 impact shape | Medium | High | Keep informed; coordinate on personal-data-in-AI overlap |
-| Backlog managers (ADO / GitHub / Jira) | Downstream consumers | Medium | Medium | Keep informed; reconciliation owned on separate thread |
-| Compliance / legal reviewers | Indirect; need verbatim-cited findings | High | Medium | Keep satisfied; validate citation fidelity |
-| End users / data subjects | Indirect; ultimate privacy-harm concern | Low | High | Monitor; harm evidence not yet gathered (see assumption A-005) |
-| wberry (named sign-off authority) | Accountable approver (DRI) for the Discover, Define, and Govern gates | High | High | Manage closely; gate decisions and final sign-off |
+| Stakeholder                                       | Role                                                                  | Power  | Interest | Engagement Strategy                                                     |
+|---------------------------------------------------|-----------------------------------------------------------------------|--------|----------|-------------------------------------------------------------------------|
+| Data-handling practitioners (DS / security / eng) | Primary users                                                         | Medium | High     | Manage closely; primary feedback loop on usability and findings quality |
+| Security Planner (sibling)                        | Consumer/producer of `cross_planner_refs`                             | Medium | High     | Keep informed; align on handoff contract                                |
+| RAI Planner (closest sibling)                     | Shares P2 classification + P5 impact shape                            | Medium | High     | Keep informed; coordinate on personal-data-in-AI overlap                |
+| Backlog managers (ADO / GitHub / Jira)            | Downstream consumers                                                  | Medium | Medium   | Keep informed; reconciliation owned on separate thread                  |
+| Compliance / legal reviewers                      | Indirect; need verbatim-cited findings                                | High   | Medium   | Keep satisfied; validate citation fidelity                              |
+| End users / data subjects                         | Indirect; ultimate privacy-harm concern                               | Low    | High     | Monitor; harm evidence not yet gathered (see assumption A-005)          |
+| wberry (named sign-off authority)                 | Accountable approver (DRI) for the Discover, Define, and Govern gates | High   | High     | Manage closely; gate decisions and final sign-off                       |
 
 ---
 
@@ -313,37 +313,37 @@ Then the Privacy Reviewer (cloned from the reviewer pattern and pointed at `priv
 
 ### FR-to-AC Coverage
 
-| FR | Acceptance Criteria | Covered |
+| FR     | Acceptance Criteria | Covered |
 |--------|---------------------|---------|
-| FR-001 | AC-001 | Yes |
-| FR-002 | AC-002 | Yes |
-| FR-003 | AC-003 | Yes |
-| FR-004 | AC-004 | Yes |
-| FR-005 | AC-005 | Yes |
-| FR-006 | AC-007 | Yes |
-| FR-007 | AC-006 | Yes |
+| FR-001 | AC-001              | Yes     |
+| FR-002 | AC-002              | Yes     |
+| FR-003 | AC-003              | Yes     |
+| FR-004 | AC-004              | Yes     |
+| FR-005 | AC-005              | Yes     |
+| FR-006 | AC-007              | Yes     |
+| FR-007 | AC-006              | Yes     |
 
 FR-to-AC coverage: 100.0% (7 of 7 FRs), meeting the 80.0% threshold.
 
 ### FR-to-BG Alignment
 
-| FR | Business Goals |
-|--------|------------------|
-| FR-001 | BG-001 |
+| FR     | Business Goals |
+|--------|----------------|
+| FR-001 | BG-001         |
 | FR-002 | BG-001, BG-002 |
-| FR-003 | BG-001 |
-| FR-004 | BG-002 |
-| FR-005 | BG-003 |
-| FR-006 | BG-001 |
-| FR-007 | BG-003 |
+| FR-003 | BG-001         |
+| FR-004 | BG-002         |
+| FR-005 | BG-003         |
+| FR-006 | BG-001         |
+| FR-007 | BG-003         |
 
 FR-to-BG coverage: 100.0% (7 of 7 FRs aligned to at least one business goal).
 
 ### BR-to-FR Enforcement
 
-| BR | Enforcing FRs |
-|--------|------------------|
-| BR-001 | FR-004 |
+| BR     | Enforcing FRs  |
+|--------|----------------|
+| BR-001 | FR-004         |
 | BR-002 | FR-001, FR-006 |
 | BR-003 | FR-002, FR-004 |
 
@@ -361,14 +361,14 @@ FR-to-BG coverage: 100.0% (7 of 7 FRs aligned to at least one business goal).
 
 ### Risk Register
 
-| Risk ID | Risk | Probability | Impact | Mitigation | Owner |
-|---------|------|-------------|--------|------------|-------|
-| R-001 | Users treat Privacy Planner output as final legal/privacy approval | Medium | High | Require disclaimer display, professional-review reminders, and verbatim citation so reviewers can validate | Compliance / legal reviewers |
-| R-002 | Standards backbone drifts from upstream (GDPR/CCPA/NIST/OWASP revisions) | Medium | Medium | Pin cited versions in `privacy-standards`; review on standards updates | project-planning-maintainers |
-| R-003 | Mixed-license content loses attribution on reproduction | Low | High | Enforce BR-003 attribution; validate licensing posture in review | security-maintainers |
-| R-004 | Privacy/security/RAI overlap is mis-flagged, creating noisy `cross_planner_refs` | Medium | Medium | Detect-and-flag only (DD-002); tune overlap heuristics; reconciliation owned downstream | Backlog managers |
-| R-005 | End-user privacy harm under-weighted because pain is not directly evidenced (A-005) | Medium | Medium | Record as accepted assumption; schedule data-subject validation before GA | wberry (DRI) |
-| R-006 | Family pattern reuse proves shallower than assumed, inflating effort | Low | High | Validate isomorphism against a sibling planner early in Define/build | project-planning-maintainers |
+| Risk ID | Risk                                                                                | Probability | Impact | Mitigation                                                                                                 | Owner                        |
+|---------|-------------------------------------------------------------------------------------|-------------|--------|------------------------------------------------------------------------------------------------------------|------------------------------|
+| R-001   | Users treat Privacy Planner output as final legal/privacy approval                  | Medium      | High   | Require disclaimer display, professional-review reminders, and verbatim citation so reviewers can validate | Compliance / legal reviewers |
+| R-002   | Standards backbone drifts from upstream (GDPR/CCPA/NIST/OWASP revisions)            | Medium      | Medium | Pin cited versions in `privacy-standards`; review on standards updates                                     | project-planning-maintainers |
+| R-003   | Mixed-license content loses attribution on reproduction                             | Low         | High   | Enforce BR-003 attribution; validate licensing posture in review                                           | security-maintainers         |
+| R-004   | Privacy/security/RAI overlap is mis-flagged, creating noisy `cross_planner_refs`    | Medium      | Medium | Detect-and-flag only (DD-002); tune overlap heuristics; reconciliation owned downstream                    | Backlog managers             |
+| R-005   | End-user privacy harm under-weighted because pain is not directly evidenced (A-005) | Medium      | Medium | Record as accepted assumption; schedule data-subject validation before GA                                  | wberry (DRI)                 |
+| R-006   | Family pattern reuse proves shallower than assumed, inflating effort                | Low         | High   | Validate isomorphism against a sibling planner early in Define/build                                       | project-planning-maintainers |
 
 ---
 

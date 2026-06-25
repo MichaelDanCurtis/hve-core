@@ -38,16 +38,16 @@ Version 0.1 approved | Status Approved for downstream handoff | Owner HVE-Core m
 
 ## Progress Tracker
 
-| Phase | Done | Gaps | Updated |
-|-------|------|------|---------|
-| Context | Seeded from approved Privacy Planner BRD | Confirm target release vehicle and collection milestone | 2026-06-21 |
-| Problem & Users | Seeded from stakeholder model and planner-family gap | Validate compliance/legal reviewer workflow expectations | 2026-06-21 |
-| Scope | Drafted for planner, privacy-standards skill, reviewer, and handoff surfaces | Confirm first-release backlog manager integration tests | 2026-06-21 |
-| Requirements | Functional and non-functional requirements drafted from approved BRD | Validate quality review complete; human approvals recorded | 2026-06-22 |
-| Metrics & Risks | Drafted with traceability, cross-planner, telemetry, and review metrics | Confirm operational dashboards after implementation design | 2026-06-21 |
-| Operationalization | Drafted with state, telemetry, handoff, and packaging expectations | Confirm support model and standards refresh cadence | 2026-06-21 |
-| Finalization | Validate and Finalize quality reviews approved; human approvals recorded | No blocking finalization gaps remain | 2026-06-22 |
-| Unresolved Critical Questions | 0 | No blocking questions remain for PRD draft creation | 2026-06-21 |
+| Phase                         | Done                                                                         | Gaps                                                       | Updated    |
+|-------------------------------|------------------------------------------------------------------------------|------------------------------------------------------------|------------|
+| Context                       | Seeded from approved Privacy Planner BRD                                     | Confirm target release vehicle and collection milestone    | 2026-06-21 |
+| Problem & Users               | Seeded from stakeholder model and planner-family gap                         | Validate compliance/legal reviewer workflow expectations   | 2026-06-21 |
+| Scope                         | Drafted for planner, privacy-standards skill, reviewer, and handoff surfaces | Confirm first-release backlog manager integration tests    | 2026-06-21 |
+| Requirements                  | Functional and non-functional requirements drafted from approved BRD         | Validate quality review complete; human approvals recorded | 2026-06-22 |
+| Metrics & Risks               | Drafted with traceability, cross-planner, telemetry, and review metrics      | Confirm operational dashboards after implementation design | 2026-06-21 |
+| Operationalization            | Drafted with state, telemetry, handoff, and packaging expectations           | Confirm support model and standards refresh cadence        | 2026-06-21 |
+| Finalization                  | Validate and Finalize quality reviews approved; human approvals recorded     | No blocking finalization gaps remain                       | 2026-06-22 |
+| Unresolved Critical Questions | 0                                                                            | No blocking questions remain for PRD draft creation        | 2026-06-21 |
 
 ## 1. Executive Summary
 
@@ -63,11 +63,11 @@ The opportunity is to make privacy planning feel like a coherent member of the e
 
 ### Product Goals
 
-| Goal ID | Statement | Source Business Goal | Baseline | Target | Timeframe | Priority |
-|---------|-----------|----------------------|----------|--------|-----------|----------|
-| PG-001 | Ship Privacy Planner as an isomorphic member of the planner family. | BG-001 | No privacy planner exists | One Privacy Planner agent, one `privacy-standards` skill, and one Privacy Reviewer pass the same structural checks as sibling planners | By 2026-09-30 | Must have |
-| PG-002 | Guarantee verbatim standards traceability for every privacy finding. | BG-002 | No privacy finding surface exists | 100% of findings cite a source control from GDPR, CCPA, NIST Privacy Framework / NISTIR 8062, or OWASP Top 10 Privacy Risks | By 2026-09-30 | Must have |
-| PG-003 | Emit a clean, machine-detectable cross-planner handoff. | BG-003 | Privacy is not a `backlog-templates` caller | Privacy is registered as the 5th caller and emits populated `cross_planner_refs` when overlap is detected | By 2026-09-30 | Should have |
+| Goal ID | Statement                                                            | Source Business Goal | Baseline                                    | Target                                                                                                                                 | Timeframe     | Priority    |
+|---------|----------------------------------------------------------------------|----------------------|---------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|---------------|-------------|
+| PG-001  | Ship Privacy Planner as an isomorphic member of the planner family.  | BG-001               | No privacy planner exists                   | One Privacy Planner agent, one `privacy-standards` skill, and one Privacy Reviewer pass the same structural checks as sibling planners | By 2026-09-30 | Must have   |
+| PG-002  | Guarantee verbatim standards traceability for every privacy finding. | BG-002               | No privacy finding surface exists           | 100% of findings cite a source control from GDPR, CCPA, NIST Privacy Framework / NISTIR 8062, or OWASP Top 10 Privacy Risks            | By 2026-09-30 | Must have   |
+| PG-003  | Emit a clean, machine-detectable cross-planner handoff.              | BG-003               | Privacy is not a `backlog-templates` caller | Privacy is registered as the 5th caller and emits populated `cross_planner_refs` when overlap is detected                              | By 2026-09-30 | Should have |
 
 ## 2. Product Context
 
@@ -103,15 +103,15 @@ Out of scope:
 
 ## 3. Users and Personas
 
-| Persona | Goals | Pain Points | Product Impact |
-|---------|-------|-------------|----------------|
-| Data-handling practitioner | Assess privacy risk for processing activities | Needs practical guidance without legal overclaiming | Primary planner interaction must be clear, gated, and traceable |
-| Compliance / legal reviewer | Validate privacy finding fidelity | Needs verbatim source-control citations and review boundaries | Findings must expose source controls and avoid acting as approval |
-| HVE-Core maintainer | Ship planner assets consistently across collections and extension packaging | Needs privacy to fit the family pattern without bespoke drift | Artifacts must follow existing planner structure and validation paths |
-| Security Planner owner | Understand overlap between privacy and security findings | Needs machine-detectable handoff without duplicated reconciliation logic | `cross_planner_refs` must flag overlap but stop at the seam |
-| RAI Planner owner | Coordinate AI personal-data overlap | Needs compatible classification and impact-assessment shape | DPIA gate mirrors the P2 classification to P5 impact pattern |
-| Backlog manager | Convert privacy findings into actionable work items | Needs stable augmentation fields and severity-to-priority mapping | Handoff fields must be structured and parser-friendly |
-| End user / data subject | Benefit from reduced privacy harm | Needs privacy risks to be surfaced before implementation | Data-subject harms inform risk framing, with direct evidence tracked as an assumption |
+| Persona                     | Goals                                                                       | Pain Points                                                              | Product Impact                                                                        |
+|-----------------------------|-----------------------------------------------------------------------------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| Data-handling practitioner  | Assess privacy risk for processing activities                               | Needs practical guidance without legal overclaiming                      | Primary planner interaction must be clear, gated, and traceable                       |
+| Compliance / legal reviewer | Validate privacy finding fidelity                                           | Needs verbatim source-control citations and review boundaries            | Findings must expose source controls and avoid acting as approval                     |
+| HVE-Core maintainer         | Ship planner assets consistently across collections and extension packaging | Needs privacy to fit the family pattern without bespoke drift            | Artifacts must follow existing planner structure and validation paths                 |
+| Security Planner owner      | Understand overlap between privacy and security findings                    | Needs machine-detectable handoff without duplicated reconciliation logic | `cross_planner_refs` must flag overlap but stop at the seam                           |
+| RAI Planner owner           | Coordinate AI personal-data overlap                                         | Needs compatible classification and impact-assessment shape              | DPIA gate mirrors the P2 classification to P5 impact pattern                          |
+| Backlog manager             | Convert privacy findings into actionable work items                         | Needs stable augmentation fields and severity-to-priority mapping        | Handoff fields must be structured and parser-friendly                                 |
+| End user / data subject     | Benefit from reduced privacy harm                                           | Needs privacy risks to be surfaced before implementation                 | Data-subject harms inform risk framing, with direct evidence tracked as an assumption |
 
 ### Primary Journey
 
@@ -135,40 +135,40 @@ journey
 
 ## 4. Design Decisions
 
-| Decision ID | Decision | Product Rationale | Requirement Impact |
-|-------------|----------|-------------------|--------------------|
-| DD-001 | Standards backbone is locked to NIST Privacy Framework / NISTIR 8062, GDPR, CCPA, and OWASP Top 10 Privacy Risks. LINDDUN and PLOT4ai are excluded from the first release. | A fixed source set keeps the first product release traceable and reviewable. | Drives FR-002, FR-004, NFR-001, CON-001, and CON-002. |
-| DD-002 | Cross-planner overlap is detected and flagged only; reconciliation and deduplication are deferred to backlog managers. | Privacy should integrate with sibling planners without owning cross-domain portfolio decisions. | Drives FR-007, NFR-003, and CON-003. |
-| DD-003 | DPIA threshold is a hard gate at the Phase 2 classification to Phase 5 impact-assessment transition, triggered when any GDPR Article 35-style high-risk condition applies. | High-risk processing needs deeper impact assessment before the user can proceed, and the predicate gives implementers and reviewers a verifiable classification rule. | Drives FR-003, AC-003, and NFR-005. |
-| DD-004 | Privacy handoff fields are `data_category`, `processing_purpose`, `dpia_ref`, `lawful_basis`, and `risk_tier`, with severity-to-priority mapping. | Stable fields let backlog managers consume privacy findings without bespoke parsing. | Drives FR-005 and AC-005. |
+| Decision ID | Decision                                                                                                                                                                   | Product Rationale                                                                                                                                                     | Requirement Impact                                    |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| DD-001      | Standards backbone is locked to NIST Privacy Framework / NISTIR 8062, GDPR, CCPA, and OWASP Top 10 Privacy Risks. LINDDUN and PLOT4ai are excluded from the first release. | A fixed source set keeps the first product release traceable and reviewable.                                                                                          | Drives FR-002, FR-004, NFR-001, CON-001, and CON-002. |
+| DD-002      | Cross-planner overlap is detected and flagged only; reconciliation and deduplication are deferred to backlog managers.                                                     | Privacy should integrate with sibling planners without owning cross-domain portfolio decisions.                                                                       | Drives FR-007, NFR-003, and CON-003.                  |
+| DD-003      | DPIA threshold is a hard gate at the Phase 2 classification to Phase 5 impact-assessment transition, triggered when any GDPR Article 35-style high-risk condition applies. | High-risk processing needs deeper impact assessment before the user can proceed, and the predicate gives implementers and reviewers a verifiable classification rule. | Drives FR-003, AC-003, and NFR-005.                   |
+| DD-004      | Privacy handoff fields are `data_category`, `processing_purpose`, `dpia_ref`, `lawful_basis`, and `risk_tier`, with severity-to-priority mapping.                          | Stable fields let backlog managers consume privacy findings without bespoke parsing.                                                                                  | Drives FR-005 and AC-005.                             |
 
 ## 5. Product Goals
 
-| Goal ID | Requirement | Measurement | Acceptance Signal |
-|---------|-------------|-------------|-------------------|
-| PG-001 | Privacy Planner conforms to the shared planner family architecture. | Structural validation passes for the agent, skill, reviewer, state, and collection artifacts. | One planner, one skill, and one reviewer are packaged and validated by 2026-09-30. |
-| PG-002 | Every privacy finding is traceable to an authoritative privacy source control. | Citation coverage across emitted findings. | 100% of emitted findings carry `gdpr_article`, `ccpa_section`, NIST PF function/category, or OWASP entry ID. |
-| PG-003 | Cross-planner overlap is machine-detectable downstream. | Handoff schema coverage and caller registration. | Privacy is registered as the 5th `backlog-templates` caller and emits `cross_planner_refs` whenever overlap is detected. |
+| Goal ID | Requirement                                                                    | Measurement                                                                                   | Acceptance Signal                                                                                                        |
+|---------|--------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| PG-001  | Privacy Planner conforms to the shared planner family architecture.            | Structural validation passes for the agent, skill, reviewer, state, and collection artifacts. | One planner, one skill, and one reviewer are packaged and validated by 2026-09-30.                                       |
+| PG-002  | Every privacy finding is traceable to an authoritative privacy source control. | Citation coverage across emitted findings.                                                    | 100% of emitted findings carry `gdpr_article`, `ccpa_section`, NIST PF function/category, or OWASP entry ID.             |
+| PG-003  | Cross-planner overlap is machine-detectable downstream.                        | Handoff schema coverage and caller registration.                                              | Privacy is registered as the 5th `backlog-templates` caller and emits `cross_planner_refs` whenever overlap is detected. |
 
 ## 6. Business Rules
 
-| Rule ID | Rule | Category | Enforceability | Enforcing FRs |
-|---------|------|----------|----------------|---------------|
-| BR-001 | Every privacy finding must cite its source control verbatim through `gdpr_article`, `ccpa_section`, NIST PF function/category, or OWASP entry ID. | Regulatory | Mandatory | FR-004 |
-| BR-002 | The Privacy Planner must conform to the shared planner identity base and six-phase orchestration contract. | Operational | Mandatory | FR-001, FR-006 |
-| BR-003 | Reproduced and paraphrased standards content must carry upstream license attribution under the mixed-license posture. | Regulatory | Mandatory | FR-002, FR-004 |
+| Rule ID | Rule                                                                                                                                              | Category    | Enforceability | Enforcing FRs  |
+|---------|---------------------------------------------------------------------------------------------------------------------------------------------------|-------------|----------------|----------------|
+| BR-001  | Every privacy finding must cite its source control verbatim through `gdpr_article`, `ccpa_section`, NIST PF function/category, or OWASP entry ID. | Regulatory  | Mandatory      | FR-004         |
+| BR-002  | The Privacy Planner must conform to the shared planner identity base and six-phase orchestration contract.                                        | Operational | Mandatory      | FR-001, FR-006 |
+| BR-003  | Reproduced and paraphrased standards content must carry upstream license attribution under the mixed-license posture.                             | Regulatory  | Mandatory      | FR-002, FR-004 |
 
 ## 7. Functional Requirements
 
-| FR ID | Requirement | Actor | Trigger | Expected Outcome | Goals | Acceptance Criteria |
-|-------|-------------|-------|---------|------------------|-------|---------------------|
-| FR-001 | Privacy Planner scaffolding | Data-handling practitioner | Practitioner starts a privacy planning session | A Privacy Planner agent runs six-phase orchestration over `planner-identity-base` with state management and session recovery isomorphic to sibling planners. | PG-001 | AC-001 |
-| FR-002 | Data-flow reasoning super-power | Privacy Planner through `privacy-standards` | A processing activity is described during assessment | The skill identifies personal data and maps collection, processing, retention, sharing, and deletion, attaching lawful basis and processing purpose to each stage. | PG-001, PG-002 | AC-002 |
-| FR-003 | Classification gate and DPIA threshold | Privacy Planner | Phase 2 classifies processing activity by privacy risk | When processing meets the DPIA threshold predicate, a hard gate blocks progression until Phase 5 impact assessment is completed. | PG-001 | AC-003 |
-| FR-004 | Standards traceability | Privacy Planner / Privacy Reviewer | A finding is emitted | The finding cites its source control verbatim across the four-standard backbone. | PG-002 | AC-004 |
-| FR-005 | Backlog handoff registration | Privacy Planner | An assessment completes with backlog-eligible findings | Privacy registers as a 5th `backlog-templates` caller and emits a privacy augmentation block on each backlog-eligible finding. | PG-003 | AC-005 |
-| FR-007 | Cross-planner refs and no-reconciliation seam | Privacy Planner | Overlap with a sibling planner is detected during assessment | The planner populates `cross_planner_refs` and stops at the handoff seam without reconciling or deduplicating. | PG-003 | AC-006 |
-| FR-006 | Privacy Reviewer | Compliance/legal reviewer and practitioner | A completed privacy plan is submitted for review | A Privacy Reviewer, cloned from the existing reviewer pattern and pointed at `privacy-standards`, evaluates the plan against the privacy backbone. | PG-001 | AC-007 |
+| FR ID  | Requirement                                   | Actor                                       | Trigger                                                      | Expected Outcome                                                                                                                                                   | Goals          | Acceptance Criteria |
+|--------|-----------------------------------------------|---------------------------------------------|--------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|---------------------|
+| FR-001 | Privacy Planner scaffolding                   | Data-handling practitioner                  | Practitioner starts a privacy planning session               | A Privacy Planner agent runs six-phase orchestration over `planner-identity-base` with state management and session recovery isomorphic to sibling planners.       | PG-001         | AC-001              |
+| FR-002 | Data-flow reasoning super-power               | Privacy Planner through `privacy-standards` | A processing activity is described during assessment         | The skill identifies personal data and maps collection, processing, retention, sharing, and deletion, attaching lawful basis and processing purpose to each stage. | PG-001, PG-002 | AC-002              |
+| FR-003 | Classification gate and DPIA threshold        | Privacy Planner                             | Phase 2 classifies processing activity by privacy risk       | When processing meets the DPIA threshold predicate, a hard gate blocks progression until Phase 5 impact assessment is completed.                                   | PG-001         | AC-003              |
+| FR-004 | Standards traceability                        | Privacy Planner / Privacy Reviewer          | A finding is emitted                                         | The finding cites its source control verbatim across the four-standard backbone.                                                                                   | PG-002         | AC-004              |
+| FR-005 | Backlog handoff registration                  | Privacy Planner                             | An assessment completes with backlog-eligible findings       | Privacy registers as a 5th `backlog-templates` caller and emits a privacy augmentation block on each backlog-eligible finding.                                     | PG-003         | AC-005              |
+| FR-007 | Cross-planner refs and no-reconciliation seam | Privacy Planner                             | Overlap with a sibling planner is detected during assessment | The planner populates `cross_planner_refs` and stops at the handoff seam without reconciling or deduplicating.                                                     | PG-003         | AC-006              |
+| FR-006 | Privacy Reviewer                              | Compliance/legal reviewer and practitioner  | A completed privacy plan is submitted for review             | A Privacy Reviewer, cloned from the existing reviewer pattern and pointed at `privacy-standards`, evaluates the plan against the privacy backbone.                 | PG-001         | AC-007              |
 
 ## 8. Non-Functional Requirements
 
@@ -210,11 +210,11 @@ NFR-009: Privacy Planner must support growth in standards mappings, handoff fiel
 
 ## 9. Constraints
 
-| Constraint ID | Constraint | Source | Category | Affected Boundary | Non-Negotiability | Impact |
-|---------------|------------|--------|----------|-------------------|-------------------|--------|
-| CON-001 | Standards backbone is fixed to NIST Privacy Framework / NISTIR 8062, GDPR, CCPA, and OWASP Top 10 Privacy Risks. | DD-001 | Technical | Scope | Backbone was deliberately locked during discovery and cannot expand without a follow-up decision. | Requirement and acceptance scope cannot add new standards without a follow-up decision. |
-| CON-002 | Mixed licensing includes OWASP CC-BY-SA-4.0, NIST public domain, and paraphrased GDPR/CCPA. | Upstream standards licensing | Regulatory | Compliance | Upstream license terms are external and must be preserved. | Standards content must preserve attribution and licensing posture. |
-| CON-003 | The planner detects and flags cross-planner overlap only; reconciliation is out of scope. | DD-002 | Organizational | Scope and delivery | Reconciliation belongs to backlog managers and is not owned by Privacy Planner. | Product handoff must stop at `cross_planner_refs` and not merge sibling findings. |
+| Constraint ID | Constraint                                                                                                       | Source                       | Category       | Affected Boundary  | Non-Negotiability                                                                                 | Impact                                                                                  |
+|---------------|------------------------------------------------------------------------------------------------------------------|------------------------------|----------------|--------------------|---------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| CON-001       | Standards backbone is fixed to NIST Privacy Framework / NISTIR 8062, GDPR, CCPA, and OWASP Top 10 Privacy Risks. | DD-001                       | Technical      | Scope              | Backbone was deliberately locked during discovery and cannot expand without a follow-up decision. | Requirement and acceptance scope cannot add new standards without a follow-up decision. |
+| CON-002       | Mixed licensing includes OWASP CC-BY-SA-4.0, NIST public domain, and paraphrased GDPR/CCPA.                      | Upstream standards licensing | Regulatory     | Compliance         | Upstream license terms are external and must be preserved.                                        | Standards content must preserve attribution and licensing posture.                      |
+| CON-003       | The planner detects and flags cross-planner overlap only; reconciliation is out of scope.                        | DD-002                       | Organizational | Scope and delivery | Reconciliation belongs to backlog managers and is not owned by Privacy Planner.                   | Product handoff must stop at `cross_planner_refs` and not merge sibling findings.       |
 
 ## 10. Process Models
 
@@ -273,58 +273,58 @@ AC-008 (Telemetry): Given Privacy Planner emits session, handoff, or reviewer be
 
 ### FR-to-AC Coverage
 
-| FR | Acceptance Criteria | Covered |
-|----|---------------------|---------|
-| FR-001 | AC-001 | Yes |
-| FR-002 | AC-002 | Yes |
-| FR-003 | AC-003 | Yes |
-| FR-004 | AC-004 | Yes |
-| FR-005 | AC-005 | Yes |
-| FR-006 | AC-007 | Yes |
-| FR-007 | AC-006 | Yes |
+| FR     | Acceptance Criteria | Covered |
+|--------|---------------------|---------|
+| FR-001 | AC-001              | Yes     |
+| FR-002 | AC-002              | Yes     |
+| FR-003 | AC-003              | Yes     |
+| FR-004 | AC-004              | Yes     |
+| FR-005 | AC-005              | Yes     |
+| FR-006 | AC-007              | Yes     |
+| FR-007 | AC-006              | Yes     |
 
 FR-to-AC coverage: 100.0% (7 of 7 FRs), meeting the 80.0% threshold.
 
 ### FR-to-Goal Alignment
 
-| FR | Product Goals |
-|----|---------------|
-| FR-001 | PG-001 |
+| FR     | Product Goals  |
+|--------|----------------|
+| FR-001 | PG-001         |
 | FR-002 | PG-001, PG-002 |
-| FR-003 | PG-001 |
-| FR-004 | PG-002 |
-| FR-005 | PG-003 |
-| FR-006 | PG-001 |
-| FR-007 | PG-003 |
+| FR-003 | PG-001         |
+| FR-004 | PG-002         |
+| FR-005 | PG-003         |
+| FR-006 | PG-001         |
+| FR-007 | PG-003         |
 
 FR-to-goal coverage: 100.0% (7 of 7 FRs aligned to at least one product goal), meeting the 100.0% threshold.
 
 ### BR-to-FR Enforcement
 
-| BR | Enforcing FRs |
-|----|---------------|
-| BR-001 | FR-004 |
+| BR     | Enforcing FRs  |
+|--------|----------------|
+| BR-001 | FR-004         |
 | BR-002 | FR-001, FR-006 |
 | BR-003 | FR-002, FR-004 |
 
 ### Non-FR Acceptance Coverage
 
-| Acceptance Criteria | Coverage Target | Covered |
-|---------------------|-----------------|---------|
-| AC-008 | NFR-006, SM-005, SM-006, Operational Readiness telemetry expectations | Yes |
+| Acceptance Criteria | Coverage Target                                                       | Covered |
+|---------------------|-----------------------------------------------------------------------|---------|
+| AC-008              | NFR-006, SM-005, SM-006, Operational Readiness telemetry expectations | Yes     |
 
 AC-008 is telemetry-specific and intentionally outside the FR-to-AC coverage denominator. It traces to privacy-safe telemetry requirements and success metrics rather than to a functional requirement.
 
 ## 13. Success Metrics
 
-| Metric ID | Metric | Baseline | Target | Source |
-|-----------|--------|----------|--------|--------|
-| SM-001 | Planner family conformance | 0 privacy planners exist | Privacy Planner agent, `privacy-standards` skill, and Privacy Reviewer pass family structural validation | Validation results |
-| SM-002 | Privacy finding citation coverage | Not applicable | 100% of findings include verbatim source-control citation | Planner/reviewer output checks |
-| SM-003 | Cross-planner handoff coverage | Privacy not registered | 100% of assessments with detected overlap emit populated `cross_planner_refs` | Handoff schema checks |
-| SM-004 | DPIA gate enforcement | Not applicable | 100% of threshold-crossing cases block Phase 2 to Phase 5 progression until impact assessment is completed | Scenario tests |
-| SM-005 | Telemetry safety | Not applicable | 0 raw personal data fields emitted as span attributes, metric dimensions, or log fields in defined telemetry acceptance tests | Telemetry review and test evidence |
-| SM-006 | Metric cardinality control | Not applicable | All proposed metric attributes are bounded-cardinality or moved to logs/trace exemplars | Telemetry design review |
+| Metric ID | Metric                            | Baseline                 | Target                                                                                                                        | Source                             |
+|-----------|-----------------------------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------|------------------------------------|
+| SM-001    | Planner family conformance        | 0 privacy planners exist | Privacy Planner agent, `privacy-standards` skill, and Privacy Reviewer pass family structural validation                      | Validation results                 |
+| SM-002    | Privacy finding citation coverage | Not applicable           | 100% of findings include verbatim source-control citation                                                                     | Planner/reviewer output checks     |
+| SM-003    | Cross-planner handoff coverage    | Privacy not registered   | 100% of assessments with detected overlap emit populated `cross_planner_refs`                                                 | Handoff schema checks              |
+| SM-004    | DPIA gate enforcement             | Not applicable           | 100% of threshold-crossing cases block Phase 2 to Phase 5 progression until impact assessment is completed                    | Scenario tests                     |
+| SM-005    | Telemetry safety                  | Not applicable           | 0 raw personal data fields emitted as span attributes, metric dimensions, or log fields in defined telemetry acceptance tests | Telemetry review and test evidence |
+| SM-006    | Metric cardinality control        | Not applicable           | All proposed metric attributes are bounded-cardinality or moved to logs/trace exemplars                                       | Telemetry design review            |
 
 Telemetry success criteria must use OpenTelemetry-aligned vocabulary. Duration metrics use histogram instruments with UCUM units such as `s`; count-style measures use counters with unit `1`. Any implementation that crosses process, service, queue, or network boundaries emits trace spans with appropriate span kinds and propagates context.
 
@@ -334,10 +334,10 @@ Privacy Planner's MVP is the smallest release that closes the planner-family pri
 
 ### First Release Boundary
 
-| Release Scope | Included Items | Linked Goals | Rationale |
-|---------------|----------------|--------------|-----------|
-| First release | FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007 | PG-001, PG-002, PG-003 | All functional requirements are required to make privacy a first-class, traceable, handoff-ready planner family member. |
-| Deferred | Cross-domain backlog reconciliation, legal approval workflow, automatic remediation, additional standards beyond the locked backbone | None | These items are explicitly out of scope or require separate governance decisions. |
+| Release Scope | Included Items                                                                                                                       | Linked Goals           | Rationale                                                                                                               |
+|---------------|--------------------------------------------------------------------------------------------------------------------------------------|------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| First release | FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007                                                                               | PG-001, PG-002, PG-003 | All functional requirements are required to make privacy a first-class, traceable, handoff-ready planner family member. |
+| Deferred      | Cross-domain backlog reconciliation, legal approval workflow, automatic remediation, additional standards beyond the locked backbone | None                   | These items are explicitly out of scope or require separate governance decisions.                                       |
 
 ### State and Recovery
 
@@ -361,46 +361,46 @@ The planner output remains assistive. Compliance/legal reviewers validate citati
 
 ### Key Assumptions
 
-| Assumption ID | Assumption | Impact if False | Mitigation |
-|---------------|------------|-----------------|------------|
-| A-001 | Privacy Planner is built by isomorphism with the existing family; net-new effort concentrates in `privacy-standards`. | High | Validate family pattern reuse early. |
-| A-002 | `backlog-templates` accepts a 5th caller with a domain augmentation block. | Medium | Confirm the caller registration and schema during implementation. |
-| A-003 | The reviewer pattern is thin orchestration and clones cheaply onto a new skill. | Medium | Prototype the reviewer clone before final release. |
-| A-004 | Privacy augmentation fields are finalized as `data_category`, `processing_purpose`, `dpia_ref`, `lawful_basis`, and `risk_tier`. | Low | Re-validate field set against `backlog-templates` before Govern. |
-| A-005 | End-user / data-subject pain is not yet directly evidenced; practitioner and sibling-planner inputs are accepted for Discover. | Medium | Schedule lightweight data-subject validation before any GA claim of end-user benefit. |
+| Assumption ID | Assumption                                                                                                                       | Impact if False | Mitigation                                                                            |
+|---------------|----------------------------------------------------------------------------------------------------------------------------------|-----------------|---------------------------------------------------------------------------------------|
+| A-001         | Privacy Planner is built by isomorphism with the existing family; net-new effort concentrates in `privacy-standards`.            | High            | Validate family pattern reuse early.                                                  |
+| A-002         | `backlog-templates` accepts a 5th caller with a domain augmentation block.                                                       | Medium          | Confirm the caller registration and schema during implementation.                     |
+| A-003         | The reviewer pattern is thin orchestration and clones cheaply onto a new skill.                                                  | Medium          | Prototype the reviewer clone before final release.                                    |
+| A-004         | Privacy augmentation fields are finalized as `data_category`, `processing_purpose`, `dpia_ref`, `lawful_basis`, and `risk_tier`. | Low             | Re-validate field set against `backlog-templates` before Govern.                      |
+| A-005         | End-user / data-subject pain is not yet directly evidenced; practitioner and sibling-planner inputs are accepted for Discover.   | Medium          | Schedule lightweight data-subject validation before any GA claim of end-user benefit. |
 
 ### Risk Register
 
-| Risk ID | Risk | Probability | Impact | Mitigation | Owner |
-|---------|------|-------------|--------|------------|-------|
-| R-001 | Users treat Privacy Planner output as final legal/privacy approval. | Medium | High | Require disclaimer display, professional-review reminders, and verbatim citations reviewers can validate. | Compliance / legal reviewers |
-| R-002 | Standards backbone drifts from upstream revisions. | Medium | Medium | Pin cited versions in `privacy-standards` and review on standards updates. | project-planning-maintainers |
-| R-003 | Mixed-license content loses attribution on reproduction. | Low | High | Enforce BR-003 attribution and validate licensing posture in review. | security-maintainers |
-| R-004 | Privacy/security/RAI overlap is mis-flagged, creating noisy `cross_planner_refs`. | Medium | Medium | Detect and flag only; tune overlap heuristics; leave reconciliation downstream. | Backlog managers |
-| R-005 | End-user privacy harm is under-weighted because pain is not directly evidenced. | Medium | Medium | Record A-005 and validate data-subject perspective before GA. | wberry (DRI) |
-| R-006 | Family pattern reuse proves shallower than assumed, inflating effort. | Low | High | Validate isomorphism against sibling planners early in implementation. | project-planning-maintainers |
+| Risk ID | Risk                                                                              | Probability | Impact | Mitigation                                                                                                | Owner                        |
+|---------|-----------------------------------------------------------------------------------|-------------|--------|-----------------------------------------------------------------------------------------------------------|------------------------------|
+| R-001   | Users treat Privacy Planner output as final legal/privacy approval.               | Medium      | High   | Require disclaimer display, professional-review reminders, and verbatim citations reviewers can validate. | Compliance / legal reviewers |
+| R-002   | Standards backbone drifts from upstream revisions.                                | Medium      | Medium | Pin cited versions in `privacy-standards` and review on standards updates.                                | project-planning-maintainers |
+| R-003   | Mixed-license content loses attribution on reproduction.                          | Low         | High   | Enforce BR-003 attribution and validate licensing posture in review.                                      | security-maintainers         |
+| R-004   | Privacy/security/RAI overlap is mis-flagged, creating noisy `cross_planner_refs`. | Medium      | Medium | Detect and flag only; tune overlap heuristics; leave reconciliation downstream.                           | Backlog managers             |
+| R-005   | End-user privacy harm is under-weighted because pain is not directly evidenced.   | Medium      | Medium | Record A-005 and validate data-subject perspective before GA.                                             | wberry (DRI)                 |
+| R-006   | Family pattern reuse proves shallower than assumed, inflating effort.             | Low         | High   | Validate isomorphism against sibling planners early in implementation.                                    | project-planning-maintainers |
 
 ## 16. Glossary
 
-| Term | Definition |
-|------|------------|
-| DPIA | Data Protection Impact Assessment, a deeper privacy impact assessment triggered when processing crosses a high-risk threshold. |
-| `cross_planner_refs` | Machine-detectable references emitted to flag overlap between sibling planners. |
-| NIST PF | NIST Privacy Framework. |
-| `privacy-standards` | The privacy domain skill that owns standards content, mappings, and classification rules. |
-| Source control | A standards citation field such as `gdpr_article`, `ccpa_section`, NIST PF function/category, or OWASP entry ID. |
+| Term                 | Definition                                                                                                                     |
+|----------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| DPIA                 | Data Protection Impact Assessment, a deeper privacy impact assessment triggered when processing crosses a high-risk threshold. |
+| `cross_planner_refs` | Machine-detectable references emitted to flag overlap between sibling planners.                                                |
+| NIST PF              | NIST Privacy Framework.                                                                                                        |
+| `privacy-standards`  | The privacy domain skill that owns standards content, mappings, and classification rules.                                      |
+| Source control       | A standards citation field such as `gdpr_article`, `ccpa_section`, NIST PF function/category, or OWASP entry ID.               |
 
 ## 17. Sign-Off
 
 ### Approval Checklist
 
-| Role | Owner | Status | Notes |
-|------|-------|--------|-------|
-| Business Sponsor | wberry (DRI) | Approved for BRD handoff | BRD approval recorded on 2026-06-20. |
-| Product Owner | project-planning-maintainers | Approved | User sign-off recorded on 2026-06-22 covers the pending Product Owner PRD approval role. |
-| Technical Lead | project-planning-maintainers | Approved | User sign-off recorded on 2026-06-22 covers the pending Technical Lead PRD approval role. |
-| Quality Lead | PRD Quality Reviewer | Finalize approved | Final quality report PRD-2026-Q2-PRIVACY-PLANNER-quality-20260622T020000Z passed and approved Finalize exit on 2026-06-22T02:00:00Z. |
-| Legal/Compliance | Compliance / legal reviewers | Approved | User sign-off recorded on 2026-06-22 covers the pending Legal/Compliance PRD approval role. |
+| Role             | Owner                        | Status                   | Notes                                                                                                                                |
+|------------------|------------------------------|--------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| Business Sponsor | wberry (DRI)                 | Approved for BRD handoff | BRD approval recorded on 2026-06-20.                                                                                                 |
+| Product Owner    | project-planning-maintainers | Approved                 | User sign-off recorded on 2026-06-22 covers the pending Product Owner PRD approval role.                                             |
+| Technical Lead   | project-planning-maintainers | Approved                 | User sign-off recorded on 2026-06-22 covers the pending Technical Lead PRD approval role.                                            |
+| Quality Lead     | PRD Quality Reviewer         | Finalize approved        | Final quality report PRD-2026-Q2-PRIVACY-PLANNER-quality-20260622T020000Z passed and approved Finalize exit on 2026-06-22T02:00:00Z. |
+| Legal/Compliance | Compliance / legal reviewers | Approved                 | User sign-off recorded on 2026-06-22 covers the pending Legal/Compliance PRD approval role.                                          |
 
 Approval decision: Approved for downstream handoff. Human approvals were recorded on 2026-06-22T01:54:06Z by wberry (DRI / sign-off authority), covering all pending PRD approval roles. Final quality report PRD-2026-Q2-PRIVACY-PLANNER-quality-20260622T020000Z passed on 2026-06-22T02:00:00Z and authorized `gate_decisions.finalize_exit: APPROVED` with zero risks, zero cautions, and no unresolved blocking findings.
 
@@ -420,10 +420,10 @@ Validate and Finalize quality reviews are complete and approved. Source BRD hand
 
 ## 19. Document Metadata
 
-| Field | Value |
-|-------|-------|
-| Source BRD | BRD-2026-Q2-PRIVACY-PLANNER |
-| Source file | `docs/brds/privacy-planner-brd.md` |
-| Session state | `.copilot-tracking/prd-sessions/privacy-planner.state.json` |
-| Disclaimer shown at | 2026-06-21T18:02:46Z |
-| Lifecycle status | Approved for downstream handoff |
+| Field               | Value                                                       |
+|---------------------|-------------------------------------------------------------|
+| Source BRD          | BRD-2026-Q2-PRIVACY-PLANNER                                 |
+| Source file         | `docs/brds/privacy-planner-brd.md`                          |
+| Session state       | `.copilot-tracking/prd-sessions/privacy-planner.state.json` |
+| Disclaimer shown at | 2026-06-21T18:02:46Z                                        |
+| Lifecycle status    | Approved for downstream handoff                             |
