@@ -280,6 +280,27 @@ stimuli:
         config:
           pattern: "(?i)handoff|sequential|create|update|link|close|github"
 
+  - name: instruction-community-interaction-conformance
+    prompt: |
+      You are about to post a public comment on a GitHub issue declining a
+      contribution that is out of scope. Which
+      `.github/instructions/**/*.instructions.md` file defines the voice,
+      tone, and response templates that apply (cite its path) and what does
+      it require for thanking, scope framing, and leaving doors open?
+    tags:
+      category: behavior-conformance
+      instruction: community-interaction
+      advisory: "true"
+    graders:
+      - type: output-matches
+        name: applyTo-evidence
+        config:
+          pattern: "(?i)community-interaction|github-backlog-.*\\.instructions\\.md"
+      - type: output-matches
+        name: scope-language
+        config:
+          pattern: "(?i)thank|scope|door|concise|tone|voice|template"
+
   - name: instruction-markdown-conformance
     prompt: |
       You are creating or editing a Markdown file at `docs/example.md`. Which
