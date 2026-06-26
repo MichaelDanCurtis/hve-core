@@ -40,6 +40,9 @@ describe("elicitResultToChoice", () => {
   it("returns the chosen id on accept with a valid choice", () => {
     expect(elicitResultToChoice({ action: "accept", content: { choice: "b" } }, OPTS)).toBe("b");
   });
+  it("returns null when the choice is not a string", () => {
+    expect(elicitResultToChoice({ action: "accept", content: { choice: 42 } }, OPTS)).toBeNull();
+  });
   it("returns null on decline", () => {
     expect(elicitResultToChoice({ action: "decline" }, OPTS)).toBeNull();
   });

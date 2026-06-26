@@ -24,6 +24,7 @@ export interface ElicitFormParams {
 // defaulting to the recommended option.
 export function optionsToElicitSchema(prompt: string, options: OptionItem[]): ElicitFormParams {
   const fallback = options.find((o) => o.recommended) ?? options[0];
+  if (!fallback) throw new Error("optionsToElicitSchema: options must not be empty");
   return {
     message: prompt,
     requestedSchema: {
