@@ -65,6 +65,18 @@ export function buildMcpServer(bridge: Bridge): McpServer {
     async () => text(handlers.check_directives(bridge)),
   );
 
+  server.registerTool(
+    "show_screen",
+    { description: "Render arbitrary static HTML in a dedicated, sandboxed cockpit pane (no scripts run; isolated from the page). For one-off rich content the fixed cockpit can't show: a mockup, a diff, rendered markdown, a diagram.", inputSchema: { html: z.string(), title: z.string().optional() } },
+    async (a) => text(handlers.show_screen(bridge, a)),
+  );
+
+  server.registerTool(
+    "clear_screen",
+    { description: "Remove the agent-authored screen pane from the cockpit.", inputSchema: {} },
+    async () => text(handlers.clear_screen(bridge)),
+  );
+
   return server;
 }
 

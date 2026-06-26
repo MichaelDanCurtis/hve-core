@@ -14,6 +14,8 @@ When the `rpi-cockpit` MCP tools are available, narrate the RPI loop by calling 
   cockpit's Steer select with the real choices for the upcoming phase. Informational; does not block.
 - At each `phase_enter` (and before a major decision), call `check_directives()`. It returns immediately with any
   directives the user queued in the cockpit (notes or an approach pick). You MUST read and incorporate them.
+- `show_screen(html, title?)` renders arbitrary static HTML in a sandboxed pane (no scripts run; for mockups, diffs,
+  rendered markdown, diagrams the fixed cockpit can't show); `clear_screen()` removes it.
 
 These beats are informational except present_options, which blocks until the user decides and returns the chosen id.
 check_directives does not block — it returns queued user directives (or "no pending directives") for you to act on.

@@ -17,11 +17,12 @@ export interface SessionState {
   pendingDecision: Decision | null;
   directives: Directive[];
   steerMenu: SteerMenu | null;
+  screen: { html: string; title?: string } | null;
   log: LogEntry[];
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], pendingDecision: null, directives: [], steerMenu: null, log: [] };
+  return { task: "", host: "", phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], pendingDecision: null, directives: [], steerMenu: null, screen: null, log: [] };
 }
 
 export function applyBeat(s: SessionState, beat: Beat, now: number): SessionState {
@@ -48,6 +49,10 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
       return { ...s, validations: { ...s.validations, [beat.check]: beat.status }, log };
     case "approaches.offer":
       return { ...s, steerMenu: { label: beat.label, options: beat.options }, log };
+    case "screen.show":
+      return { ...s, screen: { html: beat.html, title: beat.title }, log };
+    case "screen.clear":
+      return { ...s, screen: null, log };
   }
 }
 
@@ -60,6 +65,8 @@ function summarize(beat: Beat): string {
     case "artifact.update": return `${beat.path} ${beat.summary ?? ""}`.trim();
     case "validate": return `${beat.check}=${beat.status}`;
     case "approaches.offer": return beat.label;
+    case "screen.show": return beat.title ?? "screen";
+    case "screen.clear": return "cleared";
   }
 }
 

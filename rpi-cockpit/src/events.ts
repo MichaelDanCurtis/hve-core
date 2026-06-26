@@ -23,6 +23,8 @@ export const Beat = z.discriminatedUnion("type", [
   z.object({ type: z.literal("artifact.update"), path: z.string(), summary: z.string().optional() }),
   z.object({ type: z.literal("validate"), check: z.string(), status: ValidationStatus }),
   z.object({ type: z.literal("approaches.offer"), label: z.string(), options: z.array(OptionItem).min(1) }),
+  z.object({ type: z.literal("screen.show"), html: z.string(), title: z.string().optional() }),
+  z.object({ type: z.literal("screen.clear") }),
 ]);
 export type Beat = z.infer<typeof Beat>;
 

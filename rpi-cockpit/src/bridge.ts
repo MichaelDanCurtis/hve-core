@@ -35,6 +35,14 @@ export class Bridge extends EventEmitter {
     this.emitBeat({ type: "approaches.offer", label, options });
   }
 
+  showScreen(html: string, title?: string): void {
+    this.emitBeat({ type: "screen.show", html, title });
+  }
+
+  clearScreen(): void {
+    this.emitBeat({ type: "screen.clear" });
+  }
+
   presentOptions(prompt: string, options: OptionItem[], timeoutMs = 0): Promise<string> {
     const id = `d${++this.seq}`;
     this.state = { ...this.state, pendingDecision: { id, prompt, options } };

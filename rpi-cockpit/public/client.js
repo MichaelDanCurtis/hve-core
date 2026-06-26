@@ -67,10 +67,41 @@ function render(v) {
 
   setHtml("decision", v.decision ? decisionHtml(v.decision) : "");
 
+  renderScreen(v.screen);
+
   const stream = document.querySelector(".stream");
   if (stream) stream.innerHTML = v.log.slice(-12).map((l) =>
     `<div class="evt"><span class="ts">${new Date(l.t).toLocaleTimeString().slice(0, 5)}</span>
       <span><span class="k ${kindCls(l.kind)}">${esc(l.kind)}</span> <span class="txt">${esc(l.detail)}</span></span></div>`).join("");
+}
+
+// Agent-authored screen pane. SECURITY: the agent HTML renders inside an iframe
+// whose `sandbox` attribute is set to the empty string — the maximally restrictive
+// value: scripts are disabled and the frame gets a unique opaque origin. So the
+// HTML is inert (no JS) and isolated from the cockpit (no cookie/token/DOM reach
+// into the parent). We assign it via `srcdoc` (NOT escaped — the sandbox is the
+// boundary, escaping would break legitimate markup); only the title is escaped,
+// since that text lands in the cockpit's own DOM. We rebuild the iframe each time
+// so a cleared screen leaves no live frame behind.
+function renderScreen(screen) {
+  const pane = document.getElementById("screen");
+  if (!pane) return;
+  if (!screen) { pane.hidden = true; pane.innerHTML = ""; return; }
+  pane.hidden = false;
+  const title = document.createElement("div");
+  title.className = "sec";
+  title.id = "screen-title";
+  title.innerHTML = esc(screen.title || "Screen");
+  const frame = document.createElement("div");
+  frame.className = "screen-frame";
+  const iframe = document.createElement("iframe");
+  iframe.id = "screen-iframe";
+  iframe.title = "Agent screen";
+  // Empty value = no allow-scripts, no allow-same-origin. Do NOT loosen this.
+  iframe.setAttribute("sandbox", "");
+  iframe.srcdoc = screen.html;
+  frame.appendChild(iframe);
+  pane.replaceChildren(title, frame);
 }
 
 function decisionHtml(d) {

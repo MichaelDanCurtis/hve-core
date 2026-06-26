@@ -54,4 +54,10 @@ describe("toViewModel", () => {
     const s = enqueueDirective(initialState(), { id: "s1", kind: "note", text: "focus" }, 1);
     expect(toViewModel(s).directives).toHaveLength(1);
   });
+
+  it("surfaces the agent screen, defaulting to null", () => {
+    expect(toViewModel(initialState()).screen).toBeNull();
+    const s = applyBeat(initialState(), { type: "screen.show", html: "<p>hi</p>", title: "Mockup" }, 1);
+    expect(toViewModel(s).screen).toEqual({ html: "<p>hi</p>", title: "Mockup" });
+  });
 });

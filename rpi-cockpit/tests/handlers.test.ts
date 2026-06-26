@@ -45,4 +45,13 @@ describe("handlers", () => {
     expect(handlers.check_directives(b)).toBe("note: focus on errors");
     expect(handlers.check_directives(b)).toBe("no pending directives");
   });
+
+  it("show_screen sets the screen on the bridge and clear_screen removes it", () => {
+    const b = new Bridge();
+    const out = handlers.show_screen(b, { html: "<p>hi</p>", title: "Mockup" });
+    expect(b.state.screen).toEqual({ html: "<p>hi</p>", title: "Mockup" });
+    expect(typeof out).toBe("string");
+    handlers.clear_screen(b);
+    expect(b.state.screen).toBeNull();
+  });
 });

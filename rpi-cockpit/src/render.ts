@@ -35,6 +35,7 @@ export interface ViewModel {
   decision: SessionState["pendingDecision"];
   steerMenu: SteerMenuVM;
   directives: Directive[];
+  screen: SessionState["screen"];
   log: SessionState["log"];
 }
 
@@ -61,6 +62,7 @@ export function toViewModel(s: SessionState): ViewModel {
     decision: s.pendingDecision,
     steerMenu,
     directives: s.directives,
+    screen: s.screen,
     log: s.log,
   };
 }

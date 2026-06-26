@@ -36,6 +36,19 @@ it("offers a steer menu and clears it on the next phase", () => {
   expect(s.steerMenu).toBeNull();
 });
 
+it("sets the screen on screen.show and clears it on screen.clear", () => {
+  let s = applyBeat(initialState(), { type: "screen.show", html: "<p>hi</p>", title: "Mockup" }, 1);
+  expect(s.screen).toEqual({ html: "<p>hi</p>", title: "Mockup" });
+  s = applyBeat(s, { type: "screen.clear" }, 2);
+  expect(s.screen).toBeNull();
+});
+
+it("leaves the screen untouched on unrelated beats", () => {
+  let s = applyBeat(initialState(), { type: "screen.show", html: "<p>hi</p>" }, 1);
+  s = applyBeat(s, { type: "validate", check: "lint", status: "ok" }, 2);
+  expect(s.screen).toEqual({ html: "<p>hi</p>", title: undefined });
+});
+
 it("queues a directive and logs it", () => {
   const s = enqueueDirective(initialState(), { id: "s1", kind: "note", text: "focus on errors" }, 7);
   expect(s.directives).toHaveLength(1);

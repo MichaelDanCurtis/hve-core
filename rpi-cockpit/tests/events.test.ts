@@ -29,3 +29,18 @@ it("parses a steer message carrying an approach directive", () => {
   const m = SteerMsg.parse({ type: "steer", directive: { kind: "approach", value: "faster", label: "Move faster" } });
   expect(m.directive).toMatchObject({ kind: "approach", value: "faster" });
 });
+
+it("parses a screen.show beat with and without a title", () => {
+  expect(Beat.parse({ type: "screen.show", html: "<p>hi</p>", title: "Mockup" })).toMatchObject({
+    type: "screen.show", html: "<p>hi</p>", title: "Mockup",
+  });
+  expect(Beat.parse({ type: "screen.show", html: "<p>hi</p>" })).toMatchObject({ type: "screen.show", html: "<p>hi</p>" });
+});
+
+it("rejects a screen.show beat with no html", () => {
+  expect(() => Beat.parse({ type: "screen.show", title: "Mockup" })).toThrow();
+});
+
+it("parses a screen.clear beat", () => {
+  expect(Beat.parse({ type: "screen.clear" })).toEqual({ type: "screen.clear" });
+});

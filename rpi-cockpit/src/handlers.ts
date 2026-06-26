@@ -47,4 +47,12 @@ export const handlers = {
     if (drained.length === 0) return "no pending directives";
     return drained.map((d) => (d.kind === "note" ? `note: ${d.text}` : `approach: ${d.label}`)).join("\n");
   },
+  show_screen: (b: Bridge, a: { html: string; title?: string }) => {
+    b.showScreen(a.html, a.title);
+    return a.title ? `screen shown: ${a.title}` : "screen shown";
+  },
+  clear_screen: (b: Bridge) => {
+    b.clearScreen();
+    return "screen cleared";
+  },
 };
