@@ -21,6 +21,8 @@ MCP is the data and control wire (beats in, decisions out); it does not draw the
 
 Server-less first means rendering natively where the host is capable (VS Code webview, Claude Code inline). The standalone browser cockpit (a local Node server plus WebSocket) is kept only as the escape hatch for terminals that cannot render richly. It is never the foundation.
 
+The cockpit also has to represent more than the RPI loop. HVE Core's full surface (about 65 agents, plus prompts, instructions, and skills) collapses into a handful of workflow archetypes that share a small set of archetype-agnostic primitives: timeline, decision, list, question, screen, and context. That mapping is worked out in [docs/representation-map.md](docs/representation-map.md), and RPI is the first composition of those primitives rather than the whole UI.
+
 ## Current state (v0)
 
 Shipped on `design/rpi-cockpit`:
@@ -43,6 +45,7 @@ Prove the bet by rendering the existing experience with no server, reusing `toVi
 
 * A VS Code webview renderer, a panel in the HVE Core extension, with the agent and UI communicating over the extension's `postMessage` rather than HTTP or WS.
 * A Claude Code inline renderer, with the view-model emitted as inline SVG or HTML widgets the host paints in the conversation (the mechanism already demonstrated for diagrams) and click-through back to the agent.
+* Generalize the beat protocol from the RPI-specific phase enum toward the archetype-agnostic primitives in [docs/representation-map.md](docs/representation-map.md), so the renderers paint generic primitives that any HVE Core workflow can drive, with RPI as the first composition.
 
 This horizon is done when the same session looks good and stays interactive in both VS Code and Claude Code with zero localhost server.
 
