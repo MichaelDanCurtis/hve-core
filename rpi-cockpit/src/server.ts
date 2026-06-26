@@ -133,6 +133,12 @@ export async function startServer(
       } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "steer") {
         const parsed = SteerMsg.safeParse(msg);
         if (parsed.success) bridge.enqueueDirective(parsed.data.directive);
+      } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "launch") {
+        const m = msg as { workflowId?: unknown };
+        if (typeof m.workflowId === "string") bridge.requestLaunch(m.workflowId);
+      } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "navigate") {
+        const m = msg as { screen?: unknown };
+        if (m.screen === "home" || m.screen === "loop") bridge.navigate(m.screen);
       }
     });
   });

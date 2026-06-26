@@ -82,4 +82,31 @@ describe("Bridge", () => {
     b.resolveDecision("does-not-exist", "b");
     expect(seen).not.toHaveBeenCalled();
   });
+
+  describe("navigator", () => {
+    it("requestLaunch enqueues an approach directive and shows the loop", () => {
+      const b = new Bridge();
+      b.requestLaunch("build");
+      expect(b.state.view).toBe("loop");
+      expect(b.state.activeWorkflow).toBe("build");
+      expect(b.state.directives).toHaveLength(1);
+      expect(b.state.directives[0].kind).toBe("approach");
+      expect(b.state.directives[0]).toMatchObject({ value: "build" });
+    });
+
+    it("requestLaunch ignores an unknown workflow id", () => {
+      const b = new Bridge();
+      b.requestLaunch("nope");
+      expect(b.state.directives).toHaveLength(0);
+      expect(b.state.view).toBe("home");
+    });
+
+    it("navigate sets the view", () => {
+      const b = new Bridge();
+      b.navigate("loop");
+      expect(b.state.view).toBe("loop");
+      b.navigate("home");
+      expect(b.state.view).toBe("home");
+    });
+  });
 });

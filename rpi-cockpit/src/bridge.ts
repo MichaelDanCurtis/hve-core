@@ -1,7 +1,8 @@
 // rpi-cockpit/src/bridge.ts
 import { EventEmitter } from "node:events";
-import { initialState, applyBeat, enqueueDirective as reduceEnqueue, drainDirectives as reduceDrain, type SessionState } from "./state.js";
+import { initialState, applyBeat, enqueueDirective as reduceEnqueue, drainDirectives as reduceDrain, setView, startLaunch, type SessionState } from "./state.js";
 import type { Beat, OptionItem, InboundDirective, Directive } from "./events.js";
+import { WORKFLOWS } from "./catalog.js";
 
 export class Bridge extends EventEmitter {
   state: SessionState = initialState();
@@ -20,6 +21,20 @@ export class Bridge extends EventEmitter {
     // Granular, additive: lets a file sink durably record the steering directive
     // for hosts that read it off disk rather than via the in-process MCP drain.
     this.emit("directive", stamped);
+  }
+
+  requestLaunch(workflowId: string): void {
+    const wf = WORKFLOWS.find((w) => w.id === workflowId);
+    if (!wf) return;
+    this.state = startLaunch(this.state, wf.id);
+    // Reuse the directive channel: the agent drains this via check_directives
+    // and performs the launch. The cockpit never starts the agent itself.
+    this.enqueueDirective({ kind: "approach", value: wf.id, label: wf.intent });
+  }
+
+  navigate(screen: "home" | "loop"): void {
+    this.state = setView(this.state, screen);
+    this.emit("state", this.state);
   }
 
   drainDirectives(): Directive[] {

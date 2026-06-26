@@ -208,6 +208,33 @@ describe("server", () => {
     });
   });
 
+  it("a launch frame enqueues a directive and flips the view to loop", async () => {
+    const bridge = new Bridge();
+    const srv = await startServer(bridge, 0);
+    stop = srv.close;
+    const ws = new WebSocket(`ws://127.0.0.1:${srv.port}/?key=${srv.token}`);
+    await new Promise<any>((res) => ws.on("message", (d) => res(JSON.parse(String(d)))));
+    ws.send(JSON.stringify({ type: "launch", workflowId: "build" }));
+    await new Promise((r) => setTimeout(r, 30));
+    expect(bridge.state.view).toBe("loop");
+    expect(bridge.state.activeWorkflow).toBe("build");
+    expect(bridge.state.directives).toHaveLength(1);
+    ws.close();
+  });
+
+  it("a navigate frame sets the view", async () => {
+    const bridge = new Bridge();
+    const srv = await startServer(bridge, 0);
+    stop = srv.close;
+    bridge.navigate("loop");
+    const ws = new WebSocket(`ws://127.0.0.1:${srv.port}/?key=${srv.token}`);
+    await new Promise<any>((res) => ws.on("message", (d) => res(JSON.parse(String(d)))));
+    ws.send(JSON.stringify({ type: "navigate", screen: "home" }));
+    await new Promise((r) => setTimeout(r, 30));
+    expect(bridge.state.view).toBe("home");
+    ws.close();
+  });
+
   describe("embed mode (trustLoopback)", () => {
     it("HTTP GET / with no key and no cookie -> 200 index.html", async () => {
       const bridge = new Bridge();
