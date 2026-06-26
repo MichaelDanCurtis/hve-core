@@ -1,4 +1,4 @@
-#Requires -Modules Pester
+﻿#Requires -Modules Pester
 # Copyright (c) 2026 Microsoft Corporation. All rights reserved.
 # SPDX-License-Identifier: MIT
 # Import module with 'using' to make PowerShell class types (FileTypeInfo, ValidationSummary, etc.) available at parse time

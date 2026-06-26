@@ -179,7 +179,10 @@ function Repair-FileHeaders {
 
     $updated = ($lines.ToArray()) -join $newline
     if ($updated -ne $original) {
-        Set-Content -Path $FilePath -Value $updated -NoNewline -Encoding utf8
+        # Preserve a BOM on files containing non-ASCII characters so PSScriptAnalyzer's
+        # PSUseBOMForUnicodeEncodedFile rule stays satisfied; emit BOM-less UTF-8 otherwise.
+        $encoding = if ($updated -match '[^\x00-\x7F]') { 'utf8BOM' } else { 'utf8' }
+        Set-Content -Path $FilePath -Value $updated -NoNewline -Encoding $encoding
         return $true
     }
 
