@@ -41,7 +41,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: accessibility-reviewer-class-recipe
   prompt: |
@@ -61,7 +61,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: ado-backlog-manager-class-recipe
   prompt: |
@@ -81,7 +81,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: ado-prd-to-wit-class-recipe
   prompt: |
@@ -101,7 +101,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: adr-creation-class-recipe
   prompt: |
@@ -121,7 +121,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: adr-creation-disclaimer-startup
   prompt: |
@@ -245,7 +245,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: agile-coach-class-recipe
   prompt: |
@@ -265,7 +265,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: brd-builder-class-recipe
   prompt: |
@@ -285,7 +285,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: code-review-accessibility-class-recipe
   prompt: |
@@ -310,7 +310,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: code-review-full-class-recipe
   prompt: |
@@ -336,7 +336,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: code-review-functional-class-recipe
   prompt: |
@@ -361,7 +361,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: code-review-standards-class-recipe
   prompt: |
@@ -387,7 +387,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: codebase-profiler-skill-mapping
   prompt: |
@@ -449,7 +449,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: documentation-audit-class-recipe
   prompt: |
@@ -473,7 +473,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: documentation-drift-class-recipe
   prompt: |
@@ -530,7 +530,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: dt-learning-tutor-class-recipe
   prompt: |
@@ -550,7 +550,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: eval-dataset-creator-class-recipe
   prompt: |
@@ -589,7 +589,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: finding-deep-verifier-verdict-blocks
   prompt: |
@@ -724,7 +724,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: implementation-validator-full-quality-recipe
   prompt: |
@@ -782,7 +782,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: jira-backlog-manager-class-recipe
   prompt: |
@@ -802,7 +802,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: jira-prd-to-wit-class-recipe
   prompt: |
@@ -822,7 +822,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: meeting-analyst-class-recipe
   prompt: |
@@ -842,7 +842,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: memory-class-recipe
   prompt: |
@@ -862,7 +862,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: network-isa95-planner-class-recipe
   prompt: |
@@ -882,7 +882,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: phase-implementor-completion-report-shape
   prompt: |
@@ -1062,7 +1062,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: pr-review-identifies-security-risk
   prompt: |
@@ -1086,7 +1086,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: pr-review-identifies-security
   prompt: |
@@ -1149,7 +1149,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: prd-builder-class-recipe
   prompt: |
@@ -1169,7 +1169,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: privacy-planner-class-recipe
   prompt: |
@@ -1189,7 +1189,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: privacy-reviewer-class-recipe
   prompt: |
@@ -1209,7 +1209,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: product-manager-advisor-class-recipe
   prompt: |
@@ -1229,7 +1229,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: prompt-builder-class-recipe
   prompt: |
@@ -1249,7 +1249,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: prompt-evaluator-sandbox-execution-log
   prompt: |
@@ -1416,7 +1416,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: rai-planner-disclaimer-startup
   prompt: |
@@ -1460,7 +1460,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: report-generator-vuln-report
   prompt: |
@@ -1557,7 +1557,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: rpi-validator-phase-scope
   prompt: |
@@ -1615,7 +1615,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: security-reviewer-class-recipe
   prompt: |
@@ -1640,7 +1640,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: skill-assessor-audit-mode-format
   prompt: |
@@ -1713,7 +1713,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: sssc-planner-disclaimer-startup
   prompt: |
@@ -1757,7 +1757,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: system-architecture-reviewer-class-recipe
   prompt: |
@@ -1797,7 +1797,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: task-implementor-edits-source
   prompt: |
@@ -1846,7 +1846,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: task-researcher-produces-research-writeup
   prompt: |
@@ -1903,7 +1903,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: test-streamlit-dashboard-class-recipe
   prompt: |
@@ -1942,7 +1942,7 @@ stimuli:
   - type: output-matches
     name: no-source-edit
     config:
-      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      pattern: (?i)(created|wrote|modified|edited|patched|added)\s+\S{0,40}(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
 - name: vally-test-author-advisory-and-routing
   prompt: |
