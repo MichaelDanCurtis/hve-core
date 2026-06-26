@@ -19,8 +19,7 @@ function boot() {
 }
 
 function reviewVm() {
-  let s = applyBeat(initialState(), { type: "session.begin", task: "code-review", host: "localhost" }, 0);
-  s = applyBeat(s, { type: "review.start", target: "PR 9" }, 1);
+  let s = applyBeat(initialState(), { type: "review.start", target: "PR 9" }, 1);
   s = applyBeat(s, { type: "finding.add", severity: "critical", title: "RCE", file: "a.ts", line: 4, detail: "bad" }, 2);
   s = applyBeat(s, { type: "finding.add", severity: "low", title: "nit" }, 3);
   return toViewModel(s);

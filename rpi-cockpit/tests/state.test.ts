@@ -109,6 +109,7 @@ describe("review domain", () => {
     expect(s.domain).toBe("review");
     expect(s.reviewTarget).toBe("PR 7");
     expect(s.findings).toEqual([]);
+    expect(s.view).toBe("loop");
   });
   it("finding.add appends a finding", () => {
     let s = applyBeat(initialState(), { type: "review.start", target: "x" }, 1);

@@ -59,7 +59,7 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
     case "screen.clear":
       return { ...s, screen: null, log };
     case "review.start":
-      return { ...s, domain: "review", reviewTarget: beat.target, findings: [], log };
+      return { ...s, view: "loop" as const, domain: "review", reviewTarget: beat.target, findings: [], log };
     case "finding.add":
       return { ...s, findings: [...s.findings, { severity: beat.severity, title: beat.title, file: beat.file, line: beat.line, detail: beat.detail }], log };
   }
