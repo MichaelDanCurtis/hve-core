@@ -7,6 +7,7 @@
   "scripts": {
     "test": "vitest run",
     "dev": "tsx src/index.ts",
+    "preview": "node preview.mjs",
     "build": "tsc",
     "postbuild": "chmod +x dist/index.js",
     "prepare": "npm run build"
