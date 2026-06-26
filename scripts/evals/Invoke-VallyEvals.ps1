@@ -674,7 +674,16 @@ foreach ($runKey in $uniqueSpecRuns.Keys) {
         }
     }
     else {
-        $isAdvisory = Test-SpecIsAdvisory -SpecPath $specAbs
+        # Per DD-01, baseline-equivalence is advisory at PR tier: equivalence
+        # signal surfaces in the run summary but never gates merge. Its stimuli
+        # corpus is tag-resolved into this authoritative path and runs at a
+        # perfect-score threshold (1.0) against a small model, so a single grader
+        # miss on a file-reading prompt would otherwise hard-fail the spec and
+        # block the build. Treat any baseline-equivalence spec as advisory so the
+        # tag-resolved path honors the same advisory posture as the dedicated
+        # equivalence dispatch.
+        $specIsEquivalence = $specRel -match '(^|/)baseline-equivalence/'
+        $isAdvisory = (Test-SpecIsAdvisory -SpecPath $specAbs) -or $specIsEquivalence
         $result['isAdvisory'] = $isAdvisory
 
         # A zero vally exit means the spec met its aggregate threshold (the author's
@@ -682,9 +691,8 @@ foreach ($runKey in $uniqueSpecRuns.Keys) {
         # assertionsFailed are sub-threshold noise, not merge blockers. Mirror the
         # advisory-map branch above and gate only on a nonzero vally exit or a
         # moderation failure. Without this, a spec that carries no advisory-tagged
-        # stimulus (for example baseline-equivalence/stimuli.yml) would gate the
-        # build on a single sub-threshold dip even though vally reported an
-        # aggregate pass.
+        # stimulus would gate the build on a single sub-threshold dip even though
+        # vally reported an aggregate pass.
         $hardFailure = ($result.exitCode -ne 0) -or $outputModeration.flagged -or $outputModeration.error
         $subThresholdDip = (-not $hardFailure) -and ($result.assertionsFailed -gt 0)
 

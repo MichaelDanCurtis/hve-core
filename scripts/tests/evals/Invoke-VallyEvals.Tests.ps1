@@ -1206,7 +1206,12 @@ Describe 'Invoke-VallyEvals.ps1 per-stimulus advisory promotion' -Tag 'Integrati
             New-Item -ItemType Directory -Path $evalRoot -Force | Out-Null
             New-Item -ItemType Directory -Path $logsDir  -Force | Out-Null
 
-            Set-Content -LiteralPath (Join-Path $evalRoot $SpecName) -Value $SpecYaml -Encoding utf8
+            $specFullPath = Join-Path $evalRoot $SpecName
+            $specDir = Split-Path -Parent $specFullPath
+            if (-not (Test-Path -LiteralPath $specDir)) {
+                New-Item -ItemType Directory -Path $specDir -Force | Out-Null
+            }
+            Set-Content -LiteralPath $specFullPath -Value $SpecYaml -Encoding utf8
 
             $manifestPath = Join-Path $root 'manifest.json'
             @{ artifacts = @($Artifact) } | ConvertTo-Json -Depth 6 |
@@ -1484,6 +1489,44 @@ stimuli:
         $summary.perSpec[0].status | Should -Be 'advisory-fail'
         $summary.perSpec[0].isAdvisory | Should -BeFalse
         $summary.perArtifact[0].status | Should -Be 'advisory-fail'
+    }
+
+    It 'Treats a tag-resolved baseline-equivalence spec as advisory even on a hard vally failure' {
+        # Per DD-01 the equivalence corpus is advisory at PR tier. Its stimuli are
+        # tag-resolved into the authoritative path and run at a perfect-score
+        # threshold against a small model, so a hard vally failure (exit 1) on a
+        # single grader must surface as advisory rather than gate the build.
+        $spec = @'
+name: baseline-equivalence-stimuli
+stimuli:
+  - name: tool-trigger-list-scripts
+    prompt: hi
+    tags:
+      agent: task-research
+'@
+        $fx = New-PerStimFixture `
+            -SpecName 'baseline-equivalence/stimuli.yml' `
+            -SpecYaml $spec `
+            -Artifact @{ kind = 'agent'; artifactId = 'task-research'; path = '.github/agents/hve-core/task-research.agent.md'; status = 'M' }
+
+        $env:STUB_VALLY_MODE = 'fail'
+
+        & pwsh -NoProfile -File $script:ScriptPath `
+            -ManifestPath $fx.ManifestPath `
+            -EvalRoot $fx.EvalRoot `
+            -LogsDir $fx.LogsDir `
+            -RepoRoot $fx.Root `
+            -VallyCommand $script:StubPath `
+            -SkipInputModeration `
+            -SkipOutputModeration *> $null
+        $LASTEXITCODE | Should -Be 0
+
+        $summary = Get-Content -LiteralPath $fx.SummaryPath -Raw | ConvertFrom-Json
+        $summary.totals.failedSpecs | Should -Be 0
+        $summary.perSpec[0].status | Should -Be 'advisory-fail'
+        $summary.perSpec[0].isAdvisory | Should -BeTrue
+        $summary.perArtifact[0].status | Should -Be 'advisory-fail'
+        $summary.perArtifact[0].isAdvisory | Should -BeTrue
     }
 }
 
