@@ -12,7 +12,6 @@ keywords:
   - pip
   - github actions
 estimated_reading_time: 8
-ms.date: 2026-06-25
 ---
 
 ## Overview
