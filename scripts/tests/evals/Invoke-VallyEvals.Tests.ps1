@@ -1368,6 +1368,51 @@ stimuli:
         $summary.perArtifact[0].advisoryFailed | Should -Be 1
     }
 
+    It 'Does not gate sub-threshold trial dips when the spec passes aggregate (exit 0)' {
+        # An authoritative stimulus whose per-trial score dips but whose aggregate
+        # still meets threshold (vally exit 0) must not gate: the failure is
+        # sub-threshold noise, demoted to advisory.
+        $spec = @'
+name: skill-cover
+stimuli:
+  - name: stim-a
+    prompt: hi
+    tags:
+      skill: pr-reference
+      advisory: true
+  - name: stim-b
+    prompt: hi
+    tags:
+      skill: pr-reference
+'@
+        $fx = New-PerStimFixture `
+            -SpecName 'aggregate-pass.yaml' `
+            -SpecYaml $spec `
+            -Artifact @{ kind = 'skill'; artifactId = 'pr-reference'; path = '.github/skills/shared/pr-reference/SKILL.md'; status = 'M' }
+
+        $env:STUB_VALLY_MODE = 'per-stim'
+        $env:STUB_VALLY_STIM_RESULTS_JSON = '{"stim-a":false,"stim-b":false}'
+        # No STUB_VALLY_FAIL_ON_ANY: vally exits 0 (aggregate passed).
+
+        & pwsh -NoProfile -File $script:ScriptPath `
+            -ManifestPath $fx.ManifestPath `
+            -EvalRoot $fx.EvalRoot `
+            -LogsDir $fx.LogsDir `
+            -RepoRoot $fx.Root `
+            -VallyCommand $script:StubPath `
+            -SkipInputModeration `
+            -SkipOutputModeration *> $null
+        $LASTEXITCODE | Should -Be 0
+
+        $summary = Get-Content -LiteralPath $fx.SummaryPath -Raw | ConvertFrom-Json
+        $summary.totals.failedSpecs | Should -Be 0
+        $summary.perSpec[0].status | Should -Be 'advisory-fail'
+        $summary.perSpec[0].authoritativeFailed | Should -Be 0
+        $summary.perSpec[0].advisoryFailed | Should -Be 2
+        $summary.perArtifact[0].status | Should -Be 'advisory-fail'
+        $summary.perArtifact[0].authoritativeFailed | Should -Be 0
+    }
+
     It 'Falls back to legacy spec-level advisory detection when no stimulus carries the tag' {
         $spec = @'
 name: agent-cover

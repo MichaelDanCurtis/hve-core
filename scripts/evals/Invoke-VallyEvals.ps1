@@ -585,6 +585,15 @@ foreach ($runKey in $uniqueSpecRuns.Keys) {
             else { $authoritativeFailed += $unattributedFailed }
         }
 
+        # A zero vally exit means the spec met its aggregate threshold (the author's
+        # runs/threshold contract), so every stimulus passed overall. Any per-trial
+        # dips counted in assertionsFailed are sub-threshold noise, not merge
+        # blockers; demote them to advisory so an aggregate-passing spec never gates.
+        if ($result.exitCode -eq 0 -and $authoritativeFailed -gt 0) {
+            $advisoryFailed += $authoritativeFailed
+            $authoritativeFailed = 0
+        }
+
         $result['advisoryPassed'] = $advisoryPassed
         $result['advisoryFailed'] = $advisoryFailed
         $result['authoritativePassed'] = $authoritativePassed
