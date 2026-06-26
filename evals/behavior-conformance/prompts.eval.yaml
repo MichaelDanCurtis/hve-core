@@ -1270,3 +1270,21 @@ stimuli:
         name: scope-language
         config:
           pattern: "(?i)stimul|conformance|safety\\s+self-check|advisory|grader"
+
+  - name: prompt-pr-review-conformance
+    prompt: |
+      Invoke the `pr-review` prompt to review the current pull request. Produce
+      the review with findings and a verdict.
+    tags:
+      category: behavior-conformance
+      prompt: pr-review
+      advisory: "true"
+    graders:
+      - type: output-matches
+        name: review-attribution
+        config:
+          pattern: "(?i)(pr-review|pull request|code review|reviewer)"
+      - type: output-matches
+        name: scope-language
+        config:
+          pattern: "(?i)(finding|severity|verdict|approve|request changes|comment)"

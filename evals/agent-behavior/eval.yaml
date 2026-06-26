@@ -287,6 +287,181 @@ stimuli:
     config:
       pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
+- name: code-review-accessibility-lens
+  prompt: |
+    As the accessibility code-review perspective, review this markup for
+    conformance issues and cite the relevant success criteria.
+    ```html
+    <button><img src="trash.png"></button>
+    <input type="text">
+    ```
+  tags:
+    category: agent-behavior
+    advisory: "true"
+    agent: code-review-accessibility
+  graders:
+  - type: output-matches
+    name: accessibility-finding-vocabulary
+    config:
+      pattern: (?i)(accessib|alt text|label|aria|WCAG|success criteria|contrast|finding|issue)
+  - type: output-matches
+    name: no-source-edit
+    config:
+      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      negate: true
+- name: code-review-explainer-factual
+  prompt: |
+    As the code-review explainer, give a factual, Register 1 explanation of
+    what this function does. Do not assign severity or recommend changes.
+    ```python
+    def clamp(value, low, high):
+        return max(low, min(value, high))
+    ```
+  tags:
+    category: agent-behavior
+    advisory: "true"
+    agent: code-review-explainer
+  graders:
+  - type: output-matches
+    name: explanation-vocabulary
+    config:
+      pattern: (?i)(function|returns?|parameter|argument|value|purpose|does|bound|clamp|minimum|maximum)
+  - type: output-matches
+    name: no-source-edit
+    config:
+      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      negate: true
+- name: code-review-functional-lens
+  prompt: |
+    As the functional code-review perspective, review this change for logic,
+    edge cases, and error handling. Report findings with severity.
+    ```diff
+    -def divide(a, b):
+    -    return a / b
+    +def divide(a, b):
+    +    return a / b  # no guard when b == 0
+    ```
+  tags:
+    category: agent-behavior
+    advisory: "true"
+    agent: code-review-functional
+  graders:
+  - type: output-matches
+    name: functional-finding-vocabulary
+    config:
+      pattern: (?i)(edge case|division by zero|b\s*==\s*0|error handling|exception|finding|issue|severity|risk)
+  - type: output-matches
+    name: no-source-edit
+    config:
+      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      negate: true
+- name: code-review-pr-lens
+  prompt: |
+    As the PR code-review perspective, summarize this pull request at the PR
+    level: scope hygiene, validation evidence, and follow-up items. The PR
+    adds a retry helper plus tests and touches an unrelated formatting change.
+  tags:
+    category: agent-behavior
+    advisory: "true"
+    agent: code-review-pr
+  graders:
+  - type: output-matches
+    name: pr-summary-vocabulary
+    config:
+      pattern: (?i)(summary|scope|validation|evidence|follow[- ]?up|out[- ]?of[- ]?scope|test|recommend)
+  - type: output-matches
+    name: no-source-edit
+    config:
+      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      negate: true
+- name: code-review-readiness-lens
+  prompt: |
+    As the readiness code-review perspective, assess whether this change is
+    ready to merge: validation evidence, test coverage, and rollout
+    considerations. The change adds a feature flag with no accompanying tests.
+  tags:
+    category: agent-behavior
+    advisory: "true"
+    agent: code-review-readiness
+  graders:
+  - type: output-matches
+    name: readiness-vocabulary
+    config:
+      pattern: (?i)(readiness|ready|test|coverage|validation|evidence|rollout|missing|risk|recommend)
+  - type: output-matches
+    name: no-source-edit
+    config:
+      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      negate: true
+- name: code-review-security-lens
+  prompt: |
+    As the security code-review perspective, review this change for
+    injection, authentication, and secret-handling concerns. Report findings
+    with severity and a concrete exploitation path.
+    ```python
+    query = "SELECT * FROM users WHERE name = '" + name + "'"
+    db.execute(query)
+    ```
+  tags:
+    category: agent-behavior
+    advisory: "true"
+    agent: code-review-security
+  graders:
+  - type: output-matches
+    name: security-finding-vocabulary
+    config:
+      pattern: (?i)(sql injection|injection|sanitiz|parameteriz|authenticat|secret|vulnerab|exploit|severity|finding)
+  - type: output-matches
+    name: no-source-edit
+    config:
+      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      negate: true
+- name: code-review-standards-lens
+  prompt: |
+    As the standards code-review perspective, review this snippet for coding
+    standard and convention violations, and tie each finding to the rule it
+    breaks.
+    ```python
+    def ProcessData( x ):
+     result=x*2
+     return result
+    ```
+  tags:
+    category: agent-behavior
+    advisory: "true"
+    agent: code-review-standards
+  graders:
+  - type: output-matches
+    name: standards-finding-vocabulary
+    config:
+      pattern: (?i)(standard|convention|naming|style|PEP\s?8|formatting|violation|finding|issue)
+  - type: output-matches
+    name: no-source-edit
+    config:
+      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      negate: true
+- name: code-review-walkback-investigation
+  prompt: |
+    As the code-review walk-back investigator, take a deep, Register 2 look at
+    whether this caching change is correct and safe, and explain the
+    implications of a stale cache entry.
+    ```python
+    cache[key] = fetch(key)  # never invalidated
+    ```
+  tags:
+    category: agent-behavior
+    advisory: "true"
+    agent: code-review-walkback
+  graders:
+  - type: output-matches
+    name: investigation-vocabulary
+    config:
+      pattern: (?i)(implication|stale|invalidat|consisten|correct|safe|risk|because|investigat|consider)
+  - type: output-matches
+    name: no-source-edit
+    config:
+      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      negate: true
 - name: code-review-class-recipe
   prompt: |
     Review this diff and produce findings with severity:
