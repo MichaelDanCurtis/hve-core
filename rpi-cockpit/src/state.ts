@@ -9,7 +9,7 @@ export interface SteerMenu { label: string; options: OptionItem[]; }
 export interface SessionState {
   task: string;
   host: string;
-  domain: "rpi" | "review" | null;
+  domain: "rpi" | "review" | "interview" | null;
   reviewTarget: string | null;
   findings: Finding[];
   view: "home" | "loop";
@@ -19,6 +19,8 @@ export interface SessionState {
   subagents: Subagent[];
   validations: Record<string, ValidationStatus>;
   artifacts: { path: string; summary?: string }[];
+  docType: string | null;
+  pendingQuestion: { id: string; prompt: string } | null;
   pendingDecision: Decision | null;
   directives: Directive[];
   steerMenu: SteerMenu | null;
@@ -27,7 +29,7 @@ export interface SessionState {
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", domain: null, reviewTarget: null, findings: [], view: "home", activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], pendingDecision: null, directives: [], steerMenu: null, screen: null, log: [] };
+  return { task: "", host: "", domain: null, reviewTarget: null, findings: [], view: "home", activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, pendingQuestion: null, pendingDecision: null, directives: [], steerMenu: null, screen: null, log: [] };
 }
 
 export function applyBeat(s: SessionState, beat: Beat, now: number): SessionState {
@@ -62,6 +64,8 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
       return { ...s, view: "loop" as const, domain: "review", reviewTarget: beat.target, findings: [], log };
     case "finding.add":
       return { ...s, findings: [...s.findings, { severity: beat.severity, title: beat.title, file: beat.file, line: beat.line, detail: beat.detail }], log };
+    case "interview.start":
+      return { ...s, view: "loop", domain: "interview", docType: beat.docType, log };
   }
 }
 
@@ -78,6 +82,7 @@ function summarize(beat: Beat): string {
     case "screen.clear": return "cleared";
     case "review.start": return `review ${beat.target}`;
     case "finding.add": return `${beat.severity}: ${beat.title}`;
+    case "interview.start": return `interview ${beat.docType}`;
   }
 }
 

@@ -61,6 +61,14 @@ describe("toViewModel", () => {
     expect(toViewModel(s).screen).toEqual({ html: "<p>hi</p>", title: "Mockup" });
   });
 
+  it("exposes docType and pendingQuestion", () => {
+    const s = applyBeat(initialState(), { type: "interview.start", docType: "ADR" }, 1);
+    const vm = toViewModel(s);
+    expect(vm.domain).toBe("interview");
+    expect(vm.docType).toBe("ADR");
+    expect(vm.pendingQuestion).toBeNull();
+  });
+
   describe("findings view-model", () => {
     it("exposes the domain and review target", () => {
       let s = applyBeat(initialState(), { type: "review.start", target: "PR 9" }, 1);

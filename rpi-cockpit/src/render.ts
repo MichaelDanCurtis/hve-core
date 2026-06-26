@@ -27,7 +27,7 @@ export interface ViewModel {
   started: boolean;
   task: string;
   host: string;
-  domain: "rpi" | "review" | null;
+  domain: "rpi" | "review" | "interview" | null;
   reviewTarget: string | null;
   findingGroups: { severity: Severity; items: { title: string; file?: string; line?: number; detail?: string }[] }[];
   view: "home" | "loop";
@@ -40,6 +40,8 @@ export interface ViewModel {
   steps: StepVM[];
   subagents: { name: string; status: string; role?: string }[];
   validations: { check: string; status: string }[];
+  docType: string | null;
+  pendingQuestion: { id: string; prompt: string } | null;
   decision: SessionState["pendingDecision"];
   steerMenu: SteerMenuVM;
   directives: Directive[];
@@ -81,6 +83,8 @@ export function toViewModel(s: SessionState): ViewModel {
     steps,
     subagents: s.subagents.map((a) => ({ name: a.name, status: a.status, role: a.role })),
     validations: Object.entries(s.validations).map(([check, status]) => ({ check, status })),
+    docType: s.docType,
+    pendingQuestion: s.pendingQuestion,
     decision: s.pendingDecision,
     steerMenu,
     directives: s.directives,

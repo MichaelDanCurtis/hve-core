@@ -39,6 +39,7 @@ export const Beat = z.discriminatedUnion("type", [
   z.object({ type: z.literal("screen.clear") }),
   z.object({ type: z.literal("review.start"), target: z.string() }),
   z.object({ type: z.literal("finding.add"), severity: Severity, title: z.string(), file: z.string().optional(), line: z.number().int().optional(), detail: z.string().optional() }),
+  z.object({ type: z.literal("interview.start"), docType: z.string() }),
 ]);
 export type Beat = z.infer<typeof Beat>;
 

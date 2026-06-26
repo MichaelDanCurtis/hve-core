@@ -93,6 +93,19 @@ it("drains to empty when there is nothing queued", () => {
   expect(state.log).toHaveLength(0);
 });
 
+describe("interview domain", () => {
+  it("interview.start sets the interview domain, view loop, and docType", () => {
+    const s = applyBeat(initialState(), { type: "interview.start", docType: "PRD" }, 1);
+    expect(s.domain).toBe("interview");
+    expect(s.view).toBe("loop");
+    expect(s.docType).toBe("PRD");
+  });
+  it("defaults docType null and pendingQuestion null", () => {
+    expect(initialState().docType).toBeNull();
+    expect(initialState().pendingQuestion).toBeNull();
+  });
+});
+
 describe("review domain", () => {
   it("defaults domain to null with no findings", () => {
     expect(initialState().domain).toBeNull();

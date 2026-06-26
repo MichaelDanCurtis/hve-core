@@ -14,6 +14,10 @@ describe("events", () => {
     expect(OptionItem.parse({ id: "b", title: "Token middleware", recommended: true }).id).toBe("b");
   });
 
+  it("parses interview.start", () => {
+    expect(Beat.safeParse({ type: "interview.start", docType: "PRD" }).success).toBe(true);
+  });
+
   describe("review beats", () => {
     it("parses review.start", () => {
       expect(Beat.safeParse({ type: "review.start", target: "branch x" }).success).toBe(true);
