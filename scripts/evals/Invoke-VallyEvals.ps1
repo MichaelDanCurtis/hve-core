@@ -332,7 +332,14 @@ function Write-JsonFile {
     Set-Content -LiteralPath $Path -Value $json -Encoding utf8NoBOM
 }
 
-if ($MyInvocation.InvocationName -eq '.') { return }
+# Skip the eval workflow below when dot-sourced (e.g. by Pester unit tests) so
+# callers can load the helper functions without executing a run.
+if ($MyInvocation.InvocationName -ne '.') {
+    # Executed directly as a script: fall through to the main workflow.
+}
+else {
+    return
+}
 
 $resolvedRoot = Resolve-RepoRoot -Hint $RepoRoot
 
