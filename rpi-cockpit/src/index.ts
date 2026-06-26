@@ -7,6 +7,7 @@ import { Bridge } from "./bridge.js";
 import { startServer } from "./server.js";
 import { buildMcpServer, connectStdio } from "./mcp.js";
 import { runInit, type InitHost } from "./init.js";
+import { resolvePort } from "./port.js";
 
 // `rpi-cockpit init [--host claude|codex|vscode|all] [--codex-global]` wires the
 // MCP server into the host surfaces and regenerates the narration contract.
@@ -46,7 +47,7 @@ if (process.argv[2] === "init") {
 }
 
 const bridge = new Bridge();
-const port = Number(process.env.RPI_COCKPIT_PORT ?? 4399);
+const port = resolvePort(process.env);
 
 // The UI server is best-effort: if it cannot bind, narration must still work,
 // so the MCP stdio transport connects regardless of the server's outcome.
