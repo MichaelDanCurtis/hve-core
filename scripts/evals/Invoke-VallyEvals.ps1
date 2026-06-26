@@ -821,7 +821,10 @@ foreach ($plan in $artifactPlan) {
             $artifactAuthoritativeFailed += [int]$r['authoritativeFailed']
             $artifactAdvisoryFailed      += [int]$r['advisoryFailed']
         }
-        elseif ($specIsAdvisory) {
+        elseif ($specIsAdvisory -or $specStatus -eq 'advisory-fail') {
+            # A spec the main loop already demoted to 'advisory-fail' (an advisory
+            # spec, or a no-advisory spec whose per-trial dip rode on a zero vally
+            # exit) contributes only advisory failures, so it never gates the roll-up.
             $artifactAdvisoryFailed += [int]$r.assertionsFailed
         }
         else {
