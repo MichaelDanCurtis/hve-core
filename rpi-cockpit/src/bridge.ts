@@ -90,4 +90,27 @@ export class Bridge extends EventEmitter {
     // Additive: only emitted on a real resolution (unknown ids returned above).
     this.emit("decision", prompt === undefined ? { id, choiceId } : { id, choiceId, prompt });
   }
+
+  askQuestion(prompt: string, timeoutMs = 0): Promise<string> {
+    const id = `q${++this.seq}`;
+    this.state = { ...this.state, pendingQuestion: { id, prompt } };
+    this.emit("state", this.state);
+    return new Promise<string>((resolve) => {
+      this.pending.set(id, resolve);
+      if (timeoutMs > 0) {
+        setTimeout(() => { if (this.pending.has(id)) this.resolveQuestion(id, ""); }, timeoutMs);
+      }
+    });
+  }
+
+  resolveQuestion(id: string, text: string): void {
+    const resolve = this.pending.get(id);
+    if (!resolve) return;
+    this.pending.delete(id);
+    if (this.state.pendingQuestion?.id === id) {
+      this.state = { ...this.state, pendingQuestion: null };
+      this.emit("state", this.state);
+    }
+    resolve(text);
+  }
 }

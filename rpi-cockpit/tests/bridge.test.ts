@@ -83,6 +83,22 @@ describe("Bridge", () => {
     expect(seen).not.toHaveBeenCalled();
   });
 
+  describe("question primitive", () => {
+    it("askQuestion sets pendingQuestion and resolveQuestion answers it", async () => {
+      const b = new Bridge();
+      const p = b.askQuestion("What is the goal?", 0);
+      expect(b.state.pendingQuestion?.prompt).toBe("What is the goal?");
+      const id = b.state.pendingQuestion!.id;
+      b.resolveQuestion(id, "ship it");
+      expect(await p).toBe("ship it");
+      expect(b.state.pendingQuestion).toBeNull();
+    });
+    it("askQuestion times out to an empty answer", async () => {
+      const b = new Bridge();
+      expect(await b.askQuestion("q", 5)).toBe("");
+    });
+  });
+
   describe("navigator", () => {
     it("requestLaunch enqueues an approach directive and shows the loop", () => {
       const b = new Bridge();

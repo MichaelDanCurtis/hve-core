@@ -59,10 +59,44 @@ export interface ElicitCapableServer {
   elicitInput(params: ElicitFormParams, options?: { signal?: AbortSignal }): Promise<ElicitResult>;
 }
 
-// Show the in-pane card always (rung 2). If the host supports elicitation, also
-// send a native card (rung 1) and race them: the first real answer wins and the
-// loser is dismissed. A declined or cancelled elicitation is ignored so the pane
-// card and the timeout fallback stay in control.
+// The generic first-answer-wins race shared by the decision and the question.
+// Shows the pane (panePromise) always; if the host supports elicitation, also
+// sends a native card and races them. The loser is dismissed: the pane win
+// aborts the elicitation; the elicitation win resolves the pane via resolvePane.
+// A null-mapped elicitation result (decline/cancel/invalid) is ignored.
+async function raceElicitation<T>(
+  server: ElicitCapableServer,
+  panePromise: Promise<T>,
+  paneId: string | null,
+  schema: ElicitFormParams,
+  mapResult: (r: ElicitResult) => T | null,
+  resolvePane: (id: string, value: T) => void,
+): Promise<T> {
+  const canElicit = server.getClientCapabilities()?.elicitation !== undefined;
+  if (!canElicit) return panePromise;
+  const ac = new AbortController();
+  return await new Promise<T>((resolve) => {
+    let settled = false;
+    void panePromise.then((v) => {
+      if (settled) return;
+      settled = true;
+      ac.abort();
+      resolve(v);
+    });
+    void server
+      .elicitInput(schema, { signal: ac.signal })
+      .then((result) => {
+        if (settled) return;
+        const mapped = mapResult(result);
+        if (mapped === null) return;
+        settled = true;
+        if (paneId) resolvePane(paneId, mapped);
+        resolve(mapped);
+      })
+      .catch(() => { /* aborted or transport error */ });
+  });
+}
+
 export async function presentOptionsWithElicitation(
   server: ElicitCapableServer,
   bridge: Bridge,
@@ -71,29 +105,46 @@ export async function presentOptionsWithElicitation(
   timeoutMs: number,
 ): Promise<string> {
   const webPromise = bridge.presentOptions(prompt, options, timeoutMs);
-  const canElicit = server.getClientCapabilities()?.elicitation !== undefined;
-  if (!canElicit) return webPromise;
+  return raceElicitation(
+    server,
+    webPromise,
+    bridge.state.pendingDecision?.id ?? null,
+    optionsToElicitSchema(prompt, options),
+    (r) => elicitResultToChoice(r, options),
+    (id, choice) => bridge.resolveDecision(id, choice),
+  );
+}
 
-  const decisionId = bridge.state.pendingDecision?.id ?? null;
-  const ac = new AbortController();
-  return await new Promise<string>((resolve) => {
-    let settled = false;
-    void webPromise.then((choice) => {
-      if (settled) return;
-      settled = true;
-      ac.abort(); // dismiss the native card
-      resolve(choice);
-    });
-    void server
-      .elicitInput(optionsToElicitSchema(prompt, options), { signal: ac.signal })
-      .then((result) => {
-        if (settled) return;
-        const choice = elicitResultToChoice(result, options);
-        if (choice === null) return; // decline / cancel / invalid: let the pane card win
-        settled = true;
-        if (decisionId) bridge.resolveDecision(decisionId, choice); // clears the pane card and resolves webPromise
-        resolve(choice);
-      })
-      .catch(() => { /* aborted or transport error: the pane card and timeout remain */ });
-  });
+export function questionToElicitSchema(prompt: string): ElicitFormParams {
+  return {
+    message: prompt,
+    requestedSchema: {
+      type: "object",
+      properties: { answer: { type: "string", title: "Your answer" } },
+      required: ["answer"],
+    },
+  };
+}
+
+export function elicitResultToAnswer(result: ElicitResult): string | null {
+  if (result.action !== "accept" || !result.content) return null;
+  const answer = result.content.answer;
+  return typeof answer === "string" ? answer : null;
+}
+
+export async function askQuestionWithElicitation(
+  server: ElicitCapableServer,
+  bridge: Bridge,
+  prompt: string,
+  timeoutMs: number,
+): Promise<string> {
+  const webPromise = bridge.askQuestion(prompt, timeoutMs);
+  return raceElicitation(
+    server,
+    webPromise,
+    bridge.state.pendingQuestion?.id ?? null,
+    questionToElicitSchema(prompt),
+    elicitResultToAnswer,
+    (id, text) => bridge.resolveQuestion(id, text),
+  );
 }

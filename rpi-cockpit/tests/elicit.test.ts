@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { optionsToElicitSchema, elicitResultToChoice, presentOptionsWithElicitation } from "../src/elicit.js";
+import { optionsToElicitSchema, elicitResultToChoice, presentOptionsWithElicitation, questionToElicitSchema, elicitResultToAnswer, askQuestionWithElicitation } from "../src/elicit.js";
 import { Bridge } from "../src/bridge.js";
 import type { OptionItem } from "../src/events.js";
 import type { ElicitResult } from "@modelcontextprotocol/sdk/types.js";
@@ -126,5 +126,36 @@ describe("presentOptionsWithElicitation", () => {
     const id = bridge.state.pendingDecision!.id;
     bridge.resolveDecision(id, "a");
     expect(await p).toBe("a");
+  });
+});
+
+describe("question elicitation", () => {
+  it("questionToElicitSchema builds a free-text answer field", () => {
+    const f = questionToElicitSchema("Why?");
+    expect(f.message).toBe("Why?");
+    const ans = f.requestedSchema.properties.answer as { type: string };
+    expect(ans.type).toBe("string");
+    expect(f.requestedSchema.required).toEqual(["answer"]);
+  });
+  it("elicitResultToAnswer returns the string on accept, null otherwise", () => {
+    expect(elicitResultToAnswer({ action: "accept", content: { answer: "yes" } })).toBe("yes");
+    expect(elicitResultToAnswer({ action: "decline" })).toBeNull();
+    expect(elicitResultToAnswer({ action: "accept", content: { answer: 4 } })).toBeNull();
+  });
+  it("askQuestionWithElicitation: pane answer wins and aborts the elicitation", async () => {
+    const bridge = new Bridge();
+    let aborted = false;
+    const srv = fakeServer({ elicitation: true, respond: (_p, signal) => new Promise((_r, rej) => { signal?.addEventListener("abort", () => { aborted = true; rej(new Error("a")); }); }) });
+    const p = askQuestionWithElicitation(srv, bridge, "Q?", 0);
+    const id = bridge.state.pendingQuestion!.id;
+    bridge.resolveQuestion(id, "typed");
+    expect(await p).toBe("typed");
+    expect(aborted).toBe(true);
+  });
+  it("askQuestionWithElicitation: elicitation answer wins and clears the pane", async () => {
+    const bridge = new Bridge();
+    const srv = fakeServer({ elicitation: true, respond: async () => ({ action: "accept", content: { answer: "native" } }) });
+    expect(await askQuestionWithElicitation(srv, bridge, "Q?", 0)).toBe("native");
+    expect(bridge.state.pendingQuestion).toBeNull();
   });
 });
