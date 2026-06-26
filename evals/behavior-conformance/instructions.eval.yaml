@@ -1056,6 +1056,28 @@ stimuli:
         config:
           pattern: "(?i)powerpoint|slide|deck|design\\s+rule|convention|skill"
 
+  - name: instruction-coaching-patterns-conformance
+    prompt: |
+      You are beginning a capture-mode planning conversation and writing
+      state under `.copilot-tracking/security-plans/`. Which shared
+      `.github/instructions/**/*.instructions.md` file defines the
+      exploration-first coaching patterns (cite its path) and what
+      Think/Speak/Empower discovery approach does it require before
+      classification or analysis?
+    tags:
+      category: behavior-conformance
+      instruction: coaching-patterns
+      advisory: "true"
+    graders:
+      - type: output-matches
+        name: applyTo-evidence
+        config:
+          pattern: "(?i)coaching-patterns\\.instructions\\.md|\\.copilot-tracking/.*-plans"
+      - type: output-matches
+        name: scope-language
+        config:
+          pattern: "(?i)think|speak|empower|exploration|coaching|discovery"
+
   - name: instruction-privacy-identity-conformance
     prompt: |
       You are running a privacy planning session and writing state under
