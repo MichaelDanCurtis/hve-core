@@ -1447,3 +1447,47 @@ stimuli:
         $summary.perSpec[0].PSObject.Properties.Name | Should -Not -Contain 'advisoryFailed'
     }
 }
+
+Describe 'Get-SpecStimulusAdvisoryMap tag scoping' -Tag 'Unit' {
+    BeforeAll {
+        . $script:ScriptPath
+        $script:MixedSpec = Join-Path $TestDrive 'mixed-agents.yaml'
+        @'
+name: agent-cover
+stimuli:
+- name: agent-a-stim-1
+  prompt: hi
+  tags:
+    agent: agent-a
+    advisory: "true"
+- name: agent-a-stim-2
+  prompt: hi
+  tags:
+    agent: agent-a
+    advisory: "true"
+- name: agent-b-authoritative
+  prompt: hi
+  tags:
+    agent: agent-b
+'@ | Set-Content -LiteralPath $script:MixedSpec -Encoding utf8
+    }
+
+    It 'Returns the full mixed map when no tag filter is supplied' {
+        $map = Get-SpecStimulusAdvisoryMap -SpecPath $script:MixedSpec
+        $map.Keys.Count | Should -Be 3
+        $map['agent-a-stim-1'] | Should -BeTrue
+        $map['agent-b-authoritative'] | Should -BeFalse
+    }
+
+    It 'Scopes posture to the tag-filtered agent so an all-advisory subset stays advisory' {
+        $map = Get-SpecStimulusAdvisoryMap -SpecPath $script:MixedSpec -TagFilter 'agent=agent-a'
+        $map.Keys.Count | Should -Be 2
+        @($map.Values | Where-Object { -not $_ }).Count | Should -Be 0
+    }
+
+    It 'Falls back to the full set when the tag filter matches no stimulus' {
+        $map = Get-SpecStimulusAdvisoryMap -SpecPath $script:MixedSpec -TagFilter 'agent=does-not-exist'
+        $map.Keys.Count | Should -Be 3
+    }
+}
+

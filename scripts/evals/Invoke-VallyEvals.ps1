@@ -194,10 +194,14 @@ function Get-SpecStimulusAdvisoryMap {
     # `tags.advisory`, supporting per-stimulus graduation from advisory to
     # authoritative within a single spec. Returns $null when no stimulus
     # declares an advisory tag; callers then fall back to Test-SpecIsAdvisory.
+    # When -TagFilter (`key=value`) is supplied the map is scoped to the stimuli
+    # that this tag-filtered run actually executes, so a multi-agent spec does
+    # not let one agent's authoritative stimuli skew another agent's posture.
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [Parameter(Mandatory)][string]$SpecPath
+        [Parameter(Mandatory)][string]$SpecPath,
+        [string]$TagFilter
     )
 
     if (-not (Test-Path -LiteralPath $SpecPath -PathType Leaf)) { return $null }
@@ -217,7 +221,15 @@ function Get-SpecStimulusAdvisoryMap {
     $stimuli = $parsed['stimuli']
     if ($null -eq $stimuli -or -not ($stimuli -is [System.Collections.IEnumerable]) -or $stimuli -is [string]) { return $null }
 
-    $map = @{}
+    $filterKey = $null
+    $filterValue = $null
+    if (-not [string]::IsNullOrWhiteSpace($TagFilter) -and $TagFilter.Contains('=')) {
+        $eq = $TagFilter.IndexOf('=')
+        $filterKey = $TagFilter.Substring(0, $eq).Trim()
+        $filterValue = $TagFilter.Substring($eq + 1).Trim()
+    }
+
+    $entries = [System.Collections.Generic.List[hashtable]]::new()
     $sawAdvisoryTag = $false
     foreach ($stimulus in $stimuli) {
         if (-not ($stimulus -is [System.Collections.IDictionary])) { continue }
@@ -225,18 +237,31 @@ function Get-SpecStimulusAdvisoryMap {
         $name = [string]$stimulus['name']
         if ([string]::IsNullOrWhiteSpace($name)) { continue }
 
+        $tags = if ($stimulus.Contains('tags') -and $stimulus['tags'] -is [System.Collections.IDictionary]) { $stimulus['tags'] } else { $null }
+
         $advisory = $false
-        if ($stimulus.Contains('tags') -and $stimulus['tags'] -is [System.Collections.IDictionary] -and $stimulus['tags'].Contains('advisory')) {
+        if ($tags -and $tags.Contains('advisory')) {
             $sawAdvisoryTag = $true
-            $rawAdvisory = $stimulus['tags']['advisory']
+            $rawAdvisory = $tags['advisory']
             # YAML yields a real bool or a quoted string; treat only true/1/yes
             # (case-insensitive) as advisory so a quoted "false" graduates correctly.
             $advisory = if ($rawAdvisory -is [bool]) { [bool]$rawAdvisory } else { [string]$rawAdvisory -match '^(?i:true|1|yes)$' }
         }
-        $map[$name] = $advisory
+        $entries.Add(@{ name = $name; advisory = $advisory; tags = $tags })
     }
 
     if (-not $sawAdvisoryTag) { return $null }
+
+    # Scope to the run's tag filter when it matches at least one stimulus; fall
+    # back to the full set when the filter is absent or matches nothing.
+    $selected = $entries
+    if ($filterKey) {
+        $matched = @($entries | Where-Object { $_.tags -and $_.tags.Contains($filterKey) -and ([string]$_.tags[$filterKey] -eq $filterValue) })
+        if ($matched.Count -gt 0) { $selected = $matched }
+    }
+
+    $map = @{}
+    foreach ($entry in $selected) { $map[$entry.name] = $entry.advisory }
     return $map
 }
 
@@ -545,7 +570,7 @@ foreach ($runKey in $uniqueSpecRuns.Keys) {
     $result['moderationInput'] = $inputModeration
     $result['moderationOutput'] = $outputModeration
 
-    $advisoryMap = Get-SpecStimulusAdvisoryMap -SpecPath $specAbs
+    $advisoryMap = Get-SpecStimulusAdvisoryMap -SpecPath $specAbs -TagFilter $tag
     $result['perStimulusAdvisory'] = $advisoryMap
 
     if ($null -ne $advisoryMap) {
