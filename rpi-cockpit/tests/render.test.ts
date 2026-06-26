@@ -61,6 +61,25 @@ describe("toViewModel", () => {
     expect(toViewModel(s).screen).toEqual({ html: "<p>hi</p>", title: "Mockup" });
   });
 
+  describe("findings view-model", () => {
+    it("exposes the domain and review target", () => {
+      let s = applyBeat(initialState(), { type: "review.start", target: "PR 9" }, 1);
+      const vm = toViewModel(s);
+      expect(vm.domain).toBe("review");
+      expect(vm.reviewTarget).toBe("PR 9");
+    });
+    it("groups findings by severity in critical-first order, only non-empty groups", () => {
+      let s = applyBeat(initialState(), { type: "review.start", target: "x" }, 1);
+      s = applyBeat(s, { type: "finding.add", severity: "low", title: "L" }, 2);
+      s = applyBeat(s, { type: "finding.add", severity: "critical", title: "C" }, 3);
+      s = applyBeat(s, { type: "finding.add", severity: "low", title: "L2" }, 4);
+      const groups = toViewModel(s).findingGroups;
+      expect(groups.map((g) => g.severity)).toEqual(["critical", "low"]);
+      expect(groups[0].items.map((i) => i.title)).toEqual(["C"]);
+      expect(groups[1].items.map((i) => i.title)).toEqual(["L", "L2"]);
+    });
+  });
+
   describe("navigator fields", () => {
     it("exposes the view and the workflow catalog", () => {
       const vm = toViewModel(initialState());

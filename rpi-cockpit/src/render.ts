@@ -1,6 +1,6 @@
 // rpi-cockpit/src/render.ts
 import type { SessionState } from "./state.js";
-import type { Phase, OptionItem, Directive } from "./events.js";
+import type { Phase, OptionItem, Directive, Severity } from "./events.js";
 import { WORKFLOWS } from "./catalog.js";
 
 const ORDER: Phase[] = ["research", "plan", "implement", "review", "discover"];
@@ -12,6 +12,7 @@ const LEAD: Record<Phase, string> = {
   review: "Verifying the work against the plan and the validation gate.",
   discover: "Surfacing follow-up work uncovered during the cycle.",
 };
+const SEVERITY_ORDER: Severity[] = ["critical", "high", "medium", "low", "info"];
 const EMPTY_LEAD = "Waiting for an RPI session… the cockpit is connected and lights up when the agent calls session_begin.";
 const PRESETS: { id: string; title: string }[] = [
   { id: "default", title: "Default" },
@@ -26,6 +27,9 @@ export interface ViewModel {
   started: boolean;
   task: string;
   host: string;
+  domain: "rpi" | "review" | null;
+  reviewTarget: string | null;
+  findingGroups: { severity: Severity; items: { title: string; file?: string; line?: number; detail?: string }[] }[];
   view: "home" | "loop";
   workflows: { id: string; name: string; hint: string; description: string }[];
   activeWorkflow: string | null;
@@ -52,10 +56,21 @@ export function toViewModel(s: SessionState): ViewModel {
   const steerMenu: SteerMenuVM = s.steerMenu
     ? { label: s.steerMenu.label, source: "agent", options: s.steerMenu.options.map((o: OptionItem) => ({ id: o.id, title: o.title, detail: o.detail })) }
     : { label: "Next-phase approach", source: "preset", options: PRESETS.map((o) => ({ id: o.id, title: o.title })) };
+  const findingGroups = SEVERITY_ORDER
+    .map((severity) => ({
+      severity,
+      items: s.findings
+        .filter((f) => f.severity === severity)
+        .map((f) => ({ title: f.title, file: f.file, line: f.line, detail: f.detail })),
+    }))
+    .filter((g) => g.items.length > 0);
   return {
     started: s.task !== "" || s.phase !== null,
     task: s.task,
     host: s.host,
+    domain: s.domain,
+    reviewTarget: s.reviewTarget,
+    findingGroups,
     view: s.view,
     workflows: WORKFLOWS.map((w) => ({ id: w.id, name: w.name, hint: w.hint, description: w.description })),
     activeWorkflow: s.activeWorkflow,
