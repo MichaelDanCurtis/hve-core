@@ -1,12 +1,36 @@
 // rpi-cockpit/tests/state.test.ts
 import { describe, it, expect } from "vitest";
-import { initialState, applyBeat, enqueueDirective, drainDirectives } from "../src/state.js";
+import { initialState, applyBeat, enqueueDirective, drainDirectives, setView, startLaunch } from "../src/state.js";
 
 describe("applyBeat", () => {
   it("sets task and host on session.begin", () => {
     const s = applyBeat(initialState(), { type: "session.begin", task: "refactor auth", host: "claude-code" }, 1);
     expect(s.task).toBe("refactor auth");
     expect(s.host).toBe("claude-code");
+  });
+
+  describe("navigation", () => {
+    it("defaults the view to home", () => {
+      expect(initialState().view).toBe("home");
+      expect(initialState().activeWorkflow).toBeNull();
+    });
+
+    it("session.begin switches the view to loop", () => {
+      const s = applyBeat(initialState(), { type: "session.begin", task: "x", host: "claude-code" }, 1);
+      expect(s.view).toBe("loop");
+    });
+
+    it("setView returns a state with the requested view", () => {
+      expect(setView(initialState(), "loop").view).toBe("loop");
+      const back = setView(setView(initialState(), "loop"), "home");
+      expect(back.view).toBe("home");
+    });
+
+    it("startLaunch sets the active workflow and shows the loop", () => {
+      const s = startLaunch(initialState(), "build");
+      expect(s.activeWorkflow).toBe("build");
+      expect(s.view).toBe("loop");
+    });
   });
   it("advances phase and records the previous as done", () => {
     let s = applyBeat(initialState(), { type: "phase.enter", phase: "research" }, 1);

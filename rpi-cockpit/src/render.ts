@@ -1,6 +1,7 @@
 // rpi-cockpit/src/render.ts
 import type { SessionState } from "./state.js";
 import type { Phase, OptionItem, Directive } from "./events.js";
+import { WORKFLOWS } from "./catalog.js";
 
 const ORDER: Phase[] = ["research", "plan", "implement", "review", "discover"];
 const LABEL: Record<Phase, string> = { research: "Research", plan: "Plan", implement: "Implement", review: "Review", discover: "Discover" };
@@ -25,6 +26,9 @@ export interface ViewModel {
   started: boolean;
   task: string;
   host: string;
+  view: "home" | "loop";
+  workflows: { id: string; name: string; hint: string; description: string }[];
+  activeWorkflow: string | null;
   phase: Phase | null;
   phaseLabel: string | null;
   phaseNumber: number | null;
@@ -52,6 +56,9 @@ export function toViewModel(s: SessionState): ViewModel {
     started: s.task !== "" || s.phase !== null,
     task: s.task,
     host: s.host,
+    view: s.view,
+    workflows: WORKFLOWS.map((w) => ({ id: w.id, name: w.name, hint: w.hint, description: w.description })),
+    activeWorkflow: s.activeWorkflow,
     phase: s.phase,
     phaseLabel: s.phase ? LABEL[s.phase] : null,
     phaseNumber: s.phase ? idx + 1 : null,

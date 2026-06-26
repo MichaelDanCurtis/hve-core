@@ -1,7 +1,7 @@
 // rpi-cockpit/tests/render.test.ts
 import { describe, it, expect } from "vitest";
 import { toViewModel } from "../src/render.js";
-import { initialState, applyBeat, enqueueDirective } from "../src/state.js";
+import { initialState, applyBeat, enqueueDirective, startLaunch } from "../src/state.js";
 
 describe("toViewModel", () => {
   it("marks the current phase active and prior phases done", () => {
@@ -59,5 +59,20 @@ describe("toViewModel", () => {
     expect(toViewModel(initialState()).screen).toBeNull();
     const s = applyBeat(initialState(), { type: "screen.show", html: "<p>hi</p>", title: "Mockup" }, 1);
     expect(toViewModel(s).screen).toEqual({ html: "<p>hi</p>", title: "Mockup" });
+  });
+
+  describe("navigator fields", () => {
+    it("exposes the view and the workflow catalog", () => {
+      const vm = toViewModel(initialState());
+      expect(vm.view).toBe("home");
+      expect(vm.workflows.map((w) => w.id)).toEqual(["build", "review", "plan", "docs", "data", "coach"]);
+      expect(vm.workflows[0]).not.toHaveProperty("intent");
+    });
+
+    it("carries the active workflow once launched", () => {
+      const vm = toViewModel(startLaunch(initialState(), "review"));
+      expect(vm.view).toBe("loop");
+      expect(vm.activeWorkflow).toBe("review");
+    });
   });
 });

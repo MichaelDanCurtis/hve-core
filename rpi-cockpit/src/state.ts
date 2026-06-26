@@ -9,6 +9,8 @@ export interface SteerMenu { label: string; options: OptionItem[]; }
 export interface SessionState {
   task: string;
   host: string;
+  view: "home" | "loop";
+  activeWorkflow: string | null;
   phase: Phase | null;
   phasesDone: Phase[];
   subagents: Subagent[];
@@ -22,14 +24,14 @@ export interface SessionState {
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], pendingDecision: null, directives: [], steerMenu: null, screen: null, log: [] };
+  return { task: "", host: "", view: "home", activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], pendingDecision: null, directives: [], steerMenu: null, screen: null, log: [] };
 }
 
 export function applyBeat(s: SessionState, beat: Beat, now: number): SessionState {
   const log = [...s.log, { t: now, kind: beat.type, detail: summarize(beat) }];
   switch (beat.type) {
     case "session.begin":
-      return { ...s, task: beat.task, host: beat.host, log };
+      return { ...s, task: beat.task, host: beat.host, view: "loop", log };
     case "phase.enter": {
       const phasesDone = s.phase && s.phase !== beat.phase && !s.phasesDone.includes(s.phase)
         ? [...s.phasesDone, s.phase] : s.phasesDone;
@@ -86,4 +88,12 @@ export function drainDirectives(s: SessionState, now: number): { state: SessionS
 
 function summarizeDirective(d: Directive): string {
   return d.kind === "note" ? `note: ${d.text}` : `approach: ${d.label}`;
+}
+
+export function setView(s: SessionState, view: "home" | "loop"): SessionState {
+  return { ...s, view };
+}
+
+export function startLaunch(s: SessionState, workflowId: string): SessionState {
+  return { ...s, view: "loop", activeWorkflow: workflowId };
 }
