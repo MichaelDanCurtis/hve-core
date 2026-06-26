@@ -2,7 +2,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { Phase, ValidationStatus, OptionItem } from "./events.js";
+import { Phase, ValidationStatus, OptionItem, Severity } from "./events.js";
 import { handlers } from "./handlers.js";
 import { presentOptionsWithElicitation, decisionTimeoutMs, type ElicitFormParams } from "./elicit.js";
 import type { Bridge } from "./bridge.js";
@@ -46,6 +46,18 @@ export function buildMcpServer(bridge: Bridge): McpServer {
     "validate",
     { description: "Report a validation check.", inputSchema: { check: z.string(), status: ValidationStatus } },
     async (a) => text(handlers.validate(bridge, a)),
+  );
+
+  server.registerTool(
+    "review_start",
+    { description: "Begin a review; switches the cockpit to the findings panel.", inputSchema: { target: z.string() } },
+    async (a) => text(handlers.review_start(bridge, a)),
+  );
+
+  server.registerTool(
+    "add_finding",
+    { description: "Add a review finding (rendered in the findings panel, grouped by severity).", inputSchema: { severity: Severity, title: z.string(), file: z.string().optional(), line: z.number().int().optional(), detail: z.string().optional() } },
+    async (a) => text(handlers.add_finding(bridge, a)),
   );
 
   server.registerTool(

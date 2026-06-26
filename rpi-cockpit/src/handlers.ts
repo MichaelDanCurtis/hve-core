@@ -1,6 +1,6 @@
 // rpi-cockpit/src/handlers.ts
 import type { Bridge } from "./bridge.js";
-import type { OptionItem, Phase, ValidationStatus } from "./events.js";
+import type { OptionItem, Phase, Severity, ValidationStatus } from "./events.js";
 
 export const handlers = {
   session_begin: (b: Bridge, a: { task: string; host: string }) => {
@@ -26,6 +26,14 @@ export const handlers = {
   validate: (b: Bridge, a: { check: string; status: ValidationStatus }) => {
     b.emitBeat({ type: "validate", check: a.check, status: a.status });
     return `${a.check}=${a.status}`;
+  },
+  review_start: (b: Bridge, a: { target: string }) => {
+    b.emitBeat({ type: "review.start", target: a.target });
+    return `review started: ${a.target}`;
+  },
+  add_finding: (b: Bridge, a: { severity: Severity; title: string; file?: string; line?: number; detail?: string }) => {
+    b.emitBeat({ type: "finding.add", severity: a.severity, title: a.title, file: a.file, line: a.line, detail: a.detail });
+    return `finding added: ${a.severity}`;
   },
   offer_approaches: (b: Bridge, a: { label: string; options: OptionItem[] }) => {
     b.offerApproaches(a.label, a.options);

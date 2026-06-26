@@ -33,7 +33,7 @@ describe("mcp face", () => {
     expect(names).toContain("check_directives");
     expect(names).toContain("show_screen");
     expect(names).toContain("clear_screen");
-    expect(tools).toHaveLength(11);
+    expect(tools).toHaveLength(13);
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
@@ -71,6 +71,22 @@ describe("mcp face", () => {
     const out = (res.content as { type: string; text: string }[])[0].text;
     expect(out).toContain("b");
 
+    await client.close();
+    await server.close();
+  });
+
+  it("review_start and add_finding drive the findings state", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const client = new Client({ name: "t", version: "0.0.1" }, { capabilities: {} });
+    const [ct, st] = InMemoryTransport.createLinkedPair();
+    await Promise.all([server.connect(st), client.connect(ct)]);
+    await client.callTool({ name: "review_start", arguments: { target: "PR 1" } });
+    await client.callTool({ name: "add_finding", arguments: { severity: "high", title: "bug", file: "a.ts", line: 2 } });
+    expect(bridge.state.domain).toBe("review");
+    expect(bridge.state.reviewTarget).toBe("PR 1");
+    expect(bridge.state.findings).toHaveLength(1);
+    expect(bridge.state.findings[0]).toMatchObject({ severity: "high", title: "bug" });
     await client.close();
     await server.close();
   });
