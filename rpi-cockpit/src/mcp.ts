@@ -4,6 +4,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { Phase, ValidationStatus, OptionItem } from "./events.js";
 import { handlers } from "./handlers.js";
+import { presentOptionsWithElicitation, decisionTimeoutMs, type ElicitFormParams } from "./elicit.js";
 import type { Bridge } from "./bridge.js";
 
 const text = (s: string) => ({ content: [{ type: "text" as const, text: s }] });
@@ -49,8 +50,21 @@ export function buildMcpServer(bridge: Bridge): McpServer {
 
   server.registerTool(
     "present_options",
-    { description: "Ask the user to choose; blocks until they pick.", inputSchema: { prompt: z.string(), options: z.array(OptionItem).min(1) } },
-    async (a) => text(await handlers.present_options(bridge, a)),
+    { description: "Ask the user to choose; blocks until they pick. Shows the in-pane card and, where the host supports it, a native choice card; the first answer wins.", inputSchema: { prompt: z.string(), options: z.array(OptionItem).min(1) } },
+    async (a) =>
+      text(
+        await presentOptionsWithElicitation(
+          {
+            getClientCapabilities: () => server.server.getClientCapabilities(),
+            elicitInput: (params: ElicitFormParams, opts) =>
+              server.server.elicitInput(params as unknown as Parameters<typeof server.server.elicitInput>[0], opts),
+          },
+          bridge,
+          a.prompt,
+          a.options,
+          decisionTimeoutMs(),
+        ),
+      ),
   );
 
   server.registerTool(
