@@ -70,7 +70,7 @@ Structure the merged report in this order:
 4. Acceptance Criteria Coverage when story context was provided.
 5. Positive Changes and Testing Recommendations.
 6. Recommended Actions and Out-of-scope Observations.
-7. Recommended specialist follow-up reviews when specialist signals fired, with Sustainability pointing to <https://learn.microsoft.com/en-us/azure/well-architected/sustainability/sustainability-get-started> and the dated directional caveat from the [Cross-Skill Forks](cross-skill-forks.md) registry.
+7. Recommended specialist follow-up reviews when specialist signals fired, with Sustainability pointing to <https://learn.microsoft.com/azure/well-architected/sustainability/sustainability-get-started> and the dated directional caveat from the [Cross-Skill Forks](cross-skill-forks.md) registry.
 8. Risk Assessment and the final verdict.
 9. PR Comment Draft, present only when the review scope targets a pull request or merge request (see the PR comment draft section below).
 10. Disclaimer and human-review sign-off, always present as the final section (see the disclaimer and human-review sign-off section below).
