@@ -158,8 +158,11 @@
   #home { display: block; }
   .home-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .brand-mark { font-weight: 500; }
-  .welcome { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-radius: 8px; background: var(--accent-bg, rgba(80,120,255,.12)); margin-bottom: 14px; }
-  .welcome-x { font-size: 12px; }
+  .welcome-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: flex; align-items: center; justify-content: center; z-index: 100; }
+  .welcome-overlay[hidden] { display: none; }
+  .welcome-modal { background: var(--layer, #1e1e1e); border: 1px solid var(--stroke, #3a3a3a); border-radius: 12px; padding: 22px 24px; max-width: 440px; box-shadow: 0 12px 48px rgba(0,0,0,.45); }
+  .welcome-modal .welcome-text { display: block; font-size: 14px; line-height: 1.55; margin-bottom: 16px; }
+  .welcome-x { font-size: 13px; font-family: inherit; cursor: pointer; border: 1px solid var(--stroke-2, #4A4A4A); border-radius: 6px; background: var(--accent, #0e639c); color: #fff; padding: 6px 14px; }
   .orient { padding: 12px 14px; border: 1px dashed var(--stroke, #3a3a3a); border-radius: 8px; margin-bottom: 18px; font-size: 13px; }
   .home-label { font-size: 13px; opacity: .7; margin-bottom: 10px; }
   .wf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
@@ -212,15 +215,18 @@
     <button class="iconbtn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme"></button>
   </div>
 
+  <div id="welcome" class="welcome-overlay" hidden>
+    <div class="welcome-modal">
+      <span class="welcome-text">New here? This is HVE Core's home. Pick a workflow to start one, or hover a tile to see what it does.</span>
+      <button id="welcome-dismiss" class="welcome-x" aria-label="Dismiss welcome">Got it</button>
+    </div>
+  </div>
+
   <div class="main">
     <section id="home" hidden>
       <div class="home-top">
         <div class="brand"><span class="brand-mark">HVE Cockpit</span></div>
         <span id="home-status" class="muted">No loop running</span>
-      </div>
-      <div id="welcome" class="welcome" hidden>
-        <span class="welcome-text">New here? This is HVE Core's home. Pick a workflow to start one, or hover a tile to see what it does.</span>
-        <button id="welcome-dismiss" class="welcome-x" aria-label="Dismiss welcome">Got it</button>
       </div>
       <div id="orient" class="orient"></div>
       <div class="home-label">Start a workflow</div>
