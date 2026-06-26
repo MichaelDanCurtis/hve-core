@@ -4,7 +4,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { Phase, ValidationStatus, OptionItem, Severity } from "./events.js";
 import { handlers } from "./handlers.js";
-import { presentOptionsWithElicitation, decisionTimeoutMs, type ElicitFormParams } from "./elicit.js";
+import { presentOptionsWithElicitation, askQuestionWithElicitation, decisionTimeoutMs, type ElicitFormParams } from "./elicit.js";
 import type { Bridge } from "./bridge.js";
 
 const text = (s: string) => ({ content: [{ type: "text" as const, text: s }] });
@@ -58,6 +58,30 @@ export function buildMcpServer(bridge: Bridge): McpServer {
     "add_finding",
     { description: "Add a review finding (rendered in the findings panel, grouped by severity).", inputSchema: { severity: Severity, title: z.string(), file: z.string().optional(), line: z.number().int().optional(), detail: z.string().optional() } },
     async (a) => text(handlers.add_finding(bridge, a)),
+  );
+
+  server.registerTool(
+    "interview_start",
+    { description: "Begin a guided document interview; switches the cockpit to the interview view.", inputSchema: { docType: z.string() } },
+    async (a) => text(handlers.interview_start(bridge, a)),
+  );
+
+  server.registerTool(
+    "ask_question",
+    { description: "Ask the user a free-text question; blocks until they answer. Shows the in-pane question card and, where supported, a native input.", inputSchema: { prompt: z.string() } },
+    async (a) =>
+      text(
+        await askQuestionWithElicitation(
+          {
+            getClientCapabilities: () => server.server.getClientCapabilities(),
+            elicitInput: (params: ElicitFormParams, opts) =>
+              server.server.elicitInput(params as unknown as Parameters<typeof server.server.elicitInput>[0], opts),
+          },
+          bridge,
+          a.prompt,
+          decisionTimeoutMs(),
+        ),
+      ),
   );
 
   server.registerTool(

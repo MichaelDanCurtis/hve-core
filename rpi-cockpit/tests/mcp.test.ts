@@ -33,7 +33,7 @@ describe("mcp face", () => {
     expect(names).toContain("check_directives");
     expect(names).toContain("show_screen");
     expect(names).toContain("clear_screen");
-    expect(tools).toHaveLength(13);
+    expect(tools).toHaveLength(15);
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
@@ -87,6 +87,19 @@ describe("mcp face", () => {
     expect(bridge.state.reviewTarget).toBe("PR 1");
     expect(bridge.state.findings).toHaveLength(1);
     expect(bridge.state.findings[0]).toMatchObject({ severity: "high", title: "bug" });
+    await client.close();
+    await server.close();
+  });
+
+  it("ask_question resolves from a native free-text elicitation", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const client = new Client({ name: "t", version: "0.0.1" }, { capabilities: { elicitation: {} } });
+    client.setRequestHandler(ElicitRequestSchema, async () => ({ action: "accept", content: { answer: "the goal" } }));
+    const [ct, st] = InMemoryTransport.createLinkedPair();
+    await Promise.all([server.connect(st), client.connect(ct)]);
+    const res = await client.callTool({ name: "ask_question", arguments: { prompt: "What is the goal?" } });
+    expect((res.content as { text: string }[])[0].text).toBe("the goal");
     await client.close();
     await server.close();
   });

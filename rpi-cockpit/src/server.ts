@@ -139,6 +139,9 @@ export async function startServer(
       } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "navigate") {
         const m = msg as { screen?: unknown };
         if (m.screen === "home" || m.screen === "loop") bridge.navigate(m.screen);
+      } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "answer") {
+        const m = msg as { id?: unknown; text?: unknown };
+        if (typeof m.id === "string" && typeof m.text === "string") bridge.resolveQuestion(m.id, m.text);
       }
     });
   });

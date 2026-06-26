@@ -35,6 +35,10 @@ export const handlers = {
     b.emitBeat({ type: "finding.add", severity: a.severity, title: a.title, file: a.file, line: a.line, detail: a.detail });
     return `finding added: ${a.severity}`;
   },
+  interview_start: (b: Bridge, a: { docType: string }) => {
+    b.emitBeat({ type: "interview.start", docType: a.docType });
+    return `interview started: ${a.docType}`;
+  },
   offer_approaches: (b: Bridge, a: { label: string; options: OptionItem[] }) => {
     b.offerApproaches(a.label, a.options);
     return `offered ${a.options.length} approaches`;

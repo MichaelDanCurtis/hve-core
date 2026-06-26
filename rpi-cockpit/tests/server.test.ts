@@ -224,6 +224,21 @@ describe("server", () => {
     ws.close();
   });
 
+  it("an answer frame resolves a pending question", async () => {
+    const bridge = new Bridge();
+    const srv = await startServer(bridge, 0);
+    stop = srv.close;
+    const p = bridge.askQuestion("Q?", 0);
+    const qid = bridge.state.pendingQuestion!.id;
+    const ws = new WebSocket(`ws://127.0.0.1:${srv.port}/?key=${srv.token}`);
+    await new Promise<any>((res) => ws.on("message", (d) => res(JSON.parse(String(d)))));
+    const settled = new Promise<void>((res) => bridge.once("state", () => res()));
+    ws.send(JSON.stringify({ type: "answer", id: qid, text: "answered" }));
+    await settled;
+    expect(await p).toBe("answered");
+    ws.close();
+  });
+
   it("a navigate frame sets the view", async () => {
     const bridge = new Bridge();
     const srv = await startServer(bridge, 0);
