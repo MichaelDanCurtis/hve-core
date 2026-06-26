@@ -1276,6 +1276,10 @@ stimuli:
         $summary.perSpec[0].isAdvisory | Should -BeTrue
         $summary.perSpec[0].advisoryFailed | Should -Be 2
         $summary.perSpec[0].authoritativeFailed | Should -Be 0
+        $summary.perArtifact[0].status | Should -Be 'advisory-fail'
+        $summary.perArtifact[0].isAdvisory | Should -BeTrue
+        $summary.perArtifact[0].advisoryFailed | Should -Be 2
+        $summary.perArtifact[0].authoritativeFailed | Should -Be 0
     }
 
     It 'Promotes when an authoritative stimulus fails alongside an advisory one' {
@@ -1317,6 +1321,10 @@ stimuli:
         $summary.perSpec[0].advisoryFailed | Should -Be 1
         $summary.perSpec[0].authoritativeFailed | Should -Be 1
         $summary.perSpec[0].isAdvisory | Should -BeFalse
+        $summary.perArtifact[0].status | Should -Be 'fail'
+        $summary.perArtifact[0].isAdvisory | Should -BeFalse
+        $summary.perArtifact[0].authoritativeFailed | Should -Be 1
+        $summary.perArtifact[0].advisoryFailed | Should -Be 1
     }
 
     It 'Falls back to legacy spec-level advisory detection when no stimulus carries the tag' {

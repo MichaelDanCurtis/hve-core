@@ -714,12 +714,16 @@ if ($EnableBaselineEquivalence -and $shardOwnsEquivalence) {
     }
 }
 
+$hardFailStatuses = @('fail', 'content-moderation-input', 'content-moderation-error-input', 'content-moderation-output')
 $perArtifact = [System.Collections.Generic.List[object]]::new()
 foreach ($plan in $artifactPlan) {
     $artifactPassed    = 0
     $artifactFailed    = 0
     $artifactDurationMs = 0
     $artifactExitCode  = 0
+    $artifactAuthoritativeFailed = 0
+    $artifactAdvisoryFailed      = 0
+    $artifactHasHardFail = $false
     $specBreakdown     = [System.Collections.Generic.List[object]]::new()
     $allSpecsRan       = $true
 
@@ -732,7 +736,27 @@ foreach ($plan in $artifactPlan) {
         $artifactPassed     += [int]$r.assertionsPassed
         $artifactFailed     += [int]$r.assertionsFailed
         $artifactDurationMs += [int]$r.durationMs
-        if ($r.exitCode -ne 0 -and $artifactExitCode -eq 0) { $artifactExitCode = $r.exitCode }
+
+        $specStatus = if ($r.ContainsKey('status')) { [string]$r.status } else { '' }
+        $specIsAdvisory = $r.ContainsKey('isAdvisory') -and [bool]$r.isAdvisory
+
+        # Split this spec's failures into authoritative (gating) and advisory (non-gating).
+        if ($r.ContainsKey('authoritativeFailed') -or $r.ContainsKey('advisoryFailed')) {
+            $artifactAuthoritativeFailed += [int]$r['authoritativeFailed']
+            $artifactAdvisoryFailed      += [int]$r['advisoryFailed']
+        }
+        elseif ($specIsAdvisory) {
+            $artifactAdvisoryFailed += [int]$r.assertionsFailed
+        }
+        else {
+            $artifactAuthoritativeFailed += [int]$r.assertionsFailed
+        }
+
+        # A failing spec status (e.g. content moderation) gates even with zero assertion failures.
+        if ($specStatus -in $hardFailStatuses) { $artifactHasHardFail = $true }
+
+        # A nonzero exit gates only when the spec is not advisory.
+        if ($r.exitCode -ne 0 -and -not $specIsAdvisory -and $artifactExitCode -eq 0) { $artifactExitCode = $r.exitCode }
 
         $specBreakdown.Add([ordered]@{
             specPath         = $r.specRel
@@ -748,35 +772,43 @@ foreach ($plan in $artifactPlan) {
     }
 
     $status = if (-not $allSpecsRan) { 'skipped' }
-              elseif ($artifactFailed -gt 0 -or $artifactExitCode -ne 0) { 'fail' }
+              elseif ($artifactHasHardFail -or $artifactAuthoritativeFailed -gt 0 -or $artifactExitCode -ne 0) { 'fail' }
+              elseif ($artifactAdvisoryFailed -gt 0) { 'advisory-fail' }
               else { 'pass' }
+    $artifactIsAdvisory = ($status -eq 'advisory-fail')
 
     $artifactKey  = Get-ArtifactFileKey -Kind $plan.kind -ArtifactId $plan.artifactId
     $artifactFile = Join-Path -Path $resolvedLogsDir -ChildPath "eval-results-$artifactKey.json"
     $artifactRecord = [ordered]@{
-        kind             = $plan.kind
-        artifactId       = $plan.artifactId
-        path             = $plan.path
-        changeStatus     = $plan.status
-        status           = $status
-        durationMs       = $artifactDurationMs
-        assertionsPassed = $artifactPassed
-        assertionsFailed = $artifactFailed
-        specs            = @($specBreakdown)
+        kind                = $plan.kind
+        artifactId          = $plan.artifactId
+        path                = $plan.path
+        changeStatus        = $plan.status
+        status              = $status
+        isAdvisory          = $artifactIsAdvisory
+        durationMs          = $artifactDurationMs
+        assertionsPassed    = $artifactPassed
+        assertionsFailed    = $artifactFailed
+        authoritativeFailed = $artifactAuthoritativeFailed
+        advisoryFailed      = $artifactAdvisoryFailed
+        specs               = @($specBreakdown)
     }
     Write-JsonFile -Value $artifactRecord -Path $artifactFile
 
     $perArtifact.Add([ordered]@{
-        kind             = $plan.kind
-        artifactId       = $plan.artifactId
-        path             = $plan.path
-        changeStatus     = $plan.status
-        status           = $status
-        durationMs       = $artifactDurationMs
-        assertionsPassed = $artifactPassed
-        assertionsFailed = $artifactFailed
-        specCount        = $specBreakdown.Count
-        resultsFile      = "logs/eval-results-$artifactKey.json"
+        kind                = $plan.kind
+        artifactId          = $plan.artifactId
+        path                = $plan.path
+        changeStatus        = $plan.status
+        status              = $status
+        isAdvisory          = $artifactIsAdvisory
+        durationMs          = $artifactDurationMs
+        assertionsPassed    = $artifactPassed
+        assertionsFailed    = $artifactFailed
+        authoritativeFailed = $artifactAuthoritativeFailed
+        advisoryFailed      = $artifactAdvisoryFailed
+        specCount           = $specBreakdown.Count
+        resultsFile         = "logs/eval-results-$artifactKey.json"
     }) | Out-Null
 }
 

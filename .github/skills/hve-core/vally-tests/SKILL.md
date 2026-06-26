@@ -90,6 +90,8 @@ Helper scripts ship as parity pairs (`.ps1` and `.sh`) where the workflow does n
 
 All helpers honour a shared dedupe contract: SHA-256 of the prompt text after Unicode NFC normalization and whitespace collapse.
 
+The helpers emit a JSON run report to `logs/vally-test-author-<timestamp>.json`, where `<timestamp>` is `YYYYMMDD-HHMMSS` (UTC). The report captures, at minimum: `mode`; `inputs` (the resolved `files`/`path` and `kind`); `target_eval_file`; `stimuli_appended` (count and per-row hash); `dedupe_results` (count and per-row hash for skipped duplicates); `refusal_check` (per-row category match, if any); `safety_lint_exit_code`; `blockers` (any ambiguous safety-lint outcomes surfaced for review); and `written_paths`.
+
 ## Reference Index
 
 References capture the conformance taxonomy, grader selection rules, eval-suite routing, and the regex source of truth for the refusal taxonomy. Each file targets a specific decision point in the authoring workflow.
