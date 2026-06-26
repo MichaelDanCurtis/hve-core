@@ -37,7 +37,21 @@ function readCookie(cookieHeader: string | undefined, name: string): string | nu
   return null;
 }
 
-export async function startServer(bridge: Bridge, port = 4399, opts?: { stateDir?: string }) {
+export async function startServer(
+  bridge: Bridge,
+  port = 4399,
+  opts?: { stateDir?: string; trustLoopback?: boolean },
+) {
+  // Embed mode: when a trusted host (the Claude Preview pane or a VS Code
+  // webview) launches and owns this server, it loads the bare root URL, which
+  // the token gate would 403. Opting into trustLoopback skips the token check on
+  // both the HTTP gate and the WS upgrade so the pane loads with no key. The
+  // Origin check below is KEPT in both modes, so a browser still cannot drive a
+  // cross-origin connection. Trade-off: embed mode trusts ANY loopback client,
+  // which is the host-managed-pane trust boundary — anyone who can already reach
+  // 127.0.0.1 on this port is treated as the user. Secure default is unchanged:
+  // with the flag off, the per-session token is still required.
+  const trustLoopback = opts?.trustLoopback ?? Boolean(process.env.RPI_COCKPIT_TRUST_LOOPBACK);
   // Per-session token: minted in-memory each run, never persisted. Fail closed —
   // it is always present, so every HTTP request and WS upgrade is gated.
   const token = crypto.randomBytes(32).toString("hex");
@@ -52,8 +66,10 @@ export async function startServer(bridge: Bridge, port = 4399, opts?: { stateDir
   };
 
   const httpServer = http.createServer(async (req, res) => {
-    // HTTP gate: before any file serving, require a valid token (query or cookie).
-    if (!isAuthorized(req.url, req.headers.cookie)) {
+    // HTTP gate: before any file serving, require a valid token (query or cookie),
+    // UNLESS embed mode trusts the loopback pane, in which case the bare root and
+    // assets are served without a key.
+    if (!trustLoopback && !isAuthorized(req.url, req.headers.cookie)) {
       res.writeHead(403, { "content-type": "text/html" });
       res.end("<!doctype html><meta charset=utf-8><title>RPI Cockpit</title>" +
         "<p>Unauthorized. Open the full cockpit URL including <code>?key=…</code> printed on startup.</p>");
@@ -92,7 +108,10 @@ export async function startServer(bridge: Bridge, port = 4399, opts?: { stateDir
   const wss = new WebSocketServer({
     server: httpServer,
     verifyClient: (info, cb) => {
-      const tokenOk = isAuthorized(info.req.url, info.req.headers.cookie);
+      // In embed mode the token is waived, but the Origin check is NOT: a browser
+      // still must present an Origin matching this server's own host (or none, as
+      // non-browser clients do), which defeats cross-origin / DNS-rebinding.
+      const tokenOk = trustLoopback || isAuthorized(info.req.url, info.req.headers.cookie);
       const origin = info.req.headers.origin;
       const originOk = !origin || origin === "http://" + info.req.headers.host;
       if (tokenOk && originOk) cb(true);

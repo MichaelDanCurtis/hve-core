@@ -207,4 +207,61 @@ describe("server", () => {
       ws.close();
     });
   });
+
+  describe("embed mode (trustLoopback)", () => {
+    it("HTTP GET / with no key and no cookie -> 200 index.html", async () => {
+      const bridge = new Bridge();
+      const srv = await startServer(bridge, 0, { trustLoopback: true });
+      stop = srv.close;
+      const res = await get(srv.port, "/");
+      expect(res.status).toBe(200);
+      expect(res.body.toLowerCase()).toContain("<!doctype html");
+    });
+
+    it("the keyed path still serves 200 with trustLoopback on", async () => {
+      const bridge = new Bridge();
+      const srv = await startServer(bridge, 0, { trustLoopback: true });
+      stop = srv.close;
+      const res = await get(srv.port, `/?key=${srv.token}`);
+      expect(res.status).toBe(200);
+      expect(res.body.toLowerCase()).toContain("<!doctype html");
+    });
+
+    it("the secure default (no flag) still 403s GET / with no key", async () => {
+      const bridge = new Bridge();
+      const srv = await startServer(bridge, 0);
+      stop = srv.close;
+      const res = await get(srv.port, "/");
+      expect(res.status).toBe(403);
+    });
+
+    it("WS connect with NO key -> opens and receives initial state", async () => {
+      const bridge = new Bridge();
+      const srv = await startServer(bridge, 0, { trustLoopback: true });
+      stop = srv.close;
+      const ws = new WebSocket(`ws://127.0.0.1:${srv.port}`);
+      const first = await new Promise<any>((res, rej) => {
+        ws.on("message", (d) => res(JSON.parse(String(d))));
+        ws.on("error", rej);
+      });
+      expect(first.type).toBe("state");
+      ws.close();
+    });
+
+    it("WS connect with a WRONG Origin is still rejected in embed mode", async () => {
+      const bridge = new Bridge();
+      const srv = await startServer(bridge, 0, { trustLoopback: true });
+      stop = srv.close;
+      const ws = new WebSocket(`ws://127.0.0.1:${srv.port}`, {
+        headers: { origin: "http://evil.example" },
+      });
+      const opened = await new Promise<boolean>((resolve) => {
+        ws.on("open", () => resolve(true));
+        ws.on("error", () => resolve(false));
+        ws.on("close", () => resolve(false));
+      });
+      expect(opened).toBe(false);
+      try { ws.close(); } catch { /* already closed */ }
+    });
+  });
 });
