@@ -33,7 +33,7 @@ Do not invent severity levels, categories, or output fields the skill does not d
 
 * **Perspective**: Security review (apply the Security review checklist from lens-checklists.md).
 * **Categories**: Authentication & Authorization, Input Validation, Secrets & Sensitive Data, Injection, Serialization & Parsing, Dependency & Data Handling.
-* **Reference model**: Map findings to recognized risk patterns (for example, the OWASP Top 10) and identify a concrete exploit path for each finding. Omit theoretical concerns with no realistic abuse case.
+* **Reference model**: Map findings to recognized risk patterns (for example, the OWASP Top 10) and identify a concrete exploit path for each finding. Omit theoretical concerns with no realistic exploitation case.
 * **Lane boundary**: Stay within security. Do not flag pure logic bugs without a security consequence — the Functional perspective owns those — or style and naming — the Standards perspective owns those.
 
 ## Required Steps
