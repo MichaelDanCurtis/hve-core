@@ -159,6 +159,7 @@ function decisionHtml(d) {
 document.addEventListener("click", (e) => {
   if (e.target.closest("#to-home")) { sendMsg({ type: "navigate", screen: "home" }); return; }
   if (e.target.closest("#to-loop")) { sendMsg({ type: "navigate", screen: "loop" }); return; }
+  if (e.target.closest("#help-btn")) { const w = document.getElementById("welcome"); if (w) w.hidden = false; return; }
   if (e.target.closest("#welcome-dismiss")) {
     localStorage.setItem("hve-welcome-dismissed", "1");
     const w = document.getElementById("welcome"); if (w) w.hidden = true;
