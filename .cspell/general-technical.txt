@@ -1507,6 +1507,7 @@ triaging
 untriaged
 unvalidated
 vscodeignore
+Pipfile
 
 # Video & Image Processing
 drawtext
