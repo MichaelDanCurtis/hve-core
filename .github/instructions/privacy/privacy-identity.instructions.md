@@ -69,6 +69,8 @@ Each phase has entry criteria, activities, exit criteria, artifacts produced, an
 
 After the standard privacy risk assessment, evaluate whether the scenario triggers a Data Protection Impact Assessment.
 
+> **PRD phase mapping.** The PRD frames the DPIA hard gate as a "Phase 2 classification → Phase 5 impact" transition (FR-003, DD-003). In this implementation the classification and the gate both live in Phase 3 (Risk + DPIA), which hard-blocks progression before Phase 5 (Impact). The two descriptions are equivalent: the PRD's "Phase 2 classification" maps to this file's Phase 3 risk classification, and both place the impact assessment at Phase 5.
+
 * If the processing involves large-scale monitoring, systematic monitoring of a publicly accessible area, sensitive data on a large scale, or other high-risk processing patterns, set `gateResults.dpiaThresholdGate.status` to `required` and `gateResults.dpiaThresholdGate.dpiaRequired` to `true`.
 * If the processing does not meet the threshold, set `status` to `not-required` and `dpiaRequired` to `false`.
 * Record the trigger reasons in `triggers`, and add a concise note in `notes`.
@@ -94,7 +96,7 @@ After the standard privacy risk assessment, evaluate whether the scenario trigge
 ### Phase 6: Handoff
 
 * Entry: Phase 5 complete (impact summary reviewed)
-* Activities: present the complete privacy plan for review, generate the handoff summary, and hand off to backlog or implementation workflows
+* Activities: present the complete privacy plan for review, generate the handoff summary, and hand off to backlog or implementation workflows using the Backlog Handoff Contract
 * Exit: user confirms acceptance of the privacy plan
 * Artifacts: final privacy plan, handoff summary
 
@@ -207,6 +209,37 @@ The planner inherits the 3-5 per turn cadence, emoji checklist, and seven rules 
 * Phase 4 (Controls): required controls, existing mitigations, and preferred implementation style
 * Phase 5 (Impact): user-facing disclosure needs, residual risk tolerance, and follow-up work
 * Phase 6 (Handoff): target backlog system, review format preference, and handoff confirmation
+
+## Backlog Handoff Contract
+
+The Privacy Planner is the fifth `backlog-templates` caller. It emits backlog-eligible findings using the shared ADO and GitHub templates, content sanitization rules, autonomy-tier vocabulary, disclaimer-block placement, and work-item ID conventions defined in the `backlog-templates` skill (`.github/skills/shared/backlog-templates/SKILL.md`). The privacy-specific pieces below stay in this file per that skill's per-planner boundary.
+
+### Privacy Augmentation Fields
+
+Each backlog-eligible privacy finding emits these augmentation fields into the planner-specific field block (ADO description) and the YAML metadata header (GitHub issue):
+
+* `data_category` — the personal or sensitive data category the finding concerns.
+* `processing_purpose` — the processing purpose tied to the finding.
+* `dpia_ref` — the DPIA reference when the DPIA threshold gate is `required`; empty when `not-required`.
+* `lawful_basis` — the lawful basis recorded for the processing activity.
+* `risk_tier` — the privacy risk tier assigned during Phase 3.
+
+Emit `cross_planner_refs` when a privacy flow overlaps a sibling planner, per Cross-Planner Cross-Links.
+
+### Severity-to-Priority Mapping
+
+Map the finding's `risk_tier` to the backlog `priority` field:
+
+| `risk_tier` | Backlog priority |
+|-------------|------------------|
+| critical    | Critical         |
+| high        | High             |
+| medium      | Medium           |
+| low         | Low              |
+
+### Work Item Identifiers
+
+Privacy work items use the `WI-PRIV-` prefix and the `{{PRIV-TEMP-N}}` GitHub temporary ID form defined in the `backlog-templates` skill. Sequence is monotonic per plan slug.
 
 ## Cross-Planner Cross-Links
 

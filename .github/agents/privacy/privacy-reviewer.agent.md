@@ -67,4 +67,4 @@ Render the persisted review report and the inline completion summary using these
 3. Delegate standards and citation lookups to the `Researcher Subagent` to gather supporting evidence (for example, GDPR articles, CCPA/CPRA sections, DPIA thresholds) when the review needs authoritative references the planner skill does not already supply.
 4. Evaluate the plan for completeness across scope, data mapping, DPIA decisions, controls, impacts, and handoff readiness.
 5. Write or update the review report in `.copilot-tracking/privacy-reviews/` using the Review Summary Format, with evidence references, risks, and follow-up actions.
-6. Re-surface the professional review disclaimer before concluding the review.
+6. Re-surface the professional-review disclaimer before concluding the review, using the verbatim wording from the Privacy Review section of [.github/instructions/shared/disclaimer-language.instructions.md](../../instructions/shared/disclaimer-language.instructions.md).

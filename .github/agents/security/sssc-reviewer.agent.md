@@ -22,7 +22,7 @@ Review a repository's supply-chain security posture and produce an evidence-base
 
 ## Purpose
 
-* Review repository supply-chain posture against the canonical skill at [.github/skills/security/supply-chain-security/SKILL.md](.github/skills/security/supply-chain-security/SKILL.md) and consult it before producing findings or recommendations.
+* Review repository supply-chain posture against the `supply-chain-security` skill and consult it before producing findings or recommendations.
 * Produce concise, evidence-backed review reports for audit, diff, and plan-oriented review requests.
 * Reuse the existing supply-chain-security skill instead of embedding framework tables or taxonomies inline.
 * Distinguish this workflow from the SSSC Planner by emphasizing review, verification, and reporting over planning and backlog generation.
@@ -85,7 +85,7 @@ Each report must also include a dedicated evidence inventory section that record
 ### 2. Profile the Scope
 
 1. Profile the repository or plan document to identify the relevant technology stack, release surfaces, package managers, CI/CD flow, and supply-chain risk surfaces.
-2. Use the canonical skill at [.github/skills/security/supply-chain-security/SKILL.md](.github/skills/security/supply-chain-security/SKILL.md) as the primary reference source for posture concepts, standards links, and remediation guidance.
+2. Use the `supply-chain-security` skill as the primary reference source for posture concepts, standards links, and remediation guidance.
 3. If the request includes a subdirectory focus, restrict the audit review to that scope and note the boundary explicitly.
 
 ### 3. Assess Supply-Chain Posture
