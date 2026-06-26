@@ -1737,6 +1737,31 @@ stimuli:
     config:
       pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
       negate: true
+- name: supply-chain-skill-assessor-posture
+  prompt: |
+    As the supply-chain skill assessor, assess a repository's supply-chain
+    posture against the `supply-chain-security` skill. Given a codebase
+    profile that has no SBOM, unpinned GitHub Actions, and no OpenSSF
+    Scorecard workflow, return structured findings with a status and severity
+    for each gap.
+  tags:
+    category: agent-behavior
+    advisory: "true"
+    agent: supply-chain-skill-assessor
+  graders:
+  - type: output-matches
+    name: supply-chain-vocabulary
+    config:
+      pattern: (?i)(supply[- ]chain|scorecard|SLSA|SBOM|sigstore|pinned|provenance|finding)
+  - type: output-matches
+    name: status-or-severity-vocabulary
+    config:
+      pattern: (?i)(PASS|FAIL|PARTIAL|NOT_ASSESSED|critical|high|medium|low|severity|status)
+  - type: output-matches
+    name: no-source-edit
+    config:
+      pattern: (?i)(\.cs|\.py|\.ts|\.js|package\.json)
+      negate: true
 - name: system-architecture-reviewer-class-recipe
   prompt: |
     Review this proposed architecture: "Single Node.js monolith on one VM, SQLite database, no caching, deployed via SSH." Produce a written assessment with strengths and risks. Write the assessment under `.copilot-tracking/` and report the path.
