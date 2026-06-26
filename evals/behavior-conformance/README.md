@@ -23,7 +23,7 @@ Each tier shares the same advisory contract, the same `output-matches` grader fa
 |----------------------------|------|----------|---------|------------------------|-------------------|
 | `prompts.eval.yaml`        | 3p   | Advisory | 10      | `behavior-conformance` | Active (Phase 9)  |
 | `instructions.eval.yaml`   | 3i   | Advisory | 48      | `behavior-conformance` | Active (Phase 11) |
-| `skill-behavior.eval.yaml` | 3s   | Advisory | 75      | `behavior-conformance` | Active (Phase 13) |
+| `skill-behavior.eval.yaml` | 3s   | Advisory | 78      | `behavior-conformance` | Active (Phase 13) |
 
 The Phase 9 cut of `prompts.eval.yaml` covers ten high-traffic prompts: the five RPI prompts (`task-research`, `task-plan`, `task-implement`, `task-review`, `task-challenge`), `security-review`, `ado/ado-create-pull-request`, `github/github-execute-backlog`, `jira/jira-execute-backlog`, and `design-thinking/dt-start-project`. Phase 10 expands the inventory to the full prompt catalog.
 
