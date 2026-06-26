@@ -114,19 +114,31 @@ Each feature entry records the resolved OCI reference and integrity hash:
 
 Rebuild the dev container to regenerate the lockfile. In VS Code, use the **Dev Containers: Rebuild Container** command. Commit the updated `devcontainer-lock.json` alongside any changes to `devcontainer.json`.
 
-## pip: Exact-Version Pinning
+## pip: Exact-Version Staleness Validation
 
-Python dependencies must use the `==` operator for exact version pinning. The scanner excludes virtual environment directories (`.venv`, `venv`, `.tox`, `.nox`, `__pypackages__`) to avoid false positives from installed package metadata.
+The `==` exact-version convention applies to `requirements*.txt` and `Pipfile`-style dependency declarations.
+The pip scanner validates packages that are *already* pinned with the `==` operator, checking each pinned version for staleness against PyPI.
+It does not flag range specifiers (`>=`, `~=`, `<`) as violations: its regex only matches `package==version` references, so range pins are simply not inspected.
+The scanner excludes virtual environment directories (`.venv`, `venv`, `.tox`, `.nox`, `__pypackages__`) to avoid false positives from installed package metadata.
 
 ```text
-# Accepted
+# Validated for staleness (exact pin in requirements.txt / Pipfile)
 requests==2.31.0
 flask==3.0.0
 
-# Rejected
+# Not flagged (range pins are not matched by the scanner)
 requests>=2.31.0
 flask~=3.0
 ```
+
+### Lockfile-Backed Pinning for uv Skills
+
+Python skills managed with `uv` and `pyproject.toml` achieve exact pinning through `uv.lock` rather than `==` constraints in `pyproject.toml`.
+The `uv.lock` file records the exact resolved version and a per-package integrity hash for every dependency, so a range pin in `pyproject.toml` is equivalent in supply-chain terms to an `==` pin in `requirements.txt`.
+Range pins in `pyproject.toml` are therefore acceptable for uv-managed skills: prefer expressing compatible-version ranges in `pyproject.toml` and committing `uv.lock` to lock the resolved versions, syncing with `uv sync --locked` to verify against the lock.
+
+> [!NOTE]
+> `Test-DependencyPinning.ps1` does not flag range pins in `pyproject.toml`. Supply-chain security for uv-managed skills is enforced through `uv.lock` integrity hashes rather than `==` constraints, so no scanner violation is raised for ranged `pyproject.toml` dependencies.
 
 ## Workflow npm Commands: npm ci Enforcement
 
