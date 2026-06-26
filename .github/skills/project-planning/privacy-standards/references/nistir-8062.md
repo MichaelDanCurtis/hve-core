@@ -9,11 +9,11 @@ NISTIR 8062 frames privacy engineering around three design objectives: predictab
 
 ## Objectives
 
-| Objective | Practical meaning |
-|-----------|-------------------|
-| Predictability | Users and operators can understand how data will be used and what outcomes to expect |
-| Manageability | Privacy controls and governance can be exercised over the data lifecycle |
-| Disassociability | Data can be reduced, separated, or minimized to lower privacy risk |
+| Objective        | Practical meaning                                                                    |
+|------------------|--------------------------------------------------------------------------------------|
+| Predictability   | Users and operators can understand how data will be used and what outcomes to expect |
+| Manageability    | Privacy controls and governance can be exercised over the data lifecycle             |
+| Disassociability | Data can be reduced, separated, or minimized to lower privacy risk                   |
 
 ## Suggested citation field
 

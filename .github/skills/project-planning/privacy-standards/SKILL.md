@@ -51,14 +51,14 @@ Use these fields when capturing a finding, control, or risk so the reviewer can 
 
 ## Phase-to-framework mapping
 
-| Privacy phase | Primary standards package | Notes |
-|---------------|---------------------------|-------|
-| Phase 1 Capture | NIST Privacy Framework + GDPR | Context, scope, and legal basis framing |
-| Phase 2 Data Mapping | NIST Privacy Framework + NISTIR 8062 | Data inventory, purpose, and minimization reasoning |
-| Phase 3 Risk and DPIA | GDPR + CCPA/CPRA + NISTIR 8062 | DPIA triggers, risk analysis, and proportionality |
-| Phase 4 Controls | NIST Privacy Framework + OWASP Privacy Risks | Controls for collection, use, sharing, and retention |
-| Phase 5 Impact | GDPR + CCPA/CPRA + OWASP Privacy Risks | Potential harm, mitigation, and monitoring |
-| Phase 6 Handoff | All sources | Evidence handoff, review notes, and action tracking |
+| Privacy phase         | Primary standards package                    | Notes                                                |
+|-----------------------|----------------------------------------------|------------------------------------------------------|
+| Phase 1 Capture       | NIST Privacy Framework + GDPR                | Context, scope, and legal basis framing              |
+| Phase 2 Data Mapping  | NIST Privacy Framework + NISTIR 8062         | Data inventory, purpose, and minimization reasoning  |
+| Phase 3 Risk and DPIA | GDPR + CCPA/CPRA + NISTIR 8062               | DPIA triggers, risk analysis, and proportionality    |
+| Phase 4 Controls      | NIST Privacy Framework + OWASP Privacy Risks | Controls for collection, use, sharing, and retention |
+| Phase 5 Impact        | GDPR + CCPA/CPRA + OWASP Privacy Risks       | Potential harm, mitigation, and monitoring           |
+| Phase 6 Handoff       | All sources                                  | Evidence handoff, review notes, and action tracking  |
 
 ## Open-standards catalog
 

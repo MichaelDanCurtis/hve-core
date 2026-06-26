@@ -9,18 +9,18 @@ The NIST Privacy Framework organizes privacy work around outcomes that help an o
 
 ## Core functions and categories
 
-| Function | Category | Purpose |
-|----------|----------|---------|
-| Govern | GV.PO-P | Policies, processes, and governance structures |
-| Govern | GV.AT-P | Awareness and training |
-| Identify | ID.IM-P | Data inventory and system context |
-| Identify | ID.BE-P | Business purpose and data use context |
-| Control | CT.DM-P | Data management and minimization |
-| Control | CT.DP-P | Data processing and sharing controls |
-| Communicate | CM.AW-P | Notice and transparency |
-| Communicate | CM.PO-P | Privacy communications and user interaction |
-| Respond | RS.AN-P | Incident response and privacy events |
-| Recover | RC.RP-P | Recovery and remediation planning |
+| Function    | Category | Purpose                                        |
+|-------------|----------|------------------------------------------------|
+| Govern      | GV.PO-P  | Policies, processes, and governance structures |
+| Govern      | GV.AT-P  | Awareness and training                         |
+| Identify    | ID.IM-P  | Data inventory and system context              |
+| Identify    | ID.BE-P  | Business purpose and data use context          |
+| Control     | CT.DM-P  | Data management and minimization               |
+| Control     | CT.DP-P  | Data processing and sharing controls           |
+| Communicate | CM.AW-P  | Notice and transparency                        |
+| Communicate | CM.PO-P  | Privacy communications and user interaction    |
+| Respond     | RS.AN-P  | Incident response and privacy events           |
+| Recover     | RC.RP-P  | Recovery and remediation planning              |
 
 ## Suggested citation field
 
