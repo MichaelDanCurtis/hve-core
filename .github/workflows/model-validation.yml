@@ -31,12 +31,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install powershell-yaml
-        shell: pwsh
-        run: |
-          if (-not (Get-Module -ListAvailable -Name powershell-yaml | Where-Object { $_.Version -eq '0.4.7' })) {
-            Install-Module -Name powershell-yaml -RequiredVersion 0.4.7 -Force -Scope CurrentUser
-          }
+      - name: Setup PowerShell modules
+        uses: ./.github/actions/setup-ps-modules
 
       - name: Refresh model catalog from GitHub docs
         shell: pwsh
