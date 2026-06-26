@@ -24,10 +24,12 @@ stimuli:
       - type: output-matches
         name: framework-attribution
         config:
+          # cspell:disable-next-line
           pattern: '(?i)(wcag[-\s]?2\.?2|accessibility|success\s+criteri)'
       - type: output-matches
         name: read-only-posture
         config:
+          # cspell:disable-next-line
           pattern: '(?i)(read[-\s]?only|no\s+(file\s+)?(changes|edits|modif)|assessment\s+only)'
 
   - name: accessibility-framework-assessor-plan-vocabulary
@@ -55,4 +57,5 @@ stimuli:
       - type: output-matches
         name: mitigation-guidance
         config:
+          # cspell:disable-next-line
           pattern: '(?i)(mitigation|guidance|recommend|remediat)'

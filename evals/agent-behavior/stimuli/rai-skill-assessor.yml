@@ -28,6 +28,7 @@ stimuli:
       - type: output-matches
         name: read-only-posture
         config:
+          # cspell:disable-next-line
           pattern: '(?i)(read[-\s]?only|no\s+(file\s+)?(changes|edits|modif)|assessment\s+only)'
 
   - name: rai-skill-assessor-plan-vocabulary
@@ -55,4 +56,5 @@ stimuli:
       - type: output-matches
         name: mitigation-guidance
         config:
+          # cspell:disable-next-line
           pattern: '(?i)(mitigation|guidance|recommend|remediat)'

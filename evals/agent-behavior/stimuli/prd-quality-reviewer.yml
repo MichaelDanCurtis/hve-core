@@ -26,6 +26,7 @@ stimuli:
       - type: output-matches
         name: read-only-posture
         config:
+          # cspell:disable-next-line
           pattern: '(?i)(read[-\s]?only|no\s+(file\s+)?(changes|edits|modif)|review\s+only)'
 
   - name: prd-quality-reviewer-quality-report-verdict
