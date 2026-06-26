@@ -16,7 +16,7 @@ stimuli:
       - type: output-matches
         name: investigation-vocabulary
         config:
-          pattern: '(?i)(implication|stale|invalidat|consisten|correct|safe|risk|because|investigat|consider)'
+          pattern: '(?i)(implication|stale|invalidate|consistency|correct|safe|risk|because|investigate|consider)'
       - type: output-matches
         name: no-source-edit
         config:

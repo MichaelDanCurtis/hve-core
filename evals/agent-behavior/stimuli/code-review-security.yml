@@ -17,7 +17,7 @@ stimuli:
       - type: output-matches
         name: security-finding-vocabulary
         config:
-          pattern: '(?i)(sql injection|injection|sanitiz|parameteriz|authenticat|secret|vulnerab|exploit|severity|finding)'
+          pattern: '(?i)(sql injection|injection|sanitize|parameterized|authentication|secret|vulnerability|exploit|severity|finding)'
       - type: output-matches
         name: no-source-edit
         config:

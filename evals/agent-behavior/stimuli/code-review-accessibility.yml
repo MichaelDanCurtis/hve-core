@@ -16,7 +16,7 @@ stimuli:
       - type: output-matches
         name: accessibility-finding-vocabulary
         config:
-          pattern: '(?i)(accessib|alt text|label|aria|WCAG|success criteria|contrast|finding|issue)'
+          pattern: '(?i)(accessibility|alt text|label|aria|WCAG|success criteria|contrast|finding|issue)'
       - type: output-matches
         name: no-source-edit
         config:

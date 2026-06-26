@@ -303,7 +303,7 @@ stimuli:
   - type: output-matches
     name: accessibility-finding-vocabulary
     config:
-      pattern: (?i)(accessib|alt text|label|aria|WCAG|success criteria|contrast|finding|issue)
+      pattern: (?i)(accessibility|alt text|label|aria|WCAG|success criteria|contrast|finding|issue)
   - type: output-matches
     name: no-source-edit
     config:
@@ -410,7 +410,7 @@ stimuli:
   - type: output-matches
     name: security-finding-vocabulary
     config:
-      pattern: (?i)(sql injection|injection|sanitiz|parameteriz|authenticat|secret|vulnerab|exploit|severity|finding)
+      pattern: (?i)(sql injection|injection|sanitize|parameterized|authentication|secret|vulnerability|exploit|severity|finding)
   - type: output-matches
     name: no-source-edit
     config:
@@ -456,7 +456,7 @@ stimuli:
   - type: output-matches
     name: investigation-vocabulary
     config:
-      pattern: (?i)(implication|stale|invalidat|consisten|correct|safe|risk|because|investigat|consider)
+      pattern: (?i)(implication|stale|invalidate|consistency|correct|safe|risk|because|investigate|consider)
   - type: output-matches
     name: no-source-edit
     config:
