@@ -1,12 +1,23 @@
 // rpi-cockpit/tests/server.test.ts
 import { describe, it, expect, afterEach } from "vitest";
 import http from "node:http";
+import os from "node:os";
+import path from "node:path";
+import { existsSync, readFileSync, rmSync, mkdirSync } from "node:fs";
 import WebSocket from "ws";
 import { Bridge } from "../src/bridge.js";
 import { startServer } from "../src/server.js";
 
 let stop: (() => Promise<void>) | null = null;
 afterEach(async () => { if (stop) await stop(); stop = null; });
+
+// Unique temp dir per test; Date.now()/pid avoids Math.random (banned in src,
+// fine for test fixtures).
+function tempDir(tag: string): string {
+  const dir = path.join(os.tmpdir(), `rpi-cockpit-test-${tag}-${process.pid}-${Date.now()}`);
+  mkdirSync(dir, { recursive: true });
+  return dir;
+}
 
 // Minimal HTTP GET helper: returns status, headers, and body for an assertion.
 function get(
@@ -354,6 +365,52 @@ describe("server", () => {
       });
       expect(opened).toBe(false);
       try { ws.close(); } catch { /* already closed */ }
+    });
+  });
+
+  describe("writeStateSnapshot (producer)", () => {
+    it("writes state.json atomically that round-trips the bridge state", async () => {
+      const dir = tempDir("snapshot");
+      const bridge = new Bridge();
+      const srv = await startServer(bridge, 0, { stateDir: dir, writeStateSnapshot: true });
+      stop = async () => { await srv.close(); rmSync(dir, { recursive: true, force: true }); };
+      bridge.emitBeat({ type: "session.begin", task: "snap task", host: "claude-code" });
+      // Synchronous write happens inside the emit, so the file is already there.
+      const statePath = path.join(dir, "state.json");
+      expect(existsSync(statePath)).toBe(true);
+      const parsed = JSON.parse(readFileSync(statePath, "utf8"));
+      expect(parsed.task).toBe("snap task");
+      expect(parsed.domain).toBe(bridge.state.domain);
+      expect(parsed.task).toBe(bridge.state.task);
+      // No half-written temp left behind after a successful rename.
+      expect(existsSync(path.join(dir, "state.json.tmp"))).toBe(false);
+    });
+
+    it("is OFF by default: no state.json without the flag", async () => {
+      const dir = tempDir("nosnap");
+      const bridge = new Bridge();
+      const srv = await startServer(bridge, 0, { stateDir: dir });
+      stop = async () => { await srv.close(); rmSync(dir, { recursive: true, force: true }); };
+      bridge.emitBeat({ type: "session.begin", task: "x", host: "h" });
+      expect(existsSync(path.join(dir, "state.json"))).toBe(false);
+    });
+  });
+
+  describe("onInbound (consumer routing)", () => {
+    it("hands inbound frames to the callback and does NOT mutate the bridge", async () => {
+      const bridge = new Bridge();
+      const received: unknown[] = [];
+      const srv = await startServer(bridge, 0, { onInbound: (f) => received.push(f) });
+      stop = srv.close;
+      const ws = new WebSocket(`ws://127.0.0.1:${srv.port}/?key=${srv.token}`);
+      await new Promise((r) => ws.on("open", r));
+      ws.send(JSON.stringify({ type: "steer", directive: { kind: "note", text: "to inbox" } }));
+      await new Promise((r) => setTimeout(r, 40));
+      expect(received).toHaveLength(1);
+      expect(received[0]).toEqual({ type: "steer", directive: { kind: "note", text: "to inbox" } });
+      // The bridge was NOT driven: the directive went to the callback only.
+      expect(bridge.state.directives).toHaveLength(0);
+      ws.close();
     });
   });
 });

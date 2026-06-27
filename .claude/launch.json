@@ -4,7 +4,7 @@
     {
       "name": "rpi-cockpit",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["rpi-cockpit/preview.mjs"],
+      "runtimeArgs": ["rpi-cockpit/dist/index.js", "live"],
       "autoPort": true
     }
   ]

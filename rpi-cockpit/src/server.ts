@@ -3,14 +3,15 @@ import http from "node:http";
 import crypto from "node:crypto";
 import os from "node:os";
 import { readFile, mkdir, appendFile } from "node:fs/promises";
+import { writeFileSync, renameSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { WebSocketServer, type WebSocket } from "ws";
 import type { Bridge } from "./bridge.js";
 import type { SessionState } from "./state.js";
 import { toViewModel } from "./render.js";
-import { SteerMsg } from "./events.js";
 import type { Directive } from "./events.js";
+import { parseInbound, applyInbound, type InboundFrame } from "./inbound.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(here, "..", "public");
@@ -40,7 +41,18 @@ function readCookie(cookieHeader: string | undefined, name: string): string | nu
 export async function startServer(
   bridge: Bridge,
   port = 4399,
-  opts?: { stateDir?: string; trustLoopback?: boolean },
+  opts?: {
+    stateDir?: string;
+    trustLoopback?: boolean;
+    // Producer-only: when true, atomically rewrite <stateDir>/state.json on every
+    // bridge "state" event so the live consumer process can mirror it. Off by
+    // default; existing callers and tests are unchanged.
+    writeStateSnapshot?: boolean;
+    // Consumer-only: when provided, recognized inbound WS frames are handed to
+    // this callback (the consumer routes them to inbox.jsonl) instead of driving
+    // the local bridge. Off by default; the WS handler drives the bridge as before.
+    onInbound?: (f: InboundFrame) => void;
+  },
 ) {
   // Embed mode: when a trusted host (the Claude Preview pane or a VS Code
   // webview) launches and owns this server, it loads the bare root URL, which
@@ -124,36 +136,13 @@ export async function startServer(
     ws.on("message", (data) => {
       let msg: unknown;
       try { msg = JSON.parse(String(data)); } catch { return; }
-      // Inbound frame types are mutually exclusive — keep the branches symmetric.
-      if (msg && typeof msg === "object" && (msg as { type?: string }).type === "decide") {
-        const m = msg as { id?: unknown; choiceId?: unknown };
-        if (typeof m.id === "string" && typeof m.choiceId === "string") {
-          bridge.resolveDecision(m.id, m.choiceId);
-        }
-      } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "steer") {
-        const parsed = SteerMsg.safeParse(msg);
-        if (parsed.success) bridge.enqueueDirective(parsed.data.directive);
-      } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "launch") {
-        const m = msg as { workflowId?: unknown };
-        if (typeof m.workflowId === "string") bridge.requestLaunch(m.workflowId);
-      } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "navigate") {
-        const m = msg as { screen?: unknown };
-        if (m.screen === "home" || m.screen === "loop") bridge.navigate(m.screen);
-      } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "answer") {
-        const m = msg as { id?: unknown; text?: unknown };
-        if (typeof m.id === "string" && typeof m.text === "string") bridge.resolveQuestion(m.id, m.text);
-      } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "navigator") {
-        const m = msg as { open?: unknown };
-        if (typeof m.open === "boolean") m.open ? bridge.openNavigator() : bridge.closeNavigator();
-      } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "intervene") {
-        const m = msg as { action?: unknown; agentId?: unknown };
-        // Validate the action is one of the three and agentId is a string when present.
-        // intervene only enqueues a directive (intent); the cockpit never controls agents.
-        if ((m.action === "pause" || m.action === "swap" || m.action === "spawn") &&
-            (m.agentId === undefined || typeof m.agentId === "string")) {
-          bridge.intervene(m.action, m.agentId);
-        }
-      }
+      // Validate once, in one place (shared with the producer's inbox tailer).
+      const f = parseInbound(msg);
+      if (!f) return;
+      // Consumer mode routes the frame elsewhere (to inbox.jsonl); otherwise the
+      // frame drives this server's bridge exactly as the inline chain used to.
+      if (opts?.onInbound) opts.onInbound(f);
+      else applyInbound(bridge, f);
     });
   });
   const broadcast = (state: SessionState) => { for (const c of wss.clients) if (c.readyState === 1) send(c, state); };
@@ -204,6 +193,26 @@ export async function startServer(
   bridge.on("directive", onDirective);
   bridge.on("decision", onDecision);
 
+  // Producer snapshot: atomically rewrite state.json on every state change so the
+  // live consumer process always reads a complete file. Write to a temp path then
+  // rename (rename is atomic on the same filesystem). Synchronous so concurrent
+  // state events cannot interleave a half-written file. Off by default.
+  let onSnapshot: ((state: SessionState) => void) | null = null;
+  if (opts?.writeStateSnapshot) {
+    const statePath = path.join(stateDir, "state.json");
+    const tmpPath = path.join(stateDir, "state.json.tmp");
+    onSnapshot = (state: SessionState) => {
+      try {
+        writeFileSync(tmpPath, JSON.stringify(state));
+        renameSync(tmpPath, statePath);
+      } catch { /* never throw into the event path */ }
+    };
+    bridge.on("state", onSnapshot);
+    // Seed the file with the current state so a consumer that connects before the
+    // first beat still has a snapshot to render.
+    onSnapshot(bridge.state);
+  }
+
   return {
     port: addr.port,
     token,
@@ -213,6 +222,7 @@ export async function startServer(
       bridge.off("state", broadcast);
       bridge.off("directive", onDirective);
       bridge.off("decision", onDecision);
+      if (onSnapshot) bridge.off("state", onSnapshot);
       wss.close((err) => {
         if (err) return reject(err);
         httpServer.close((e) => (e ? reject(e) : resolve()));
