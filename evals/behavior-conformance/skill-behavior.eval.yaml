@@ -1529,6 +1529,25 @@ stimuli:
         name: scope-language
         config:
           pattern: '(?i)(review|request|validation|evidence|handoff)'
+  - name: skill-code-review-knowledge
+    prompt: |
+      Summarize the review workflow defined by the `code-review` skill: its
+      perspectives, depth tiers, severity taxonomy, and structured output
+      contract. Cite at least three elements it standardizes.
+    tags:
+      category: behavior-conformance
+      skill: code-review
+      shape: knowledge
+      advisory: "true"
+    graders:
+      - type: output-matches
+        name: skill-domain-attribution
+        config:
+          pattern: '(?i)(code-review|code review|perspective|depth|severity|verdict|finding)'
+      - type: output-matches
+        name: scope-language
+        config:
+          pattern: '(?i)(review|severity|perspective|output|finding|verdict)'
   - name: skill-privacy-standards-knowledge
     prompt: |
       Summarize the privacy frameworks the `privacy-standards` skill provides
