@@ -67,6 +67,30 @@ export function buildMcpServer(bridge: Bridge): McpServer {
   );
 
   server.registerTool(
+    "backlog_start",
+    { description: "Begin a backlog board; switches the cockpit to the kanban view. Declare the ordered column/state names (e.g. Triage, Todo, In progress, Done).", inputSchema: { target: z.string(), columns: z.array(z.string()).min(1) } },
+    async (a) => text(handlers.backlog_start(bridge, a)),
+  );
+
+  server.registerTool(
+    "add_item",
+    { description: "Add or update a work item on the backlog board, placing it in the given column.", inputSchema: { id: z.string(), title: z.string(), column: z.string(), kind: z.string().optional(), tier: z.string().optional() } },
+    async (a) => text(handlers.add_item(bridge, a)),
+  );
+
+  server.registerTool(
+    "move_item",
+    { description: "Move a work item to a different column on the board.", inputSchema: { id: z.string(), column: z.string() } },
+    async (a) => text(handlers.move_item(bridge, a)),
+  );
+
+  server.registerTool(
+    "set_backlog_action",
+    { description: "Set or clear the current action line in the board header (pass null to clear).", inputSchema: { text: z.string().nullable() } },
+    async (a) => text(handlers.set_backlog_action(bridge, a)),
+  );
+
+  server.registerTool(
     "ask_question",
     { description: "Ask the user a free-text question; blocks until they answer. Shows the in-pane question card and, where supported, a native input.", inputSchema: { prompt: z.string() } },
     async (a) =>

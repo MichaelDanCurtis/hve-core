@@ -88,6 +88,25 @@ describe("toViewModel", () => {
     });
   });
 
+  describe("board view-model", () => {
+    it("returns columns in declared order, keeps empty columns, groups items, with count and passthrough", () => {
+      let s = applyBeat(initialState(), { type: "backlog.start", target: "Sprint 4", columns: ["Todo", "Doing", "Done"] }, 1);
+      s = applyBeat(s, { type: "item.add", id: "I1", title: "a", column: "Todo", kind: "bug", tier: "T1" }, 2);
+      s = applyBeat(s, { type: "item.add", id: "I2", title: "b", column: "Done" }, 3);
+      s = applyBeat(s, { type: "item.add", id: "I3", title: "c", column: "Todo" }, 4);
+      s = applyBeat(s, { type: "backlog.action", text: "triaging" }, 5);
+      const { board } = toViewModel(s);
+      expect(board.target).toBe("Sprint 4");
+      expect(board.action).toBe("triaging");
+      expect(board.count).toBe(3);
+      expect(board.columns.map((c) => c.name)).toEqual(["Todo", "Doing", "Done"]);
+      expect(board.columns[1].items).toEqual([]);
+      expect(board.columns[0].items.map((i) => i.id)).toEqual(["I1", "I3"]);
+      expect(board.columns[0].items[0]).toEqual({ id: "I1", title: "a", kind: "bug", tier: "T1" });
+      expect(board.columns[2].items.map((i) => i.id)).toEqual(["I2"]);
+    });
+  });
+
   describe("navigator fields", () => {
     it("exposes the view and the workflow catalog", () => {
       const vm = toViewModel(initialState());

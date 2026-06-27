@@ -20,7 +20,7 @@ describe("mcp face", () => {
     expect(bridge.state.phase).toBe("review");
   });
 
-  it("registers the steering and screen tools and lists seventeen total", async () => {
+  it("registers the steering and screen tools and lists twenty-one total", async () => {
     const bridge = new Bridge();
     const server = buildMcpServer(bridge);
     const [clientT, serverT] = InMemoryTransport.createLinkedPair();
@@ -36,7 +36,7 @@ describe("mcp face", () => {
     expect(names).toContain("clear_screen");
     expect(names).toContain("present_workflows");
     expect(names).toContain("open_navigator");
-    expect(tools).toHaveLength(17);
+    expect(tools).toHaveLength(21);
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
@@ -123,6 +123,28 @@ describe("mcp face", () => {
     expect(bridge.state.reviewTarget).toBe("PR 1");
     expect(bridge.state.findings).toHaveLength(1);
     expect(bridge.state.findings[0]).toMatchObject({ severity: "high", title: "bug" });
+    await client.close();
+    await server.close();
+  });
+
+  it("the backlog tools drive the board state", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const client = new Client({ name: "t", version: "0.0.1" }, { capabilities: {} });
+    const [ct, st] = InMemoryTransport.createLinkedPair();
+    await Promise.all([server.connect(st), client.connect(ct)]);
+    await client.callTool({ name: "backlog_start", arguments: { target: "Sprint 4", columns: ["Todo", "Done"] } });
+    expect(bridge.state.domain).toBe("backlog");
+    expect(bridge.state.boardColumns).toEqual(["Todo", "Done"]);
+    await client.callTool({ name: "add_item", arguments: { id: "I1", title: "fix", column: "Todo", kind: "bug", tier: "T2" } });
+    expect(bridge.state.boardItems).toHaveLength(1);
+    expect(bridge.state.boardItems[0]).toMatchObject({ id: "I1", title: "fix", column: "Todo", kind: "bug", tier: "T2" });
+    await client.callTool({ name: "move_item", arguments: { id: "I1", column: "Done" } });
+    expect(bridge.state.boardItems[0].column).toBe("Done");
+    await client.callTool({ name: "set_backlog_action", arguments: { text: "triaging" } });
+    expect(bridge.state.boardAction).toBe("triaging");
+    await client.callTool({ name: "set_backlog_action", arguments: { text: null } });
+    expect(bridge.state.boardAction).toBeNull();
     await client.close();
     await server.close();
   });

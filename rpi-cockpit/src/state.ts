@@ -2,6 +2,7 @@
 import type { Beat, Phase, OptionItem, ValidationStatus, Directive, Finding } from "./events.js";
 
 export interface Subagent { name: string; role?: string; status: "active" | "idle"; result?: string; }
+export interface BacklogItem { id: string; title: string; column: string; kind?: string; tier?: string; }
 export interface Decision { id: string; prompt: string; options: OptionItem[]; }
 export interface LogEntry { t: number; kind: string; detail: string; }
 export interface SteerMenu { label: string; options: OptionItem[]; }
@@ -9,9 +10,13 @@ export interface SteerMenu { label: string; options: OptionItem[]; }
 export interface SessionState {
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | null;
   reviewTarget: string | null;
   findings: Finding[];
+  boardTarget: string | null;
+  boardColumns: string[];
+  boardItems: BacklogItem[];
+  boardAction: string | null;
   view: "home" | "loop";
   navigatorOpen: boolean;
   activeWorkflow: string | null;
@@ -30,7 +35,7 @@ export interface SessionState {
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", domain: null, reviewTarget: null, findings: [], view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, pendingQuestion: null, pendingDecision: null, directives: [], steerMenu: null, screen: null, log: [] };
+  return { task: "", host: "", domain: null, reviewTarget: null, findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, pendingQuestion: null, pendingDecision: null, directives: [], steerMenu: null, screen: null, log: [] };
 }
 
 export function applyBeat(s: SessionState, beat: Beat, now: number): SessionState {
@@ -67,6 +72,16 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
       return { ...s, findings: [...s.findings, { severity: beat.severity, title: beat.title, file: beat.file, line: beat.line, detail: beat.detail }], log };
     case "interview.start":
       return { ...s, view: "loop", domain: "interview", docType: beat.docType, pendingQuestion: null, log };
+    case "backlog.start":
+      return { ...s, view: "loop", domain: "backlog", boardTarget: beat.target, boardColumns: beat.columns, boardItems: [], boardAction: null, log };
+    case "item.add": {
+      const others = s.boardItems.filter((i) => i.id !== beat.id);
+      return { ...s, boardItems: [...others, { id: beat.id, title: beat.title, column: beat.column, kind: beat.kind, tier: beat.tier }], log };
+    }
+    case "item.move":
+      return { ...s, boardItems: s.boardItems.map((i) => i.id === beat.id ? { ...i, column: beat.column } : i), log };
+    case "backlog.action":
+      return { ...s, boardAction: beat.text, log };
   }
 }
 
@@ -84,6 +99,10 @@ function summarize(beat: Beat): string {
     case "review.start": return `review ${beat.target}`;
     case "finding.add": return `${beat.severity}: ${beat.title}`;
     case "interview.start": return `interview ${beat.docType}`;
+    case "backlog.start": return `backlog ${beat.target}`;
+    case "item.add": return `${beat.id}: ${beat.title}`;
+    case "item.move": return `${beat.id} -> ${beat.column}`;
+    case "backlog.action": return beat.text ?? "(cleared)";
   }
 }
 

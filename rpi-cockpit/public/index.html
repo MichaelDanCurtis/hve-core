@@ -192,6 +192,21 @@
   .iv-input { width: 100%; box-sizing: border-box; min-height: 64px; }
   .iv-send { margin-top: 8px; }
   .iv-empty { opacity: .6; font-size: 13px; }
+  .board-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+  .board-target { font-weight: 500; }
+  .board-count { font-size: 12px; opacity: .6; }
+  .board-action { font-size: 12px; color: var(--accent-cyan, #9CDCFE); background: var(--brand-2, #094771); padding: 2px 9px; border-radius: 11px; }
+  .board { display: flex; gap: 12px; align-items: flex-start; overflow-x: auto; padding-bottom: 6px; }
+  .board-col { flex: 0 0 210px; background: var(--layer, #252526); border: 1px solid var(--stroke, #3C3C3C); border-radius: 8px; padding: 10px; }
+  .col-head { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; opacity: .7; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .col-count { opacity: .6; }
+  .bcard { border: 1px solid var(--stroke, #3C3C3C); border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; background: var(--body-bg, #1E1E1E); }
+  .bcard:last-child { margin-bottom: 0; }
+  .bcard-id { font-family: 'Cascadia Code','Segoe UI Mono',ui-monospace,monospace; font-size: 11px; color: var(--accent-blue, #4FC1FF); }
+  .bcard-title { font-size: 13px; margin-top: 2px; }
+  .bcard-chips { display: flex; gap: 6px; margin-top: 6px; }
+  .chip-kind, .chip-tier { font-size: 10.5px; padding: 1px 7px; border-radius: 9px; border: 1px solid var(--stroke-2, #4A4A4A); color: var(--text-2, #9D9D9D); }
+  .col-empty { height: 6px; }
 </style>
 <script>
   /* Apply persisted theme before first paint to avoid flash. */
@@ -290,6 +305,14 @@
       <div id="iv-question"></div>
       <iframe id="iv-doc" sandbox="" title="Document preview" style="width:100%;min-height:280px;border:1px solid var(--stroke,#3a3a3a);border-radius:8px;margin-top:14px"></iframe>
     </div>
+    <section id="backlog-view" hidden>
+      <div class="board-head">
+        <span class="board-target" id="board-target">Backlog</span>
+        <span class="board-count" id="board-count"></span>
+        <span class="board-action" id="board-action" hidden></span>
+      </div>
+      <div class="board" id="board"></div>
+    </section>
     </section>
   </div>
 </div>

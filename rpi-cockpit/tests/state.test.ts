@@ -149,3 +149,55 @@ describe("review domain", () => {
     expect(s.findings).toEqual([{ severity: "high", title: "bug", file: "a.ts", line: 3, detail: undefined }]);
   });
 });
+
+describe("backlog domain", () => {
+  it("defaults the board fields", () => {
+    const s = initialState();
+    expect(s.boardTarget).toBeNull();
+    expect(s.boardColumns).toEqual([]);
+    expect(s.boardItems).toEqual([]);
+    expect(s.boardAction).toBeNull();
+  });
+  it("backlog.start sets the backlog domain, view loop, columns, and resets items/action", () => {
+    let s = applyBeat(initialState(), { type: "item.add", id: "x", title: "stale", column: "Todo" }, 1);
+    s = applyBeat(s, { type: "backlog.action", text: "old" }, 2);
+    s = applyBeat(s, { type: "backlog.start", target: "Sprint 4", columns: ["Todo", "Doing", "Done"] }, 3);
+    expect(s.domain).toBe("backlog");
+    expect(s.view).toBe("loop");
+    expect(s.boardTarget).toBe("Sprint 4");
+    expect(s.boardColumns).toEqual(["Todo", "Doing", "Done"]);
+    expect(s.boardItems).toEqual([]);
+    expect(s.boardAction).toBeNull();
+  });
+  it("item.add adds a work item", () => {
+    let s = applyBeat(initialState(), { type: "backlog.start", target: "b", columns: ["Todo"] }, 1);
+    s = applyBeat(s, { type: "item.add", id: "I1", title: "fix login", column: "Todo", kind: "bug", tier: "T2" }, 2);
+    expect(s.boardItems).toEqual([{ id: "I1", title: "fix login", column: "Todo", kind: "bug", tier: "T2" }]);
+  });
+  it("item.add with an existing id replaces it, keeping the count", () => {
+    let s = applyBeat(initialState(), { type: "backlog.start", target: "b", columns: ["Todo", "Done"] }, 1);
+    s = applyBeat(s, { type: "item.add", id: "I1", title: "first", column: "Todo" }, 2);
+    s = applyBeat(s, { type: "item.add", id: "I1", title: "second", column: "Done", kind: "task" }, 3);
+    expect(s.boardItems).toHaveLength(1);
+    expect(s.boardItems[0]).toMatchObject({ id: "I1", title: "second", column: "Done", kind: "task" });
+  });
+  it("item.move changes the column", () => {
+    let s = applyBeat(initialState(), { type: "backlog.start", target: "b", columns: ["Todo", "Done"] }, 1);
+    s = applyBeat(s, { type: "item.add", id: "I1", title: "t", column: "Todo" }, 2);
+    s = applyBeat(s, { type: "item.move", id: "I1", column: "Done" }, 3);
+    expect(s.boardItems[0].column).toBe("Done");
+  });
+  it("item.move with an unknown id is a no-op", () => {
+    let s = applyBeat(initialState(), { type: "backlog.start", target: "b", columns: ["Todo", "Done"] }, 1);
+    s = applyBeat(s, { type: "item.add", id: "I1", title: "t", column: "Todo" }, 2);
+    s = applyBeat(s, { type: "item.move", id: "nope", column: "Done" }, 3);
+    expect(s.boardItems).toEqual([{ id: "I1", title: "t", column: "Todo", kind: undefined, tier: undefined }]);
+  });
+  it("backlog.action sets the text and clears with null", () => {
+    let s = applyBeat(initialState(), { type: "backlog.start", target: "b", columns: ["Todo"] }, 1);
+    s = applyBeat(s, { type: "backlog.action", text: "triaging" }, 2);
+    expect(s.boardAction).toBe("triaging");
+    s = applyBeat(s, { type: "backlog.action", text: null }, 3);
+    expect(s.boardAction).toBeNull();
+  });
+});

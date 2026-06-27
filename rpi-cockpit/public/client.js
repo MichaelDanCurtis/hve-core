@@ -70,10 +70,19 @@ function render(v) {
   const rpiView = document.getElementById("rpi-view");
   const findingsView = document.getElementById("findings-view");
   const interviewView = document.getElementById("interview-view");
+  const backlogView = document.getElementById("backlog-view");
   if (rpiView && findingsView) {
+    if (v.domain === "backlog") {
+      rpiView.hidden = true; findingsView.hidden = true;
+      if (interviewView) interviewView.hidden = true;
+      if (backlogView) backlogView.hidden = false;
+      renderBoard(v);
+      return;
+    }
     if (v.domain === "interview") {
       rpiView.hidden = true; findingsView.hidden = true;
       if (interviewView) interviewView.hidden = false;
+      if (backlogView) backlogView.hidden = true;
       renderInterview(v);
       return;
     }
@@ -81,6 +90,7 @@ function render(v) {
     rpiView.hidden = review;
     findingsView.hidden = !review;
     if (interviewView) interviewView.hidden = true;
+    if (backlogView) backlogView.hidden = true;
     if (review) { renderFindings(v); return; }
   }
 
@@ -230,6 +240,25 @@ function renderFindings(v) {
           </div>`).join("")}
      </div>`).join("")
     || `<div class="meta">No findings.</div>`);
+}
+
+function renderBoard(v) {
+  const b = v.board || { columns: [] };
+  setText("board-target", b.target || "Backlog");
+  const n = b.count || 0;
+  setText("board-count", n === 1 ? "1 item" : n + " items");
+  const action = document.getElementById("board-action");
+  if (action) { action.textContent = b.action || ""; action.hidden = !b.action; }
+  setHtml("board", (b.columns || []).map((c) =>
+    `<div class="board-col">
+       <div class="col-head"><span>${esc(c.name)}</span><span class="col-count">${c.items.length}</span></div>
+       ${c.items.map((it) =>
+         `<div class="bcard">
+            <div class="bcard-id">${esc(it.id)}</div>
+            <div class="bcard-title">${esc(it.title)}</div>
+            ${(it.kind || it.tier) ? `<div class="bcard-chips">${it.kind ? `<span class="chip-kind">${esc(it.kind)}</span>` : ""}${it.tier ? `<span class="chip-tier">${esc(it.tier)}</span>` : ""}</div>` : ""}
+          </div>`).join("") || `<div class="col-empty"></div>`}
+     </div>`).join(""));
 }
 
 function renderInterview(v) {

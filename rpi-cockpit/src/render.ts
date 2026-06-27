@@ -27,9 +27,10 @@ export interface ViewModel {
   started: boolean;
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | null;
   reviewTarget: string | null;
   findingGroups: { severity: Severity; items: { title: string; file?: string; line?: number; detail?: string }[] }[];
+  board: { target: string | null; action: string | null; count: number; columns: { name: string; items: { id: string; title: string; kind?: string; tier?: string }[] }[] };
   view: "home" | "loop";
   navigatorOpen: boolean;
   workflows: { id: string; name: string; hint: string; description: string }[];
@@ -67,6 +68,17 @@ export function toViewModel(s: SessionState): ViewModel {
         .map((f) => ({ title: f.title, file: f.file, line: f.line, detail: f.detail })),
     }))
     .filter((g) => g.items.length > 0);
+  const board = {
+    target: s.boardTarget,
+    action: s.boardAction,
+    count: s.boardItems.length,
+    columns: s.boardColumns.map((name) => ({
+      name,
+      items: s.boardItems
+        .filter((i) => i.column === name)
+        .map((i) => ({ id: i.id, title: i.title, kind: i.kind, tier: i.tier })),
+    })),
+  };
   return {
     started: s.task !== "" || s.phase !== null,
     task: s.task,
@@ -74,6 +86,7 @@ export function toViewModel(s: SessionState): ViewModel {
     domain: s.domain,
     reviewTarget: s.reviewTarget,
     findingGroups,
+    board,
     view: s.view,
     navigatorOpen: s.navigatorOpen,
     workflows: WORKFLOWS.map((w) => ({ id: w.id, name: w.name, hint: w.hint, description: w.description })),

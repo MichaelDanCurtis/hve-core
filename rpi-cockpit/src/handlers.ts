@@ -39,6 +39,22 @@ export const handlers = {
     b.emitBeat({ type: "interview.start", docType: a.docType });
     return `interview started: ${a.docType}`;
   },
+  backlog_start: (b: Bridge, a: { target: string; columns: string[] }) => {
+    b.emitBeat({ type: "backlog.start", target: a.target, columns: a.columns });
+    return `backlog started: ${a.target}`;
+  },
+  add_item: (b: Bridge, a: { id: string; title: string; column: string; kind?: string; tier?: string }) => {
+    b.emitBeat({ type: "item.add", id: a.id, title: a.title, column: a.column, kind: a.kind, tier: a.tier });
+    return `item added: ${a.id}`;
+  },
+  move_item: (b: Bridge, a: { id: string; column: string }) => {
+    b.emitBeat({ type: "item.move", id: a.id, column: a.column });
+    return `item moved: ${a.id}`;
+  },
+  set_backlog_action: (b: Bridge, a: { text: string | null }) => {
+    b.emitBeat({ type: "backlog.action", text: a.text });
+    return a.text ? `action: ${a.text}` : "action cleared";
+  },
   offer_approaches: (b: Bridge, a: { label: string; options: OptionItem[] }) => {
     b.offerApproaches(a.label, a.options);
     return `offered ${a.options.length} approaches`;
