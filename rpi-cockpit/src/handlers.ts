@@ -1,6 +1,7 @@
 // rpi-cockpit/src/handlers.ts
 import type { Bridge } from "./bridge.js";
 import type { OptionItem, Phase, Severity, ValidationStatus } from "./events.js";
+import { isLoopbackHttpUrl } from "./url.js";
 
 export const handlers = {
   session_begin: (b: Bridge, a: { task: string; host: string }) => {
@@ -58,6 +59,13 @@ export const handlers = {
   set_context: (b: Bridge, a: { instructions?: string[]; skills?: string[]; collection?: string | null }) => {
     b.emitBeat({ type: "context.set", instructions: a.instructions ?? [], skills: a.skills ?? [], collection: a.collection ?? null });
     return "context updated";
+  },
+  set_app_frame: (b: Bridge, a: { url: string | null }) => {
+    if (a.url !== null && !isLoopbackHttpUrl(a.url)) {
+      return "rejected: the app frame URL must be a loopback http(s) URL (localhost, 127.0.0.1, or [::1])";
+    }
+    b.emitBeat({ type: "appframe.set", url: a.url });
+    return a.url ? `app frame set: ${a.url}` : "app frame cleared";
   },
   offer_approaches: (b: Bridge, a: { label: string; options: OptionItem[] }) => {
     b.offerApproaches(a.label, a.options);

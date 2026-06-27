@@ -3,6 +3,22 @@
 const LABEL = { research: "Research", plan: "Plan", implement: "Implement", review: "Review", discover: "Discover" };
 const WF_ICON = { build: "</>", review: "✓", plan: "▦", docs: "▤", data: "▥", coach: "✷" };
 
+// Client mirror of src/url.ts isLoopbackHttpUrl. The app frame is a TRUSTED iframe
+// (scripts + the app's own origin), so its URL is constrained to a loopback http(s)
+// origin. The server already rejects non-loopback URLs at the MCP tool boundary;
+// this re-check before assigning the iframe src is defense in depth. Keep this in
+// lockstep with the TS predicate.
+function isLoopbackHttpUrl(u) {
+  try {
+    const url = new URL(u);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+    const h = url.hostname.toLowerCase();
+    return h === "localhost" || h === "127.0.0.1" || h === "[::1]" || h === "::1";
+  } catch {
+    return false;
+  }
+}
+
 function renderNavTiles(v) {
   setHtml("nav-workflows", (v.workflows || []).map((w) =>
     `<div class="wf-tile" data-launch="${esc(w.id)}" role="button" tabindex="0" aria-label="Start ${esc(w.name)}">
@@ -30,6 +46,32 @@ function renderContext(v) {
   const gs = group("ctx-skills", (c.skills || []).map((t) => chip(t)));
   const gc = group("ctx-collection", c.collection ? [chip(c.collection, "collection")] : []);
   strip.hidden = !(gi || gs || gc);
+}
+
+// App frame panel (#app-frame). SECURITY: the app frame is the TRUSTED sibling of
+// the sandboxed screen pane. The iframe's sandbox is fixed in index.html to
+// "allow-scripts allow-same-origin allow-forms" (no top-navigation, no popups);
+// because the framed app runs on its own port it is cross-origin to the cockpit,
+// so allow-same-origin grants the app its OWN origin, never the cockpit's. We
+// re-check the loopback predicate here before assigning src as defense in depth:
+// the server already rejected non-loopback URLs at the tool boundary, but a stale
+// or tampered view-model URL must never reach the iframe. The URL text lands in
+// the cockpit DOM via setText (escaped), and src is set via setAttribute only
+// after the check passes.
+function renderAppFrame(v) {
+  const panel = document.getElementById("app-frame");
+  const iframe = document.getElementById("af-iframe");
+  if (!panel || !iframe) return;
+  const url = v.appFrame && v.appFrame.url;
+  if (url && isLoopbackHttpUrl(url)) {
+    panel.hidden = false;
+    setText("af-url", url);
+    if (iframe.getAttribute("src") !== url) iframe.setAttribute("src", url);
+  } else {
+    panel.hidden = true;
+    if (iframe.getAttribute("src")) iframe.removeAttribute("src");
+    setText("af-url", "");
+  }
 }
 
 let ws = null;
@@ -73,6 +115,7 @@ function renderHome(v) {
 
 function render(v) {
   renderContext(v);
+  renderAppFrame(v);
   renderNavTiles(v);
   // present_options is cross-cutting: paint the decision card regardless of domain
   // (it lives outside every view section), so a decision raised during a review,

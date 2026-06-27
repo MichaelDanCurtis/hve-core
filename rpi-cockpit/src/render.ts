@@ -49,6 +49,7 @@ export interface ViewModel {
   directives: Directive[];
   screen: SessionState["screen"];
   context: { instructions: string[]; skills: string[]; collection: string | null };
+  appFrame: { url: string | null };
   log: SessionState["log"];
 }
 
@@ -109,6 +110,7 @@ export function toViewModel(s: SessionState): ViewModel {
     directives: s.directives,
     screen: s.screen,
     context: { instructions: s.contextInstructions, skills: s.contextSkills, collection: s.contextCollection },
+    appFrame: { url: s.appFrameUrl },
     log: s.log,
   };
 }

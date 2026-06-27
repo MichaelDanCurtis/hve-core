@@ -97,6 +97,12 @@ export function buildMcpServer(bridge: Bridge): McpServer {
   );
 
   server.registerTool(
+    "set_app_frame",
+    { description: "Embed the user's app-under-development in a trusted iframe beside the cockpit. The URL MUST be a loopback http(s) URL (localhost / 127.0.0.1 / [::1]); non-loopback URLs are rejected. Pass null to clear the frame.", inputSchema: { url: z.string().nullable() } },
+    async (a) => text(handlers.set_app_frame(bridge, a)),
+  );
+
+  server.registerTool(
     "ask_question",
     { description: "Ask the user a free-text question; blocks until they answer. Shows the in-pane question card and, where supported, a native input.", inputSchema: { prompt: z.string() } },
     async (a) =>

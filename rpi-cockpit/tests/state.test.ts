@@ -172,6 +172,21 @@ describe("context.set", () => {
   });
 });
 
+describe("appframe.set", () => {
+  it("sets appFrameUrl on appframe.set", () => {
+    const s = applyBeat(initialState(), { type: "appframe.set", url: "http://localhost:5173" }, 1);
+    expect(s.appFrameUrl).toBe("http://localhost:5173");
+  });
+  it("clears appFrameUrl on appframe.set with null", () => {
+    let s = applyBeat(initialState(), { type: "appframe.set", url: "http://localhost:5173" }, 1);
+    s = applyBeat(s, { type: "appframe.set", url: null }, 2);
+    expect(s.appFrameUrl).toBeNull();
+  });
+  it("defaults appFrameUrl to null", () => {
+    expect(initialState().appFrameUrl).toBeNull();
+  });
+});
+
 describe("backlog domain", () => {
   it("defaults the board fields", () => {
     const s = initialState();

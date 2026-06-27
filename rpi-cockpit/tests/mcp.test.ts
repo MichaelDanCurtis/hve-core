@@ -20,7 +20,7 @@ describe("mcp face", () => {
     expect(bridge.state.phase).toBe("review");
   });
 
-  it("registers the steering and screen tools and lists twenty-two total", async () => {
+  it("registers the steering and screen tools and lists twenty-three total", async () => {
     const bridge = new Bridge();
     const server = buildMcpServer(bridge);
     const [clientT, serverT] = InMemoryTransport.createLinkedPair();
@@ -37,7 +37,8 @@ describe("mcp face", () => {
     expect(names).toContain("present_workflows");
     expect(names).toContain("open_navigator");
     expect(names).toContain("set_context");
-    expect(tools).toHaveLength(22);
+    expect(names).toContain("set_app_frame");
+    expect(tools).toHaveLength(23);
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
@@ -174,6 +175,37 @@ describe("mcp face", () => {
     expect(bridge.state.contextSkills).toEqual(["deepsearch"]);
     expect(bridge.state.contextInstructions).toEqual([]);
     expect(bridge.state.contextCollection).toBeNull();
+    await client.close();
+    await server.close();
+  });
+
+  it("set_app_frame accepts a loopback url and clears on null", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const client = new Client({ name: "t", version: "0.0.1" }, { capabilities: {} });
+    const [ct, st] = InMemoryTransport.createLinkedPair();
+    await Promise.all([server.connect(st), client.connect(ct)]);
+    await client.callTool({ name: "set_app_frame", arguments: { url: "http://localhost:5173" } });
+    expect(bridge.state.appFrameUrl).toBe("http://localhost:5173");
+    await client.callTool({ name: "set_app_frame", arguments: { url: null } });
+    expect(bridge.state.appFrameUrl).toBeNull();
+    await client.close();
+    await server.close();
+  });
+
+  it("set_app_frame rejects non-loopback / non-http urls and leaves state unchanged (server guard)", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const client = new Client({ name: "t", version: "0.0.1" }, { capabilities: {} });
+    const [ct, st] = InMemoryTransport.createLinkedPair();
+    await Promise.all([server.connect(st), client.connect(ct)]);
+    for (const url of ["http://evil.com", "javascript:alert(1)", "file:///etc/passwd"]) {
+      const res = await client.callTool({ name: "set_app_frame", arguments: { url } });
+      const out = (res.content as { text: string }[])[0].text;
+      expect(out).toContain("rejected");
+      // The rejected URL never updates state: no beat is emitted, so it stays null.
+      expect(bridge.state.appFrameUrl).toBeNull();
+    }
     await client.close();
     await server.close();
   });

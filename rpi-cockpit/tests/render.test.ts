@@ -134,6 +134,16 @@ describe("toViewModel", () => {
     });
   });
 
+  describe("app frame view-model", () => {
+    it("passes through the app frame url", () => {
+      const s = applyBeat(initialState(), { type: "appframe.set", url: "http://localhost:5173" }, 1);
+      expect(toViewModel(s).appFrame.url).toBe("http://localhost:5173");
+    });
+    it("defaults the app frame url to null", () => {
+      expect(toViewModel(initialState()).appFrame).toEqual({ url: null });
+    });
+  });
+
   describe("navigator fields", () => {
     it("exposes the view and the workflow catalog", () => {
       const vm = toViewModel(initialState());
