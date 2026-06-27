@@ -107,6 +107,20 @@ describe("toViewModel", () => {
     });
   });
 
+  describe("context view-model", () => {
+    it("passes through instructions, skills, and collection", () => {
+      const s = applyBeat(initialState(), { type: "context.set", instructions: ["no em-dashes"], skills: ["tdd", "deepsearch"], collection: "hve-core" }, 1);
+      const vm = toViewModel(s);
+      expect(vm.context.instructions).toEqual(["no em-dashes"]);
+      expect(vm.context.skills).toEqual(["tdd", "deepsearch"]);
+      expect(vm.context.collection).toBe("hve-core");
+    });
+    it("defaults to empty lists and null collection", () => {
+      const vm = toViewModel(initialState());
+      expect(vm.context).toEqual({ instructions: [], skills: [], collection: null });
+    });
+  });
+
   describe("navigator fields", () => {
     it("exposes the view and the workflow catalog", () => {
       const vm = toViewModel(initialState());

@@ -48,6 +48,7 @@ export interface ViewModel {
   steerMenu: SteerMenuVM;
   directives: Directive[];
   screen: SessionState["screen"];
+  context: { instructions: string[]; skills: string[]; collection: string | null };
   log: SessionState["log"];
 }
 
@@ -104,6 +105,7 @@ export function toViewModel(s: SessionState): ViewModel {
     steerMenu,
     directives: s.directives,
     screen: s.screen,
+    context: { instructions: s.contextInstructions, skills: s.contextSkills, collection: s.contextCollection },
     log: s.log,
   };
 }

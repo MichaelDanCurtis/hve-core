@@ -155,6 +155,13 @@
     .opts{grid-template-columns:1fr}
   }
 
+  .context-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 7px 16px; background: var(--rail, #252526); border-bottom: 1px solid var(--stroke, #3C3C3C); }
+  .ctx-group { display: flex; align-items: center; gap: 7px; }
+  .ctx-label { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3, #6E6E6E); font-weight: 600; }
+  .ctx-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .ctx-chip { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--layer-alt, #2D2D2D); border: 1px solid var(--stroke, #3C3C3C); color: var(--text-2, #9D9D9D); }
+  .ctx-chip.collection { background: var(--brand-2, #094771); color: var(--accent-cyan, #9CDCFE); border-color: transparent; }
+
   [hidden] { display: none !important; }
   .home-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .brand-mark { font-weight: 500; }
@@ -239,6 +246,12 @@
       <div id="nav-workflows" class="wf-grid"></div>
       <button id="welcome-dismiss" class="welcome-x" aria-label="Dismiss welcome" style="margin-top:16px">Got it</button>
     </div>
+  </div>
+
+  <div id="context-strip" class="context-strip" hidden>
+    <div class="ctx-group" id="ctx-instructions" hidden><span class="ctx-label">Instructions</span><span class="ctx-chips"></span></div>
+    <div class="ctx-group" id="ctx-skills" hidden><span class="ctx-label">Skills</span><span class="ctx-chips"></span></div>
+    <div class="ctx-group" id="ctx-collection" hidden><span class="ctx-label">Collection</span><span class="ctx-chips"></span></div>
   </div>
 
   <div class="main">

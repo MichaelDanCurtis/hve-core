@@ -44,6 +44,7 @@ export const Beat = z.discriminatedUnion("type", [
   z.object({ type: z.literal("item.add"), id: z.string(), title: z.string(), column: z.string(), kind: z.string().optional(), tier: z.string().optional() }),
   z.object({ type: z.literal("item.move"), id: z.string(), column: z.string() }),
   z.object({ type: z.literal("backlog.action"), text: z.string().nullable() }),
+  z.object({ type: z.literal("context.set"), instructions: z.array(z.string()), skills: z.array(z.string()), collection: z.string().nullable() }),
 ]);
 export type Beat = z.infer<typeof Beat>;
 

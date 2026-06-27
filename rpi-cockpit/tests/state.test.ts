@@ -150,6 +150,28 @@ describe("review domain", () => {
   });
 });
 
+describe("context.set", () => {
+  it("sets all three context fields", () => {
+    const s = applyBeat(initialState(), { type: "context.set", instructions: ["no em-dashes", "lint to zero"], skills: ["tdd"], collection: "hve-core" }, 1);
+    expect(s.contextInstructions).toEqual(["no em-dashes", "lint to zero"]);
+    expect(s.contextSkills).toEqual(["tdd"]);
+    expect(s.contextCollection).toBe("hve-core");
+  });
+  it("defaults the three context fields to empty", () => {
+    const s = initialState();
+    expect(s.contextInstructions).toEqual([]);
+    expect(s.contextSkills).toEqual([]);
+    expect(s.contextCollection).toBeNull();
+  });
+  it("a second context.set replaces, clearing with empty arrays and null", () => {
+    let s = applyBeat(initialState(), { type: "context.set", instructions: ["a", "b"], skills: ["x"], collection: "C" }, 1);
+    s = applyBeat(s, { type: "context.set", instructions: [], skills: [], collection: null }, 2);
+    expect(s.contextInstructions).toEqual([]);
+    expect(s.contextSkills).toEqual([]);
+    expect(s.contextCollection).toBeNull();
+  });
+});
+
 describe("backlog domain", () => {
   it("defaults the board fields", () => {
     const s = initialState();

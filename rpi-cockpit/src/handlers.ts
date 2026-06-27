@@ -55,6 +55,10 @@ export const handlers = {
     b.emitBeat({ type: "backlog.action", text: a.text });
     return a.text ? `action: ${a.text}` : "action cleared";
   },
+  set_context: (b: Bridge, a: { instructions?: string[]; skills?: string[]; collection?: string | null }) => {
+    b.emitBeat({ type: "context.set", instructions: a.instructions ?? [], skills: a.skills ?? [], collection: a.collection ?? null });
+    return "context updated";
+  },
   offer_approaches: (b: Bridge, a: { label: string; options: OptionItem[] }) => {
     b.offerApproaches(a.label, a.options);
     return `offered ${a.options.length} approaches`;

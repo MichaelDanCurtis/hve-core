@@ -31,11 +31,14 @@ export interface SessionState {
   directives: Directive[];
   steerMenu: SteerMenu | null;
   screen: { html: string; title?: string } | null;
+  contextInstructions: string[];
+  contextSkills: string[];
+  contextCollection: string | null;
   log: LogEntry[];
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", domain: null, reviewTarget: null, findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, pendingQuestion: null, pendingDecision: null, directives: [], steerMenu: null, screen: null, log: [] };
+  return { task: "", host: "", domain: null, reviewTarget: null, findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, pendingQuestion: null, pendingDecision: null, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, log: [] };
 }
 
 export function applyBeat(s: SessionState, beat: Beat, now: number): SessionState {
@@ -82,6 +85,8 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
       return { ...s, boardItems: s.boardItems.map((i) => i.id === beat.id ? { ...i, column: beat.column } : i), log };
     case "backlog.action":
       return { ...s, boardAction: beat.text, log };
+    case "context.set":
+      return { ...s, contextInstructions: beat.instructions, contextSkills: beat.skills, contextCollection: beat.collection, log };
   }
 }
 
@@ -103,6 +108,7 @@ function summarize(beat: Beat): string {
     case "item.add": return `${beat.id}: ${beat.title}`;
     case "item.move": return `${beat.id} -> ${beat.column}`;
     case "backlog.action": return beat.text ?? "(cleared)";
+    case "context.set": return `${beat.instructions.length} instr · ${beat.skills.length} skills${beat.collection ? " · " + beat.collection : ""}`;
   }
 }
 

@@ -13,6 +13,25 @@ function renderNavTiles(v) {
      </div>`).join(""));
 }
 
+function renderContext(v) {
+  const c = v.context || { instructions: [], skills: [], collection: null };
+  const strip = document.getElementById("context-strip");
+  if (!strip) return;
+  const chip = (t, cls) => `<span class="ctx-chip${cls ? " " + cls : ""}">${esc(t)}</span>`;
+  const group = (id, chips) => {
+    const el = document.getElementById(id);
+    if (!el) return false;
+    const has = chips.length > 0;
+    el.hidden = !has;
+    if (has) el.querySelector(".ctx-chips").innerHTML = chips.join("");
+    return has;
+  };
+  const gi = group("ctx-instructions", (c.instructions || []).map((t) => chip(t)));
+  const gs = group("ctx-skills", (c.skills || []).map((t) => chip(t)));
+  const gc = group("ctx-collection", c.collection ? [chip(c.collection, "collection")] : []);
+  strip.hidden = !(gi || gs || gc);
+}
+
 let ws = null;
 let backoff = 500;
 
@@ -53,6 +72,7 @@ function renderHome(v) {
 }
 
 function render(v) {
+  renderContext(v);
   renderNavTiles(v);
   if (v.navigatorOpen) { const w = document.getElementById("welcome"); if (w) w.hidden = false; }
 

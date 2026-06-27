@@ -20,7 +20,7 @@ describe("mcp face", () => {
     expect(bridge.state.phase).toBe("review");
   });
 
-  it("registers the steering and screen tools and lists twenty-one total", async () => {
+  it("registers the steering and screen tools and lists twenty-two total", async () => {
     const bridge = new Bridge();
     const server = buildMcpServer(bridge);
     const [clientT, serverT] = InMemoryTransport.createLinkedPair();
@@ -36,7 +36,8 @@ describe("mcp face", () => {
     expect(names).toContain("clear_screen");
     expect(names).toContain("present_workflows");
     expect(names).toContain("open_navigator");
-    expect(tools).toHaveLength(21);
+    expect(names).toContain("set_context");
+    expect(tools).toHaveLength(22);
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
@@ -145,6 +146,34 @@ describe("mcp face", () => {
     expect(bridge.state.boardAction).toBe("triaging");
     await client.callTool({ name: "set_backlog_action", arguments: { text: null } });
     expect(bridge.state.boardAction).toBeNull();
+    await client.close();
+    await server.close();
+  });
+
+  it("set_context with full args sets all three context fields", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const client = new Client({ name: "t", version: "0.0.1" }, { capabilities: {} });
+    const [ct, st] = InMemoryTransport.createLinkedPair();
+    await Promise.all([server.connect(st), client.connect(ct)]);
+    await client.callTool({ name: "set_context", arguments: { instructions: ["no em-dashes", "lint to zero"], skills: ["tdd"], collection: "hve-core" } });
+    expect(bridge.state.contextInstructions).toEqual(["no em-dashes", "lint to zero"]);
+    expect(bridge.state.contextSkills).toEqual(["tdd"]);
+    expect(bridge.state.contextCollection).toBe("hve-core");
+    await client.close();
+    await server.close();
+  });
+
+  it("set_context with partial args defaults the others to [] and null", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const client = new Client({ name: "t", version: "0.0.1" }, { capabilities: {} });
+    const [ct, st] = InMemoryTransport.createLinkedPair();
+    await Promise.all([server.connect(st), client.connect(ct)]);
+    await client.callTool({ name: "set_context", arguments: { skills: ["deepsearch"] } });
+    expect(bridge.state.contextSkills).toEqual(["deepsearch"]);
+    expect(bridge.state.contextInstructions).toEqual([]);
+    expect(bridge.state.contextCollection).toBeNull();
     await client.close();
     await server.close();
   });

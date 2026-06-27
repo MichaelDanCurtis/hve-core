@@ -91,6 +91,12 @@ export function buildMcpServer(bridge: Bridge): McpServer {
   );
 
   server.registerTool(
+    "set_context",
+    { description: "Set the active context shown in the cockpit's context strip: the instructions (coding standards), skills, and collection currently in effect. Replaces the whole context, so pass everything currently active.", inputSchema: { instructions: z.array(z.string()).optional(), skills: z.array(z.string()).optional(), collection: z.string().nullable().optional() } },
+    async (a) => text(handlers.set_context(bridge, a)),
+  );
+
+  server.registerTool(
     "ask_question",
     { description: "Ask the user a free-text question; blocks until they answer. Shows the in-pane question card and, where supported, a native input.", inputSchema: { prompt: z.string() } },
     async (a) =>
