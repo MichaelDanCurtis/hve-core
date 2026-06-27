@@ -58,6 +58,10 @@
   .iconbtn:hover{background:var(--layer);border-color:var(--stroke)}
 
   .main{display:flex;flex:1;min-height:0}
+  /* The active loop view fills the main area. Most views have wide in-flow content
+     so they filled anyway; the codemap's world is absolutely positioned (no
+     intrinsic width), so without this it would collapse to the header width. */
+  #loop{flex:1;min-width:0}
   .rail-left{width:248px;flex:none;padding:14px 12px;border-right:1px solid var(--stroke);background:var(--rail);-webkit-backdrop-filter:var(--rail-blur);backdrop-filter:var(--rail-blur);overflow:auto}
   .rail-title{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--text-3);font-weight:600;margin:4px 8px 10px}
   .chipline{display:flex;gap:6px;margin:0 6px 14px;flex-wrap:wrap}
