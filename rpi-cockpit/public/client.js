@@ -1,6 +1,17 @@
 // rpi-cockpit/public/client.js
 // Thin painter: every value comes from the server's view model (src/render.ts).
 const LABEL = { research: "Research", plan: "Plan", implement: "Implement", review: "Review", discover: "Discover" };
+const WF_ICON = { build: "</>", review: "✓", plan: "▦", docs: "▤", data: "▥", coach: "✷" };
+
+function renderNavTiles(v) {
+  setHtml("nav-workflows", (v.workflows || []).map((w) =>
+    `<div class="wf-tile" data-launch="${esc(w.id)}">
+       <div class="wf-ico">${esc(WF_ICON[w.id] || "•")}</div>
+       <div class="wf-name">${esc(w.name)}</div>
+       <div class="wf-hint">${esc(w.hint)}</div>
+       <div class="wf-desc">${esc(w.description)}</div>
+     </div>`).join(""));
+}
 
 let ws = null;
 let backoff = 500;
@@ -42,6 +53,9 @@ function renderHome(v) {
 }
 
 function render(v) {
+  renderNavTiles(v);
+  if (v.navigatorOpen) { const w = document.getElementById("welcome"); if (w) w.hidden = false; }
+
   const home = document.getElementById("home");
   const loop = document.getElementById("loop");
   if (home && loop) {
@@ -165,6 +179,8 @@ document.addEventListener("click", (e) => {
     const w = document.getElementById("welcome"); if (w) w.hidden = true;
     return;
   }
+  const tile = e.target.closest("[data-launch]");
+  if (tile) { sendMsg({ type: "launch", workflowId: tile.dataset.launch }); const w = document.getElementById("welcome"); if (w) w.hidden = true; return; }
   const choice = e.target.closest("#decision [data-choice]");
   if (choice) { sendMsg({ type: "decide", id: choice.dataset.id, choiceId: choice.dataset.choice }); return; }
   const ivSend = e.target.closest("#iv-send");

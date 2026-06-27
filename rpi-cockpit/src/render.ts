@@ -31,6 +31,7 @@ export interface ViewModel {
   reviewTarget: string | null;
   findingGroups: { severity: Severity; items: { title: string; file?: string; line?: number; detail?: string }[] }[];
   view: "home" | "loop";
+  navigatorOpen: boolean;
   workflows: { id: string; name: string; hint: string; description: string }[];
   activeWorkflow: string | null;
   phase: Phase | null;
@@ -74,6 +75,7 @@ export function toViewModel(s: SessionState): ViewModel {
     reviewTarget: s.reviewTarget,
     findingGroups,
     view: s.view,
+    navigatorOpen: s.navigatorOpen,
     workflows: WORKFLOWS.map((w) => ({ id: w.id, name: w.name, hint: w.hint, description: w.description })),
     activeWorkflow: s.activeWorkflow,
     phase: s.phase,

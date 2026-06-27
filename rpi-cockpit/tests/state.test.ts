@@ -1,6 +1,6 @@
 // rpi-cockpit/tests/state.test.ts
 import { describe, it, expect } from "vitest";
-import { initialState, applyBeat, enqueueDirective, drainDirectives, setView, startLaunch } from "../src/state.js";
+import { initialState, applyBeat, enqueueDirective, drainDirectives, setView, startLaunch, setNavigatorOpen } from "../src/state.js";
 
 describe("applyBeat", () => {
   it("sets task and host on session.begin", () => {
@@ -30,6 +30,20 @@ describe("applyBeat", () => {
       const s = startLaunch(initialState(), "build");
       expect(s.activeWorkflow).toBe("build");
       expect(s.view).toBe("loop");
+    });
+
+    it("defaults navigatorOpen to false", () => {
+      expect(initialState().navigatorOpen).toBe(false);
+    });
+
+    it("setNavigatorOpen toggles the navigator flag", () => {
+      expect(setNavigatorOpen(initialState(), true).navigatorOpen).toBe(true);
+      expect(setNavigatorOpen(setNavigatorOpen(initialState(), true), false).navigatorOpen).toBe(false);
+    });
+
+    it("startLaunch closes the navigator pop-up", () => {
+      const open = setNavigatorOpen(initialState(), true);
+      expect(startLaunch(open, "build").navigatorOpen).toBe(false);
     });
   });
   it("advances phase and records the previous as done", () => {

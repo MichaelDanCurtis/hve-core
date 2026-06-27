@@ -128,6 +128,12 @@ export function buildMcpServer(bridge: Bridge): McpServer {
   );
 
   server.registerTool(
+    "open_navigator",
+    { description: "Open the Navigator pop-up in the cockpit so the user can pick a workflow. Use for a /Nav command or at the start of the main skill.", inputSchema: {} },
+    async () => text(handlers.open_navigator(bridge)),
+  );
+
+  server.registerTool(
     "present_workflows",
     { description: "Offer the user the HVE Core workflows as a native choice card and return the chosen workflow's launch instruction. Use to let the user pick what to do.", inputSchema: {} },
     async () =>

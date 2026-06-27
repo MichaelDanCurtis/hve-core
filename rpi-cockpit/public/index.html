@@ -160,9 +160,17 @@
   .brand-mark { font-weight: 500; }
   .welcome-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: flex; align-items: center; justify-content: center; z-index: 100; }
   .welcome-overlay[hidden] { display: none; }
-  .welcome-modal { background: var(--layer, #1e1e1e); border: 1px solid var(--stroke, #3a3a3a); border-radius: 12px; padding: 22px 24px; max-width: 440px; box-shadow: 0 12px 48px rgba(0,0,0,.45); }
+  .welcome-modal { background: var(--layer, #1e1e1e); border: 1px solid var(--stroke, #3a3a3a); border-radius: 12px; padding: 22px 24px; max-width: 680px; max-height: 86vh; overflow: auto; box-shadow: 0 12px 48px rgba(0,0,0,.45); }
   .welcome-modal .welcome-text { display: block; font-size: 14px; line-height: 1.55; margin-bottom: 16px; }
   .welcome-x { font-size: 13px; font-family: inherit; cursor: pointer; border: 1px solid var(--stroke-2, #4A4A4A); border-radius: 6px; background: var(--accent, #0e639c); color: #fff; padding: 6px 14px; }
+  .nav-label { font-size: 13px; opacity: .7; margin: 14px 0 10px; }
+  .wf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+  .wf-tile { position: relative; border: 1px solid var(--stroke, #3a3a3a); border-radius: 10px; padding: 14px; min-height: 84px; cursor: pointer; }
+  .wf-tile:hover { border-color: var(--stroke-2, #666); }
+  .wf-name { font-weight: 500; margin-top: 8px; }
+  .wf-hint { font-size: 12px; opacity: .6; margin-top: 2px; }
+  .wf-desc { position: absolute; inset: 0; padding: 14px; border-radius: 10px; background: var(--layer, #1e1e1e); opacity: 0; transition: opacity .12s; font-size: 12.5px; display: flex; align-items: center; }
+  .wf-tile:hover .wf-desc { opacity: 1; }
   .orient { padding: 12px 14px; border: 1px dashed var(--stroke, #3a3a3a); border-radius: 8px; margin-bottom: 18px; font-size: 13px; }
   .crumb-back { font-size: 12px; font-family: inherit; cursor: pointer; border: 1px solid var(--stroke, #3a3a3a); border-radius: 4px; background: var(--layer, #252526); color: var(--text-2, #9D9D9D); padding: 2px 8px; }
   .crumb-back:hover { border-color: var(--stroke-2, #4A4A4A); color: var(--text, #CCCCCC); }
@@ -210,8 +218,10 @@
 
   <div id="welcome" class="welcome-overlay" hidden>
     <div class="welcome-modal">
-      <span class="welcome-text">New here? This is HVE Core's cockpit. Ask in the chat to start a workflow, and it runs here. You can reopen this any time with the help button.</span>
-      <button id="welcome-dismiss" class="welcome-x" aria-label="Dismiss welcome">Got it</button>
+      <span class="welcome-text">What do you want to do? Pick a workflow to start it here, or reopen this any time with the help button.</span>
+      <div class="nav-label">Start a workflow</div>
+      <div id="nav-workflows" class="wf-grid"></div>
+      <button id="welcome-dismiss" class="welcome-x" aria-label="Dismiss welcome" style="margin-top:16px">Got it</button>
     </div>
   </div>
 

@@ -56,4 +56,8 @@ export const handlers = {
     b.clearScreen();
     return "screen cleared";
   },
+  open_navigator: (b: Bridge) => {
+    b.openNavigator();
+    return "navigator opened";
+  },
 };

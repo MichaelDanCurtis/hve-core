@@ -1,6 +1,6 @@
 // rpi-cockpit/src/bridge.ts
 import { EventEmitter } from "node:events";
-import { initialState, applyBeat, enqueueDirective as reduceEnqueue, drainDirectives as reduceDrain, setView, startLaunch, type SessionState } from "./state.js";
+import { initialState, applyBeat, enqueueDirective as reduceEnqueue, drainDirectives as reduceDrain, setView, startLaunch, setNavigatorOpen, type SessionState } from "./state.js";
 import type { Beat, OptionItem, InboundDirective, Directive } from "./events.js";
 import { WORKFLOWS } from "./catalog.js";
 
@@ -34,6 +34,11 @@ export class Bridge extends EventEmitter {
 
   navigate(screen: "home" | "loop"): void {
     this.state = setView(this.state, screen);
+    this.emit("state", this.state);
+  }
+
+  openNavigator(): void {
+    this.state = setNavigatorOpen(this.state, true);
     this.emit("state", this.state);
   }
 

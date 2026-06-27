@@ -20,7 +20,7 @@ describe("mcp face", () => {
     expect(bridge.state.phase).toBe("review");
   });
 
-  it("registers the steering and screen tools and lists sixteen total", async () => {
+  it("registers the steering and screen tools and lists seventeen total", async () => {
     const bridge = new Bridge();
     const server = buildMcpServer(bridge);
     const [clientT, serverT] = InMemoryTransport.createLinkedPair();
@@ -35,10 +35,24 @@ describe("mcp face", () => {
     expect(names).toContain("show_screen");
     expect(names).toContain("clear_screen");
     expect(names).toContain("present_workflows");
-    expect(tools).toHaveLength(16);
+    expect(names).toContain("open_navigator");
+    expect(tools).toHaveLength(17);
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
+  });
+
+  it("open_navigator opens the navigator pop-up in the bridge state", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const [clientT, serverT] = InMemoryTransport.createLinkedPair();
+    await server.connect(serverT);
+    const client = new Client({ name: "test", version: "0" });
+    await client.connect(clientT);
+
+    expect(bridge.state.navigatorOpen).toBe(false);
+    await client.callTool({ name: "open_navigator", arguments: {} });
+    expect(bridge.state.navigatorOpen).toBe(true);
   });
 
   it("show_screen and clear_screen tools drive the bridge screen state", async () => {

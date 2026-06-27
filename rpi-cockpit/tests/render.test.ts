@@ -101,5 +101,9 @@ describe("toViewModel", () => {
       expect(vm.view).toBe("loop");
       expect(vm.activeWorkflow).toBe("review");
     });
+
+    it("exposes navigatorOpen, defaulting to false", () => {
+      expect(toViewModel(initialState()).navigatorOpen).toBe(false);
+    });
   });
 });

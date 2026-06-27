@@ -13,6 +13,7 @@ export interface SessionState {
   reviewTarget: string | null;
   findings: Finding[];
   view: "home" | "loop";
+  navigatorOpen: boolean;
   activeWorkflow: string | null;
   phase: Phase | null;
   phasesDone: Phase[];
@@ -29,7 +30,7 @@ export interface SessionState {
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", domain: null, reviewTarget: null, findings: [], view: "home", activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, pendingQuestion: null, pendingDecision: null, directives: [], steerMenu: null, screen: null, log: [] };
+  return { task: "", host: "", domain: null, reviewTarget: null, findings: [], view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, pendingQuestion: null, pendingDecision: null, directives: [], steerMenu: null, screen: null, log: [] };
 }
 
 export function applyBeat(s: SessionState, beat: Beat, now: number): SessionState {
@@ -109,5 +110,9 @@ export function setView(s: SessionState, view: "home" | "loop"): SessionState {
 }
 
 export function startLaunch(s: SessionState, workflowId: string): SessionState {
-  return { ...s, view: "loop", activeWorkflow: workflowId };
+  return { ...s, view: "loop", navigatorOpen: false, activeWorkflow: workflowId };
+}
+
+export function setNavigatorOpen(s: SessionState, open: boolean): SessionState {
+  return { ...s, navigatorOpen: open };
 }
