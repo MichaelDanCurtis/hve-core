@@ -2,7 +2,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { Phase, ValidationStatus, OptionItem, Severity } from "./events.js";
+import { Phase, ValidationStatus, OptionItem, Severity, AgentStatus } from "./events.js";
 import { handlers } from "./handlers.js";
 import { presentOptionsWithElicitation, askQuestionWithElicitation, presentWorkflows, decisionTimeoutMs, questionTimeoutMs, type ElicitFormParams } from "./elicit.js";
 import type { Bridge } from "./bridge.js";
@@ -100,6 +100,30 @@ export function buildMcpServer(bridge: Bridge): McpServer {
     "set_app_frame",
     { description: "Embed the user's app-under-development in a trusted iframe beside the cockpit. The URL MUST be a loopback http(s) URL (localhost / 127.0.0.1 / [::1]); non-loopback URLs are rejected. Pass null to clear the frame.", inputSchema: { url: z.string().nullable() } },
     async (a) => text(handlers.set_app_frame(bridge, a)),
+  );
+
+  server.registerTool(
+    "team_start",
+    { description: "Begin a team-orchestration run; switches the cockpit to the team board. Names the orchestrator (lead) and the overall task.", inputSchema: { task: z.string(), orchestrator: z.string() } },
+    async (a) => text(handlers.team_start(bridge, a)),
+  );
+
+  server.registerTool(
+    "add_agent",
+    { description: "Add a subagent to the team board with a status (queued/running/blocked/done/failed).", inputSchema: { id: z.string(), name: z.string(), role: z.string().optional(), status: AgentStatus } },
+    async (a) => text(handlers.add_agent(bridge, a)),
+  );
+
+  server.registerTool(
+    "update_agent",
+    { description: "Update a team subagent's status and/or current action.", inputSchema: { id: z.string(), status: AgentStatus.optional(), action: z.string().nullable().optional() } },
+    async (a) => text(handlers.update_agent(bridge, a)),
+  );
+
+  server.registerTool(
+    "remove_agent",
+    { description: "Remove a subagent from the team board.", inputSchema: { id: z.string() } },
+    async (a) => text(handlers.remove_agent(bridge, a)),
   );
 
   server.registerTool(

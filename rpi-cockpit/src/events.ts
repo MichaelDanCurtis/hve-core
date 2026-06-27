@@ -7,6 +7,9 @@ export type Phase = z.infer<typeof Phase>;
 export const ValidationStatus = z.enum(["ok", "running", "fail", "pending"]);
 export type ValidationStatus = z.infer<typeof ValidationStatus>;
 
+export const AgentStatus = z.enum(["queued", "running", "blocked", "done", "failed"]);
+export type AgentStatus = z.infer<typeof AgentStatus>;
+
 export const OptionItem = z.object({
   id: z.string(),
   title: z.string(),
@@ -46,6 +49,10 @@ export const Beat = z.discriminatedUnion("type", [
   z.object({ type: z.literal("backlog.action"), text: z.string().nullable() }),
   z.object({ type: z.literal("context.set"), instructions: z.array(z.string()), skills: z.array(z.string()), collection: z.string().nullable() }),
   z.object({ type: z.literal("appframe.set"), url: z.string().nullable() }),
+  z.object({ type: z.literal("team.start"), task: z.string(), orchestrator: z.string() }),
+  z.object({ type: z.literal("agent.add"), id: z.string(), name: z.string(), role: z.string().optional(), status: AgentStatus }),
+  z.object({ type: z.literal("agent.update"), id: z.string(), status: AgentStatus.optional(), action: z.string().nullable().optional() }),
+  z.object({ type: z.literal("agent.remove"), id: z.string() }),
 ]);
 export type Beat = z.infer<typeof Beat>;
 

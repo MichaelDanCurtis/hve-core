@@ -20,7 +20,7 @@ describe("mcp face", () => {
     expect(bridge.state.phase).toBe("review");
   });
 
-  it("registers the steering and screen tools and lists twenty-three total", async () => {
+  it("registers the steering and screen tools and lists twenty-seven total", async () => {
     const bridge = new Bridge();
     const server = buildMcpServer(bridge);
     const [clientT, serverT] = InMemoryTransport.createLinkedPair();
@@ -38,7 +38,11 @@ describe("mcp face", () => {
     expect(names).toContain("open_navigator");
     expect(names).toContain("set_context");
     expect(names).toContain("set_app_frame");
-    expect(tools).toHaveLength(23);
+    expect(names).toContain("team_start");
+    expect(names).toContain("add_agent");
+    expect(names).toContain("update_agent");
+    expect(names).toContain("remove_agent");
+    expect(tools).toHaveLength(27);
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
@@ -147,6 +151,26 @@ describe("mcp face", () => {
     expect(bridge.state.boardAction).toBe("triaging");
     await client.callTool({ name: "set_backlog_action", arguments: { text: null } });
     expect(bridge.state.boardAction).toBeNull();
+    await client.close();
+    await server.close();
+  });
+
+  it("the team tools drive the roster state", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const client = new Client({ name: "t", version: "0.0.1" }, { capabilities: {} });
+    const [ct, st] = InMemoryTransport.createLinkedPair();
+    await Promise.all([server.connect(st), client.connect(ct)]);
+    await client.callTool({ name: "team_start", arguments: { task: "ship", orchestrator: "Lead" } });
+    expect(bridge.state.domain).toBe("team");
+    expect(bridge.state.orchestrator).toBe("Lead");
+    await client.callTool({ name: "add_agent", arguments: { id: "a1", name: "Worker", role: "impl", status: "running" } });
+    expect(bridge.state.teamAgents).toHaveLength(1);
+    expect(bridge.state.teamAgents[0]).toMatchObject({ id: "a1", name: "Worker", role: "impl", status: "running" });
+    await client.callTool({ name: "update_agent", arguments: { id: "a1", status: "done", action: "shipped" } });
+    expect(bridge.state.teamAgents[0]).toMatchObject({ status: "done", action: "shipped" });
+    await client.callTool({ name: "remove_agent", arguments: { id: "a1" } });
+    expect(bridge.state.teamAgents).toHaveLength(0);
     await client.close();
     await server.close();
   });

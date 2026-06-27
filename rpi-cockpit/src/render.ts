@@ -13,6 +13,8 @@ const LEAD: Record<Phase, string> = {
   discover: "Surfacing follow-up work uncovered during the cycle.",
 };
 const SEVERITY_ORDER: Severity[] = ["critical", "high", "medium", "low", "info"];
+const AGENT_STATUS_ORDER = ["running", "blocked", "queued", "done", "failed"] as const;
+const AGENT_STATUS_LABEL: Record<string, string> = { running: "Running", blocked: "Blocked", queued: "Queued", done: "Done", failed: "Failed" };
 const EMPTY_LEAD = "Waiting for an RPI session… the cockpit is connected and lights up when the agent calls session_begin.";
 const PRESETS: { id: string; title: string }[] = [
   { id: "default", title: "Default" },
@@ -27,10 +29,11 @@ export interface ViewModel {
   started: boolean;
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | null;
   reviewTarget: string | null;
   findingGroups: { severity: Severity; items: { title: string; file?: string; line?: number; detail?: string }[] }[];
   board: { target: string | null; action: string | null; count: number; columns: { name: string; items: { id: string; title: string; kind?: string; tier?: string }[] }[] };
+  team: { orchestrator: string | null; count: number; columns: { status: string; label: string; agents: { id: string; name: string; role?: string; action?: string | null }[] }[] };
   view: "home" | "loop";
   navigatorOpen: boolean;
   workflows: { id: string; name: string; hint: string; description: string }[];
@@ -81,6 +84,19 @@ export function toViewModel(s: SessionState): ViewModel {
         .map((i) => ({ id: i.id, title: i.title, kind: i.kind, tier: i.tier })),
     })),
   };
+  const team = {
+    orchestrator: s.orchestrator,
+    count: s.teamAgents.length,
+    columns: AGENT_STATUS_ORDER
+      .map((status) => ({
+        status,
+        label: AGENT_STATUS_LABEL[status],
+        agents: s.teamAgents
+          .filter((a) => a.status === status)
+          .map((a) => ({ id: a.id, name: a.name, role: a.role, action: a.action })),
+      }))
+      .filter((c) => c.agents.length > 0),
+  };
   return {
     // A directly-launched review/interview/backlog sets domain without session.begin
     // (so task is "" and phase null); treat any active domain as started so the Home
@@ -92,6 +108,7 @@ export function toViewModel(s: SessionState): ViewModel {
     reviewTarget: s.reviewTarget,
     findingGroups,
     board,
+    team,
     view: s.view,
     navigatorOpen: s.navigatorOpen,
     workflows: WORKFLOWS.map((w) => ({ id: w.id, name: w.name, hint: w.hint, description: w.description })),

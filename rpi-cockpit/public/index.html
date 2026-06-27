@@ -241,6 +241,23 @@
   .chip-kind, .chip-tier { font-size: 10.5px; padding: 1px 7px; border-radius: 9px; border: 1px solid var(--stroke-2, #4A4A4A); color: var(--text-2, #9D9D9D); }
   .col-empty { height: 6px; }
 
+  .team-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .team-orch { font-weight: 500; }
+  .team-count { font-size: 12px; opacity: .6; }
+  .team-head .btn { margin-left: auto; }
+  .agent-card { border: 1px solid var(--stroke, #3C3C3C); border-radius: 6px; padding: 9px 10px; margin-bottom: 8px; background: var(--body-bg, #1E1E1E); }
+  .agent-card:last-child { margin-bottom: 0; }
+  .agent-name { font-weight: 500; font-size: 13px; }
+  .agent-role { font-size: 11.5px; opacity: .6; margin-top: 1px; }
+  .agent-action { font-size: 12px; opacity: .85; margin-top: 5px; }
+  .agent-status { display: inline-block; font-size: 10.5px; padding: 1px 7px; border-radius: 9px; margin-top: 6px; border: 1px solid var(--stroke-2, #4A4A4A); color: var(--text-2, #9D9D9D); }
+  .agent-status.running { color: var(--accent-cyan, #9CDCFE); background: var(--brand-2, #094771); border-color: transparent; }
+  .agent-status.blocked { color: var(--fail, #f2b8b5); background: var(--fail-bg, #3a1714); border-color: var(--fail-stroke, #5c2622); }
+  .agent-status.done { color: var(--ok, #73C991); background: var(--ok-bg, #16301F); border-color: transparent; }
+  .agent-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .agent-actions .mini-btn { font-size: 11px; font-family: inherit; cursor: pointer; padding: 2px 9px; border-radius: 5px; border: 1px solid var(--stroke-2, #4A4A4A); background: var(--layer, #252526); color: var(--text-2, #9D9D9D); }
+  .agent-actions .mini-btn:hover { color: var(--text, #CCCCCC); border-color: var(--stroke-2, #4A4A4A); }
+
   /* =========================================================================
      Fluent depth, material, and motion polish (enhancement, not a rebuild).
      Layered on top of the existing rules above; no IA / layout / color change.
@@ -412,6 +429,14 @@
         <span class="board-action" id="board-action" aria-live="polite" hidden></span>
       </div>
       <div class="board" id="board" aria-label="Backlog board"></div>
+    </section>
+    <section id="team-view" hidden>
+      <div class="team-head">
+        <span class="team-orch" id="team-orch">Orchestrator</span>
+        <span class="team-count" id="team-count"></span>
+        <button class="btn" id="team-spawn" data-intervene="spawn">Spawn agent</button>
+      </div>
+      <div class="board" id="team-board" aria-label="Team board"></div>
     </section>
     </section>
     <aside id="app-frame" hidden aria-label="App under development">

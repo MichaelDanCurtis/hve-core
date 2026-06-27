@@ -137,6 +137,28 @@ describe("Bridge", () => {
     });
   });
 
+  describe("intervene", () => {
+    it("enqueues a directive naming the action and agent for a pause", () => {
+      const b = new Bridge();
+      b.intervene("pause", "a1");
+      expect(b.state.directives).toHaveLength(1);
+      const d = b.state.directives[0];
+      expect(d.kind).toBe("note");
+      expect(d).toMatchObject({ kind: "note" });
+      if (d.kind === "note") {
+        expect(d.text).toContain("pause");
+        expect(d.text).toContain("a1");
+      }
+    });
+    it("enqueues a spawn directive with no agent id", () => {
+      const b = new Bridge();
+      b.intervene("spawn");
+      expect(b.state.directives).toHaveLength(1);
+      const d = b.state.directives[0];
+      if (d.kind === "note") expect(d.text).toContain("spawn");
+    });
+  });
+
   it("logs a decision.timeout entry on the auto-resolve fallback", async () => {
     const b = new Bridge();
     await b.presentOptions("pick", [{ id: "a", title: "A" }, { id: "b", title: "B", recommended: true }], 5);

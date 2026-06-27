@@ -32,6 +32,17 @@ export class Bridge extends EventEmitter {
     this.enqueueDirective({ kind: "approach", value: wf.id, label: wf.intent });
   }
 
+  // Intervention is intent only: enqueue a directive note the orchestrator drains
+  // via check_directives and acts on. The cockpit never pauses, swaps, or spawns an
+  // agent itself — it has no handle on the running agents. Reuse enqueueDirective so
+  // the note rides the same talk-back channel as steer (stamped, logged, file-sunk).
+  intervene(action: "pause" | "swap" | "spawn", agentId?: string): void {
+    const text = action === "spawn"
+      ? "intervene: spawn a new agent"
+      : `intervene: ${action} agent ${agentId ?? ""}`.trim();
+    this.enqueueDirective({ kind: "note", text });
+  }
+
   navigate(screen: "home" | "loop"): void {
     this.state = setView(this.state, screen);
     this.emit("state", this.state);

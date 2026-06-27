@@ -238,3 +238,58 @@ describe("backlog domain", () => {
     expect(s.boardAction).toBeNull();
   });
 });
+
+describe("team domain", () => {
+  it("defaults the team fields", () => {
+    const s = initialState();
+    expect(s.orchestrator).toBeNull();
+    expect(s.teamAgents).toEqual([]);
+  });
+  it("team.start sets the team domain, view loop, orchestrator, and resets the roster", () => {
+    let s = applyBeat(initialState(), { type: "agent.add", id: "a1", name: "stale", status: "running" }, 1);
+    s = applyBeat(s, { type: "team.start", task: "ship feature", orchestrator: "Lead" }, 2);
+    expect(s.domain).toBe("team");
+    expect(s.view).toBe("loop");
+    expect(s.task).toBe("ship feature");
+    expect(s.orchestrator).toBe("Lead");
+    expect(s.teamAgents).toEqual([]);
+  });
+  it("agent.add adds a team agent", () => {
+    let s = applyBeat(initialState(), { type: "team.start", task: "t", orchestrator: "L" }, 1);
+    s = applyBeat(s, { type: "agent.add", id: "a1", name: "Worker", role: "impl", status: "running" }, 2);
+    expect(s.teamAgents).toEqual([{ id: "a1", name: "Worker", role: "impl", status: "running" }]);
+  });
+  it("agent.add with an existing id replaces it, keeping the count", () => {
+    let s = applyBeat(initialState(), { type: "team.start", task: "t", orchestrator: "L" }, 1);
+    s = applyBeat(s, { type: "agent.add", id: "a1", name: "first", status: "queued" }, 2);
+    s = applyBeat(s, { type: "agent.add", id: "a1", name: "second", status: "running" }, 3);
+    expect(s.teamAgents).toHaveLength(1);
+    expect(s.teamAgents[0]).toMatchObject({ id: "a1", name: "second", status: "running" });
+  });
+  it("agent.update changes status without wiping action", () => {
+    let s = applyBeat(initialState(), { type: "team.start", task: "t", orchestrator: "L" }, 1);
+    s = applyBeat(s, { type: "agent.add", id: "a1", name: "W", status: "queued" }, 2);
+    s = applyBeat(s, { type: "agent.update", id: "a1", action: "writing tests" }, 3);
+    s = applyBeat(s, { type: "agent.update", id: "a1", status: "running" }, 4);
+    expect(s.teamAgents[0]).toMatchObject({ status: "running", action: "writing tests" });
+  });
+  it("agent.update changes action without wiping status", () => {
+    let s = applyBeat(initialState(), { type: "team.start", task: "t", orchestrator: "L" }, 1);
+    s = applyBeat(s, { type: "agent.add", id: "a1", name: "W", status: "running" }, 2);
+    s = applyBeat(s, { type: "agent.update", id: "a1", action: "refactoring" }, 3);
+    expect(s.teamAgents[0]).toMatchObject({ status: "running", action: "refactoring" });
+  });
+  it("agent.update with an unknown id is a no-op", () => {
+    let s = applyBeat(initialState(), { type: "team.start", task: "t", orchestrator: "L" }, 1);
+    s = applyBeat(s, { type: "agent.add", id: "a1", name: "W", status: "running" }, 2);
+    s = applyBeat(s, { type: "agent.update", id: "nope", status: "done" }, 3);
+    expect(s.teamAgents).toEqual([{ id: "a1", name: "W", role: undefined, status: "running" }]);
+  });
+  it("agent.remove removes an agent from the roster", () => {
+    let s = applyBeat(initialState(), { type: "team.start", task: "t", orchestrator: "L" }, 1);
+    s = applyBeat(s, { type: "agent.add", id: "a1", name: "W1", status: "running" }, 2);
+    s = applyBeat(s, { type: "agent.add", id: "a2", name: "W2", status: "queued" }, 3);
+    s = applyBeat(s, { type: "agent.remove", id: "a1" }, 4);
+    expect(s.teamAgents.map((a) => a.id)).toEqual(["a2"]);
+  });
+});

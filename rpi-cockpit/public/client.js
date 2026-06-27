@@ -138,11 +138,21 @@ function render(v) {
   const findingsView = document.getElementById("findings-view");
   const interviewView = document.getElementById("interview-view");
   const backlogView = document.getElementById("backlog-view");
+  const teamView = document.getElementById("team-view");
   if (rpiView && findingsView) {
+    if (v.domain === "team") {
+      rpiView.hidden = true; findingsView.hidden = true;
+      if (interviewView) interviewView.hidden = true;
+      if (backlogView) backlogView.hidden = true;
+      if (teamView) teamView.hidden = false;
+      renderTeam(v);
+      return;
+    }
     if (v.domain === "backlog") {
       rpiView.hidden = true; findingsView.hidden = true;
       if (interviewView) interviewView.hidden = true;
       if (backlogView) backlogView.hidden = false;
+      if (teamView) teamView.hidden = true;
       renderBoard(v);
       return;
     }
@@ -150,6 +160,7 @@ function render(v) {
       rpiView.hidden = true; findingsView.hidden = true;
       if (interviewView) interviewView.hidden = false;
       if (backlogView) backlogView.hidden = true;
+      if (teamView) teamView.hidden = true;
       renderInterview(v);
       return;
     }
@@ -158,6 +169,7 @@ function render(v) {
     findingsView.hidden = !review;
     if (interviewView) interviewView.hidden = true;
     if (backlogView) backlogView.hidden = true;
+    if (teamView) teamView.hidden = true;
     if (review) { renderFindings(v); return; }
   }
 
@@ -246,6 +258,8 @@ function decisionHtml(d) {
 
 // Event delegation: home interactions + decision buttons + steer "Queue directive" button.
 document.addEventListener("click", (e) => {
+  const iv = e.target.closest("[data-intervene]");
+  if (iv) { sendMsg({ type: "intervene", action: iv.dataset.intervene, agentId: iv.dataset.agent }); return; }
   if (e.target.closest("#to-home")) { sendMsg({ type: "navigate", screen: "home" }); return; }
   if (e.target.closest("#to-loop")) { sendMsg({ type: "navigate", screen: "loop" }); return; }
   if (e.target.closest("#help-btn")) { const w = document.getElementById("welcome"); if (w) w.hidden = false; return; }
@@ -347,6 +361,28 @@ function renderBoard(v) {
             <div class="bcard-title">${esc(it.title)}</div>
             ${(it.kind || it.tier) ? `<div class="bcard-chips">${it.kind ? `<span class="chip-kind">${esc(it.kind)}</span>` : ""}${it.tier ? `<span class="chip-tier">${esc(it.tier)}</span>` : ""}</div>` : ""}
           </div>`).join("") || `<div class="col-empty"></div>`}
+     </div>`).join(""));
+}
+
+function renderTeam(v) {
+  const t = v.team || { orchestrator: null, count: 0, columns: [] };
+  setText("team-orch", t.orchestrator || "Orchestrator");
+  const n = t.count || 0;
+  setText("team-count", n === 1 ? "1 agent" : n + " agents");
+  setHtml("team-board", (t.columns || []).map((c) =>
+    `<div class="board-col">
+       <div class="col-head"><span>${esc(c.label)}</span><span class="col-count">${c.agents.length}</span></div>
+       ${c.agents.map((a) =>
+         `<div class="agent-card">
+            <div class="agent-name">${esc(a.name)}</div>
+            ${a.role ? `<div class="agent-role">${esc(a.role)}</div>` : ""}
+            ${a.action ? `<div class="agent-action">${esc(a.action)}</div>` : ""}
+            <span class="agent-status ${esc(c.status)}">${esc(c.label)}</span>
+            <div class="agent-actions">
+              <button class="mini-btn" data-intervene="pause" data-agent="${esc(a.id)}">Pause</button>
+              <button class="mini-btn" data-intervene="swap" data-agent="${esc(a.id)}">Swap</button>
+            </div>
+          </div>`).join("")}
      </div>`).join(""));
 }
 

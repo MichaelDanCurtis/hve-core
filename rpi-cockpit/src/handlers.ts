@@ -1,6 +1,6 @@
 // rpi-cockpit/src/handlers.ts
 import type { Bridge } from "./bridge.js";
-import type { OptionItem, Phase, Severity, ValidationStatus } from "./events.js";
+import type { AgentStatus, OptionItem, Phase, Severity, ValidationStatus } from "./events.js";
 import { isLoopbackHttpUrl } from "./url.js";
 
 export const handlers = {
@@ -55,6 +55,22 @@ export const handlers = {
   set_backlog_action: (b: Bridge, a: { text: string | null }) => {
     b.emitBeat({ type: "backlog.action", text: a.text });
     return a.text ? `action: ${a.text}` : "action cleared";
+  },
+  team_start: (b: Bridge, a: { task: string; orchestrator: string }) => {
+    b.emitBeat({ type: "team.start", task: a.task, orchestrator: a.orchestrator });
+    return `team started: ${a.orchestrator}`;
+  },
+  add_agent: (b: Bridge, a: { id: string; name: string; role?: string; status: AgentStatus }) => {
+    b.emitBeat({ type: "agent.add", id: a.id, name: a.name, role: a.role, status: a.status });
+    return `agent added: ${a.name}`;
+  },
+  update_agent: (b: Bridge, a: { id: string; status?: AgentStatus; action?: string | null }) => {
+    b.emitBeat({ type: "agent.update", id: a.id, status: a.status, action: a.action });
+    return `agent updated: ${a.id}`;
+  },
+  remove_agent: (b: Bridge, a: { id: string }) => {
+    b.emitBeat({ type: "agent.remove", id: a.id });
+    return `agent removed: ${a.id}`;
   },
   set_context: (b: Bridge, a: { instructions?: string[]; skills?: string[]; collection?: string | null }) => {
     b.emitBeat({ type: "context.set", instructions: a.instructions ?? [], skills: a.skills ?? [], collection: a.collection ?? null });

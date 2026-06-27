@@ -145,6 +145,14 @@ export async function startServer(
       } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "navigator") {
         const m = msg as { open?: unknown };
         if (typeof m.open === "boolean") m.open ? bridge.openNavigator() : bridge.closeNavigator();
+      } else if (msg && typeof msg === "object" && (msg as { type?: string }).type === "intervene") {
+        const m = msg as { action?: unknown; agentId?: unknown };
+        // Validate the action is one of the three and agentId is a string when present.
+        // intervene only enqueues a directive (intent); the cockpit never controls agents.
+        if ((m.action === "pause" || m.action === "swap" || m.action === "spawn") &&
+            (m.agentId === undefined || typeof m.agentId === "string")) {
+          bridge.intervene(m.action, m.agentId);
+        }
       }
     });
   });

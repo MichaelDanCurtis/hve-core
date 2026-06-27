@@ -120,6 +120,29 @@ describe("toViewModel", () => {
     });
   });
 
+  describe("team view-model", () => {
+    it("groups agents by status in fixed order, drops empty status columns, count = total", () => {
+      let s = applyBeat(initialState(), { type: "team.start", task: "ship", orchestrator: "Lead" }, 1);
+      s = applyBeat(s, { type: "agent.add", id: "a1", name: "Q", status: "queued" }, 2);
+      s = applyBeat(s, { type: "agent.add", id: "a2", name: "R1", role: "impl", status: "running" }, 3);
+      s = applyBeat(s, { type: "agent.add", id: "a3", name: "R2", status: "running" }, 4);
+      s = applyBeat(s, { type: "agent.update", id: "a2", action: "writing tests" }, 5);
+      const { team } = toViewModel(s);
+      expect(team.orchestrator).toBe("Lead");
+      expect(team.count).toBe(3);
+      // running comes before queued; blocked/done/failed are empty and dropped
+      expect(team.columns.map((c) => c.status)).toEqual(["running", "queued"]);
+      expect(team.columns[0].label).toBe("Running");
+      expect(team.columns[0].agents.map((a) => a.id)).toEqual(["a2", "a3"]);
+      expect(team.columns[0].agents[0]).toEqual({ id: "a2", name: "R1", role: "impl", action: "writing tests" });
+      expect(team.columns[1].agents.map((a) => a.id)).toEqual(["a1"]);
+    });
+    it("defaults to a null orchestrator, zero count, and no columns", () => {
+      const { team } = toViewModel(initialState());
+      expect(team).toEqual({ orchestrator: null, count: 0, columns: [] });
+    });
+  });
+
   describe("context view-model", () => {
     it("passes through instructions, skills, and collection", () => {
       const s = applyBeat(initialState(), { type: "context.set", instructions: ["no em-dashes"], skills: ["tdd", "deepsearch"], collection: "hve-core" }, 1);

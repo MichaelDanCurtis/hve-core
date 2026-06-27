@@ -1,7 +1,8 @@
 // rpi-cockpit/src/state.ts
-import type { Beat, Phase, OptionItem, ValidationStatus, Directive, Finding } from "./events.js";
+import type { Beat, Phase, OptionItem, ValidationStatus, Directive, Finding, AgentStatus } from "./events.js";
 
 export interface Subagent { name: string; role?: string; status: "active" | "idle"; result?: string; }
+export interface TeamAgent { id: string; name: string; role?: string; status: AgentStatus; action?: string | null; }
 export interface BacklogItem { id: string; title: string; column: string; kind?: string; tier?: string; }
 export interface Decision { id: string; prompt: string; options: OptionItem[]; }
 export interface LogEntry { t: number; kind: string; detail: string; }
@@ -10,8 +11,10 @@ export interface SteerMenu { label: string; options: OptionItem[]; }
 export interface SessionState {
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | null;
   reviewTarget: string | null;
+  orchestrator: string | null;
+  teamAgents: TeamAgent[];
   findings: Finding[];
   boardTarget: string | null;
   boardColumns: string[];
@@ -43,7 +46,7 @@ export interface SessionState {
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", domain: null, reviewTarget: null, findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, pendingQuestion: null, pendingDecision: null, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, log: [] };
+  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, pendingQuestion: null, pendingDecision: null, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, log: [] };
 }
 
 export function applyBeat(s: SessionState, beat: Beat, now: number): SessionState {
@@ -94,6 +97,14 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
       return { ...s, contextInstructions: beat.instructions, contextSkills: beat.skills, contextCollection: beat.collection, log };
     case "appframe.set":
       return { ...s, appFrameUrl: beat.url, log };
+    case "team.start":
+      return { ...s, view: "loop", domain: "team", task: beat.task, orchestrator: beat.orchestrator, teamAgents: [], log };
+    case "agent.add":
+      return { ...s, teamAgents: [...s.teamAgents.filter((x) => x.id !== beat.id), { id: beat.id, name: beat.name, role: beat.role, status: beat.status }], log };
+    case "agent.update":
+      return { ...s, teamAgents: s.teamAgents.map((a) => a.id === beat.id ? { ...a, ...(beat.status !== undefined ? { status: beat.status } : {}), ...(beat.action !== undefined ? { action: beat.action } : {}) } : a), log };
+    case "agent.remove":
+      return { ...s, teamAgents: s.teamAgents.filter((a) => a.id !== beat.id), log };
   }
 }
 
@@ -117,6 +128,10 @@ function summarize(beat: Beat): string {
     case "backlog.action": return beat.text ?? "(cleared)";
     case "context.set": return `${beat.instructions.length} instr · ${beat.skills.length} skills${beat.collection ? " · " + beat.collection : ""}`;
     case "appframe.set": return beat.url ? `app frame ${beat.url}` : "app frame cleared";
+    case "team.start": return `team ${beat.orchestrator}`;
+    case "agent.add": return `${beat.name} (${beat.status})`;
+    case "agent.update": return `${beat.id}${beat.status ? " " + beat.status : ""}`;
+    case "agent.remove": return beat.id;
   }
 }
 

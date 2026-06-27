@@ -85,6 +85,36 @@ describe("server", () => {
     ws.close();
   });
 
+  it("enqueues a directive from an inbound intervene frame", async () => {
+    const bridge = new Bridge();
+    const srv = await startServer(bridge, 0);
+    stop = srv.close;
+    const ws = new WebSocket(`ws://127.0.0.1:${srv.port}/?key=${srv.token}`);
+    await new Promise((r) => ws.on("open", r));
+    ws.send(JSON.stringify({ type: "intervene", action: "pause", agentId: "a1" }));
+    await new Promise((r) => setTimeout(r, 30));
+    expect(bridge.state.directives).toHaveLength(1);
+    const d = bridge.state.directives[0];
+    expect(d.kind).toBe("note");
+    if (d.kind === "note") {
+      expect(d.text).toContain("pause");
+      expect(d.text).toContain("a1");
+    }
+    ws.close();
+  });
+
+  it("ignores an intervene frame with an invalid action", async () => {
+    const bridge = new Bridge();
+    const srv = await startServer(bridge, 0);
+    stop = srv.close;
+    const ws = new WebSocket(`ws://127.0.0.1:${srv.port}/?key=${srv.token}`);
+    await new Promise((r) => ws.on("open", r));
+    ws.send(JSON.stringify({ type: "intervene", action: "delete", agentId: "a1" }));
+    await new Promise((r) => setTimeout(r, 30));
+    expect(bridge.state.directives).toHaveLength(0);
+    ws.close();
+  });
+
   describe("auth", () => {
     it("mints a per-session token and a keyed url in the return", async () => {
       const bridge = new Bridge();
