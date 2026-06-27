@@ -2,7 +2,7 @@
 title: Environment Customization
 description: Configure DevContainers, VS Code settings, MCP servers, and coding agent environments for your team
 author: Microsoft
-ms.date: 2026-06-11
+ms.date: 2026-06-26
 ms.topic: how-to
 keywords:
   - devcontainer
