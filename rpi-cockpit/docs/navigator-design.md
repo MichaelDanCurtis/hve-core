@@ -3,9 +3,9 @@
 
 ## Purpose
 
-The Navigator is the home of the HVE Cockpit, the graphical front door to HVE Core. It exists to answer the question a newcomer cannot answer today: what can this do, where am I, and what comes next. It answers that graphically, beside the text interface rather than in place of it.
+The Navigator is the front door of the HVE Cockpit, the graphical way into HVE Core. It exists to answer the question a newcomer cannot answer today: what can this do, where am I, and what comes next. It answers that graphically, beside the text interface rather than in place of it. The Navigator is a pop-up overlay inside the cockpit, not a separate home screen. The cockpit's standing surface is the active loop view, and the Navigator opens over it on demand.
 
-This spec covers the Navigator (the home), the loop views it opens into, the transitions between them, and the host-neutral rendering model that lets all of it run in Claude Code, VS Code (Copilot), and Codex. It builds on [ROADMAP.md](../ROADMAP.md) and the archetype-to-primitive mapping in [docs/representation-map.md](representation-map.md). RPI is the first loop; the Navigator is the shell around all of them.
+This spec covers the Navigator (the pop-up picker), the loop views it opens into, the transitions between them, and the host-neutral rendering model that lets all of it run in Claude Code, VS Code (Copilot), and Codex. It builds on [ROADMAP.md](../ROADMAP.md) and the archetype-to-primitive mapping in [docs/representation-map.md](representation-map.md). RPI is the first loop view; the Navigator is the picker that opens over it.
 
 ## Principles
 
@@ -18,25 +18,27 @@ These constraints are load-bearing and shape every decision below.
 | Discoverability first | The reason the Navigator exists is introduction. Orient and launch come after. |
 | Host-neutral core | The Navigator and the loop views are one web cockpit. The host supplies the pane. Inline rendering in the chat is a per-host enhancement layered on top, never a dependency. |
 
-## The two surfaces
+## The surfaces
 
-The cockpit is one shell hosting two kinds of surface.
+The cockpit is one shell. Its standing surface is the active loop view; the Navigator is a pop-up that opens over it.
 
 | Surface | What it is | Role |
 |---|---|---|
-| The Navigator | The home and primary surface | Introduce what HVE Core can do, orient you in the active loop or domain, and route your intent |
-| Loop views | One graphical composition per workflow archetype | Run whatever loop you are in: RPI, a review, a document interview, a data-science build, a backlog board |
+| Loop views | One graphical composition per workflow archetype, filling the pane | Run whatever loop you are in: RPI, a review, a document interview, a data-science build, a backlog board |
+| The Navigator pop-up | A modal overlay layered over the loop view | Introduce what HVE Core can do and route your intent into a workflow |
+| In-chat workflow card | A native choice card in the chat (the `present_workflows` tool) | The same picker offered inline, so you can choose a workflow without leaving the text interface |
 
-You begin in the Navigator, enter a loop view to do the work, and return to the Navigator between tasks. Transitions run both ways: you start a loop by clicking a tile, or the agent hands off into the next loop (a document builder finishing into a backlog manager) and the cockpit surfaces that handoff instead of leaving it silent.
+The Navigator pop-up and the in-chat card are two surfaces for the same act, picking a workflow. The pop-up opens from the help button, on first run, or when the agent runs `open_navigator` (a `/Nav` command); the in-chat card is offered by the agent in the chat. Either one launches the workflow; the cockpit then shows the running loop and the pop-up closes. Transitions run both ways: you start a loop by picking a workflow, or the agent hands off into the next loop (a document builder finishing into a backlog manager) and the cockpit surfaces that handoff instead of leaving it silent.
 
-## The Navigator home
+## The Navigator pop-up
 
-The home, when idle, leads with introduce and browse. When a loop is running, the same surface leads with orient. It is built from these parts:
+The Navigator is a modal overlay inside the cockpit. It merges the first-run welcome and the workflow picker into one surface, so the introduction and the way to act on it live together. It opens in three ways: automatically on first run (per project), from the persistent help button in the pane chrome, and when the agent calls `open_navigator` in response to a `/Nav` command. It is built from these parts:
 
-1. Pane chrome: the cockpit name and a status indicator (idle, or the running loop).
-2. First-run welcome: a one-time, per-project welcome that briefly explains what HVE Core can do, then dismisses and does not return. On a host that cannot overlay a modal, it renders as a banner or as the first screen in the pane.
-3. Orient strip: when a loop is running it shows the active loop and links back into it. When idle it is the empty state ("nothing running, pick a workflow to begin").
-4. Workflow grid: a clean grid of workflow tiles, the heart of the home.
+1. Intro line: a brief, plain-language statement of what HVE Core can do and how to reopen the pop-up. This is the welcome, folded into the picker.
+2. Workflow grid: a clean grid of workflow tiles, the heart of the pop-up.
+3. Dismiss: a "Got it" button that closes the pop-up. The first-run auto-open is remembered per project, so it does not return uninvited, and the help button reopens it any time.
+
+The cockpit's standing surface behind the pop-up is the active loop view, or, before any loop runs, a minimal home with an orient line. The pop-up never replaces the loop; it floats over it and closes on launch. The help button is the persistent way back in, and it will grow into a fuller help function in a later version.
 
 ### Workflow tiles
 
@@ -51,20 +53,20 @@ Six tiles, mapped to the workflow archetypes in the representation map and relab
 | Analyze data | Generators (data science) |
 | Coach and learn | Coaches and tutors |
 
-The seventh archetype, meta and utility (memory, prompt-builder, issue-triage, and similar), is plumbing rather than a front-door workflow, so it is not a home tile. Those agents are reachable as a drill-in.
+The seventh archetype, meta and utility (memory, prompt-builder, issue-triage, and similar), is plumbing rather than a front-door workflow, so it is not a tile. Those agents are reachable as a drill-in.
 
-Each tile is calm at rest: an icon, the name, and a short resting hint of two or three words. Hovering a tile reveals a plain-language description of what that workflow does. That hover description is the entire ongoing discoverability mechanism, so the home stays uncluttered. Clicking a tile expresses intent, which the host agent turns into a launch. Individual agents live inside their workflow as a drill-in, not on the home.
+Each tile is calm at rest: an icon, the name, and a short resting hint of two or three words. Hovering a tile reveals a plain-language description of what that workflow does. That hover description is the entire ongoing discoverability mechanism, so the grid stays uncluttered. Clicking a tile expresses intent, which the host agent turns into a launch, and closes the pop-up. Individual agents live inside their workflow as a drill-in, not in the picker.
 
 ## The loop view
 
-Clicking a tile opens that workflow's GUI in the same pane, in place. The RPI loop view is the first one, and it is the cockpit already built.
+Picking a workflow (from the pop-up or the in-chat card) opens that workflow's GUI in the pane. The RPI loop view is the first one, and it is the cockpit already built.
 
 | Part | Content |
 |---|---|
-| Chrome | A breadcrumb back to the Navigator (for example `HVE Cockpit` to `Build code`) and a status indicator. The breadcrumb is the transition running the other way. |
+| Chrome | A breadcrumb back to the Navigator home (for example `HVE Cockpit` to `Build code`), a persistent help button that reopens the Navigator pop-up, and a status indicator. |
 | Body | The workflow's composition of primitives. For RPI: the phase stepper (research, plan, implement, review, discover), live subagents, the validation gate, decision cards, and the steer panel. |
 
-The other five tiles get their own loop views over time, in the proof order from the representation map (reviewers, then the interview, then the backlog board). Until a tile has a rich loop view, it still launches and runs in text, with the home as its front door.
+The other five tiles get their own loop views over time, in the proof order from the representation map (reviewers, then the interview, then the backlog board). Until a tile has a rich loop view, it still launches and runs in text, with the pop-up as its front door.
 
 ## The rendering ladder
 
@@ -72,11 +74,11 @@ The cockpit is one web app, but a given beat can be shown at different richness 
 
 | Rung | What it renders | Mechanism | Status |
 |---|---|---|---|
-| 1. Inline choice | The decision and question primitives: a bounded set of options plus a freeform answer | An MCP elicitation, rendered as each host's native choice UI | Confirmed in VS Code (the native choice card) and Claude Code (AskUserQuestion) |
-| 2. Rich pane | The Navigator grid, the loop views, screens | The web cockpit in a host pane | Confirmed in Claude Code (Preview pane) and VS Code (Simple Browser at `127.0.0.1:4399`) |
+| 1. Inline choice | The decision and question primitives, and the workflow picker: a bounded set of options plus a freeform answer | An MCP elicitation, rendered as each host's native choice UI | Confirmed in VS Code (the native choice card) and Claude Code (AskUserQuestion) |
+| 2. Rich pane | The Navigator pop-up, the loop views, screens | The web cockpit in a host pane | Confirmed in Claude Code (Preview pane) and VS Code (Simple Browser at `127.0.0.1:4399`) |
 | 3. Inline rich widget | The Navigator shown live inside the chat transcript | Free on Claude Code; VS Code via the extension's `chatOutputRenderers` iframe; editor-agnostic once MCP Apps matures | Confirmed on Claude Code; emerging in VS Code; a nice-to-have, not load-bearing |
 
-The decision and question primitive is realized as an MCP elicitation. Its schema is limited to primitive and enum types (a bounded choice plus a freeform field), which is exactly right for a decision and is also what keeps rung one cleanly separate from the rich canvas of rung two. The Navigator grid and loop views are never elicitations; they are pane content.
+The decision and question primitive is realized as an MCP elicitation. Its schema is limited to primitive and enum types (a bounded choice plus a freeform field), which is exactly right for a decision and is also what keeps rung one cleanly separate from the rich canvas of rung two. The same elicitation mechanism backs the in-chat workflow card. The Navigator pop-up and loop views are never elicitations; they are pane content.
 
 ### Host matrix
 
@@ -88,13 +90,13 @@ The decision and question primitive is realized as an MCP elicitation. Its schem
 
 ## Click to launch: the control flow
 
-1. The user clicks a workflow tile (or answers an elicitation).
-2. The cockpit emits the intent over the existing talk-back channel (a directive, or the elicitation result).
+1. The user picks a workflow, from the Navigator pop-up or the in-chat card (or answers an elicitation).
+2. The cockpit emits the intent over the existing talk-back channel (a directive, or the elicitation result), and the pop-up closes.
 3. The host agent picks up the intent and runs the corresponding HVE Core workflow.
 4. The agent narrates beats, which drive the loop view.
 5. The cockpit reflects the running loop. It never launches the workflow itself.
 
-The active loop or domain is held as session state so the home can orient on it and the breadcrumb knows what is running.
+The active loop or domain is held as session state so the cockpit can orient on it and the breadcrumb knows what is running. A navigator-open flag is held as session state too, so a `/Nav` command can pop the Navigator over the running loop.
 
 ## Protocol additions for v1
 
@@ -104,17 +106,21 @@ The Navigator needs a small amount on top of the existing RPI-specific protocol:
 2. Add a capability catalog: the workflows, their descriptions, and the intent each one emits when clicked. For v1 this is a small static configuration covering the six workflows. A later phase can generate it from HVE Core's agent and prompt manifest.
 3. Add an active loop or domain to session state, for orient and for transitions.
 4. Realize the decision and question primitive as an MCP elicitation.
+5. Add a navigator-open flag to session state and an `open_navigator` tool, so a `/Nav` command can pop the Navigator over the running loop. The pop-up also opens client-side from the help button and on first run.
+6. Offer the picker inline through a `present_workflows` tool that renders a native choice card in the chat, the second launch surface.
 
 ## Scope
 
 In scope for v1:
 
-* The home: pane chrome, the one-time first-run welcome, the orient strip with its empty and active states, and the workflow grid with hover descriptions.
-* Click to express intent, routed to the host agent for launch.
+* The Navigator pop-up: the merged first-run welcome and the workflow grid with hover descriptions, opened from the help button, on first run, and via `open_navigator` (a `/Nav` command).
+* The in-chat workflow card (`present_workflows`) as a second launch surface.
+* Pane chrome with a persistent help button, and a minimal home with an orient line behind the pop-up.
+* Click to express intent, routed to the host agent for launch, closing the pop-up.
 * The decision and question primitive as an MCP elicitation, rendered natively per host.
-* The RPI loop view as the one wired loop, reached through the home, with a breadcrumb back.
+* The RPI loop view as the one wired loop, reached through the picker, with a breadcrumb back.
 * Host-neutral pane rendering in Claude Code and VS Code.
-* The capability catalog (static, six workflows) and the active loop or domain state.
+* The capability catalog (static, six workflows), the active loop or domain state, and the navigator-open state.
 
 Deferred to later phases:
 
@@ -122,6 +128,7 @@ Deferred to later phases:
 * The inline rich widget tier (rung three) in VS Code and via MCP Apps.
 * The app frame primitive (a trusted localhost iframe of the app under development beside the cockpit).
 * Generating the capability catalog from HVE Core's manifest.
+* Growing the help button into a fuller help function.
 
 ## Non-goals
 
