@@ -258,6 +258,25 @@
   .agent-actions .mini-btn { font-size: 11px; font-family: inherit; cursor: pointer; padding: 2px 9px; border-radius: 5px; border: 1px solid var(--stroke-2, #4A4A4A); background: var(--layer, #252526); color: var(--text-2, #9D9D9D); }
   .agent-actions .mini-btn:hover { color: var(--text, #CCCCCC); border-color: var(--stroke-2, #4A4A4A); }
 
+  /* ---- Codebase map (CSS-3D spatial view) ---- */
+  .cm-head { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .cm-title { font-weight: 500; }
+  .cm-legend { display: flex; gap: 10px; font-size: 11px; }
+  .cm-key { display: inline-flex; align-items: center; gap: 5px; color: var(--text-2, #9D9D9D); }
+  .cm-key::before { content: ""; width: 9px; height: 9px; border-radius: 2px; background: var(--stroke-2, #4A4A4A); }
+  .cm-key.focus::before { background: var(--accent-blue, #4FC1FF); }
+  .cm-key.read::before { background: var(--accent2, #C9A9F0); }
+  .cm-key.edited::before { background: var(--ok, #73C991); }
+  .cm-stage { position: relative; height: calc(100vh - 220px); min-height: 360px; perspective: 1300px; overflow: hidden; }
+  .cm-tilt { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(8deg); }
+  .cm-world { position: absolute; left: 50%; top: 42%; width: 0; height: 0; transform-style: preserve-3d; transition: transform var(--dur-slow, 320ms) var(--ease-standard, ease); transform: translate3d(0,0,-260px); }
+  .cn { position: absolute; left: 0; top: 0; width: 132px; margin-left: -66px; margin-top: -22px; box-sizing: border-box; padding: 7px 9px; border-radius: 7px; border: 1px solid var(--stroke, #3C3C3C); background: var(--layer, #252526); color: var(--text, #CCCCCC); font-size: 11.5px; transform: translate3d(var(--tx,0), var(--ty,0), var(--tz,0)); transition: transform var(--dur-slow,320ms) var(--ease-standard,ease), box-shadow var(--dur-normal,200ms), border-color var(--dur-normal,200ms), opacity var(--dur-normal,200ms); will-change: transform; }
+  .cn .cn-name { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cn .cn-path { font-size: 10px; opacity: .55; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cn.read { border-color: var(--accent2, #C9A9F0); }
+  .cn.edited { border-color: var(--ok, #73C991); box-shadow: 0 0 0 1px var(--ok, #73C991) inset; }
+  .cn.focused { transform: translate3d(var(--tx,0), var(--ty,0), var(--tz,0)) scale(1.16); border-color: var(--accent-blue, #4FC1FF); box-shadow: var(--shadow-8, 0 8px 16px rgba(0,0,0,.45)); z-index: 2; }
+
   /* =========================================================================
      Fluent depth, material, and motion polish (enhancement, not a rebuild).
      Layered on top of the existing rules above; no IA / layout / color change.
@@ -437,6 +456,13 @@
         <button class="btn" id="team-spawn" data-intervene="spawn">Spawn agent</button>
       </div>
       <div class="board" id="team-board" aria-label="Team board"></div>
+    </section>
+    <section id="codemap-view" hidden>
+      <div class="cm-head">
+        <span class="cm-title">Codebase map</span>
+        <span class="cm-legend"><span class="cm-key focus">focus</span><span class="cm-key read">read</span><span class="cm-key edited">edited</span></span>
+      </div>
+      <div class="cm-stage"><div class="cm-tilt"><div class="cm-world" id="cm-world"></div></div></div>
     </section>
     </section>
     <aside id="app-frame" hidden aria-label="App under development">

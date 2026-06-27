@@ -293,3 +293,55 @@ describe("team domain", () => {
     expect(s.teamAgents.map((a) => a.id)).toEqual(["a2"]);
   });
 });
+
+describe("codemap domain", () => {
+  it("defaults the codemap fields", () => {
+    const s = initialState();
+    expect(s.codemapNodes).toEqual([]);
+    expect(s.codemapFocus).toBeNull();
+    expect(s.codemapTouches).toEqual({});
+  });
+  it("codemap.set sets the codemap domain, view loop, nodes, and resets focus/touches", () => {
+    let s = applyBeat(initialState(), { type: "codemap.set", nodes: [{ id: "n1", path: "src/a.ts", kind: "file" }] }, 1);
+    s = applyBeat(s, { type: "codemap.focus", id: "n1" }, 2);
+    s = applyBeat(s, { type: "codemap.touch", id: "n1", kind: "edit" }, 3);
+    s = applyBeat(s, { type: "codemap.set", nodes: [{ id: "n2", path: "src/b.ts", kind: "file" }] }, 4);
+    expect(s.domain).toBe("codemap");
+    expect(s.view).toBe("loop");
+    expect(s.codemapNodes).toEqual([{ id: "n2", path: "src/b.ts", kind: "file" }]);
+    expect(s.codemapFocus).toBeNull();
+    expect(s.codemapTouches).toEqual({});
+  });
+  it("codemap.focus sets the focus to a known node", () => {
+    let s = applyBeat(initialState(), { type: "codemap.set", nodes: [{ id: "n1", path: "a.ts", kind: "file" }] }, 1);
+    s = applyBeat(s, { type: "codemap.focus", id: "n1" }, 2);
+    expect(s.codemapFocus).toBe("n1");
+  });
+  it("codemap.focus on an unknown id is a no-op", () => {
+    let s = applyBeat(initialState(), { type: "codemap.set", nodes: [{ id: "n1", path: "a.ts", kind: "file" }] }, 1);
+    s = applyBeat(s, { type: "codemap.focus", id: "nope" }, 2);
+    expect(s.codemapFocus).toBeNull();
+  });
+  it("codemap.touch sets read", () => {
+    let s = applyBeat(initialState(), { type: "codemap.set", nodes: [{ id: "n1", path: "a.ts", kind: "file" }] }, 1);
+    s = applyBeat(s, { type: "codemap.touch", id: "n1", kind: "read" }, 2);
+    expect(s.codemapTouches.n1).toBe("read");
+  });
+  it("codemap.touch edit overrides an existing read", () => {
+    let s = applyBeat(initialState(), { type: "codemap.set", nodes: [{ id: "n1", path: "a.ts", kind: "file" }] }, 1);
+    s = applyBeat(s, { type: "codemap.touch", id: "n1", kind: "read" }, 2);
+    s = applyBeat(s, { type: "codemap.touch", id: "n1", kind: "edit" }, 3);
+    expect(s.codemapTouches.n1).toBe("edit");
+  });
+  it("codemap.touch read does NOT downgrade an existing edit", () => {
+    let s = applyBeat(initialState(), { type: "codemap.set", nodes: [{ id: "n1", path: "a.ts", kind: "file" }] }, 1);
+    s = applyBeat(s, { type: "codemap.touch", id: "n1", kind: "edit" }, 2);
+    s = applyBeat(s, { type: "codemap.touch", id: "n1", kind: "read" }, 3);
+    expect(s.codemapTouches.n1).toBe("edit");
+  });
+  it("codemap.touch on an unknown id is a no-op", () => {
+    let s = applyBeat(initialState(), { type: "codemap.set", nodes: [{ id: "n1", path: "a.ts", kind: "file" }] }, 1);
+    s = applyBeat(s, { type: "codemap.touch", id: "nope", kind: "read" }, 2);
+    expect(s.codemapTouches).toEqual({});
+  });
+});

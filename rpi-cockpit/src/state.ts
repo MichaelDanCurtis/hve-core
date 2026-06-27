@@ -1,9 +1,10 @@
 // rpi-cockpit/src/state.ts
-import type { Beat, Phase, OptionItem, ValidationStatus, Directive, Finding, AgentStatus } from "./events.js";
+import type { Beat, Phase, OptionItem, ValidationStatus, Directive, Finding, AgentStatus, CodeKind } from "./events.js";
 
 export interface Subagent { name: string; role?: string; status: "active" | "idle"; result?: string; }
 export interface TeamAgent { id: string; name: string; role?: string; status: AgentStatus; action?: string | null; }
 export interface BacklogItem { id: string; title: string; column: string; kind?: string; tier?: string; }
+export interface CodeNode { id: string; path: string; kind: CodeKind; group?: string; }
 export interface Decision { id: string; prompt: string; options: OptionItem[]; }
 export interface LogEntry { t: number; kind: string; detail: string; }
 export interface SteerMenu { label: string; options: OptionItem[]; }
@@ -11,7 +12,7 @@ export interface SteerMenu { label: string; options: OptionItem[]; }
 export interface SessionState {
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | "team" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | null;
   reviewTarget: string | null;
   orchestrator: string | null;
   teamAgents: TeamAgent[];
@@ -42,11 +43,14 @@ export interface SessionState {
   contextSkills: string[];
   contextCollection: string | null;
   appFrameUrl: string | null;
+  codemapNodes: CodeNode[];
+  codemapFocus: string | null;
+  codemapTouches: Record<string, "read" | "edit">;
   log: LogEntry[];
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, pendingQuestion: null, pendingDecision: null, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, log: [] };
+  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, pendingQuestion: null, pendingDecision: null, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, codemapNodes: [], codemapFocus: null, codemapTouches: {}, log: [] };
 }
 
 export function applyBeat(s: SessionState, beat: Beat, now: number): SessionState {
@@ -105,6 +109,19 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
       return { ...s, teamAgents: s.teamAgents.map((a) => a.id === beat.id ? { ...a, ...(beat.status !== undefined ? { status: beat.status } : {}), ...(beat.action !== undefined ? { action: beat.action } : {}) } : a), log };
     case "agent.remove":
       return { ...s, teamAgents: s.teamAgents.filter((a) => a.id !== beat.id), log };
+    case "codemap.set":
+      return { ...s, view: "loop", domain: "codemap", codemapNodes: beat.nodes, codemapFocus: null, codemapTouches: {}, log };
+    case "codemap.focus": {
+      const exists = s.codemapNodes.some((n) => n.id === beat.id);
+      return exists ? { ...s, codemapFocus: beat.id, log } : { ...s, log };
+    }
+    case "codemap.touch": {
+      const exists = s.codemapNodes.some((n) => n.id === beat.id);
+      if (!exists) return { ...s, log };
+      const cur = s.codemapTouches[beat.id];
+      const next = (cur === "edit" || beat.kind === "edit") ? "edit" : "read";
+      return { ...s, codemapTouches: { ...s.codemapTouches, [beat.id]: next }, log };
+    }
   }
 }
 
@@ -132,6 +149,9 @@ function summarize(beat: Beat): string {
     case "agent.add": return `${beat.name} (${beat.status})`;
     case "agent.update": return `${beat.id}${beat.status ? " " + beat.status : ""}`;
     case "agent.remove": return beat.id;
+    case "codemap.set": return `${beat.nodes.length} nodes`;
+    case "codemap.focus": return beat.id;
+    case "codemap.touch": return `${beat.kind} ${beat.id}`;
   }
 }
 

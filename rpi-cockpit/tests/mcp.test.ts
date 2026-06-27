@@ -20,7 +20,7 @@ describe("mcp face", () => {
     expect(bridge.state.phase).toBe("review");
   });
 
-  it("registers the steering and screen tools and lists twenty-seven total", async () => {
+  it("registers the steering and screen tools and lists thirty total", async () => {
     const bridge = new Bridge();
     const server = buildMcpServer(bridge);
     const [clientT, serverT] = InMemoryTransport.createLinkedPair();
@@ -42,7 +42,10 @@ describe("mcp face", () => {
     expect(names).toContain("add_agent");
     expect(names).toContain("update_agent");
     expect(names).toContain("remove_agent");
-    expect(tools).toHaveLength(27);
+    expect(names).toContain("codemap_set");
+    expect(names).toContain("codemap_focus");
+    expect(names).toContain("codemap_touch");
+    expect(tools).toHaveLength(30);
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
@@ -171,6 +174,23 @@ describe("mcp face", () => {
     expect(bridge.state.teamAgents[0]).toMatchObject({ status: "done", action: "shipped" });
     await client.callTool({ name: "remove_agent", arguments: { id: "a1" } });
     expect(bridge.state.teamAgents).toHaveLength(0);
+    await client.close();
+    await server.close();
+  });
+
+  it("the codemap tools drive the codemap state", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const client = new Client({ name: "t", version: "0.0.1" }, { capabilities: {} });
+    const [ct, st] = InMemoryTransport.createLinkedPair();
+    await Promise.all([server.connect(st), client.connect(ct)]);
+    await client.callTool({ name: "codemap_set", arguments: { nodes: [{ id: "n1", path: "src/a.ts", kind: "file" }, { id: "n2", path: "src/b.ts", kind: "file" }] } });
+    expect(bridge.state.domain).toBe("codemap");
+    expect(bridge.state.codemapNodes).toHaveLength(2);
+    await client.callTool({ name: "codemap_focus", arguments: { id: "n1" } });
+    expect(bridge.state.codemapFocus).toBe("n1");
+    await client.callTool({ name: "codemap_touch", arguments: { id: "n2", kind: "edit" } });
+    expect(bridge.state.codemapTouches.n2).toBe("edit");
     await client.close();
     await server.close();
   });

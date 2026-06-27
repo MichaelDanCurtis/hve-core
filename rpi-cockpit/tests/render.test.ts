@@ -143,6 +143,40 @@ describe("toViewModel", () => {
     });
   });
 
+  describe("codemap view-model", () => {
+    it("passes through nodes, focus, and touches", () => {
+      let s = applyBeat(initialState(), { type: "codemap.set", nodes: [
+        { id: "n1", path: "src/a.ts", kind: "file" },
+        { id: "n2", path: "src/b.ts", kind: "file" },
+      ] }, 1);
+      s = applyBeat(s, { type: "codemap.focus", id: "n1" }, 2);
+      s = applyBeat(s, { type: "codemap.touch", id: "n2", kind: "edit" }, 3);
+      const vm = toViewModel(s);
+      expect(vm.domain).toBe("codemap");
+      expect(vm.codemap.nodes.map((n) => n.id)).toEqual(["n1", "n2"]);
+      expect(vm.codemap.focus).toBe("n1");
+      expect(vm.codemap.touches).toEqual({ n2: "edit" });
+    });
+    it("derives the group from the path top segment when group is absent", () => {
+      const s = applyBeat(initialState(), { type: "codemap.set", nodes: [
+        { id: "n1", path: "src/a.ts", kind: "file" },
+        { id: "n2", path: "README.md", kind: "file" },
+      ] }, 1);
+      const vm = toViewModel(s);
+      expect(vm.codemap.nodes[0].group).toBe("src");
+      expect(vm.codemap.nodes[1].group).toBe("(root)");
+    });
+    it("keeps an explicit group over the derived one", () => {
+      const s = applyBeat(initialState(), { type: "codemap.set", nodes: [
+        { id: "n1", path: "src/a.ts", kind: "file", group: "core" },
+      ] }, 1);
+      expect(toViewModel(s).codemap.nodes[0].group).toBe("core");
+    });
+    it("defaults to empty nodes, null focus, empty touches", () => {
+      expect(toViewModel(initialState()).codemap).toEqual({ nodes: [], focus: null, touches: {} });
+    });
+  });
+
   describe("context view-model", () => {
     it("passes through instructions, skills, and collection", () => {
       const s = applyBeat(initialState(), { type: "context.set", instructions: ["no em-dashes"], skills: ["tdd", "deepsearch"], collection: "hve-core" }, 1);

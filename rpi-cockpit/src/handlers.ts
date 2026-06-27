@@ -1,6 +1,6 @@
 // rpi-cockpit/src/handlers.ts
 import type { Bridge } from "./bridge.js";
-import type { AgentStatus, OptionItem, Phase, Severity, ValidationStatus } from "./events.js";
+import type { AgentStatus, CodeKind, OptionItem, Phase, Severity, TouchKind, ValidationStatus } from "./events.js";
 import { isLoopbackHttpUrl } from "./url.js";
 
 export const handlers = {
@@ -71,6 +71,18 @@ export const handlers = {
   remove_agent: (b: Bridge, a: { id: string }) => {
     b.emitBeat({ type: "agent.remove", id: a.id });
     return `agent removed: ${a.id}`;
+  },
+  codemap_set: (b: Bridge, a: { nodes: { id: string; path: string; kind: CodeKind; group?: string }[] }) => {
+    b.emitBeat({ type: "codemap.set", nodes: a.nodes });
+    return `codemap set: ${a.nodes.length} nodes`;
+  },
+  codemap_focus: (b: Bridge, a: { id: string }) => {
+    b.emitBeat({ type: "codemap.focus", id: a.id });
+    return `focus ${a.id}`;
+  },
+  codemap_touch: (b: Bridge, a: { id: string; kind: TouchKind }) => {
+    b.emitBeat({ type: "codemap.touch", id: a.id, kind: a.kind });
+    return `${a.kind} ${a.id}`;
   },
   set_context: (b: Bridge, a: { instructions?: string[]; skills?: string[]; collection?: string | null }) => {
     b.emitBeat({ type: "context.set", instructions: a.instructions ?? [], skills: a.skills ?? [], collection: a.collection ?? null });

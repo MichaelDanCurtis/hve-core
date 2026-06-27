@@ -76,6 +76,10 @@ function renderAppFrame(v) {
 
 let ws = null;
 let backoff = 500;
+// Tracks the rendered codemap node-id signature so renderCodemap rebuilds the
+// node elements only when the node set changes (build-once); focus/touch updates
+// then mutate classes + the camera transform in place so the camera glides. (codemap)
+let cmSig = null;
 
 function connect() {
   setConn("connecting");
@@ -139,12 +143,23 @@ function render(v) {
   const interviewView = document.getElementById("interview-view");
   const backlogView = document.getElementById("backlog-view");
   const teamView = document.getElementById("team-view");
+  const codemapView = document.getElementById("codemap-view");
   if (rpiView && findingsView) {
+    if (v.domain === "codemap") {
+      rpiView.hidden = true; findingsView.hidden = true;
+      if (interviewView) interviewView.hidden = true;
+      if (backlogView) backlogView.hidden = true;
+      if (teamView) teamView.hidden = true;
+      if (codemapView) codemapView.hidden = false;
+      renderCodemap(v);
+      return;
+    }
     if (v.domain === "team") {
       rpiView.hidden = true; findingsView.hidden = true;
       if (interviewView) interviewView.hidden = true;
       if (backlogView) backlogView.hidden = true;
       if (teamView) teamView.hidden = false;
+      if (codemapView) codemapView.hidden = true;
       renderTeam(v);
       return;
     }
@@ -153,6 +168,7 @@ function render(v) {
       if (interviewView) interviewView.hidden = true;
       if (backlogView) backlogView.hidden = false;
       if (teamView) teamView.hidden = true;
+      if (codemapView) codemapView.hidden = true;
       renderBoard(v);
       return;
     }
@@ -161,6 +177,7 @@ function render(v) {
       if (interviewView) interviewView.hidden = false;
       if (backlogView) backlogView.hidden = true;
       if (teamView) teamView.hidden = true;
+      if (codemapView) codemapView.hidden = true;
       renderInterview(v);
       return;
     }
@@ -170,6 +187,7 @@ function render(v) {
     if (interviewView) interviewView.hidden = true;
     if (backlogView) backlogView.hidden = true;
     if (teamView) teamView.hidden = true;
+    if (codemapView) codemapView.hidden = true;
     if (review) { renderFindings(v); return; }
   }
 
@@ -384,6 +402,58 @@ function renderTeam(v) {
             </div>
           </div>`).join("")}
      </div>`).join(""));
+}
+
+// Codebase map (CSS-3D). Build-once / update-in-place: rebuild the .cn node
+// elements only when the node-id signature changes (a new map); on focus/touch
+// re-renders only the state classes and the camera transform change, so the
+// CSS transition glides the camera instead of snapping. (codemap)
+function renderCodemap(v) {
+  const cm = v.codemap || { nodes: [], focus: null, touches: {} };
+  const world = document.getElementById("cm-world");
+  if (!world) return;
+  const sig = cm.nodes.map((n) => n.id).join("|");
+  if (sig !== cmSig) {
+    // rebuild once per node set
+    cmSig = sig;
+    const groups = [];
+    cm.nodes.forEach((n) => { if (!groups.includes(n.group)) groups.push(n.group); });
+    const perRow = Math.max(1, Math.ceil(Math.sqrt(groups.length)));
+    const counters = {};
+    world.innerHTML = cm.nodes.map((n) => {
+      const gi = groups.indexOf(n.group);
+      const k = (counters[n.group] = (counters[n.group] || 0) + 1) - 1;
+      const cgx = gi % perRow, cgz = Math.floor(gi / perRow);
+      const clusterX = (cgx - (perRow - 1) / 2) * 430;
+      const clusterZ = cgz * 360;
+      const col = k % 2, row = Math.floor(k / 2);
+      const tx = Math.round(clusterX + (col - 0.5) * 150);
+      const ty = Math.round(row * 78 - 30);
+      const tz = Math.round(clusterZ);
+      const name = n.path.split("/").pop();
+      return `<div class="cn" data-node="${esc(n.id)}" style="--tx:${tx}px;--ty:${ty}px;--tz:${tz}px">
+        <div class="cn-name">${esc(name)}</div><div class="cn-path">${esc(n.group)}</div></div>`;
+    }).join("");
+  }
+  // update states + camera every time (no rebuild)
+  const cards = world.querySelectorAll(".cn");
+  let fx = 0, fy = 0, fz = 0, haveFocus = false;
+  cards.forEach((el) => {
+    const id = el.dataset.node;
+    el.classList.toggle("focused", id === cm.focus);
+    const t = cm.touches[id];
+    el.classList.toggle("read", t === "read");
+    el.classList.toggle("edited", t === "edit");
+    if (id === cm.focus) {
+      fx = parseFloat(el.style.getPropertyValue("--tx")) || 0;
+      fy = parseFloat(el.style.getPropertyValue("--ty")) || 0;
+      fz = parseFloat(el.style.getPropertyValue("--tz")) || 0;
+      haveFocus = true;
+    }
+  });
+  world.style.transform = haveFocus
+    ? `translate3d(${-fx}px, ${-fy}px, ${-fz + 150}px)`
+    : `translate3d(0,0,-260px)`;
 }
 
 function renderInterview(v) {

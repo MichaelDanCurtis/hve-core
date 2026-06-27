@@ -10,6 +10,12 @@ export type ValidationStatus = z.infer<typeof ValidationStatus>;
 export const AgentStatus = z.enum(["queued", "running", "blocked", "done", "failed"]);
 export type AgentStatus = z.infer<typeof AgentStatus>;
 
+export const CodeKind = z.enum(["file", "dir"]);
+export type CodeKind = z.infer<typeof CodeKind>;
+
+export const TouchKind = z.enum(["read", "edit"]);
+export type TouchKind = z.infer<typeof TouchKind>;
+
 export const OptionItem = z.object({
   id: z.string(),
   title: z.string(),
@@ -53,6 +59,9 @@ export const Beat = z.discriminatedUnion("type", [
   z.object({ type: z.literal("agent.add"), id: z.string(), name: z.string(), role: z.string().optional(), status: AgentStatus }),
   z.object({ type: z.literal("agent.update"), id: z.string(), status: AgentStatus.optional(), action: z.string().nullable().optional() }),
   z.object({ type: z.literal("agent.remove"), id: z.string() }),
+  z.object({ type: z.literal("codemap.set"), nodes: z.array(z.object({ id: z.string(), path: z.string(), kind: CodeKind, group: z.string().optional() })).max(60) }),
+  z.object({ type: z.literal("codemap.focus"), id: z.string() }),
+  z.object({ type: z.literal("codemap.touch"), id: z.string(), kind: TouchKind }),
 ]);
 export type Beat = z.infer<typeof Beat>;
 

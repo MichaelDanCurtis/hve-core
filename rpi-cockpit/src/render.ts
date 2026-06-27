@@ -29,11 +29,12 @@ export interface ViewModel {
   started: boolean;
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | "team" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | null;
   reviewTarget: string | null;
   findingGroups: { severity: Severity; items: { title: string; file?: string; line?: number; detail?: string }[] }[];
   board: { target: string | null; action: string | null; count: number; columns: { name: string; items: { id: string; title: string; kind?: string; tier?: string }[] }[] };
   team: { orchestrator: string | null; count: number; columns: { status: string; label: string; agents: { id: string; name: string; role?: string; action?: string | null }[] }[] };
+  codemap: { nodes: { id: string; path: string; kind: string; group: string }[]; focus: string | null; touches: Record<string, string> };
   view: "home" | "loop";
   navigatorOpen: boolean;
   workflows: { id: string; name: string; hint: string; description: string }[];
@@ -97,6 +98,16 @@ export function toViewModel(s: SessionState): ViewModel {
       }))
       .filter((c) => c.agents.length > 0),
   };
+  const codemap = {
+    nodes: s.codemapNodes.map((n) => ({
+      id: n.id,
+      path: n.path,
+      kind: n.kind,
+      group: n.group || (n.path.split("/").length > 1 ? n.path.split("/")[0] : "(root)"),
+    })),
+    focus: s.codemapFocus,
+    touches: s.codemapTouches,
+  };
   return {
     // A directly-launched review/interview/backlog sets domain without session.begin
     // (so task is "" and phase null); treat any active domain as started so the Home
@@ -109,6 +120,7 @@ export function toViewModel(s: SessionState): ViewModel {
     findingGroups,
     board,
     team,
+    codemap,
     view: s.view,
     navigatorOpen: s.navigatorOpen,
     workflows: WORKFLOWS.map((w) => ({ id: w.id, name: w.name, hint: w.hint, description: w.description })),

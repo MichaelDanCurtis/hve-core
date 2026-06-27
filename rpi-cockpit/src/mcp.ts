@@ -2,7 +2,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { Phase, ValidationStatus, OptionItem, Severity, AgentStatus } from "./events.js";
+import { Phase, ValidationStatus, OptionItem, Severity, AgentStatus, CodeKind, TouchKind } from "./events.js";
 import { handlers } from "./handlers.js";
 import { presentOptionsWithElicitation, askQuestionWithElicitation, presentWorkflows, decisionTimeoutMs, questionTimeoutMs, type ElicitFormParams } from "./elicit.js";
 import type { Bridge } from "./bridge.js";
@@ -124,6 +124,24 @@ export function buildMcpServer(bridge: Bridge): McpServer {
     "remove_agent",
     { description: "Remove a subagent from the team board.", inputSchema: { id: z.string() } },
     async (a) => text(handlers.remove_agent(bridge, a)),
+  );
+
+  server.registerTool(
+    "codemap_set",
+    { description: "Set the codebase map: the slice of files/dirs relevant to this task (max 60). Switches the cockpit to the 3D codebase map.", inputSchema: { nodes: z.array(z.object({ id: z.string(), path: z.string(), kind: CodeKind, group: z.string().optional() })).max(60) } },
+    async (a) => text(handlers.codemap_set(bridge, a)),
+  );
+
+  server.registerTool(
+    "codemap_focus",
+    { description: "Move the codebase-map camera to a node (the file the agent is now working in).", inputSchema: { id: z.string() } },
+    async (a) => text(handlers.codemap_focus(bridge, a)),
+  );
+
+  server.registerTool(
+    "codemap_touch",
+    { description: "Mark a codebase-map node as read or edited (the agent's trail).", inputSchema: { id: z.string(), kind: TouchKind } },
+    async (a) => text(handlers.codemap_touch(bridge, a)),
   );
 
   server.registerTool(
