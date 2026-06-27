@@ -91,8 +91,7 @@ jobs:
             '^\.github/agents/',
             '^\.github/prompts/',
             '^\.github/instructions/',
-            '^\.github/skills/',
-            '^\.github/workflows/eval-validation\.yml$'
+            '^\.github/skills/'
           )
 
           # package.json and package-lock.json change often for reasons unrelated to
