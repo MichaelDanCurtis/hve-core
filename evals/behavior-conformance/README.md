@@ -2,7 +2,7 @@
 title: Behavior Conformance Suite
 description: 'Tier 3 conformance evaluations for prompts, instructions, and skill behavior'
 author: HVE Core Team
-ms.date: 2026-06-26
+ms.date: 2026-06-27
 ---
 
 This directory hosts the behavior conformance suite. It is the only suite under `evals/` that ships in advisory mode by default: failures are reported in the pull request summary but do not block the build until each spec graduates per the graduation policy below.
@@ -34,6 +34,8 @@ The Phase 11 cut of `instructions.eval.yaml` covers 44 high-signal instructions 
 * HVE-Core authoring: `markdown`, `prompt-builder`, `pull-request`, `writing-style`.
 * RAI and Security planning: `rai-identity`, `rai-risk-classification`, `backlog-handoff`, `sssc-assessment`.
 * Additional: `docusaurus-edits`, `experiment-designer`, `story-quality`, `disclaimer-language`.
+
+The Phase 13 cut of `skill-behavior.eval.yaml` covers the RPI and prompt-engineering skill workflows in advisory mode. The current branch-specific calibration status is not yet established for gating: pass-rate and false-positive measurements are collected from advisory CI runs before graduation, and regex-only `output-matches` graders check contract vocabulary and routing signals rather than full semantic correctness.
 
 ## Pipeline integration
 

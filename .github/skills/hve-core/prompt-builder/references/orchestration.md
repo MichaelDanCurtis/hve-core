@@ -20,12 +20,16 @@ Repeat each subagent dispatch, answering any clarifying questions it returns, un
 
 When the caller supplies a run folder, evidence root, tracking root, or similar orchestration-owned path, treat that path as the evidence root for the run. Store or mirror research, updater tracking, sandbox execution logs, and evaluation logs under that root so the caller can trace the complete workflow.
 
+Normalize and validate caller-provided roots before writing. Accept workspace-relative paths under `.copilot-tracking/` by default, or an explicitly trusted run root named by the caller. Reject paths with `..` traversal, source artifact directories, existing non-evidence files, and absolute paths unless the caller explicitly identifies the absolute path as a trusted run root. Record the resolved evidence root in the run log before creating or mirroring artifacts.
+
+Treat research, updater tracking, sandbox execution logs, evaluation logs, and analysis reports as internal evidence. Redact secrets, tokens, credentials, and sensitive prompt outputs before mirroring logs outside canonical tracking paths, and confirm the resolved destination and evidence categories before writing durable evidence outside approved roots.
+
 Use the canonical `.copilot-tracking/research`, `.copilot-tracking/prompts`, and `.copilot-tracking/sandbox` paths when no caller-specific location is supplied. When mirroring canonical paths under a caller-owned root, preserve the same relative shapes, such as `research/...`, `prompts/...`, and `sandbox/...`, unless the caller supplied more specific subpaths.
 
 ## Sandbox contract and cross-run continuity
 
 * Default sandbox root: `.copilot-tracking/sandbox/`.
-* Caller-owned sandbox root: when the caller supplies a run folder, evidence root, tracking root, or sandbox path, place or mirror the sandbox under that location. Use a `sandbox/` child folder unless the caller supplied a more specific sandbox path.
+* Caller-owned sandbox root: when the caller supplies a run folder, evidence root, tracking root, or sandbox path, place or mirror the sandbox under that location only after the caller-root validation rules pass. Use a `sandbox/` child folder unless the caller supplied a more specific sandbox path.
 * Folder name pattern: `{{YYYY-MM-DD}}-{{topic}}-{{run-number}}`.
 * Use today's date as `{{YYYY-MM-DD}}`.
 * When multiple target files are supplied, use the lexically first entry as the primary artifact.
@@ -71,6 +75,8 @@ When generating bounded agents, include handoffs only when the user asks for the
 
 Generated audit-style workflows, or generated modes that distinguish audit from improvement, must state source-edit authority on each relevant surface: prompt inputs, agent protocol, instruction constraints, and skill-support references. The `/prompt-builder` default remains create, update, and improve. Use `/prompt-analyze` for read-only review, and use `/prompt-refactor` for cleanup or scoped refactor work.
 In generated audit/improvement workflows, make read-only audit behavior explicit with a field such as `mode=audit`, and make source edits explicit with `mode=improve` or `applyChanges=true`.
+
+Pair source-edit authority with evidence-root authority. Generated workflows that accept caller-owned evidence, tracking, report, or sandbox roots must state the approved root policy, normalized destination logging, disclosure boundary, and rejection behavior for untrusted paths.
 
 ## Cleanup rules before final response
 

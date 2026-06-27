@@ -34,7 +34,7 @@ applyTo: '.copilot-tracking/changes/{{YYYY-MM-DD}}/{{task_slug}}-changes.md'
 
 ## Risks and Mitigations
 
-* {{material_risk}} - Status: {{resolved_mitigated_deferred_blocker}} - Rationale: {{rationale}}
+* {{material_risk}} - Likelihood: {{low_medium_high_or_unknown}} - Impact: {{low_medium_high_or_scope}} - Priority: {{likelihood_impact_basis_or_model_reference}} - Status: {{resolved_mitigated_deferred_blocker}} - Rationale: {{rationale}}
 
 ## Implementation Checklist
 

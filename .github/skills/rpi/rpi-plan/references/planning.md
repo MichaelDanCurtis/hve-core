@@ -35,7 +35,7 @@ Then add `<!-- markdownlint-disable-file -->` before the H1.
 * User requirements: capture the user-stated goals and record the source of each requirement, including a source reference for every caller-stated constraint.
 * Derived objectives: add planner-derived objectives and the reasoning behind them, citing the research finding or reasoning that created them.
 * Context summary: reference the research artifact, current code paths, and any subagent findings.
-* Risks and mitigations: capture each material research risk and whether it was resolved, mitigated, deferred with rationale, or recorded as a blocker.
+* Risks and mitigations: capture each material research risk, likelihood, impact or magnitude, priority basis, and whether it was resolved, mitigated, deferred with rationale, or recorded as a blocker.
 * Implementation checklist: break work into phases and steps, annotate parallelizable work with `<!-- parallelizable: true -->`, and point each step to the details file lines.
 * Final validation phase: include full project validation, minor fix iteration, and blocking issue reporting.
 * Planning log reference: link to `.copilot-tracking/plans/logs/{{YYYY-MM-DD}}/{{task_slug}}-log.md` for discrepancy handling, validator findings, implementation paths considered, deferred work, and validation coverage.

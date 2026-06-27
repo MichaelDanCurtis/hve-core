@@ -6,6 +6,10 @@ description: "Validation selection matrix for prompt-refactor runs"
 
 Use this matrix after applying refactor edits and before the final response. Select validations based on the changed artifact types and the repository capabilities available in the current workspace. When a validation is not available, skip it explicitly and record the reason.
 
+## Operator Prerequisites
+
+Use this matrix only when you have repository checkout access, permission to run the relevant validation commands, and enough prompt-artifact familiarity to interpret Markdown, frontmatter, schema, and eval output. Escalate instead of guessing when permissions are missing, tools are unavailable, validation output is ambiguous, or the available check would be broader or more destructive than the requested refactor scope.
+
 ## Selection Rules
 
 * Validate every changed file with the narrowest relevant checks available.
