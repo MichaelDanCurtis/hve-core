@@ -20,7 +20,7 @@ describe("mcp face", () => {
     expect(bridge.state.phase).toBe("review");
   });
 
-  it("registers the steering and screen tools and lists thirty total", async () => {
+  it("registers the steering and screen tools and lists thirty-two total", async () => {
     const bridge = new Bridge();
     const server = buildMcpServer(bridge);
     const [clientT, serverT] = InMemoryTransport.createLinkedPair();
@@ -45,7 +45,9 @@ describe("mcp face", () => {
     expect(names).toContain("codemap_set");
     expect(names).toContain("codemap_focus");
     expect(names).toContain("codemap_touch");
-    expect(tools).toHaveLength(30);
+    expect(names).toContain("dataset_profile");
+    expect(names).toContain("add_column");
+    expect(tools).toHaveLength(32);
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
@@ -278,5 +280,23 @@ describe("mcp face", () => {
     void client.callTool({ name: "present_options", arguments: { prompt: "Pick?", options: [{ id: "a", title: "A" }], id: "d7" } });
     await new Promise((r) => setTimeout(r, 10));
     expect(bridge.state.decisions.find((d) => d.id === "d7")?.kind).toBe("choice");
+  });
+
+  it("dataset_profile + add_column drive the data profile state", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const [clientT, serverT] = InMemoryTransport.createLinkedPair();
+    await server.connect(serverT);
+    const client = new Client({ name: "test", version: "0" });
+    await client.connect(clientT);
+
+    await client.callTool({ name: "dataset_profile", arguments: { name: "sales.csv", rows: 100, columns: 2, source: "dw" } });
+    await client.callTool({ name: "add_column", arguments: { name: "id", dtype: "int", nullPct: 0, distinct: 100, quality: "ok" } });
+    expect(bridge.state.domain).toBe("dataprofile");
+    expect(bridge.state.profileDataset).toMatchObject({ name: "sales.csv", cols: 2 });
+    expect(bridge.state.profileColumns[0]).toMatchObject({ name: "id", dtype: "int", quality: "ok" });
+
+    await client.close();
+    await server.close();
   });
 });

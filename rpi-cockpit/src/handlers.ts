@@ -56,6 +56,14 @@ export const handlers = {
     b.emitBeat({ type: "backlog.action", text: a.text });
     return a.text ? `action: ${a.text}` : "action cleared";
   },
+  dataset_profile: (b: Bridge, a: { name: string; rows?: number; columns?: number; source?: string }) => {
+    b.emitBeat({ type: "profile.start", name: a.name, rows: a.rows, columns: a.columns, source: a.source });
+    return `profile started: ${a.name}`;
+  },
+  add_column: (b: Bridge, a: { name: string; dtype: string; nullPct?: number; distinct?: number; stat?: string; quality?: "ok" | "warn" | "risk" }) => {
+    b.emitBeat({ type: "column.add", name: a.name, dtype: a.dtype, nullPct: a.nullPct, distinct: a.distinct, stat: a.stat, quality: a.quality });
+    return `column added: ${a.name}`;
+  },
   team_start: (b: Bridge, a: { task: string; orchestrator: string }) => {
     b.emitBeat({ type: "team.start", task: a.task, orchestrator: a.orchestrator });
     return `team started: ${a.orchestrator}`;

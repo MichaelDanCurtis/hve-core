@@ -91,6 +91,18 @@ export function buildMcpServer(bridge: Bridge): McpServer {
   );
 
   server.registerTool(
+    "dataset_profile",
+    { description: "Begin a dataset profile; switches the cockpit to the data-profile table view. Name the dataset; optionally give its row count, total column count, and source.", inputSchema: { name: z.string(), rows: z.number().int().optional(), columns: z.number().int().optional(), source: z.string().optional() } },
+    async (a) => text(handlers.dataset_profile(bridge, a)),
+  );
+
+  server.registerTool(
+    "add_column",
+    { description: "Add or update one column's profile in the dataset profile view (a dataset field, not a kanban column). Give its name and dtype; optionally null percentage (0-100), distinct count, a representative stat string (e.g. \"0-4820\" or \"mean 126.2\"), and a quality flag (ok/warn/risk).", inputSchema: { name: z.string(), dtype: z.string(), nullPct: z.number().optional(), distinct: z.number().int().optional(), stat: z.string().optional(), quality: z.enum(["ok", "warn", "risk"]).optional() } },
+    async (a) => text(handlers.add_column(bridge, a)),
+  );
+
+  server.registerTool(
     "set_context",
     { description: "Set the active context shown in the cockpit's context strip: the instructions (coding standards), skills, and collection currently in effect. Replaces the whole context, so pass everything currently active. Omitting instructions, skills, or collection clears that group.", inputSchema: { instructions: z.array(z.string()).optional(), skills: z.array(z.string()).optional(), collection: z.string().nullable().optional() } },
     async (a) => text(handlers.set_context(bridge, a)),
