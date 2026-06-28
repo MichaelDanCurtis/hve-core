@@ -111,4 +111,18 @@ describe("applyInbound", () => {
       expect(d.text).toContain("a1");
     }
   });
+
+  it("parseInbound accepts a valid revise frame", () => {
+    expect(parseInbound({ type: "revise", id: "d1" })).toEqual({ type: "revise", id: "d1" });
+  });
+  it("parseInbound rejects a revise frame without a string id", () => {
+    expect(parseInbound({ type: "revise" })).toBeNull();
+    expect(parseInbound({ type: "revise", id: 3 })).toBeNull();
+  });
+  it("applyInbound revise calls bridge.revise", () => {
+    const b = new Bridge();
+    const p = b.presentOptions("x", [{ id: "a", title: "A" }], 0, "d1"); b.resolveDecision("d1", "a"); void p;
+    applyInbound(b, { type: "revise", id: "d1" });
+    expect(b.state.decisions[0].status).toBe("pending");
+  });
 });

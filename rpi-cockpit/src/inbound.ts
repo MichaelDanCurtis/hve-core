@@ -13,7 +13,8 @@ export type InboundFrame =
   | { type: "navigate"; screen: "home" | "loop" }
   | { type: "answer"; id: string; text: string }
   | { type: "navigator"; open: boolean }
-  | { type: "intervene"; action: "pause" | "swap" | "spawn"; agentId?: string };
+  | { type: "intervene"; action: "pause" | "swap" | "spawn"; agentId?: string }
+  | { type: "revise"; id: string };
 
 // Mirror the EXACT validation the WS handler used. Return null on anything
 // malformed or unrecognized so the caller can ignore it without crashing.
@@ -64,6 +65,11 @@ export function parseInbound(msg: unknown): InboundFrame | null {
     }
     return null;
   }
+  if (type === "revise") {
+    const m = msg as { id?: unknown };
+    if (typeof m.id === "string") return { type: "revise", id: m.id };
+    return null;
+  }
   return null;
 }
 
@@ -90,6 +96,9 @@ export function applyInbound(bridge: Bridge, f: InboundFrame): void {
       return;
     case "intervene":
       bridge.intervene(f.action, f.agentId);
+      return;
+    case "revise":
+      bridge.revise(f.id);
       return;
   }
 }
