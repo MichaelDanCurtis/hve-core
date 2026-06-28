@@ -228,11 +228,18 @@
   .finding-detail { font-size: 13px; opacity: .85; margin-top: 6px; white-space: pre-wrap; }
   .sev-critical .sev-label { color: #e26a6a; }
   .sev-high .sev-label { color: #e0954b; }
-  #iv-question { border: 1px solid var(--stroke, #3a3a3a); border-radius: 8px; padding: 12px 14px; }
-  .iv-prompt { font-weight: 500; margin-bottom: 8px; }
-  .iv-input { width: 100%; box-sizing: border-box; min-height: 64px; }
-  .iv-send { margin-top: 8px; }
   .iv-empty { opacity: .6; font-size: 13px; }
+  #decision-flow { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .flow-row { border: 1px solid var(--stroke, #3C3C3C); border-radius: 8px; padding: 9px 12px; }
+  .flow-row.pending { border-color: var(--accent-blue, #4FC1FF); background: var(--brand-2, #094771); }
+  .flow-row.superseded { opacity: .55; }
+  .flow-prompt { font-size: 13px; }
+  .flow-answer { font-size: 12.5px; color: var(--text-2, #9D9D9D); margin-top: 3px; }
+  .flow-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .flow-chip { font-size: 11.5px; padding: 2px 9px; border-radius: 11px; border: 1px solid var(--stroke-2, #4A4A4A); color: var(--text-2, #9D9D9D); }
+  .flow-chip.picked { color: var(--accent-cyan, #9CDCFE); border-color: var(--accent-blue, #4FC1FF); }
+  .flow-revise { font-size: 11px; font-family: inherit; cursor: pointer; padding: 2px 9px; border-radius: 5px; border: 1px solid var(--stroke-2, #4A4A4A); background: var(--layer, #252526); color: var(--text-2, #9D9D9D); margin-top: 6px; }
+  .flow-chat { font-size: 12px; color: var(--accent-cyan, #9CDCFE); margin-top: 5px; }
   .board-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
   .board-target { font-weight: 500; }
   .board-count { font-size: 12px; opacity: .6; }
@@ -302,7 +309,7 @@
   @keyframes screenIn { from { opacity: 0 } to { opacity: 1 } }
   .welcome-overlay { animation: overlayIn var(--dur-normal) var(--ease-standard); }
   .welcome-modal { animation: modalIn var(--dur-slow) var(--ease-entrance); }
-  #decision .decide { animation: decideIn var(--dur-normal) var(--ease-entrance); }
+  .flow-row.pending { animation: decideIn var(--dur-normal) var(--ease-entrance); }
   /* #app-frame is shown by removing [hidden]; display:none->flex restarts the
      animation, so the slide-in runs each time the panel reappears. */
   #app-frame { animation: panelIn var(--dur-slow) var(--ease-entrance); }
@@ -392,11 +399,9 @@
     </section>
 
     <section id="loop">
-    <!-- present_options is cross-cutting: it can fire in any domain (RPI, review,
-         interview, backlog) without changing the view. The decision card lives
-         here, outside every view section, so client.js paints it regardless of
-         domain (see A1 in the harden pass). -->
-    <div id="decision" aria-live="polite"></div>
+    <!-- #decision-flow is shared across domains; client.js moves it into the
+         active view's .flow-slot so it appears inline in the relevant pane. -->
+    <div id="decision-flow" hidden></div>
     <div id="rpi-view">
     <aside class="rail-left">
       <div class="rail-title">RPI loop</div>
@@ -404,6 +409,7 @@
     </aside>
 
     <section class="center">
+      <div class="flow-slot"></div>
       <div class="h-row" aria-live="polite"><h1 id="phase-title">HVE Cockpit</h1><span class="state" id="phase-state"></span></div>
       <div class="lead" id="lead"></div>
 
@@ -446,7 +452,7 @@
       <div class="rev-head">
         <span id="iv-doctype" class="rev-target"></span>
       </div>
-      <div id="iv-question"></div>
+      <div class="flow-slot"></div>
       <iframe id="iv-doc" sandbox="" title="Document preview" style="width:100%;min-height:280px;border:1px solid var(--stroke,#3a3a3a);border-radius:8px;margin-top:14px"></iframe>
     </div>
     <section id="backlog-view" hidden>

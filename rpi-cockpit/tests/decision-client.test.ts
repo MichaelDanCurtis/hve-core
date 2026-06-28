@@ -18,48 +18,51 @@ function boot() {
   return win;
 }
 
-const DECISION = { id: "d1", prompt: "Which approach?", options: [{ id: "a", title: "A" }, { id: "b", title: "B", recommended: true }] };
-
-// present_options is cross-cutting; the card must paint regardless of domain. (A1)
-describe("decision card paints in every domain", () => {
+describe("decision flow", () => {
   let win: ReturnType<typeof boot>;
   beforeEach(() => { win = boot(); });
 
-  function withDecision(s: ReturnType<typeof initialState>) {
-    return toViewModel({ ...s, pendingDecision: DECISION });
-  }
-
-  it("paints the card on the RPI domain", () => {
-    const s = applyBeat(initialState(), { type: "session.begin", task: "t", host: "h" }, 1);
-    (win as any).render(withDecision(s));
-    expect(win.document.querySelector("#decision .decide")).not.toBeNull();
-    expect(win.document.querySelector("#decision [data-choice]")).not.toBeNull();
+  it("renders the decision flow with answered, pending, and revisit affordances", () => {
+    (win as any).render({
+      view: "loop", domain: "rpi", navigatorOpen: false, workflows: [],
+      context: { instructions: [], skills: [], collection: null }, appFrame: { url: null },
+      hostElicits: true,
+      decisions: [
+        { id: "d1", prompt: "Strategy?", kind: "choice", options: [{ id: "a", title: "Blue-green" }], answer: "a", status: "answered" },
+        { id: "q2", prompt: "Window?", kind: "text", status: "pending" },
+      ],
+      // minimal RPI fields:
+      task: "t", host: "h", phase: "implement", phaseLabel: "Implement", phaseNumber: 3, lead: "x",
+      steps: [{ phase: "implement", status: "active" }], subagents: [], validations: [],
+      steerMenu: { label: "x", source: "preset", options: [] }, directives: [], screen: null, log: [],
+      findingGroups: [], board: { target: null, action: null, count: 0, columns: [] },
+      team: { orchestrator: null, count: 0, columns: [] }, codemap: { nodes: [], focus: null, touches: {} },
+      reviewTarget: null, docType: null,
+    });
+    const rows = (win as any).document.querySelectorAll("#decision-flow .flow-row");
+    expect(rows.length).toBe(2);
+    expect((win as any).document.querySelector('#decision-flow .flow-row[data-decision-id="d1"] [data-revise="d1"]')).toBeTruthy();
+    const pending = (win as any).document.querySelector('#decision-flow .flow-row[data-decision-id="q2"]');
+    expect(pending?.className).toContain("pending");
+    // hostElicits true => choice chips are NOT clickable inputs
+    expect((win as any).document.querySelector('#decision-flow [data-choice]')).toBeNull();
   });
 
-  it("paints the card on the backlog domain", () => {
-    const s = applyBeat(initialState(), { type: "backlog.start", target: "Sprint", columns: ["Todo"] }, 1);
-    (win as any).render(withDecision(s));
-    expect(win.document.querySelector("#decision .decide")).not.toBeNull();
-    expect(win.document.querySelector("#decision [data-choice]")).not.toBeNull();
-  });
-
-  it("paints the card on the interview domain", () => {
-    const s = applyBeat(initialState(), { type: "interview.start", docType: "PRD" }, 1);
-    (win as any).render(withDecision(s));
-    expect(win.document.querySelector("#decision .decide")).not.toBeNull();
-    expect(win.document.querySelector("#decision [data-choice]")).not.toBeNull();
-  });
-
-  it("paints the card on the review domain", () => {
-    const s = applyBeat(initialState(), { type: "review.start", target: "PR 1" }, 1);
-    (win as any).render(withDecision(s));
-    expect(win.document.querySelector("#decision .decide")).not.toBeNull();
-    expect(win.document.querySelector("#decision [data-choice]")).not.toBeNull();
-  });
-
-  it("clears the card when there is no pending decision", () => {
-    const s = applyBeat(initialState(), { type: "review.start", target: "PR 1" }, 1);
-    (win as any).render(toViewModel(s));
-    expect(win.document.querySelector("#decision .decide")).toBeNull();
+  it("renders interactive choice chips when hostElicits is false", () => {
+    (win as any).render({
+      view: "loop", domain: "rpi", navigatorOpen: false, workflows: [],
+      context: { instructions: [], skills: [], collection: null }, appFrame: { url: null },
+      hostElicits: false,
+      decisions: [
+        { id: "d1", prompt: "Pick one?", kind: "choice", options: [{ id: "x", title: "Option X" }], status: "pending" },
+      ],
+      task: "t", host: "h", phase: "implement", phaseLabel: "Implement", phaseNumber: 3, lead: "x",
+      steps: [{ phase: "implement", status: "active" }], subagents: [], validations: [],
+      steerMenu: { label: "x", source: "preset", options: [] }, directives: [], screen: null, log: [],
+      findingGroups: [], board: { target: null, action: null, count: 0, columns: [] },
+      team: { orchestrator: null, count: 0, columns: [] }, codemap: { nodes: [], focus: null, touches: {} },
+      reviewTarget: null, docType: null,
+    });
+    expect((win as any).document.querySelector('#decision-flow [data-choice]')).not.toBeNull();
   });
 });

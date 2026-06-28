@@ -37,16 +37,14 @@ describe("interview client", () => {
     expect((win.document.getElementById("findings-view") as any).hidden).toBe(true);
   });
 
-  it("renders the question prompt in iv-question", () => {
-    (win as any).render(interviewVm());
-    const q = win.document.getElementById("iv-question");
-    expect(q!.textContent).toContain("What problem?");
-  });
-
-  it("renders a send button with data-answer attribute", () => {
-    (win as any).render(interviewVm());
-    const btn = win.document.querySelector("[data-answer]");
-    expect(btn).not.toBeNull();
+  it("renders the doc iframe when a screen is present", () => {
+    const b = new Bridge();
+    b.emitBeat({ type: "interview.start", docType: "PRD" });
+    (b.state as any).screen = { html: "<p>Draft content</p>" };
+    (win as any).render(toViewModel(b.state));
+    const doc = win.document.getElementById("iv-doc") as HTMLIFrameElement;
+    expect(doc).not.toBeNull();
+    expect((doc as any).srcdoc).toContain("Draft content");
   });
 
   it("shows rpi-view and hides interview-view on a session.begin (rpi) loop", () => {

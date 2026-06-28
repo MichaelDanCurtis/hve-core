@@ -121,10 +121,7 @@ function render(v) {
   renderContext(v);
   renderAppFrame(v);
   renderNavTiles(v);
-  // present_options is cross-cutting: paint the decision card regardless of domain
-  // (it lives outside every view section), so a decision raised during a review,
-  // interview, or backlog still shows a card in the pane. (A1)
-  setHtml("decision", v.decision ? decisionHtml(v.decision) : "");
+  renderDecisionFlow(v);
   if (v.navigatorOpen) { const w = document.getElementById("welcome"); if (w) w.hidden = false; }
 
   const home = document.getElementById("home");
@@ -263,15 +260,25 @@ function renderScreen(screen) {
   pane.replaceChildren(title, frame);
 }
 
-function decisionHtml(d) {
-  const opts = d.options.map((o) =>
-    `<div class="opt ${o.recommended ? "rec" : ""}">${o.recommended ? '<span class="badge">RECOMMENDED</span>' : ""}
-      <h4>${esc(o.title)}</h4><p>${esc(o.detail ?? "")}</p></div>`).join("");
-  const btns = d.options.map((o) =>
-    `<button class="btn ${o.recommended ? "primary" : ""}" data-id="${esc(d.id)}" data-choice="${esc(o.id)}">Choose ${esc(o.title)}</button>`).join("");
-  return `<div class="decide"><div class="decide-head"><span class="t">${esc(d.prompt)}</span>
-    <span class="s">present_options · awaiting your pick</span></div>
-    <div class="decide-body"><div class="opts">${opts}</div><div class="btns">${btns}</div></div></div>`;
+function renderDecisionFlow(v) {
+  const flow = document.getElementById("decision-flow");
+  if (!flow) return;
+  const ds = v.decisions || [];
+  if (ds.length === 0) { flow.hidden = true; flow.innerHTML = ""; return; }
+  flow.hidden = false;
+  const interactive = !v.hostElicits; // pane is a fallback input only when chat can't elicit
+  flow.innerHTML = ds.map((d) => {
+    const chips = d.kind === "choice" && d.options ? `<div class="flow-chips">${d.options.map((o) =>
+      `<span class="flow-chip ${d.answer === o.id ? "picked" : ""}" ${interactive && d.status === "pending" ? `data-choice="${esc(o.id)}" data-id="${esc(d.id)}" role="button" tabindex="0"` : ""}>${esc(o.title)}</span>`).join("")}</div>` : "";
+    const answer = d.kind === "text" && d.answer ? `<div class="flow-answer">${esc(d.answer)}</div>` : "";
+    const pendingHint = d.status === "pending" ? `<div class="flow-chat">awaiting your answer in chat</div>` : "";
+    const revise = d.status === "answered" ? `<button class="flow-revise" data-revise="${esc(d.id)}">revisit</button>` : "";
+    return `<div class="flow-row ${esc(d.status)}" data-decision-id="${esc(d.id)}">
+      <div class="flow-prompt">${esc(d.prompt)}</div>${answer}${chips}${pendingHint}${revise}</div>`;
+  }).join("");
+  // Host the flow in the active view's slot (RPI center / interview), else leave in #loop.
+  const slot = document.querySelector(v.domain === "rpi" ? "#rpi-view .center .flow-slot" : v.domain === "interview" ? "#interview-view .flow-slot" : null);
+  if (slot && flow.parentElement !== slot) slot.appendChild(flow);
 }
 
 // Event delegation: home interactions + decision buttons + steer "Queue directive" button.
@@ -292,15 +299,10 @@ document.addEventListener("click", (e) => {
   }
   const tile = e.target.closest("[data-launch]");
   if (tile) { launchWorkflow(tile.dataset.launch); return; }
-  const choice = e.target.closest("#decision [data-choice]");
-  if (choice) { sendMsg({ type: "decide", id: choice.dataset.id, choiceId: choice.dataset.choice }); return; }
-  const ivSend = e.target.closest("#iv-send");
-  if (ivSend) {
-    const input = document.getElementById("iv-input");
-    const txt = (input && input.value || "").trim();
-    if (txt) sendMsg({ type: "answer", id: ivSend.dataset.answer, text: txt });
-    return;
-  }
+  const rev = e.target.closest("[data-revise]");
+  if (rev) { sendMsg({ type: "revise", id: rev.dataset.revise }); return; }
+  const fchoice = e.target.closest("#decision-flow [data-choice]");
+  if (fchoice) { sendMsg({ type: "decide", id: fchoice.dataset.id, choiceId: fchoice.dataset.choice }); return; }
   if (e.target.closest("#steer-send")) {
     const note = document.getElementById("steer-note");
     const text = (note && note.value || "").trim();
@@ -458,14 +460,6 @@ function renderCodemap(v) {
 
 function renderInterview(v) {
   setText("iv-doctype", v.docType ? `Interview: ${v.docType}` : "Interview");
-  if (v.pendingQuestion) {
-    setHtml("iv-question",
-      `<div class="iv-prompt">${esc(v.pendingQuestion.prompt)}</div>
-       <textarea id="iv-input" class="iv-input" placeholder="Type your answer"></textarea>
-       <button id="iv-send" class="iv-send" data-answer="${esc(v.pendingQuestion.id)}">Send answer</button>`);
-  } else {
-    setHtml("iv-question", `<div class="iv-empty">Waiting for the next question.</div>`);
-  }
   const doc = document.getElementById("iv-doc");
   if (doc) doc.srcdoc = v.screen?.html ?? "";
 }
