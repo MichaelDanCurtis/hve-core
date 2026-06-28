@@ -189,11 +189,18 @@
   .af-frame { flex: 1; min-height: 0; }
   #af-iframe { width: 100%; height: 100%; border: 0; background: #fff; }
 
+  #iv-doc { width: 100%; min-height: 280px; border: 1px solid var(--stroke, #3a3a3a); border-radius: 8px; margin-top: 14px; background: #fff; }
+  @media (min-width: 980px) {
+    #interview-view { display: flex; gap: 22px; align-items: stretch; min-height: 0; }
+    #interview-view .iv-convo { flex: 1 1 0; min-width: 0; overflow: auto; }
+    #interview-view #iv-doc { flex: 1 1 0; min-width: 0; min-height: 0; margin-top: 0; }
+  }
   [hidden] { display: none !important; }
   /* C2: a visible keyboard focus indicator for every interactive control, in both
      themes (var(--accent-blue) is defined for dark and light). */
   .iconbtn:focus-visible, .btn:focus-visible, .wf-tile:focus-visible,
   .crumb-back:focus-visible, #welcome-dismiss:focus-visible,
+  .finding-loc:focus-visible, .finding-open:focus-visible,
   select:focus-visible, textarea:focus-visible {
     outline: 2px solid var(--accent-blue, #4FC1FF); outline-offset: 2px;
   }
@@ -227,6 +234,9 @@
   .iv-step-done .iv-step-dot { background: transparent; }
   .iv-step-active { color: var(--accent-cyan, #9CDCFE); border-color: var(--accent-blue, #4FC1FF); background: var(--brand-2, #094771); }
   .iv-step-active .iv-step-dot { background: var(--accent-blue, #4FC1FF); }
+  .iv-step-prog { font-size: 10.5px; opacity: .8; margin-left: 5px; }
+  .iv-step-bar { display: inline-block; width: 28px; height: 3px; border-radius: 2px; background: var(--stroke-2, #4A4A4A); margin-left: 6px; vertical-align: middle; overflow: hidden; }
+  .iv-step-bar > i { display: block; height: 100%; background: var(--accent-blue, #4FC1FF); }
   .sev-group { margin-bottom: 16px; }
   .sev-label { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; opacity: .7; margin-bottom: 6px; }
   .finding { border: 1px solid var(--stroke, #3a3a3a); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
@@ -234,6 +244,8 @@
   .finding-title { font-weight: 500; }
   .finding-loc { font-size: 12px; opacity: .6; background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; cursor: pointer; }
   .finding-loc:hover { opacity: .9; text-decoration: underline; }
+  .finding-open { font-size: 12px; opacity: .6; background: none; border: 0; padding: 0 0 0 6px; margin: 0; color: inherit; font: inherit; cursor: pointer; }
+  .finding-open:hover { opacity: .9; }
   #rev-pipeline { margin-bottom: 12px; }
   .rev-pipe-label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; opacity: .5; margin-bottom: 6px; }
   .finding-detail { font-size: 13px; opacity: .85; margin-top: 6px; white-space: pre-wrap; }
@@ -472,12 +484,14 @@
       <div id="findings"></div>
     </div>
     <div id="interview-view" hidden>
-      <div class="rev-head">
-        <span id="iv-doctype" class="rev-target"></span>
+      <div class="iv-convo">
+        <div class="rev-head">
+          <span id="iv-doctype" class="rev-target"></span>
+        </div>
+        <div id="iv-steps" hidden></div>
+        <div class="flow-slot"></div>
       </div>
-      <div id="iv-steps" hidden></div>
-      <div class="flow-slot"></div>
-      <iframe id="iv-doc" sandbox="" title="Document preview" style="width:100%;min-height:280px;border:1px solid var(--stroke,#3a3a3a);border-radius:8px;margin-top:14px"></iframe>
+      <iframe id="iv-doc" sandbox="" title="Document preview"></iframe>
     </div>
     <section id="backlog-view" hidden>
       <div class="board-head">

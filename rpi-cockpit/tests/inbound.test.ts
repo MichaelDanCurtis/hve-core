@@ -125,4 +125,20 @@ describe("applyInbound", () => {
     applyInbound(b, { type: "revise", id: "d1" });
     expect(b.state.decisions[0].status).toBe("pending");
   });
+
+  it("parseInbound accepts an open frame with and without a line", () => {
+    expect(parseInbound({ type: "open", file: "a.ts", line: 4 })).toEqual({ type: "open", file: "a.ts", line: 4 });
+    expect(parseInbound({ type: "open", file: "a.ts" })).toEqual({ type: "open", file: "a.ts" });
+  });
+  it("parseInbound rejects an open frame with a bad file or line", () => {
+    expect(parseInbound({ type: "open" })).toBeNull();
+    expect(parseInbound({ type: "open", file: 3 })).toBeNull();
+    expect(parseInbound({ type: "open", file: "a.ts", line: "4" })).toBeNull();
+  });
+  it("applyInbound open enqueues an editor directive", () => {
+    const b = new Bridge();
+    applyInbound(b, { type: "open", file: "src/x.ts", line: 9 });
+    expect(b.state.directives.at(-1)).toMatchObject({ kind: "note" });
+    expect((b.state.directives.at(-1) as { text: string }).text).toContain("src/x.ts:9");
+  });
 });

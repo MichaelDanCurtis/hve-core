@@ -31,12 +31,16 @@ When the `rpi-cockpit` MCP tools are available, narrate your work to the cockpit
 * `add_finding(severity, title, file?, line?, detail?)` per finding (severity critical|high|medium|low|info). The cockpit groups findings by severity with file links.
 * If your review runs a pipeline of subagents (profile, assess, verify, report), call `subagent_start(name, role)` / `subagent_stop(name, result)` for each: the findings panel shows them as a live "reviewers" strip above the findings, so the user sees progress during a long scan instead of an empty panel.
 * If your review is narrative rather than a list of graded findings (for example a PR walkthrough of design forks and architectural shape), render it with `show_screen(html, title)` as rendered markdown; reserve `review_start` + `add_finding` and the findings panel for severity-graded findings.
+* If `check_directives()` returns a note like `open <file>:<line> in the editor`, the user clicked a finding's open control: open that file (at the line, if given).
 
 ## Guided document builders (PRD, BRD, ADR, security, RAI, accessibility plans)
 
 * `interview_start(docType)` when you begin the guided interview.
 * Ask each question with `ask_question(prompt)` (it blocks for the answer); render the growing draft with `show_screen(html, "…")`.
-* If your interview runs a multi-step program (a phase-gated planner like ADR Frame/Decide/Govern or a six-phase assessment, or a coach running a curriculum or method sequence), call `set_steps(steps, current, label?)` when you begin and again as you advance (a higher `current`): the interview view shows a progress stepper above the conversation so the user sees the whole roadmap and the current step. Re-declare `steps` if an adaptive program's path changes.
+* If your interview runs a multi-step program (a phase-gated planner like ADR Frame/Decide/Govern or a six-phase assessment, or a coach running a curriculum or
+  method sequence), call `set_steps(steps, current, label?, progress?)` when you begin and again as you advance (a higher `current`): the interview view shows a
+  progress stepper above the conversation so the user sees the whole roadmap and the current step. Re-declare `steps` if an adaptive program's path changes.
+  Pass progress as { done, total } to show sub-progress on the active step (for example a comprehension check 2 of 3).
 
 ## Backlog orchestration (GitHub, ADO, Jira: discover, triage, sprint, execute)
 

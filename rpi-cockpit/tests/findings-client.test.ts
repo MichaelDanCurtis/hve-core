@@ -81,4 +81,12 @@ describe("findings client", () => {
     const lowGroup = groups.find((g) => g.textContent!.includes("nit"))!;
     expect(lowGroup.querySelector(".finding-loc")).toBeNull();
   });
+
+  it("renders an open button carrying the file and line", () => {
+    (win as any).render(reviewVmWithPipeline()); // its high finding is api.ts:12
+    const open = win.document.querySelector("#findings .finding-open") as any;
+    expect(open.tagName).toBe("BUTTON");
+    expect(open.getAttribute("data-file")).toBe("api.ts");
+    expect(open.getAttribute("data-line")).toBe("12");
+  });
 });

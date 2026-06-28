@@ -14,7 +14,8 @@ export type InboundFrame =
   | { type: "answer"; id: string; text: string }
   | { type: "navigator"; open: boolean }
   | { type: "intervene"; action: "pause" | "swap" | "spawn"; agentId?: string }
-  | { type: "revise"; id: string };
+  | { type: "revise"; id: string }
+  | { type: "open"; file: string; line?: number };
 
 // Mirror the EXACT validation the WS handler used. Return null on anything
 // malformed or unrecognized so the caller can ignore it without crashing.
@@ -70,6 +71,13 @@ export function parseInbound(msg: unknown): InboundFrame | null {
     if (typeof m.id === "string") return { type: "revise", id: m.id };
     return null;
   }
+  if (type === "open") {
+    const m = msg as { file?: unknown; line?: unknown };
+    if (typeof m.file === "string" && (m.line === undefined || typeof m.line === "number")) {
+      return m.line === undefined ? { type: "open", file: m.file } : { type: "open", file: m.file, line: m.line };
+    }
+    return null;
+  }
   return null;
 }
 
@@ -99,6 +107,9 @@ export function applyInbound(bridge: Bridge, f: InboundFrame): void {
       return;
     case "revise":
       bridge.revise(f.id);
+      return;
+    case "open":
+      bridge.enqueueDirective({ kind: "note", text: f.line != null ? `open ${f.file}:${f.line} in the editor` : `open ${f.file} in the editor` });
       return;
   }
 }

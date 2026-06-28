@@ -61,9 +61,38 @@ function steppedVm() {
   return toViewModel(s);
 }
 
+describe("interview layout", () => {
+  let win: ReturnType<typeof boot>;
+  beforeEach(() => { win = boot(); });
+
+  it("wraps the conversation in .iv-convo with the draft iframe as a sibling", () => {
+    (win as any).render(steppedVm()); // existing helper from the stepper tests
+    const view = win.document.getElementById("interview-view")!;
+    const convo = view.querySelector(".iv-convo")!;
+    expect(convo).not.toBeNull();
+    expect(convo.querySelector("#iv-steps")).not.toBeNull();
+    expect(convo.querySelector(".flow-slot")).not.toBeNull();
+    // the draft iframe is a direct child of #interview-view, NOT inside .iv-convo
+    const ivDoc = win.document.getElementById("iv-doc")!;
+    expect(ivDoc).not.toBeNull();
+    expect(ivDoc.parentElement!.id).toBe("interview-view");
+    expect(convo.querySelector("#iv-doc")).toBeNull();
+  });
+});
+
 describe("interview stepper", () => {
   let win: ReturnType<typeof boot>;
   beforeEach(() => { win = boot(); });
+
+  it("renders done/total and a mini-bar on the active step with progress", () => {
+    let s = applyBeat(initialState(), { type: "interview.start", docType: "ADR" }, 1);
+    s = applyBeat(s, { type: "steps.set", steps: ["Frame", "Decide", "Govern"], current: 1, progress: { done: 2, total: 4 } }, 2);
+    (win as any).render(toViewModel(s));
+    const active = win.document.querySelector("#iv-steps .iv-step-active")!;
+    expect(active.querySelector(".iv-step-prog")!.textContent).toBe("2/4");
+    const bar = active.querySelector(".iv-step-bar > i") as any;
+    expect(bar.getAttribute("style")).toContain("width:50%");
+  });
 
   it("renders the interview stepper with done/active/pending pills", () => {
     (win as any).render(steppedVm());
