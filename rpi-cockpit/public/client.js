@@ -303,6 +303,8 @@ document.addEventListener("click", (e) => {
   if (rev) { sendMsg({ type: "revise", id: rev.dataset.revise }); return; }
   const fchoice = e.target.closest("#decision-flow [data-choice]");
   if (fchoice) { sendMsg({ type: "decide", id: fchoice.dataset.id, choiceId: fchoice.dataset.choice }); return; }
+  const loc = e.target.closest(".finding-loc[data-loc]");
+  if (loc) { copyLoc(loc); return; }
   if (e.target.closest("#steer-send")) {
     const note = document.getElementById("steer-note");
     const text = (note && note.value || "").trim();
@@ -346,21 +348,41 @@ const kindCls = (k) => k.startsWith("directive") ? "s2" : k === "validate" ? "ok
 
 const SEV_LABEL = { critical: "Critical", high: "High", medium: "Medium", low: "Low", info: "Info" };
 
+function copyLoc(btn) {
+  const text = btn.dataset.loc;
+  try { if (navigator.clipboard) navigator.clipboard.writeText(text); } catch { /* clipboard unavailable */ }
+  btn.textContent = "copied";
+  setTimeout(() => { btn.textContent = text; }, 1200);
+}
+
 function renderFindings(v) {
   setText("rev-target", v.reviewTarget || "Review");
   const total = v.findingGroups.reduce((n, g) => n + g.items.length, 0);
   setText("rev-counts", total === 1 ? "1 finding" : `${total} findings`);
+  const pipe = document.getElementById("rev-pipeline");
+  if (pipe) {
+    const subs = v.subagents || [];
+    if (subs.length) {
+      pipe.hidden = false;
+      pipe.innerHTML = `<div class="rev-pipe-label">Live reviewers</div>` + subs.map((a) =>
+        `<div class="sub-card"><div class="av">${initials(a.name)}</div>
+          <div style="flex:1"><div class="nm">${esc(a.name)}</div><div class="meta">${esc(a.role ?? "")}</div></div>
+          <span class="tagidle">${esc(a.status)}</span></div>`).join("");
+    } else { pipe.hidden = true; pipe.innerHTML = ""; }
+  }
   setHtml("findings", v.findingGroups.map((g) =>
     `<div class="sev-group sev-${esc(g.severity)}">
        <div class="sev-label">${esc(SEV_LABEL[g.severity] || g.severity)} (${g.items.length})</div>
-       ${g.items.map((f) =>
-         `<div class="finding">
+       ${g.items.map((f) => {
+         const loc = f.file ? esc(f.file) + (f.line != null ? ":" + esc(String(f.line)) : "") : "";
+         return `<div class="finding">
             <div class="finding-top">
               <span class="finding-title">${esc(f.title)}</span>
-              ${f.file ? `<span class="finding-loc">${esc(f.file)}${f.line != null ? ":" + esc(String(f.line)) : ""}</span>` : ""}
+              ${f.file ? `<button type="button" class="finding-loc" data-loc="${loc}" title="Copy location">${loc}</button>` : ""}
             </div>
             ${f.detail ? `<div class="finding-detail">${esc(f.detail)}</div>` : ""}
-          </div>`).join("")}
+          </div>`;
+       }).join("")}
      </div>`).join("")
     || `<div class="meta">No findings.</div>`);
 }

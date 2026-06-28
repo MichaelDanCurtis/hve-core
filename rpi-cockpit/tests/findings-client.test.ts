@@ -25,6 +25,14 @@ function reviewVm() {
   return toViewModel(s);
 }
 
+function reviewVmWithPipeline() {
+  let s = applyBeat(initialState(), { type: "review.start", target: "Security audit" }, 1);
+  s = applyBeat(s, { type: "subagent.start", name: "Codebase Profiler", role: "profiler" }, 2);
+  s = applyBeat(s, { type: "subagent.start", name: "Skill Assessor", role: "auth skill" }, 3);
+  s = applyBeat(s, { type: "finding.add", severity: "high", title: "Missing authz", file: "api.ts", line: 12, detail: "x" }, 4);
+  return toViewModel(s);
+}
+
 describe("findings client", () => {
   let win: ReturnType<typeof boot>;
   beforeEach(() => { win = boot(); });
@@ -47,5 +55,30 @@ describe("findings client", () => {
     (win as any).render(toViewModel(s));
     expect((win.document.getElementById("rpi-view") as any).hidden).toBe(false);
     expect((win.document.getElementById("findings-view") as any).hidden).toBe(true);
+  });
+
+  it("renders the live-reviewers pipeline strip from subagents, hidden when none", () => {
+    (win as any).render(reviewVmWithPipeline());
+    const pipe = win.document.getElementById("rev-pipeline") as any;
+    expect(pipe.hidden).toBe(false);
+    expect(pipe.querySelectorAll(".sub-card").length).toBe(2);
+    (win as any).render(reviewVm()); // reviewVm() has no subagents
+    expect((win.document.getElementById("rev-pipeline") as any).hidden).toBe(true);
+  });
+
+  it("emits the finding location as a button carrying path:line, and copying flips its label", () => {
+    (win as any).render(reviewVmWithPipeline());
+    const loc = win.document.querySelector("#findings .finding-loc") as any;
+    expect(loc.tagName).toBe("BUTTON");
+    expect(loc.getAttribute("data-loc")).toBe("api.ts:12");
+    loc.click();
+    expect(loc.textContent).toBe("copied");
+  });
+
+  it("omits the location button for a finding with no file", () => {
+    (win as any).render(reviewVm()); // the "nit" low finding has no file
+    const groups = [...win.document.querySelectorAll("#findings .sev-group")];
+    const lowGroup = groups.find((g) => g.textContent!.includes("nit"))!;
+    expect(lowGroup.querySelector(".finding-loc")).toBeNull();
   });
 });
