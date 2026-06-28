@@ -251,6 +251,16 @@ describe("toViewModel", () => {
     });
   });
 
+  it("projects the data profile dataset and columns", () => {
+    let s = applyBeat(initialState(), { type: "profile.start", name: "sales.csv", rows: 100, columns: 3, source: "warehouse" }, 1);
+    s = applyBeat(s, { type: "column.add", name: "id", dtype: "int", nullPct: 0, distinct: 100, quality: "ok" }, 2);
+    const vm = toViewModel(s);
+    expect(vm.domain).toBe("dataprofile");
+    expect(vm.dataProfile.dataset).toEqual({ name: "sales.csv", rows: 100, cols: 3, source: "warehouse" });
+    expect(vm.dataProfile.columns).toEqual([{ name: "id", dtype: "int", nullPct: 0, distinct: 100, stat: undefined, quality: "ok" }]);
+    expect(toViewModel(initialState()).dataProfile.dataset).toBeNull();
+  });
+
   describe("navigator fields", () => {
     it("exposes the view and the workflow catalog", () => {
       const vm = toViewModel(initialState());

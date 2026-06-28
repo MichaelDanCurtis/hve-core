@@ -4,6 +4,7 @@ import type { Beat, Phase, OptionItem, ValidationStatus, Directive, Finding, Age
 export interface Subagent { name: string; role?: string; status: "active" | "idle"; result?: string; }
 export interface TeamAgent { id: string; name: string; role?: string; status: AgentStatus; action?: string | null; }
 export interface BacklogItem { id: string; title: string; column: string; kind?: string; tier?: string; parent?: string; }
+export interface ProfileColumn { name: string; dtype: string; nullPct?: number; distinct?: number; stat?: string; quality?: "ok" | "warn" | "risk"; }
 export interface CodeNode { id: string; path: string; kind: CodeKind; group?: string; }
 export interface Decision { id: string; prompt: string; options: OptionItem[]; }
 export type DecisionKind = "choice" | "text";
@@ -15,7 +16,7 @@ export interface SteerMenu { label: string; options: OptionItem[]; }
 export interface SessionState {
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | null;
   reviewTarget: string | null;
   orchestrator: string | null;
   teamAgents: TeamAgent[];
@@ -49,11 +50,13 @@ export interface SessionState {
   codemapNodes: CodeNode[];
   codemapFocus: string | null;
   codemapTouches: Record<string, "read" | "edit">;
+  profileDataset: { name: string; rows?: number; cols?: number; source?: string } | null;
+  profileColumns: ProfileColumn[];
   log: LogEntry[];
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, decisions: [], hostElicits: false, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, codemapNodes: [], codemapFocus: null, codemapTouches: {}, log: [] };
+  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, decisions: [], hostElicits: false, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, codemapNodes: [], codemapFocus: null, codemapTouches: {}, profileDataset: null, profileColumns: [], log: [] };
 }
 
 export function applyBeat(s: SessionState, beat: Beat, now: number): SessionState {
@@ -100,6 +103,13 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
       return { ...s, boardItems: s.boardItems.map((i) => i.id === beat.id ? { ...i, column: beat.column } : i), log };
     case "backlog.action":
       return { ...s, boardAction: beat.text, log };
+    case "profile.start":
+      return { ...s, view: "loop", domain: "dataprofile", profileDataset: { name: beat.name, rows: beat.rows, cols: beat.columns, source: beat.source }, profileColumns: [], log };
+    case "column.add": {
+      const col = { name: beat.name, dtype: beat.dtype, nullPct: beat.nullPct, distinct: beat.distinct, stat: beat.stat, quality: beat.quality };
+      const exists = s.profileColumns.some((c) => c.name === beat.name);
+      return { ...s, profileColumns: exists ? s.profileColumns.map((c) => (c.name === beat.name ? col : c)) : [...s.profileColumns, col], log };
+    }
     case "context.set":
       return { ...s, contextInstructions: beat.instructions, contextSkills: beat.skills, contextCollection: beat.collection, log };
     case "appframe.set":
@@ -146,6 +156,8 @@ function summarize(beat: Beat): string {
     case "item.add": return `${beat.id}: ${beat.title}`;
     case "item.move": return `${beat.id} -> ${beat.column}`;
     case "backlog.action": return beat.text ?? "(cleared)";
+    case "profile.start": return beat.name;
+    case "column.add": return beat.name;
     case "context.set": return `${beat.instructions.length} instr · ${beat.skills.length} skills${beat.collection ? " · " + beat.collection : ""}`;
     case "appframe.set": return beat.url ? `app frame ${beat.url}` : "app frame cleared";
     case "team.start": return `team ${beat.orchestrator}`;

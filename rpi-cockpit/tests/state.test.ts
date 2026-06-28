@@ -391,3 +391,21 @@ describe("decision flow", () => {
     expect(s.boardItems.find((i) => i.id === "X1")?.parent).toBeUndefined();
   });
 });
+
+describe("data profile", () => {
+  it("profile.start sets the dataset and clears columns", () => {
+    let s = applyBeat(initialState(), { type: "profile.start", name: "sales.csv", rows: 38201, columns: 12, source: "warehouse" }, 1);
+    expect(s.domain).toBe("dataprofile");
+    expect(s.view).toBe("loop");
+    expect(s.profileDataset).toEqual({ name: "sales.csv", rows: 38201, cols: 12, source: "warehouse" });
+    expect(s.profileColumns).toEqual([]);
+  });
+  it("column.add appends, and a same-name add updates in place (order preserved)", () => {
+    let s = applyBeat(initialState(), { type: "profile.start", name: "d", rows: 1, columns: 2 }, 1);
+    s = applyBeat(s, { type: "column.add", name: "revenue", dtype: "float", nullPct: 0, distinct: 900, stat: "0-4820", quality: "ok" }, 2);
+    s = applyBeat(s, { type: "column.add", name: "region", dtype: "category", distinct: 5, stat: "top: US 42%", quality: "warn" }, 3);
+    s = applyBeat(s, { type: "column.add", name: "revenue", dtype: "float", nullPct: 3, distinct: 901 }, 4);
+    expect(s.profileColumns.map((c) => c.name)).toEqual(["revenue", "region"]);
+    expect(s.profileColumns[0]).toEqual({ name: "revenue", dtype: "float", nullPct: 3, distinct: 901, stat: undefined, quality: undefined });
+  });
+});

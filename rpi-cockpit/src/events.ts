@@ -53,6 +53,8 @@ export const Beat = z.discriminatedUnion("type", [
   z.object({ type: z.literal("item.add"), id: z.string(), title: z.string(), column: z.string(), kind: z.string().optional(), tier: z.string().optional(), parent: z.string().optional() }),
   z.object({ type: z.literal("item.move"), id: z.string(), column: z.string() }),
   z.object({ type: z.literal("backlog.action"), text: z.string().nullable() }),
+  z.object({ type: z.literal("profile.start"), name: z.string(), rows: z.number().int().optional(), columns: z.number().int().optional(), source: z.string().optional() }),
+  z.object({ type: z.literal("column.add"), name: z.string(), dtype: z.string(), nullPct: z.number().optional(), distinct: z.number().int().optional(), stat: z.string().optional(), quality: z.enum(["ok", "warn", "risk"]).optional() }),
   z.object({ type: z.literal("context.set"), instructions: z.array(z.string()), skills: z.array(z.string()), collection: z.string().nullable() }),
   z.object({ type: z.literal("appframe.set"), url: z.string().nullable() }),
   z.object({ type: z.literal("team.start"), task: z.string(), orchestrator: z.string() }),
