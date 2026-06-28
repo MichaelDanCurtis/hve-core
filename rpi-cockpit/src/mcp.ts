@@ -146,9 +146,10 @@ export function buildMcpServer(bridge: Bridge): McpServer {
 
   server.registerTool(
     "ask_question",
-    { description: "Ask the user a free-text question; blocks until they answer. Shows the in-pane question card and, where supported, a native input.", inputSchema: { prompt: z.string() } },
-    async (a) =>
-      text(
+    { description: "Ask the user a free-text question; blocks until they answer. Shows the in-pane question card and, where supported, a native input.", inputSchema: { prompt: z.string(), id: z.string().optional() } },
+    async (a) => {
+      bridge.setHostElicits(server.server.getClientCapabilities()?.elicitation !== undefined);
+      return text(
         await askQuestionWithElicitation(
           {
             getClientCapabilities: () => server.server.getClientCapabilities(),
@@ -161,15 +162,18 @@ export function buildMcpServer(bridge: Bridge): McpServer {
           // an empty timeout fallback is indistinguishable from a deliberate empty
           // answer, so let the interactive interview block until the user answers.
           questionTimeoutMs(),
+          a.id,
         ),
-      ),
+      );
+    },
   );
 
   server.registerTool(
     "present_options",
-    { description: "Ask the user to choose; blocks until they pick. Shows the in-pane card and, where the host supports it, a native choice card; the first answer wins.", inputSchema: { prompt: z.string(), options: z.array(OptionItem).min(1) } },
-    async (a) =>
-      text(
+    { description: "Ask the user to choose; blocks until they pick. Shows the in-pane card and, where the host supports it, a native choice card; the first answer wins.", inputSchema: { prompt: z.string(), options: z.array(OptionItem).min(1), id: z.string().optional() } },
+    async (a) => {
+      bridge.setHostElicits(server.server.getClientCapabilities()?.elicitation !== undefined);
+      return text(
         await presentOptionsWithElicitation(
           {
             getClientCapabilities: () => server.server.getClientCapabilities(),
@@ -180,8 +184,10 @@ export function buildMcpServer(bridge: Bridge): McpServer {
           a.prompt,
           a.options,
           decisionTimeoutMs(),
+          a.id,
         ),
-      ),
+      );
+    },
   );
 
   server.registerTool(

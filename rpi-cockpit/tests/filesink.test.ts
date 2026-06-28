@@ -73,7 +73,7 @@ describe("file sink", () => {
     stop = srv.close;
 
     const choice = bridge.presentOptions("pick", [{ id: "a", title: "A" }, { id: "b", title: "B" }]);
-    const id = bridge.state.pendingDecision!.id;
+    const id = bridge.state.decisions.at(-1)!.id;
     bridge.resolveDecision(id, "b");
     expect(await choice).toBe("b");
 

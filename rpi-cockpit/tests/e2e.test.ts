@@ -39,8 +39,8 @@ describe("end to end", () => {
     expect(states.at(-1).state.phase).toBe("implement");
 
     const call = client.callTool({ name: "present_options", arguments: { prompt: "pick", options: [{ id: "a", title: "A" }] } });
-    await waitFor(() => bridge.state.pendingDecision != null);
-    ws.send(JSON.stringify({ type: "decide", id: bridge.state.pendingDecision!.id, choiceId: "a" }));
+    await waitFor(() => bridge.state.decisions.some((d) => d.status === "pending"));
+    ws.send(JSON.stringify({ type: "decide", id: bridge.state.decisions.at(-1)!.id, choiceId: "a" }));
     const res: any = await call;
     expect(res.content[0].text).toBe("a");
     ws.close();

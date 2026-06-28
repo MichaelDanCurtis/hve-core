@@ -88,7 +88,7 @@ describe("presentOptionsWithElicitation", () => {
     const srv = fakeServer({ elicitation: false });
     const p = presentOptionsWithElicitation(srv, bridge, "Which?", OPTS, 0);
     // The pane card is shown; resolve it like the web decide frame would.
-    const id = bridge.state.pendingDecision!.id;
+    const id = bridge.state.decisions.at(-1)!.id;
     bridge.resolveDecision(id, "a");
     expect(await p).toBe("a");
     expect(srv.elicitCalls()).toBe(0);
@@ -99,7 +99,7 @@ describe("presentOptionsWithElicitation", () => {
     const srv = fakeServer({ elicitation: true, respond: async () => ({ action: "accept", content: { choice: "c" } }) });
     const choice = await presentOptionsWithElicitation(srv, bridge, "Which?", OPTS, 0);
     expect(choice).toBe("c");
-    expect(bridge.state.pendingDecision).toBeNull();
+    expect(bridge.state.decisions.at(-1)?.status).toBe("answered");
   });
 
   it("when the pane card answers first, resolves with the web choice and aborts the elicitation", async () => {
@@ -113,7 +113,7 @@ describe("presentOptionsWithElicitation", () => {
         }),
     });
     const p = presentOptionsWithElicitation(srv, bridge, "Which?", OPTS, 0);
-    const id = bridge.state.pendingDecision!.id;
+    const id = bridge.state.decisions.at(-1)!.id;
     bridge.resolveDecision(id, "b");
     expect(await p).toBe("b");
     expect(aborted).toBe(true);
@@ -124,10 +124,16 @@ describe("presentOptionsWithElicitation", () => {
     const srv = fakeServer({ elicitation: true, respond: async () => ({ action: "decline" }) });
     const p = presentOptionsWithElicitation(srv, bridge, "Which?", OPTS, 0);
     await new Promise((r) => setTimeout(r, 10)); // let the declined elicitation settle
-    expect(bridge.state.pendingDecision).not.toBeNull();
-    const id = bridge.state.pendingDecision!.id;
+    expect(bridge.state.decisions.at(-1)?.status).toBe("pending");
+    const id = bridge.state.decisions.at(-1)!.id;
     bridge.resolveDecision(id, "a");
     expect(await p).toBe("a");
+  });
+
+  it("presentOptionsWithElicitation forwards the id to the bridge", () => {
+    const bridge = new Bridge();
+    void presentOptionsWithElicitation({ getClientCapabilities: () => ({}), elicitInput: async () => ({ action: "decline" }) }, bridge, "Pick?", [{ id: "a", title: "A" }], 0, "d9");
+    expect(bridge.state.decisions[0].id).toBe("d9");
   });
 });
 
@@ -149,7 +155,7 @@ describe("question elicitation", () => {
     let aborted = false;
     const srv = fakeServer({ elicitation: true, respond: (_p, signal) => new Promise((_r, rej) => { signal?.addEventListener("abort", () => { aborted = true; rej(new Error("a")); }); }) });
     const p = askQuestionWithElicitation(srv, bridge, "Q?", 0);
-    const id = bridge.state.pendingQuestion!.id;
+    const id = bridge.state.decisions.at(-1)!.id;
     bridge.resolveQuestion(id, "typed");
     expect(await p).toBe("typed");
     expect(aborted).toBe(true);
@@ -158,7 +164,7 @@ describe("question elicitation", () => {
     const bridge = new Bridge();
     const srv = fakeServer({ elicitation: true, respond: async () => ({ action: "accept", content: { answer: "native" } }) });
     expect(await askQuestionWithElicitation(srv, bridge, "Q?", 0)).toBe("native");
-    expect(bridge.state.pendingQuestion).toBeNull();
+    expect(bridge.state.decisions.at(-1)?.status).toBe("answered");
   });
 });
 

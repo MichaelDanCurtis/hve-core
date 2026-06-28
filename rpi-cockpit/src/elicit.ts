@@ -114,15 +114,17 @@ export async function presentOptionsWithElicitation(
   prompt: string,
   options: OptionItem[],
   timeoutMs: number,
+  id?: string,
 ): Promise<string> {
-  const webPromise = bridge.presentOptions(prompt, options, timeoutMs);
+  const webPromise = bridge.presentOptions(prompt, options, timeoutMs, id);
+  const paneId = id ?? bridge.state.decisions.at(-1)?.id ?? null;
   return raceElicitation(
     server,
     webPromise,
-    bridge.state.pendingDecision?.id ?? null,
+    paneId,
     optionsToElicitSchema(prompt, options),
     (r) => elicitResultToChoice(r, options),
-    (id, choice) => bridge.resolveDecision(id, choice),
+    (pid, choice) => bridge.resolveDecision(pid, choice),
   );
 }
 
@@ -148,15 +150,17 @@ export async function askQuestionWithElicitation(
   bridge: Bridge,
   prompt: string,
   timeoutMs: number,
+  id?: string,
 ): Promise<string> {
-  const webPromise = bridge.askQuestion(prompt, timeoutMs);
+  const webPromise = bridge.askQuestion(prompt, timeoutMs, id);
+  const paneId = id ?? bridge.state.decisions.at(-1)?.id ?? null;
   return raceElicitation(
     server,
     webPromise,
-    bridge.state.pendingQuestion?.id ?? null,
+    paneId,
     questionToElicitSchema(prompt),
     elicitResultToAnswer,
-    (id, text) => bridge.resolveQuestion(id, text),
+    (pid, text) => bridge.resolveQuestion(pid, text),
   );
 }
 

@@ -266,4 +266,17 @@ describe("mcp face", () => {
     await client.close();
     await server.close();
   });
+
+  it("present_options forwards the id into the decisions flow", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const [clientT, serverT] = InMemoryTransport.createLinkedPair();
+    await server.connect(serverT);
+    const client = new Client({ name: "test", version: "0" });
+    await client.connect(clientT);
+
+    void client.callTool({ name: "present_options", arguments: { prompt: "Pick?", options: [{ id: "a", title: "A" }], id: "d7" } });
+    await new Promise((r) => setTimeout(r, 10));
+    expect(bridge.state.decisions.find((d) => d.id === "d7")?.kind).toBe("choice");
+  });
 });

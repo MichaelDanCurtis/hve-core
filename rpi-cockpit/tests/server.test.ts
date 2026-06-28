@@ -52,7 +52,7 @@ describe("server", () => {
 
     const choice = bridge.presentOptions("pick", [{ id: "a", title: "A" }]);
     await new Promise((r) => setTimeout(r, 20));
-    const id = bridge.state.pendingDecision!.id;
+    const id = bridge.state.decisions.at(-1)!.id;
     ws.send(JSON.stringify({ type: "decide", id, choiceId: "a" }));
     expect(await choice).toBe("a");
     ws.close();
@@ -67,7 +67,7 @@ describe("server", () => {
     ws.send("this is not json");
     const choice = bridge.presentOptions("pick", [{ id: "a", title: "A" }]);
     await new Promise((r) => setTimeout(r, 20));
-    ws.send(JSON.stringify({ type: "decide", id: bridge.state.pendingDecision!.id, choiceId: "a" }));
+    ws.send(JSON.stringify({ type: "decide", id: bridge.state.decisions.at(-1)!.id, choiceId: "a" }));
     expect(await choice).toBe("a");
     ws.close();
   });
@@ -243,7 +243,7 @@ describe("server", () => {
       await new Promise((r) => ws.on("open", r));
       const choice = bridge.presentOptions("pick", [{ id: "a", title: "A" }]);
       await new Promise((r) => setTimeout(r, 20));
-      ws.send(JSON.stringify({ type: "decide", id: bridge.state.pendingDecision!.id, choiceId: "a" }));
+      ws.send(JSON.stringify({ type: "decide", id: bridge.state.decisions.at(-1)!.id, choiceId: "a" }));
       expect(await choice).toBe("a");
       ws.close();
     });
@@ -270,7 +270,7 @@ describe("server", () => {
     const srv = await startServer(bridge, 0);
     stop = srv.close;
     const p = bridge.askQuestion("Q?", 0);
-    const qid = bridge.state.pendingQuestion!.id;
+    const qid = bridge.state.decisions.at(-1)!.id;
     const ws = new WebSocket(`ws://127.0.0.1:${srv.port}/?key=${srv.token}`);
     await new Promise<any>((res) => ws.on("message", (d) => res(JSON.parse(String(d)))));
     const settled = new Promise<void>((res) => bridge.once("state", () => res()));
