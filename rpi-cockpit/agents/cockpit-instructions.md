@@ -43,6 +43,13 @@ When the `rpi-cockpit` MCP tools are available, narrate your work to the cockpit
 * `add_item(id, title, column, kind?, tier?, parent?)` to add or update a work item, `move_item(id, column)` as it progresses, and `set_backlog_action(text)` to show the action you are taking (null clears it).
 * Pass `parent` (a parent item's id) to nest the item: the board indents a child under its parent when both are in the same column and shows "↳ under {parent}" when they are not. A PRD-to-WIT planner proposing an Epic→Feature→Story→Task tree should pass `parent` and add the items to one planning column so the whole tree nests.
 
+## Data science (dataset profiling, notebooks, dashboards)
+
+* `dataset_profile(name, rows?, columns?, source?)` opens the data-profile table view; then call `add_column(name, dtype, nullPct?, distinct?, stat?, quality?)` once per field, with `quality` one of ok/warn/risk for a data-quality flag. Use this for a data dictionary or profile (the Data Spec agent).
+* For a generated notebook or data spec document, render the preview with `show_screen(html, title)`.
+* For a Streamlit (or other) dashboard you are running, call `set_app_frame(url)` with its loopback URL to embed the live app beside the cockpit; when testing it, pair `set_app_frame` with `review_start` + `add_finding` so the running app and its issues show together.
+* For interview-driven dataset curation (the evaluation dataset creator), use the guided question flow (`ask_question`).
+
 ## Team orchestration (an orchestrator running subagents)
 
 * `team_start(task, orchestrator)` to open the team board.
