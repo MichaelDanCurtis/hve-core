@@ -74,7 +74,7 @@ export function buildMcpServer(bridge: Bridge): McpServer {
 
   server.registerTool(
     "add_item",
-    { description: "Add or update a work item on the backlog board, placing it in the given column.", inputSchema: { id: z.string(), title: z.string(), column: z.string(), kind: z.string().optional(), tier: z.string().optional() } },
+    { description: "Add or update a work item on the backlog board, placing it in the given column. Pass parent (a parent item's id) to nest it under that item in the hierarchy.", inputSchema: { id: z.string(), title: z.string(), column: z.string(), kind: z.string().optional(), tier: z.string().optional(), parent: z.string().optional() } },
     async (a) => text(handlers.add_item(bridge, a)),
   );
 

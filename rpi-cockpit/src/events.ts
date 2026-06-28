@@ -50,7 +50,7 @@ export const Beat = z.discriminatedUnion("type", [
   z.object({ type: z.literal("finding.add"), severity: Severity, title: z.string(), file: z.string().optional(), line: z.number().int().optional(), detail: z.string().optional() }),
   z.object({ type: z.literal("interview.start"), docType: z.string() }),
   z.object({ type: z.literal("backlog.start"), target: z.string(), columns: z.array(z.string()).min(1) }),
-  z.object({ type: z.literal("item.add"), id: z.string(), title: z.string(), column: z.string(), kind: z.string().optional(), tier: z.string().optional() }),
+  z.object({ type: z.literal("item.add"), id: z.string(), title: z.string(), column: z.string(), kind: z.string().optional(), tier: z.string().optional(), parent: z.string().optional() }),
   z.object({ type: z.literal("item.move"), id: z.string(), column: z.string() }),
   z.object({ type: z.literal("backlog.action"), text: z.string().nullable() }),
   z.object({ type: z.literal("context.set"), instructions: z.array(z.string()), skills: z.array(z.string()), collection: z.string().nullable() }),

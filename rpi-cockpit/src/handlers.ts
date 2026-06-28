@@ -44,8 +44,8 @@ export const handlers = {
     b.emitBeat({ type: "backlog.start", target: a.target, columns: a.columns });
     return `backlog started: ${a.target}`;
   },
-  add_item: (b: Bridge, a: { id: string; title: string; column: string; kind?: string; tier?: string }) => {
-    b.emitBeat({ type: "item.add", id: a.id, title: a.title, column: a.column, kind: a.kind, tier: a.tier });
+  add_item: (b: Bridge, a: { id: string; title: string; column: string; kind?: string; tier?: string; parent?: string }) => {
+    b.emitBeat({ type: "item.add", id: a.id, title: a.title, column: a.column, kind: a.kind, tier: a.tier, parent: a.parent });
     return `item added: ${a.id}`;
   },
   move_item: (b: Bridge, a: { id: string; column: string }) => {

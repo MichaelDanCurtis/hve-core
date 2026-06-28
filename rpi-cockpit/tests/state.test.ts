@@ -382,4 +382,12 @@ describe("decision flow", () => {
   it("setHostElicits toggles the flag", () => {
     expect(setHostElicits(initialState(), true).hostElicits).toBe(true);
   });
+
+  it("item.add stores an optional parent", () => {
+    let s = applyBeat(initialState(), { type: "backlog.start", target: "S", columns: ["Todo"] }, 1);
+    s = applyBeat(s, { type: "item.add", id: "F1", title: "Feature", column: "Todo", parent: "E1" }, 2);
+    s = applyBeat(s, { type: "item.add", id: "X1", title: "No parent", column: "Todo" }, 3);
+    expect(s.boardItems.find((i) => i.id === "F1")?.parent).toBe("E1");
+    expect(s.boardItems.find((i) => i.id === "X1")?.parent).toBeUndefined();
+  });
 });

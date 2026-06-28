@@ -3,7 +3,7 @@ import type { Beat, Phase, OptionItem, ValidationStatus, Directive, Finding, Age
 
 export interface Subagent { name: string; role?: string; status: "active" | "idle"; result?: string; }
 export interface TeamAgent { id: string; name: string; role?: string; status: AgentStatus; action?: string | null; }
-export interface BacklogItem { id: string; title: string; column: string; kind?: string; tier?: string; }
+export interface BacklogItem { id: string; title: string; column: string; kind?: string; tier?: string; parent?: string; }
 export interface CodeNode { id: string; path: string; kind: CodeKind; group?: string; }
 export interface Decision { id: string; prompt: string; options: OptionItem[]; }
 export type DecisionKind = "choice" | "text";
@@ -94,7 +94,7 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
       return { ...s, view: "loop", domain: "backlog", boardTarget: beat.target, boardColumns: beat.columns, boardItems: [], boardAction: null, log };
     case "item.add": {
       const others = s.boardItems.filter((i) => i.id !== beat.id);
-      return { ...s, boardItems: [...others, { id: beat.id, title: beat.title, column: beat.column, kind: beat.kind, tier: beat.tier }], log };
+      return { ...s, boardItems: [...others, { id: beat.id, title: beat.title, column: beat.column, kind: beat.kind, tier: beat.tier, parent: beat.parent }], log };
     }
     case "item.move":
       return { ...s, boardItems: s.boardItems.map((i) => i.id === beat.id ? { ...i, column: beat.column } : i), log };
