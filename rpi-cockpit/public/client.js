@@ -141,6 +141,7 @@ function render(v) {
   const backlogView = document.getElementById("backlog-view");
   const teamView = document.getElementById("team-view");
   const codemapView = document.getElementById("codemap-view");
+  const dataprofileView = document.getElementById("dataprofile-view");
   if (rpiView && findingsView) {
     if (v.domain === "codemap") {
       rpiView.hidden = true; findingsView.hidden = true;
@@ -148,6 +149,7 @@ function render(v) {
       if (backlogView) backlogView.hidden = true;
       if (teamView) teamView.hidden = true;
       if (codemapView) codemapView.hidden = false;
+      if (dataprofileView) dataprofileView.hidden = true;
       renderCodemap(v);
       return;
     }
@@ -157,6 +159,7 @@ function render(v) {
       if (backlogView) backlogView.hidden = true;
       if (teamView) teamView.hidden = false;
       if (codemapView) codemapView.hidden = true;
+      if (dataprofileView) dataprofileView.hidden = true;
       renderTeam(v);
       return;
     }
@@ -166,7 +169,18 @@ function render(v) {
       if (backlogView) backlogView.hidden = false;
       if (teamView) teamView.hidden = true;
       if (codemapView) codemapView.hidden = true;
+      if (dataprofileView) dataprofileView.hidden = true;
       renderBoard(v);
+      return;
+    }
+    if (v.domain === "dataprofile") {
+      rpiView.hidden = true; findingsView.hidden = true;
+      if (interviewView) interviewView.hidden = true;
+      if (backlogView) backlogView.hidden = true;
+      if (teamView) teamView.hidden = true;
+      if (codemapView) codemapView.hidden = true;
+      if (dataprofileView) dataprofileView.hidden = false;
+      renderDataProfile(v);
       return;
     }
     if (v.domain === "interview") {
@@ -175,6 +189,7 @@ function render(v) {
       if (backlogView) backlogView.hidden = true;
       if (teamView) teamView.hidden = true;
       if (codemapView) codemapView.hidden = true;
+      if (dataprofileView) dataprofileView.hidden = true;
       renderInterview(v);
       return;
     }
@@ -185,6 +200,7 @@ function render(v) {
     if (backlogView) backlogView.hidden = true;
     if (teamView) teamView.hidden = true;
     if (codemapView) codemapView.hidden = true;
+    if (dataprofileView) dataprofileView.hidden = true;
     if (review) { renderFindings(v); return; }
   }
 
@@ -405,6 +421,23 @@ function renderBoard(v) {
             ${(it.kind || it.tier) ? `<div class="bcard-chips">${it.kind ? `<span class="chip-kind">${esc(it.kind)}</span>` : ""}${it.tier ? `<span class="chip-tier">${esc(it.tier)}</span>` : ""}</div>` : ""}
           </div>`).join("") || `<div class="col-empty"></div>`}
      </div>`).join(""));
+}
+
+function renderDataProfile(v) {
+  const dp = v.dataProfile || { dataset: null, columns: [] };
+  const ds = dp.dataset;
+  setText("dp-name", ds ? ds.name : "Dataset");
+  const meta = ds ? [ds.rows != null ? `${ds.rows} rows` : null, ds.cols != null ? `${ds.cols} cols` : null, ds.source].filter(Boolean).join(" · ") : "";
+  setText("dp-meta", meta);
+  const head = `<thead><tr><th>Column</th><th>Type</th><th>Null %</th><th>Distinct</th><th>Stat</th><th></th></tr></thead>`;
+  const body = (dp.columns || []).map((c) =>
+    `<tr><td class="dp-col">${esc(c.name)}</td><td class="dp-type">${esc(c.dtype)}</td>
+       <td>${c.nullPct != null ? esc(String(c.nullPct)) + "%" : ""}</td>
+       <td>${c.distinct != null ? esc(String(c.distinct)) : ""}</td>
+       <td class="dp-stat">${c.stat ? esc(c.stat) : ""}</td>
+       <td>${c.quality ? `<span class="dp-q dp-q-${esc(c.quality)}" title="${esc(c.quality)}"></span>` : ""}</td></tr>`).join("")
+    || `<tr><td colspan="6" class="meta">No columns profiled yet.</td></tr>`;
+  setHtml("dp-table", head + `<tbody>${body}</tbody>`);
 }
 
 function renderTeam(v) {

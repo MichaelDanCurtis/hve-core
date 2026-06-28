@@ -259,6 +259,17 @@
   .chip-kind, .chip-tier { font-size: 10.5px; padding: 1px 7px; border-radius: 9px; border: 1px solid var(--stroke-2, #4A4A4A); color: var(--text-2, #9D9D9D); }
   .col-empty { height: 6px; }
 
+  .dp-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .dp-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-3, #6E6E6E); font-weight: 600; padding: 6px 10px; border-bottom: 1px solid var(--stroke, #3C3C3C); }
+  .dp-table td { padding: 7px 10px; border-bottom: 1px solid var(--stroke, #3C3C3C); }
+  .dp-col { font-weight: 600; }
+  .dp-type { color: var(--accent-cyan, #9CDCFE); }
+  .dp-stat { color: var(--text-2, #9D9D9D); }
+  .dp-q { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+  .dp-q-ok { background: var(--ok, #73C991); }
+  .dp-q-warn { background: #E0954B; }
+  .dp-q-risk { background: var(--fail, #f2b8b5); }
+
   .team-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
   .team-orch { font-weight: 500; }
   .team-count { font-size: 12px; opacity: .6; }
@@ -466,6 +477,13 @@
         <span class="board-action" id="board-action" aria-live="polite" hidden></span>
       </div>
       <div class="board" id="board" aria-label="Backlog board"></div>
+    </section>
+    <section id="dataprofile-view" hidden>
+      <div class="rev-head">
+        <span class="board-target" id="dp-name">Dataset</span>
+        <span class="board-count" id="dp-meta"></span>
+      </div>
+      <table id="dp-table" class="dp-table"></table>
     </section>
     <section id="team-view" hidden>
       <div class="team-head">
