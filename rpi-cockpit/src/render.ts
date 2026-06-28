@@ -82,6 +82,7 @@ export interface ViewModel {
   subagents: { name: string; status: string; role?: string }[];
   validations: { check: string; status: string }[];
   docType: string | null;
+  interviewSteps: { label?: string; steps: { name: string; status: "done" | "active" | "pending" }[] } | null;
   decisions: { id: string; prompt: string; kind: string; options?: { id: string; title: string; detail?: string; recommended?: boolean }[]; answer?: string; status: string }[];
   hostElicits: boolean;
   steerMenu: SteerMenuVM;
@@ -143,6 +144,10 @@ export function toViewModel(s: SessionState): ViewModel {
     focus: s.codemapFocus,
     touches: s.codemapTouches,
   };
+  const ist = s.interviewSteps;
+  const interviewSteps = ist
+    ? { label: ist.label, steps: ist.names.map((name, i) => ({ name, status: (i < ist.current ? "done" : i === ist.current ? "active" : "pending") as "done" | "active" | "pending" })) }
+    : null;
   return {
     // A directly-launched review/interview/backlog sets domain without session.begin
     // (so task is "" and phase null); treat any active domain as started so the Home
@@ -169,6 +174,7 @@ export function toViewModel(s: SessionState): ViewModel {
     subagents: s.subagents.map((a) => ({ name: a.name, status: a.status, role: a.role })),
     validations: Object.entries(s.validations).map(([check, status]) => ({ check, status })),
     docType: s.docType,
+    interviewSteps,
     decisions: s.decisions.map((d) => ({ id: d.id, prompt: d.prompt, kind: d.kind, options: d.options, answer: d.answer, status: d.status })),
     hostElicits: s.hostElicits,
     steerMenu,

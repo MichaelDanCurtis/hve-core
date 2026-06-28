@@ -261,6 +261,17 @@ describe("toViewModel", () => {
     expect(toViewModel(initialState()).dataProfile.dataset).toBeNull();
   });
 
+  it("projects interview steps with done/active/pending derived from current", () => {
+    const s = applyBeat(initialState(), { type: "steps.set", steps: ["Frame", "Decide", "Govern"], current: 1, label: "ADR" }, 1);
+    const vm = toViewModel(s);
+    expect(vm.interviewSteps).toEqual({ label: "ADR", steps: [
+      { name: "Frame", status: "done" },
+      { name: "Decide", status: "active" },
+      { name: "Govern", status: "pending" },
+    ] });
+    expect(toViewModel(initialState()).interviewSteps).toBeNull();
+  });
+
   describe("navigator fields", () => {
     it("exposes the view and the workflow catalog", () => {
       const vm = toViewModel(initialState());

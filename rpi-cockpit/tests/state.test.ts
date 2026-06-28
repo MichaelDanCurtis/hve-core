@@ -392,6 +392,22 @@ describe("decision flow", () => {
   });
 });
 
+describe("interview steps", () => {
+  it("steps.set stores the program and clamps current into range", () => {
+    let s = applyBeat(initialState(), { type: "steps.set", steps: ["Frame", "Decide", "Govern"], current: 1, label: "ADR" }, 1);
+    expect(s.interviewSteps).toEqual({ label: "ADR", names: ["Frame", "Decide", "Govern"], current: 1 });
+    s = applyBeat(initialState(), { type: "steps.set", steps: ["a", "b"], current: 9 }, 1);
+    expect(s.interviewSteps!.current).toBe(1); // clamped to last
+    s = applyBeat(initialState(), { type: "steps.set", steps: ["a", "b"], current: -3 }, 1);
+    expect(s.interviewSteps!.current).toBe(0); // clamped to first
+  });
+  it("interview.start resets interviewSteps", () => {
+    let s = applyBeat(initialState(), { type: "steps.set", steps: ["a", "b"], current: 0 }, 1);
+    s = applyBeat(s, { type: "interview.start", docType: "PRD" }, 2);
+    expect(s.interviewSteps).toBeNull();
+  });
+});
+
 describe("data profile", () => {
   it("profile.start sets the dataset and clears columns", () => {
     let s = applyBeat(initialState(), { type: "profile.start", name: "sales.csv", rows: 38201, columns: 12, source: "warehouse" }, 1);
