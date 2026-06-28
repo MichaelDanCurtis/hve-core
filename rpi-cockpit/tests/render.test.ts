@@ -1,7 +1,7 @@
 // rpi-cockpit/tests/render.test.ts
 import { describe, it, expect } from "vitest";
 import { toViewModel } from "../src/render.js";
-import { initialState, applyBeat, enqueueDirective, startLaunch } from "../src/state.js";
+import { initialState, applyBeat, enqueueDirective, startLaunch, addDecision, answerDecision, setHostElicits } from "../src/state.js";
 
 describe("toViewModel", () => {
   it("marks the current phase active and prior phases done", () => {
@@ -11,10 +11,6 @@ describe("toViewModel", () => {
     expect(vm.steps.find((x) => x.phase === "research")!.status).toBe("done");
     expect(vm.steps.find((x) => x.phase === "implement")!.status).toBe("active");
     expect(vm.steps.find((x) => x.phase === "review")!.status).toBe("pending");
-  });
-  it("exposes the pending decision", () => {
-    const s = { ...initialState(), pendingDecision: { id: "d1", prompt: "pick", options: [{ id: "a", title: "A" }] } };
-    expect(toViewModel(s).decision?.id).toBe("d1");
   });
   it("exposes validations as check/status pairs", () => {
     const s = applyBeat(initialState(), { type: "validate", check: "tests", status: "fail" }, 1);
@@ -74,12 +70,25 @@ describe("toViewModel", () => {
     expect(toViewModel(s).screen).toEqual({ html: "<p>hi</p>", title: "Mockup" });
   });
 
-  it("exposes docType and pendingQuestion", () => {
+  it("exposes docType", () => {
     const s = applyBeat(initialState(), { type: "interview.start", docType: "ADR" }, 1);
     const vm = toViewModel(s);
     expect(vm.domain).toBe("interview");
     expect(vm.docType).toBe("ADR");
-    expect(vm.pendingQuestion).toBeNull();
+  });
+
+  it("projects the decisions flow and hostElicits, and drops the legacy single-decision fields", () => {
+    let s = initialState();
+    s = setHostElicits(s, true);
+    s = answerDecision(addDecision(s, { id: "d1", prompt: "Pick?", kind: "choice", options: [{ id: "a", title: "A" }] }), "d1", "a");
+    s = addDecision(s, { id: "q2", prompt: "Name?", kind: "text" });
+    const vm = toViewModel(s);
+    expect(vm.hostElicits).toBe(true);
+    expect(vm.decisions).toHaveLength(2);
+    expect(vm.decisions[0]).toMatchObject({ id: "d1", kind: "choice", status: "answered", answer: "a" });
+    expect(vm.decisions[1]).toMatchObject({ id: "q2", kind: "text", status: "pending" });
+    expect("decision" in vm).toBe(false);
+    expect("pendingQuestion" in vm).toBe(false);
   });
 
   describe("findings view-model", () => {

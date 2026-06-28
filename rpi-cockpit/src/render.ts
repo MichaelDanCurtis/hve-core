@@ -47,8 +47,8 @@ export interface ViewModel {
   subagents: { name: string; status: string; role?: string }[];
   validations: { check: string; status: string }[];
   docType: string | null;
-  pendingQuestion: { id: string; prompt: string } | null;
-  decision: SessionState["pendingDecision"];
+  decisions: { id: string; prompt: string; kind: string; options?: { id: string; title: string; detail?: string; recommended?: boolean }[]; answer?: string; status: string }[];
+  hostElicits: boolean;
   steerMenu: SteerMenuVM;
   directives: Directive[];
   screen: SessionState["screen"];
@@ -133,8 +133,8 @@ export function toViewModel(s: SessionState): ViewModel {
     subagents: s.subagents.map((a) => ({ name: a.name, status: a.status, role: a.role })),
     validations: Object.entries(s.validations).map(([check, status]) => ({ check, status })),
     docType: s.docType,
-    pendingQuestion: s.pendingQuestion,
-    decision: s.pendingDecision,
+    decisions: s.decisions.map((d) => ({ id: d.id, prompt: d.prompt, kind: d.kind, options: d.options, answer: d.answer, status: d.status })),
+    hostElicits: s.hostElicits,
     steerMenu,
     directives: s.directives,
     screen: s.screen,
