@@ -61,6 +61,25 @@ function steppedVm() {
   return toViewModel(s);
 }
 
+describe("interview layout", () => {
+  let win: ReturnType<typeof boot>;
+  beforeEach(() => { win = boot(); });
+
+  it("wraps the conversation in .iv-convo with the draft iframe as a sibling", () => {
+    (win as any).render(steppedVm()); // existing helper from the stepper tests
+    const view = win.document.getElementById("interview-view")!;
+    const convo = view.querySelector(".iv-convo")!;
+    expect(convo).not.toBeNull();
+    expect(convo.querySelector("#iv-steps")).not.toBeNull();
+    expect(convo.querySelector(".flow-slot")).not.toBeNull();
+    // the draft iframe is a direct child of #interview-view, NOT inside .iv-convo
+    const ivDoc = win.document.getElementById("iv-doc")!;
+    expect(ivDoc).not.toBeNull();
+    expect(ivDoc.parentElement!.id).toBe("interview-view");
+    expect(convo.querySelector("#iv-doc")).toBeNull();
+  });
+});
+
 describe("interview stepper", () => {
   let win: ReturnType<typeof boot>;
   beforeEach(() => { win = boot(); });
