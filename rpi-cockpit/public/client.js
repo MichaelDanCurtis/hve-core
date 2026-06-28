@@ -321,6 +321,13 @@ document.addEventListener("click", (e) => {
   if (fchoice) { sendMsg({ type: "decide", id: fchoice.dataset.id, choiceId: fchoice.dataset.choice }); return; }
   const loc = e.target.closest(".finding-loc[data-loc]");
   if (loc) { copyLoc(loc); return; }
+  const open = e.target.closest(".finding-open[data-file]");
+  if (open) {
+    const file = open.dataset.file;
+    const line = open.dataset.line;
+    sendMsg(line != null ? { type: "open", file, line: Number(line) } : { type: "open", file });
+    return;
+  }
   if (e.target.closest("#steer-send")) {
     const note = document.getElementById("steer-note");
     const text = (note && note.value || "").trim();
@@ -394,7 +401,7 @@ function renderFindings(v) {
          return `<div class="finding">
             <div class="finding-top">
               <span class="finding-title">${esc(f.title)}</span>
-              ${f.file ? `<button type="button" class="finding-loc" data-loc="${loc}" title="Copy location">${loc}</button>` : ""}
+              ${f.file ? `<button type="button" class="finding-loc" data-loc="${loc}" title="Copy location">${loc}</button><button type="button" class="finding-open" data-file="${esc(f.file)}"${f.line != null ? ` data-line="${esc(String(f.line))}"` : ""} title="Open in editor" aria-label="Open ${loc}">↗</button>` : ""}
             </div>
             ${f.detail ? `<div class="finding-detail">${esc(f.detail)}</div>` : ""}
           </div>`;
