@@ -238,6 +238,26 @@ export function buildMcpServer(bridge: Bridge): McpServer {
     async () => text(handlers.open_navigator(bridge)),
   );
 
+  const galleryItemSchema = z.object({ id: z.string().optional(), label: z.string(), group: z.string().optional(), url: z.string().optional(), html: z.string().optional(), caption: z.string().optional() });
+
+  server.registerTool(
+    "gallery_open",
+    { description: "Open the gallery view: a scrollable grid of scaled live thumbnails. Pass a title and an array of items; each item is EITHER a live `url` (a website or loopback dev server, framed live) OR an inline `html` snapshot, plus a `label`, optional `group` (section header), and optional `caption`. `url` must be a loopback http(s) URL or an external https URL. `size` is s/m/l (default m).", inputSchema: { title: z.string(), items: z.array(galleryItemSchema), size: z.enum(["s", "m", "l"]).optional() } },
+    async (a) => text(handlers.gallery_open(bridge, a)),
+  );
+
+  server.registerTool(
+    "gallery_add",
+    { description: "Add or update one gallery tile by id (upsert). The item has the same shape as a gallery_open item (label, one of url/html, optional group/caption). Use this to stream tiles into an open gallery.", inputSchema: { item: galleryItemSchema } },
+    async (a) => text(handlers.gallery_add(bridge, a)),
+  );
+
+  server.registerTool(
+    "gallery_clear",
+    { description: "Remove all tiles from the gallery (the view stays open with its title).", inputSchema: {} },
+    async () => text(handlers.gallery_clear(bridge)),
+  );
+
   server.registerTool(
     "present_workflows",
     { description: "Offer the user the HVE Core workflows as a native choice card and return the chosen workflow's launch instruction. Use to let the user pick what to do.", inputSchema: {} },

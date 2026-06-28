@@ -15,3 +15,18 @@ export function isLoopbackHttpUrl(u: string): boolean {
     return false;
   }
 }
+
+// Gallery tiles may frame loopback dev servers (http or https) and external
+// https sites. External http is rejected. The client mirrors this predicate
+// before assigning an iframe src (defense in depth), so keep the two copies
+// byte-for-byte equivalent (the copy lives in public/client.js).
+export function isGalleryUrl(u: string): boolean {
+  try {
+    const url = new URL(u);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+    if (isLoopbackHttpUrl(u)) return true;
+    return url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
