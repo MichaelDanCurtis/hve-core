@@ -1,5 +1,5 @@
 // rpi-cockpit/src/render.ts
-import type { SessionState } from "./state.js";
+import type { SessionState, BacklogItem } from "./state.js";
 import type { Phase, OptionItem, Directive, Severity } from "./events.js";
 import { WORKFLOWS } from "./catalog.js";
 
@@ -23,6 +23,40 @@ const PRESETS: { id: string; title: string }[] = [
   { id: "ask-first", title: "Ask before big changes" },
 ];
 
+function orderColumnItems(
+  columnItems: BacklogItem[],
+  byId: Map<string, BacklogItem>,
+  inColumn: Set<string>,
+): { id: string; title: string; kind?: string; tier?: string; depth: number; parentRef?: string }[] {
+  const childrenOf = new Map<string, BacklogItem[]>();
+  const roots: BacklogItem[] = [];
+  for (const i of columnItems) {
+    const sameColParent = i.parent && inColumn.has(i.parent) ? i.parent : null;
+    if (sameColParent) {
+      const arr = childrenOf.get(sameColParent) ?? [];
+      arr.push(i);
+      childrenOf.set(sameColParent, arr);
+    } else {
+      roots.push(i);
+    }
+  }
+  const out: { id: string; title: string; kind?: string; tier?: string; depth: number; parentRef?: string }[] = [];
+  const seen = new Set<string>();
+  const visit = (i: BacklogItem, depth: number): void => {
+    if (seen.has(i.id)) return;
+    seen.add(i.id);
+    const crossColumn = i.parent !== undefined && !inColumn.has(i.parent);
+    out.push({
+      id: i.id, title: i.title, kind: i.kind, tier: i.tier, depth,
+      parentRef: crossColumn ? (byId.get(i.parent as string)?.title ?? (i.parent as string)) : undefined,
+    });
+    for (const c of childrenOf.get(i.id) ?? []) visit(c, depth + 1);
+  };
+  for (const r of roots) visit(r, 0);
+  for (const i of columnItems) if (!seen.has(i.id)) visit(i, 0); // defensive: cycles/orphans never silently drop
+  return out;
+}
+
 export interface StepVM { phase: Phase; status: "done" | "active" | "pending"; }
 export interface SteerMenuVM { label: string; source: "agent" | "preset"; options: { id: string; title: string; detail?: string }[]; }
 export interface ViewModel {
@@ -32,7 +66,7 @@ export interface ViewModel {
   domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | null;
   reviewTarget: string | null;
   findingGroups: { severity: Severity; items: { title: string; file?: string; line?: number; detail?: string }[] }[];
-  board: { target: string | null; action: string | null; count: number; columns: { name: string; items: { id: string; title: string; kind?: string; tier?: string }[] }[] };
+  board: { target: string | null; action: string | null; count: number; columns: { name: string; items: { id: string; title: string; kind?: string; tier?: string; depth: number; parentRef?: string }[] }[] };
   team: { orchestrator: string | null; count: number; columns: { status: string; label: string; agents: { id: string; name: string; role?: string; action?: string | null }[] }[] };
   codemap: { nodes: { id: string; path: string; kind: string; group: string }[]; focus: string | null; touches: Record<string, string> };
   view: "home" | "loop";
@@ -74,16 +108,16 @@ export function toViewModel(s: SessionState): ViewModel {
         .map((f) => ({ title: f.title, file: f.file, line: f.line, detail: f.detail })),
     }))
     .filter((g) => g.items.length > 0);
+  const byId = new Map(s.boardItems.map((i) => [i.id, i]));
   const board = {
     target: s.boardTarget,
     action: s.boardAction,
     count: s.boardItems.length,
-    columns: s.boardColumns.map((name) => ({
-      name,
-      items: s.boardItems
-        .filter((i) => i.column === name)
-        .map((i) => ({ id: i.id, title: i.title, kind: i.kind, tier: i.tier })),
-    })),
+    columns: s.boardColumns.map((name) => {
+      const columnItems = s.boardItems.filter((i) => i.column === name);
+      const inColumn = new Set(columnItems.map((i) => i.id));
+      return { name, items: orderColumnItems(columnItems, byId, inColumn) };
+    }),
   };
   const team = {
     orchestrator: s.orchestrator,

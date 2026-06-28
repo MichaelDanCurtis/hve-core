@@ -124,7 +124,7 @@ describe("toViewModel", () => {
       expect(board.columns.map((c) => c.name)).toEqual(["Todo", "Doing", "Done"]);
       expect(board.columns[1].items).toEqual([]);
       expect(board.columns[0].items.map((i) => i.id)).toEqual(["I1", "I3"]);
-      expect(board.columns[0].items[0]).toEqual({ id: "I1", title: "a", kind: "bug", tier: "T1" });
+      expect(board.columns[0].items[0]).toEqual({ id: "I1", title: "a", kind: "bug", tier: "T1", depth: 0 });
       expect(board.columns[2].items.map((i) => i.id)).toEqual(["I2"]);
     });
   });
@@ -207,6 +207,47 @@ describe("toViewModel", () => {
     });
     it("defaults the app frame url to null", () => {
       expect(toViewModel(initialState()).appFrame).toEqual({ url: null });
+    });
+  });
+
+  describe("backlog hierarchy projection", () => {
+    function build(items: { id: string; title: string; column: string; parent?: string }[]) {
+      let s = applyBeat(initialState(), { type: "backlog.start", target: "S", columns: ["Plan", "Done"] }, 1);
+      items.forEach((it, n) => { s = applyBeat(s, { type: "item.add", ...it }, n + 2); });
+      return toViewModel(s);
+    }
+    const plan = (vm: any) => vm.board.columns.find((c: any) => c.name === "Plan").items;
+    const done = (vm: any) => vm.board.columns.find((c: any) => c.name === "Done").items;
+
+    it("nests a same-column chain with increasing depth, parent-first", () => {
+      const vm = build([
+        { id: "E", title: "Epic", column: "Plan" },
+        { id: "F", title: "Feature", column: "Plan", parent: "E" },
+        { id: "S", title: "Story", column: "Plan", parent: "F" },
+      ]);
+      expect(plan(vm).map((i: any) => [i.id, i.depth])).toEqual([["E", 0], ["F", 1], ["S", 2]]);
+      expect(plan(vm).every((i: any) => i.parentRef === undefined)).toBe(true);
+    });
+
+    it("shows a parentRef when the parent is in a different column", () => {
+      const vm = build([
+        { id: "E", title: "Epic", column: "Plan" },
+        { id: "S", title: "Story", column: "Done", parent: "E" },
+      ]);
+      expect(done(vm)).toEqual([{ id: "S", title: "Story", kind: undefined, tier: undefined, depth: 0, parentRef: "Epic" }]);
+    });
+
+    it("falls back to the raw parent id when the parent is not on the board", () => {
+      const vm = build([{ id: "S", title: "Orphan", column: "Plan", parent: "ghost" }]);
+      expect(plan(vm)[0]).toMatchObject({ id: "S", depth: 0, parentRef: "ghost" });
+    });
+
+    it("keeps parentless items in insertion order at depth 0", () => {
+      const vm = build([
+        { id: "A", title: "A", column: "Plan" },
+        { id: "B", title: "B", column: "Plan" },
+      ]);
+      expect(plan(vm).map((i: any) => [i.id, i.depth])).toEqual([["A", 0], ["B", 0]]);
     });
   });
 
