@@ -10,13 +10,14 @@ export interface Decision { id: string; prompt: string; options: OptionItem[]; }
 export type DecisionKind = "choice" | "text";
 export type DecisionStatus = "pending" | "answered" | "superseded";
 export interface DecisionEntry { id: string; prompt: string; kind: DecisionKind; options?: OptionItem[]; answer?: string; status: DecisionStatus; }
+export interface GalleryItem { id: string; label: string; group?: string; url?: string; html?: string; caption?: string; }
 export interface LogEntry { t: number; kind: string; detail: string; }
 export interface SteerMenu { label: string; options: OptionItem[]; }
 
 export interface SessionState {
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | null;
   reviewTarget: string | null;
   orchestrator: string | null;
   teamAgents: TeamAgent[];
@@ -53,11 +54,18 @@ export interface SessionState {
   codemapTouches: Record<string, "read" | "edit">;
   profileDataset: { name: string; rows?: number; cols?: number; source?: string } | null;
   profileColumns: ProfileColumn[];
+  galleryTitle: string | null;
+  gallerySize: "s" | "m" | "l";
+  galleryItems: GalleryItem[];
   log: LogEntry[];
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, interviewSteps: null, decisions: [], hostElicits: false, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, codemapNodes: [], codemapFocus: null, codemapTouches: {}, profileDataset: null, profileColumns: [], log: [] };
+  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, interviewSteps: null, decisions: [], hostElicits: false, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, codemapNodes: [], codemapFocus: null, codemapTouches: {}, profileDataset: null, profileColumns: [], galleryTitle: null, gallerySize: "m", galleryItems: [], log: [] };
+}
+
+function normGalleryItem(it: { id?: string; label: string; group?: string; url?: string; html?: string; caption?: string }, idx: number): GalleryItem {
+  return { id: it.id && it.id.length ? it.id : `g${idx}`, label: it.label, group: it.group, url: it.url, html: it.html, caption: it.caption };
 }
 
 export function applyBeat(s: SessionState, beat: Beat, now: number): SessionState {
@@ -115,6 +123,15 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
       const exists = s.profileColumns.some((c) => c.name === beat.name);
       return { ...s, profileColumns: exists ? s.profileColumns.map((c) => (c.name === beat.name ? col : c)) : [...s.profileColumns, col], log };
     }
+    case "gallery.open":
+      return { ...s, view: "loop", domain: "gallery", galleryTitle: beat.title, gallerySize: beat.size ?? "m", galleryItems: beat.items.map((it, i) => normGalleryItem(it, i)), log };
+    case "gallery.add": {
+      const item = normGalleryItem(beat.item, s.galleryItems.length);
+      const exists = s.galleryItems.some((g) => g.id === item.id);
+      return { ...s, view: "loop", domain: "gallery", galleryItems: exists ? s.galleryItems.map((g) => (g.id === item.id ? item : g)) : [...s.galleryItems, item], log };
+    }
+    case "gallery.clear":
+      return { ...s, galleryItems: [], log };
     case "context.set":
       return { ...s, contextInstructions: beat.instructions, contextSkills: beat.skills, contextCollection: beat.collection, log };
     case "appframe.set":
@@ -173,6 +190,9 @@ function summarize(beat: Beat): string {
     case "codemap.set": return `${beat.nodes.length} nodes`;
     case "codemap.focus": return beat.id;
     case "codemap.touch": return `${beat.kind} ${beat.id}`;
+    case "gallery.open": return beat.title;
+    case "gallery.add": return beat.item.label;
+    case "gallery.clear": return "cleared";
   }
 }
 
