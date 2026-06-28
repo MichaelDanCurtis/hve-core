@@ -14,10 +14,10 @@ describe("Bridge", () => {
   it("blocks presentOptions until resolveDecision is called", async () => {
     const b = new Bridge();
     const p = b.presentOptions("pick", [{ id: "a", title: "A" }, { id: "b", title: "B" }]);
-    expect(b.state.pendingDecision?.options.length).toBe(2);
-    b.resolveDecision(b.state.pendingDecision!.id, "b");
+    expect(b.state.decisions[0].options?.length).toBe(2);
+    b.resolveDecision(b.state.decisions[0].id, "b");
     await expect(p).resolves.toBe("b");
-    expect(b.state.pendingDecision).toBeNull();
+    expect(b.state.decisions[0].status).toBe("answered");
   });
   it("falls back to the recommended option on timeout", async () => {
     const b = new Bridge();
@@ -66,7 +66,7 @@ describe("Bridge", () => {
     const seen = vi.fn();
     b.on("decision", seen);
     const p = b.presentOptions("pick", [{ id: "a", title: "A" }, { id: "b", title: "B" }]);
-    const id = b.state.pendingDecision!.id;
+    const id = b.state.decisions[0].id;
     b.resolveDecision(id, "b");
     return p.then((choice) => {
       expect(choice).toBe("b");
@@ -84,14 +84,14 @@ describe("Bridge", () => {
   });
 
   describe("question primitive", () => {
-    it("askQuestion sets pendingQuestion and resolveQuestion answers it", async () => {
+    it("askQuestion appends a pending text decision and resolveQuestion answers it", async () => {
       const b = new Bridge();
       const p = b.askQuestion("What is the goal?", 0);
-      expect(b.state.pendingQuestion?.prompt).toBe("What is the goal?");
-      const id = b.state.pendingQuestion!.id;
+      expect(b.state.decisions[0].prompt).toBe("What is the goal?");
+      const id = b.state.decisions[0].id;
       b.resolveQuestion(id, "ship it");
       expect(await p).toBe("ship it");
-      expect(b.state.pendingQuestion).toBeNull();
+      expect(b.state.decisions[0].status).toBe("answered");
     });
     it("askQuestion times out to an empty answer", async () => {
       const b = new Bridge();
@@ -165,5 +165,45 @@ describe("Bridge", () => {
     const timeout = b.state.log.find((l) => l.kind === "decision.timeout");
     expect(timeout).toBeDefined();
     expect(timeout!.detail).toContain("b");
+  });
+
+  // ── New tests from task-2 brief ──────────────────────────────────────────
+
+  it("presentOptions appends a pending choice decision and resolves to answered", async () => {
+    const b = new Bridge();
+    const p = b.presentOptions("Pick?", [{ id: "a", title: "A" }], 0, "d1");
+    expect(b.state.decisions[0]).toMatchObject({ id: "d1", kind: "choice", status: "pending" });
+    b.resolveDecision("d1", "a");
+    await expect(p).resolves.toBe("a");
+    expect(b.state.decisions[0]).toMatchObject({ status: "answered", answer: "a" });
+  });
+
+  it("askQuestion appends a pending text decision and resolves to answered", async () => {
+    const b = new Bridge();
+    const p = b.askQuestion("Name?", 0, "q1");
+    b.resolveQuestion("q1", "Ada");
+    await expect(p).resolves.toBe("Ada");
+    expect(b.state.decisions[0]).toMatchObject({ kind: "text", status: "answered", answer: "Ada" });
+  });
+
+  it("revise re-opens a decision, supersedes downstream, and enqueues a directive", async () => {
+    const b = new Bridge();
+    b.resolveDecision("d1", "a"); // no-op guard
+    const p1 = b.presentOptions("One?", [{ id: "a", title: "A" }], 0, "d1"); b.resolveDecision("d1", "a"); await p1;
+    const p2 = b.askQuestion("Two?", 0, "q2"); b.resolveQuestion("q2", "x"); await p2;
+    b.revise("d1");
+    expect(b.state.decisions.map((d) => d.status)).toEqual(["pending", "superseded"]);
+    expect(b.state.directives.at(-1)?.kind).toBe("note");
+    expect((b.state.directives.at(-1) as { text: string }).text).toContain("revise");
+  });
+
+  it("presentOptions auto-resolves to the recommended option on timeout", async () => {
+    const b = new Bridge();
+    const p = b.presentOptions("Pick?", [{ id: "a", title: "A" }, { id: "b", title: "B", recommended: true }], 20, "d1");
+    await expect(p).resolves.toBe("b");
+  });
+
+  it("setHostElicits sets the flag", () => {
+    const b = new Bridge(); b.setHostElicits(true); expect(b.state.hostElicits).toBe(true);
   });
 });

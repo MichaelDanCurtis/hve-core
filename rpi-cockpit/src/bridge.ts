@@ -1,6 +1,6 @@
 // rpi-cockpit/src/bridge.ts
 import { EventEmitter } from "node:events";
-import { initialState, applyBeat, enqueueDirective as reduceEnqueue, drainDirectives as reduceDrain, setView, startLaunch, setNavigatorOpen, type SessionState } from "./state.js";
+import { initialState, applyBeat, enqueueDirective as reduceEnqueue, drainDirectives as reduceDrain, setView, startLaunch, setNavigatorOpen, addDecision, answerDecision, reviseDecision, setHostElicits as reduceSetHostElicits, type SessionState } from "./state.js";
 import type { Beat, OptionItem, InboundDirective, Directive } from "./events.js";
 import { WORKFLOWS } from "./catalog.js";
 
@@ -79,26 +79,24 @@ export class Bridge extends EventEmitter {
     this.emitBeat({ type: "screen.clear" });
   }
 
-  presentOptions(prompt: string, options: OptionItem[], timeoutMs = 0): Promise<string> {
-    const id = `d${++this.seq}`;
-    this.state = { ...this.state, pendingDecision: { id, prompt, options } };
+  presentOptions(prompt: string, options: OptionItem[], timeoutMs = 0, id?: string): Promise<string> {
+    const did = id ?? `d${++this.seq}`;
+    this.state = addDecision(this.state, { id: did, prompt, kind: "choice", options });
     this.emit("state", this.state);
     return new Promise<string>((resolve) => {
-      this.pending.set(id, resolve);
-      if (timeoutMs > 0) {
-        setTimeout(() => {
-          if (this.pending.has(id)) {
-            const fallback = options.find((o) => o.recommended)?.id ?? options[0]?.id;
-            if (fallback !== undefined) {
-              // Log the auto-resolve so a timeout fallback is distinguishable from a
-              // real user pick (the durable decisions.jsonl records only the choiceId). (B3)
-              this.state = { ...this.state, log: [...this.state.log, { t: Date.now(), kind: "decision.timeout", detail: `auto-resolved to ${fallback}` }] };
-              this.emit("state", this.state);
-              this.resolveDecision(id, fallback);
-            }
+      this.pending.set(did, resolve);
+      if (timeoutMs > 0) setTimeout(() => {
+        if (this.pending.has(did)) {
+          // Log the auto-resolve so a timeout fallback is distinguishable from a
+          // real user pick (the durable decisions.jsonl records only the choiceId). (B3)
+          const fallback = options.find((o) => o.recommended)?.id ?? options[0]?.id;
+          if (fallback !== undefined) {
+            this.state = { ...this.state, log: [...this.state.log, { t: Date.now(), kind: "decision.timeout", detail: `auto-resolved to ${fallback}` }] };
+            this.emit("state", this.state);
+            this.resolveDecision(did, fallback);
           }
-        }, timeoutMs);
-      }
+        }
+      }, timeoutMs);
     });
   }
 
@@ -106,27 +104,21 @@ export class Bridge extends EventEmitter {
     const resolve = this.pending.get(id);
     if (!resolve) return;
     this.pending.delete(id);
-    // Capture the prompt before we clear the pending decision so the granular
-    // "decision" event can carry it for the durable file sink.
-    const prompt = this.state.pendingDecision?.id === id ? this.state.pendingDecision.prompt : undefined;
-    if (this.state.pendingDecision?.id === id) {
-      this.state = { ...this.state, pendingDecision: null };
-      this.emit("state", this.state);
-    }
+    const prompt = this.state.decisions.find((d) => d.id === id)?.prompt;
+    this.state = answerDecision(this.state, id, choiceId);
+    this.emit("state", this.state);
     resolve(choiceId);
     // Additive: only emitted on a real resolution (unknown ids returned above).
     this.emit("decision", prompt === undefined ? { id, choiceId } : { id, choiceId, prompt });
   }
 
-  askQuestion(prompt: string, timeoutMs = 0): Promise<string> {
-    const id = `q${++this.seq}`;
-    this.state = { ...this.state, pendingQuestion: { id, prompt } };
+  askQuestion(prompt: string, timeoutMs = 0, id?: string): Promise<string> {
+    const qid = id ?? `q${++this.seq}`;
+    this.state = addDecision(this.state, { id: qid, prompt, kind: "text" });
     this.emit("state", this.state);
     return new Promise<string>((resolve) => {
-      this.pending.set(id, resolve);
-      if (timeoutMs > 0) {
-        setTimeout(() => { if (this.pending.has(id)) this.resolveQuestion(id, ""); }, timeoutMs);
-      }
+      this.pending.set(qid, resolve);
+      if (timeoutMs > 0) setTimeout(() => { if (this.pending.has(qid)) this.resolveQuestion(qid, ""); }, timeoutMs);
     });
   }
 
@@ -134,10 +126,21 @@ export class Bridge extends EventEmitter {
     const resolve = this.pending.get(id);
     if (!resolve) return;
     this.pending.delete(id);
-    if (this.state.pendingQuestion?.id === id) {
-      this.state = { ...this.state, pendingQuestion: null };
-      this.emit("state", this.state);
-    }
+    this.state = answerDecision(this.state, id, text);
+    this.emit("state", this.state);
     resolve(text);
+  }
+
+  revise(id: string): void {
+    const entry = this.state.decisions.find((d) => d.id === id);
+    if (!entry) return;
+    this.state = reviseDecision(this.state, id);
+    this.emit("state", this.state);
+    this.enqueueDirective({ kind: "note", text: `revise decision "${entry.prompt}" (id ${id}): re-ask it and reconsider what follows` });
+  }
+
+  setHostElicits(v: boolean): void {
+    this.state = reduceSetHostElicits(this.state, v);
+    this.emit("state", this.state);
   }
 }
