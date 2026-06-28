@@ -63,13 +63,14 @@ export interface ViewModel {
   started: boolean;
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | null;
   reviewTarget: string | null;
   findingGroups: { severity: Severity; items: { title: string; file?: string; line?: number; detail?: string }[] }[];
   board: { target: string | null; action: string | null; count: number; columns: { name: string; items: { id: string; title: string; kind?: string; tier?: string; depth: number; parentRef?: string }[] }[] };
   team: { orchestrator: string | null; count: number; columns: { status: string; label: string; agents: { id: string; name: string; role?: string; action?: string | null }[] }[] };
   codemap: { nodes: { id: string; path: string; kind: string; group: string }[]; focus: string | null; touches: Record<string, string> };
   dataProfile: { dataset: { name: string; rows?: number; cols?: number; source?: string } | null; columns: { name: string; dtype: string; nullPct?: number; distinct?: number; stat?: string; quality?: string }[] };
+  gallery: { title: string | null; size: "s" | "m" | "l"; items: { id: string; label: string; group: string | null; kind: "url" | "html" | "empty"; src: string | null; caption: string | null }[] };
   view: "home" | "loop";
   navigatorOpen: boolean;
   workflows: { id: string; name: string; hint: string; description: string }[];
@@ -165,6 +166,18 @@ export function toViewModel(s: SessionState): ViewModel {
     team,
     codemap,
     dataProfile: { dataset: s.profileDataset, columns: s.profileColumns },
+    gallery: {
+      title: s.galleryTitle,
+      size: s.gallerySize,
+      items: s.galleryItems.map((it) => ({
+        id: it.id,
+        label: it.label,
+        group: it.group ?? null,
+        kind: it.url ? "url" : it.html ? "html" : "empty",
+        src: it.url ?? it.html ?? null,
+        caption: it.caption ?? null,
+      })),
+    },
     view: s.view,
     navigatorOpen: s.navigatorOpen,
     workflows: WORKFLOWS.map((w) => ({ id: w.id, name: w.name, hint: w.hint, description: w.description })),

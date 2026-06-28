@@ -24,6 +24,16 @@ export const OptionItem = z.object({
 });
 export type OptionItem = z.infer<typeof OptionItem>;
 
+export const GalleryItem = z.object({
+  id: z.string().optional(),
+  label: z.string(),
+  group: z.string().optional(),
+  url: z.string().optional(),
+  html: z.string().optional(),
+  caption: z.string().optional(),
+});
+export type GalleryItem = z.infer<typeof GalleryItem>;
+
 export const Severity = z.enum(["critical", "high", "medium", "low", "info"]);
 export type Severity = z.infer<typeof Severity>;
 
@@ -65,6 +75,9 @@ export const Beat = z.discriminatedUnion("type", [
   z.object({ type: z.literal("codemap.set"), nodes: z.array(z.object({ id: z.string(), path: z.string(), kind: CodeKind, group: z.string().optional() })).max(60) }),
   z.object({ type: z.literal("codemap.focus"), id: z.string() }),
   z.object({ type: z.literal("codemap.touch"), id: z.string(), kind: TouchKind }),
+  z.object({ type: z.literal("gallery.open"), title: z.string(), size: z.enum(["s", "m", "l"]).optional(), items: z.array(GalleryItem) }),
+  z.object({ type: z.literal("gallery.add"), item: GalleryItem }),
+  z.object({ type: z.literal("gallery.clear") }),
 ]);
 export type Beat = z.infer<typeof Beat>;
 

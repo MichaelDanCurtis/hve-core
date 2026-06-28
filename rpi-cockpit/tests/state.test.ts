@@ -412,6 +412,38 @@ describe("interview steps", () => {
   });
 });
 
+describe("gallery", () => {
+  it("gallery.open sets title/size/items, fills missing ids, and switches domain", () => {
+    let s = applyBeat(initialState(), { type: "gallery.open", title: "My apps", size: "l", items: [
+      { id: "", label: "Site", url: "https://example.com" },
+      { id: "", label: "Snap", html: "<b>hi</b>" },
+    ] }, 1);
+    expect(s.domain).toBe("gallery");
+    expect(s.view).toBe("loop");
+    expect(s.galleryTitle).toBe("My apps");
+    expect(s.gallerySize).toBe("l");
+    expect(s.galleryItems.map((i) => i.id)).toEqual(["g0", "g1"]);
+  });
+  it("gallery.open defaults size to m", () => {
+    const s = applyBeat(initialState(), { type: "gallery.open", title: "T", items: [] }, 1);
+    expect(s.gallerySize).toBe("m");
+  });
+  it("gallery.add appends, and a same-id add updates in place (order preserved)", () => {
+    let s = applyBeat(initialState(), { type: "gallery.open", title: "T", items: [{ id: "a", label: "A", url: "https://a.test" }] }, 1);
+    s = applyBeat(s, { type: "gallery.add", item: { id: "b", label: "B", html: "<i>b</i>" } }, 2);
+    s = applyBeat(s, { type: "gallery.add", item: { id: "a", label: "A2", url: "https://a2.test" } }, 3);
+    expect(s.galleryItems.map((i) => i.id)).toEqual(["a", "b"]);
+    expect(s.galleryItems[0]).toMatchObject({ id: "a", label: "A2", url: "https://a2.test" });
+  });
+  it("gallery.clear empties items but keeps title and domain", () => {
+    let s = applyBeat(initialState(), { type: "gallery.open", title: "T", items: [{ id: "a", label: "A", url: "https://a.test" }] }, 1);
+    s = applyBeat(s, { type: "gallery.clear" }, 2);
+    expect(s.galleryItems).toEqual([]);
+    expect(s.galleryTitle).toBe("T");
+    expect(s.domain).toBe("gallery");
+  });
+});
+
 describe("data profile", () => {
   it("profile.start sets the dataset and clears columns", () => {
     let s = applyBeat(initialState(), { type: "profile.start", name: "sales.csv", rows: 38201, columns: 12, source: "warehouse" }, 1);

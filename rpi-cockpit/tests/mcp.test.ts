@@ -48,7 +48,10 @@ describe("mcp face", () => {
     expect(names).toContain("dataset_profile");
     expect(names).toContain("add_column");
     expect(names).toContain("set_steps");
-    expect(tools).toHaveLength(33);
+    expect(names).toContain("gallery_open");
+    expect(names).toContain("gallery_add");
+    expect(names).toContain("gallery_clear");
+    expect(tools).toHaveLength(36);
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
@@ -321,5 +324,32 @@ describe("mcp face", () => {
     await client.connect(clientT);
     await client.callTool({ name: "set_steps", arguments: { steps: ["a", "b"], current: 0, progress: { done: 1, total: 4 } } });
     expect(bridge.state.interviewSteps!.progress).toEqual({ done: 1, total: 4 });
+  });
+
+  it("gallery tools drive the gallery state and reject bad input", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const [clientT, serverT] = InMemoryTransport.createLinkedPair();
+    await server.connect(serverT);
+    const client = new Client({ name: "test", version: "0" });
+    await client.connect(clientT);
+
+    await client.callTool({ name: "gallery_open", arguments: { title: "Apps", size: "l", items: [
+      { label: "Local", url: "http://localhost:3000/" },
+      { label: "Snap", html: "<b>x</b>" },
+    ] } });
+    expect(bridge.state.domain).toBe("gallery");
+    expect(bridge.state.galleryTitle).toBe("Apps");
+    expect(bridge.state.gallerySize).toBe("l");
+    expect(bridge.state.galleryItems.map((i) => i.id)).toEqual(["g0", "g1"]);
+
+    await client.callTool({ name: "gallery_add", arguments: { item: { id: "x", label: "Ext", url: "https://example.com" } } });
+    expect(bridge.state.galleryItems.at(-1)).toMatchObject({ id: "x", label: "Ext" });
+
+    await client.callTool({ name: "gallery_clear", arguments: {} });
+    expect(bridge.state.galleryItems).toEqual([]);
+
+    const bad = await client.callTool({ name: "gallery_open", arguments: { title: "T", items: [{ label: "Bad", url: "http://evil.example.com" }] } });
+    expect(bad.isError).toBe(true);
   });
 });

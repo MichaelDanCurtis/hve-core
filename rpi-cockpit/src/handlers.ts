@@ -1,7 +1,7 @@
 // rpi-cockpit/src/handlers.ts
 import type { Bridge } from "./bridge.js";
 import type { AgentStatus, CodeKind, OptionItem, Phase, Severity, TouchKind, ValidationStatus } from "./events.js";
-import { isLoopbackHttpUrl } from "./url.js";
+import { isLoopbackHttpUrl, isGalleryUrl } from "./url.js";
 
 export const handlers = {
   session_begin: (b: Bridge, a: { task: string; host: string }) => {
@@ -127,5 +127,19 @@ export const handlers = {
   open_navigator: (b: Bridge) => {
     b.openNavigator();
     return "navigator opened";
+  },
+  gallery_open: (b: Bridge, a: { title: string; size?: "s" | "m" | "l"; items: { id?: string; label: string; group?: string; url?: string; html?: string; caption?: string }[] }) => {
+    for (const it of a.items) if (it.url && !isGalleryUrl(it.url)) throw new Error(`gallery url must be loopback http(s) or external https: ${it.url}`);
+    b.emitBeat({ type: "gallery.open", title: a.title, size: a.size, items: a.items });
+    return `gallery opened: ${a.title} (${a.items.length})`;
+  },
+  gallery_add: (b: Bridge, a: { item: { id?: string; label: string; group?: string; url?: string; html?: string; caption?: string } }) => {
+    if (a.item.url && !isGalleryUrl(a.item.url)) throw new Error(`gallery url must be loopback http(s) or external https: ${a.item.url}`);
+    b.emitBeat({ type: "gallery.add", item: a.item });
+    return `gallery item: ${a.item.label}`;
+  },
+  gallery_clear: (b: Bridge) => {
+    b.emitBeat({ type: "gallery.clear" });
+    return "gallery cleared";
   },
 };

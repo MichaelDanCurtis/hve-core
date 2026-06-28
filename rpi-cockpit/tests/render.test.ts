@@ -251,6 +251,25 @@ describe("toViewModel", () => {
     });
   });
 
+  it("projects the gallery with derived kind and src", () => {
+    let s = applyBeat(initialState(), { type: "gallery.open", title: "G", size: "s", items: [
+      { id: "u", label: "U", group: "live", url: "https://example.com" },
+      { id: "h", label: "H", html: "<b>x</b>" },
+      { id: "e", label: "E" },
+    ] }, 1);
+    const vm = toViewModel(s);
+    expect(vm.domain).toBe("gallery");
+    expect(vm.gallery.title).toBe("G");
+    expect(vm.gallery.size).toBe("s");
+    expect(vm.gallery.items).toEqual([
+      { id: "u", label: "U", group: "live", kind: "url", src: "https://example.com", caption: null },
+      { id: "h", label: "H", group: null, kind: "html", src: "<b>x</b>", caption: null },
+      { id: "e", label: "E", group: null, kind: "empty", src: null, caption: null },
+    ]);
+    expect(toViewModel(initialState()).gallery.title).toBeNull();
+    expect(toViewModel(initialState()).gallery.size).toBe("m");
+  });
+
   it("projects the data profile dataset and columns", () => {
     let s = applyBeat(initialState(), { type: "profile.start", name: "sales.csv", rows: 100, columns: 3, source: "warehouse" }, 1);
     s = applyBeat(s, { type: "column.add", name: "id", dtype: "int", nullPct: 0, distinct: 100, quality: "ok" }, 2);
