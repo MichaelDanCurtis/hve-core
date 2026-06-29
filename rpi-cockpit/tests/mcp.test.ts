@@ -51,12 +51,16 @@ describe("mcp face", () => {
     expect(names).toContain("gallery_open");
     expect(names).toContain("gallery_add");
     expect(names).toContain("gallery_clear");
-    expect(tools).toHaveLength(41);
+    expect(tools).toHaveLength(45);
     expect(names).toContain("promptlab_start");
     expect(names).toContain("add_case");
     expect(names).toContain("memory_open");
     expect(names).toContain("add_memory");
     expect(names).toContain("add_handoff");
+    expect(names).toContain("flow_open");
+    expect(names).toContain("add_flow_node");
+    expect(names).toContain("add_flow_edge");
+    expect(names).toContain("flow_focus");
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
@@ -376,6 +380,33 @@ describe("mcp face", () => {
     const bad = await client.callTool({ name: "add_case", arguments: { id: "c2", scenario: "x", verdict: "bogus" } });
     expect(bad.isError).toBe(true);
   });
+
+  it("flow tools drive the canvas and reject bad enums", async () => {
+  const bridge = new Bridge();
+  const server = buildMcpServer(bridge);
+  const [clientT, serverT] = InMemoryTransport.createLinkedPair();
+  await server.connect(serverT);
+  const client = new Client({ name: "test", version: "0" });
+  await client.connect(clientT);
+
+  await client.callTool({ name: "flow_open", arguments: { title: "hve-core pipeline" } });
+  await client.callTool({ name: "add_flow_node", arguments: { id: "triage", kind: "workflow", label: "Issue Triage", sub: "copilot" } });
+  await client.callTool({ name: "add_flow_node", arguments: { id: "impl", kind: "workflow", label: "Implement" } });
+  await client.callTool({ name: "add_flow_edge", arguments: { id: "e1", from: "triage", to: "impl", label: "agent-ready" } });
+  await client.callTool({ name: "flow_focus", arguments: { workflow: "triage" } });
+  expect(bridge.state.domain).toBe("flow");
+  expect(bridge.state.flowTitle).toBe("hve-core pipeline");
+  expect(bridge.state.flowNodes.map((n) => n.id)).toEqual(["triage", "impl"]);
+  expect(bridge.state.flowEdges[0]).toMatchObject({ from: "triage", to: "impl", label: "agent-ready", kind: "label" });
+  expect(bridge.state.flowFocus).toBe("triage");
+
+  const badKind = await client.callTool({ name: "add_flow_node", arguments: { id: "x", kind: "bogus", label: "x" } });
+  expect(badKind.isError).toBe(true);
+  const badStatus = await client.callTool({ name: "add_flow_node", arguments: { id: "y", kind: "workflow", label: "y", status: "bogus" } });
+  expect(badStatus.isError).toBe(true);
+  const badEdgeKind = await client.callTool({ name: "add_flow_edge", arguments: { id: "z", from: "triage", to: "impl", kind: "bogus" } });
+  expect(badEdgeKind.isError).toBe(true);
+});
 
   it("memory tools drive the memory view and reject bad enums", async () => {
     const bridge = new Bridge();
