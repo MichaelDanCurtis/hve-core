@@ -271,6 +271,24 @@ export function buildMcpServer(bridge: Bridge): McpServer {
   );
 
   server.registerTool(
+    "memory_open",
+    { description: "Open the Memory view and switch the cockpit to it. Optionally name the collection (e.g. a project memory name). Clears the entries and handoffs for a fresh session view.", inputSchema: { title: z.string().optional() } },
+    async (a) => text(handlers.memory_open(bridge, a)),
+  );
+
+  server.registerTool(
+    "add_memory",
+    { description: "Add or update one MEMORY ENTRY (a recalled or written fact, not a kanban item / dataset column / prompt case). Give an id, its content, and a category to group by (a memory type like user/feedback/project/reference, or a source); optionally a short title and a tag: recalled (loaded into context), added (written this session), or updated.", inputSchema: { id: z.string(), content: z.string(), category: z.string(), tag: z.enum(["recalled", "added", "updated"]).optional(), title: z.string().optional() } },
+    async (a) => text(handlers.add_memory(bridge, a)),
+  );
+
+  server.registerTool(
+    "add_handoff",
+    { description: "Add or update one memory HANDOFF: another agent handing state to Memory. Give an id, `from` (the handing-off agent's name), a summary of what was handed, and an action: stored, merged, or recalled.", inputSchema: { id: z.string(), from: z.string(), summary: z.string(), action: z.enum(["stored", "merged", "recalled"]).optional() } },
+    async (a) => text(handlers.add_handoff(bridge, a)),
+  );
+
+  server.registerTool(
     "present_workflows",
     { description: "Offer the user the HVE Core workflows as a native choice card and return the chosen workflow's launch instruction. Use to let the user pick what to do.", inputSchema: {} },
     async () =>

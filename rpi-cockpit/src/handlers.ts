@@ -1,7 +1,7 @@
 // rpi-cockpit/src/handlers.ts
 import type { Bridge } from "./bridge.js";
 import type { AgentStatus, CodeKind, OptionItem, Phase, Severity, TouchKind, ValidationStatus } from "./events.js";
-import type { PromptVerdict } from "./state.js";
+import type { PromptVerdict, MemoryTag, HandoffAction } from "./state.js";
 import { isLoopbackHttpUrl, isGalleryUrl } from "./url.js";
 
 export const handlers = {
@@ -150,5 +150,17 @@ export const handlers = {
   add_case: (b: Bridge, a: { id: string; scenario: string; output?: string; verdict?: PromptVerdict; note?: string }) => {
     b.emitBeat({ type: "case.add", id: a.id, scenario: a.scenario, output: a.output, verdict: a.verdict, note: a.note });
     return `case ${a.id}: ${a.verdict ?? "pending"}`;
+  },
+  memory_open: (b: Bridge, a: { title?: string }) => {
+    b.emitBeat({ type: "memory.open", title: a.title });
+    return `memory view opened${a.title ? `: ${a.title}` : ""}`;
+  },
+  add_memory: (b: Bridge, a: { id: string; content: string; category: string; tag?: MemoryTag; title?: string }) => {
+    b.emitBeat({ type: "memory.add", id: a.id, content: a.content, category: a.category, tag: a.tag, title: a.title });
+    return `memory ${a.id}: ${a.tag ?? "recalled"}`;
+  },
+  add_handoff: (b: Bridge, a: { id: string; from: string; summary: string; action?: HandoffAction }) => {
+    b.emitBeat({ type: "handoff.add", id: a.id, from: a.from, summary: a.summary, action: a.action });
+    return `handoff ${a.id} from ${a.from}: ${a.action ?? "stored"}`;
   },
 };
