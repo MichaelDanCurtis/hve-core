@@ -285,6 +285,21 @@ describe("toViewModel", () => {
     expect(toViewModel(initialState()).promptlab.name).toBeNull();
   });
 
+  it("projects the memory view with derived tag counts", () => {
+    let s = applyBeat(initialState(), { type: "memory.open", title: "hve-core" }, 1);
+    s = applyBeat(s, { type: "memory.add", id: "a", content: "c1", category: "user", tag: "recalled" }, 2);
+    s = applyBeat(s, { type: "memory.add", id: "b", content: "c2", category: "project", tag: "added" }, 3);
+    s = applyBeat(s, { type: "memory.add", id: "c", content: "c3", category: "project" }, 4);
+    s = applyBeat(s, { type: "handoff.add", id: "h", from: "RPI", summary: "did x", action: "stored" }, 5);
+    const vm = toViewModel(s);
+    expect(vm.domain).toBe("memory");
+    expect(vm.memory.title).toBe("hve-core");
+    expect(vm.memory.counts).toEqual({ recalled: 2, added: 1, updated: 0, total: 3 });
+    expect(vm.memory.entries[1]).toEqual({ id: "b", title: null, content: "c2", category: "project", tag: "added" });
+    expect(vm.memory.handoffs[0]).toEqual({ id: "h", from: "RPI", summary: "did x", action: "stored" });
+    expect(toViewModel(initialState()).memory.title).toBeNull();
+  });
+
   it("projects the data profile dataset and columns", () => {
     let s = applyBeat(initialState(), { type: "profile.start", name: "sales.csv", rows: 100, columns: 3, source: "warehouse" }, 1);
     s = applyBeat(s, { type: "column.add", name: "id", dtype: "int", nullPct: 0, distinct: 100, quality: "ok" }, 2);

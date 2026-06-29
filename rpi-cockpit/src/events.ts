@@ -80,6 +80,9 @@ export const Beat = z.discriminatedUnion("type", [
   z.object({ type: z.literal("gallery.clear") }),
   z.object({ type: z.literal("promptlab.start"), name: z.string(), prompt: z.string().optional(), round: z.number().int().optional() }),
   z.object({ type: z.literal("case.add"), id: z.string(), scenario: z.string(), output: z.string().optional(), verdict: z.enum(["pending", "running", "pass", "warn", "fail"]).optional(), note: z.string().optional() }),
+  z.object({ type: z.literal("memory.open"), title: z.string().optional() }),
+  z.object({ type: z.literal("memory.add"), id: z.string(), content: z.string(), category: z.string(), tag: z.enum(["recalled", "added", "updated"]).optional(), title: z.string().optional() }),
+  z.object({ type: z.literal("handoff.add"), id: z.string(), from: z.string(), summary: z.string(), action: z.enum(["stored", "merged", "recalled"]).optional() }),
 ]);
 export type Beat = z.infer<typeof Beat>;
 

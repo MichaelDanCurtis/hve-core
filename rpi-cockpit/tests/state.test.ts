@@ -471,6 +471,38 @@ describe("promptlab", () => {
   });
 });
 
+describe("memory", () => {
+  it("memory.open sets title and clears both arrays", () => {
+    let s = applyBeat(initialState(), { type: "memory.add", id: "x", content: "old", category: "project" }, 1);
+    s = applyBeat(s, { type: "handoff.add", id: "h", from: "RPI", summary: "old" }, 2);
+    s = applyBeat(s, { type: "memory.open", title: "hve-core" }, 3);
+    expect(s.domain).toBe("memory");
+    expect(s.view).toBe("loop");
+    expect(s.memoryTitle).toBe("hve-core");
+    expect(s.memoryEntries).toEqual([]);
+    expect(s.memoryHandoffs).toEqual([]);
+  });
+  it("memory.open defaults title to null", () => {
+    const s = applyBeat(initialState(), { type: "memory.open" }, 1);
+    expect(s.memoryTitle).toBeNull();
+  });
+  it("memory.add appends, defaults tag to recalled, and a same-id add updates in place", () => {
+    let s = applyBeat(initialState(), { type: "memory.open", title: "t" }, 1);
+    s = applyBeat(s, { type: "memory.add", id: "e1", content: "likes terse output", category: "user" }, 2);
+    s = applyBeat(s, { type: "memory.add", id: "e2", content: "ship to fork", category: "project", tag: "added" }, 3);
+    s = applyBeat(s, { type: "memory.add", id: "e1", content: "likes terse output", category: "user", tag: "updated", title: "output style" }, 4);
+    expect(s.memoryEntries.map((e) => e.id)).toEqual(["e1", "e2"]);
+    expect(s.memoryEntries[0]).toEqual({ id: "e1", title: "output style", content: "likes terse output", category: "user", tag: "updated" });
+    expect(s.memoryEntries[1].tag).toBe("added");
+  });
+  it("handoff.add appends, upserts by id, and defaults action to stored", () => {
+    let s = applyBeat(initialState(), { type: "memory.open" }, 1);
+    s = applyBeat(s, { type: "handoff.add", id: "h1", from: "GitHub Backlog Manager", summary: "sprint state" }, 2);
+    s = applyBeat(s, { type: "handoff.add", id: "h1", from: "GitHub Backlog Manager", summary: "sprint state", action: "merged" }, 3);
+    expect(s.memoryHandoffs).toEqual([{ id: "h1", from: "GitHub Backlog Manager", summary: "sprint state", action: "merged" }]);
+  });
+});
+
 describe("data profile", () => {
   it("profile.start sets the dataset and clears columns", () => {
     let s = applyBeat(initialState(), { type: "profile.start", name: "sales.csv", rows: 38201, columns: 12, source: "warehouse" }, 1);
