@@ -101,9 +101,9 @@ let cmSig = null;
 let glItems = [];
 let glSizeOverride = null;
 let glResizeRaf = 0;
-// Promptlab: which case rows are expanded, keyed by the case's data-pc index. The
-// expanded state lives here (not read back from the DOM) so a click flips it and
-// writes the row's class in one shot. (promptlab)
+// Promptlab: which case rows are expanded, keyed by the case's data-pc value (its
+// stable case id). The expanded state lives here (not read back from the DOM) so a
+// click flips it and writes the row's class in one shot. (promptlab)
 const plOpen = new Set();
 
 function connect() {
@@ -383,17 +383,18 @@ document.addEventListener("click", (e) => {
   const pcHead = e.target.closest(".pc-head");
   if (pcHead && pcHead.parentElement) {
     // Toggle the case row's expanded state. We resolve the live .pc-case from a fresh
-    // document query (by its stable data-pc index) and write its class in a single
+    // document scan (matching its stable data-pc id) and write its class in a single
     // assignment from plOpen, rather than mutating pcHead.parentElement / calling
     // classList.toggle: in a real browser both resolve to the same node and either
     // works, but under the happy-dom test harness the event-target node is a separate
     // object graph (mutations don't reflect) and DOMTokenList.toggle on a queried node
-    // is unreliable — a single className write from our own state is the robust path.
+    // is unreliable, so a single className write from our own state is the robust path.
+    // We match by getAttribute (not a built selector) so an exotic id cannot malform it.
     const k = pcHead.parentElement.getAttribute("data-pc");
     if (k != null) {
       if (plOpen.has(k)) plOpen.delete(k); else plOpen.add(k);
-      const pcCase = document.querySelector(`.pc-case[data-pc="${k}"]`);
-      if (pcCase) pcCase.className = plOpen.has(k) ? "pc-case open" : "pc-case";
+      const cls = plOpen.has(k) ? "pc-case open" : "pc-case";
+      document.querySelectorAll(".pc-case").forEach((el) => { if (el.getAttribute("data-pc") === k) el.className = cls; });
     }
     return;
   }
