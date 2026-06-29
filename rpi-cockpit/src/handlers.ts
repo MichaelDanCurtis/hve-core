@@ -1,7 +1,7 @@
 // rpi-cockpit/src/handlers.ts
 import type { Bridge } from "./bridge.js";
 import type { AgentStatus, CodeKind, OptionItem, Phase, Severity, TouchKind, ValidationStatus } from "./events.js";
-import type { PromptVerdict, MemoryTag, HandoffAction } from "./state.js";
+import type { PromptVerdict, MemoryTag, HandoffAction, FlowNodeKind, FlowStatus, FlowEdgeKind, FlowEdgeStatus } from "./state.js";
 import { isLoopbackHttpUrl, isGalleryUrl } from "./url.js";
 
 export const handlers = {
@@ -162,5 +162,21 @@ export const handlers = {
   add_handoff: (b: Bridge, a: { id: string; from: string; summary: string; action?: HandoffAction }) => {
     b.emitBeat({ type: "handoff.add", id: a.id, from: a.from, summary: a.summary, action: a.action });
     return `handoff ${a.id} from ${a.from}: ${a.action ?? "stored"}`;
+  },
+  flow_open: (b: Bridge, a: { title?: string }) => {
+    b.emitBeat({ type: "flow.open", title: a.title });
+    return `flow canvas opened${a.title ? `: ${a.title}` : ""}`;
+  },
+  add_flow_node: (b: Bridge, a: { id: string; kind: FlowNodeKind; label: string; scope?: string; sub?: string; status?: FlowStatus }) => {
+    b.emitBeat({ type: "flownode.add", id: a.id, kind: a.kind, label: a.label, scope: a.scope, sub: a.sub, status: a.status });
+    return `flow node ${a.id} (${a.kind})`;
+  },
+  add_flow_edge: (b: Bridge, a: { id: string; from: string; to: string; scope?: string; label?: string; kind?: FlowEdgeKind; status?: FlowEdgeStatus }) => {
+    b.emitBeat({ type: "flowedge.add", id: a.id, from: a.from, to: a.to, scope: a.scope, label: a.label, kind: a.kind, status: a.status });
+    return `flow edge ${a.from} -> ${a.to}`;
+  },
+  flow_focus: (b: Bridge, a: { workflow?: string | null }) => {
+    b.emitBeat({ type: "flow.focus", workflow: a.workflow ?? null });
+    return `flow focus: ${a.workflow ?? "(orchestration)"}`;
   },
 };

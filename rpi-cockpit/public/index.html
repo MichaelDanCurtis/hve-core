@@ -372,6 +372,53 @@
   .mh-summary { color: var(--text-2, #9D9D9D); font-size: 11.5px; margin: 3px 0 6px; }
   .mh-action { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 1px 8px; border-radius: 9px; background: var(--layer-alt, #2D2D2D); color: var(--text-2, #9D9D9D); }
   .mh-a-recalled { color: var(--accent-cyan, #9CDCFE); } .mh-a-merged { color: #E0954B; } .mh-a-stored { color: var(--ok, #73C991); }
+  #flow-view { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .gw-back { font: inherit; font-size: 11px; background: var(--layer, #252526); color: var(--text-2, #9D9D9D); border: 1px solid var(--stroke, #3C3C3C); border-radius: 6px; padding: 2px 9px; cursor: pointer; margin-right: 10px; }
+  .gw-stage { flex: 1; min-height: 0; display: flex; }
+  .gw-legend { flex: 0 0 120px; padding: 12px; border-right: 1px solid var(--stroke, #3C3C3C); display: flex; flex-direction: column; gap: 7px; font-size: 11px; }
+  .gw-legend .gw-leg { display: flex; align-items: center; gap: 7px; color: var(--text-2, #9D9D9D); }
+  .gw-legend .gw-dot { width: 9px; height: 9px; border-radius: 3px; }
+  .gw-canvas { flex: 1 1 0; min-width: 0; position: relative; overflow: hidden; background:
+    radial-gradient(circle, var(--stroke, #3C3C3C) 1px, transparent 1px) 0 0 / 22px 22px; cursor: grab; }
+  .gw-canvas.grabbing { cursor: grabbing; }
+  .gw-world { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; }
+  .gw-node { position: absolute; width: 180px; border: 1px solid var(--stroke-2, #4A4A4A); border-radius: 9px; background: var(--layer, #252526); box-shadow: var(--shadow-4); overflow: hidden; cursor: pointer; }
+  .gw-node.gw-sel { outline: 2px solid var(--brand, #0E639C); }
+  .gw-node .gw-head { display: flex; align-items: center; gap: 8px; padding: 7px 10px; font-weight: 600; font-size: 12.5px; border-left: 3px solid var(--stroke-2, #4A4A4A); }
+  .gw-node .gw-body { padding: 6px 10px 9px; font-size: 11px; color: var(--text-3, #6E6E6E); }
+  .gw-glyph { width: 16px; text-align: center; }
+  .gw-port { position: absolute; top: 50%; width: 9px; height: 9px; border-radius: 50%; background: var(--stroke-2, #4A4A4A); transform: translateY(-50%); }
+  .gw-port.gw-in { left: -5px; } .gw-port.gw-out { right: -5px; }
+  /* kind accents */
+  .gw-k-workflow .gw-head { border-left-color: var(--accent-blue, #4FC1FF); }
+  .gw-k-trigger .gw-head { border-left-color: #C9A9F0; }
+  .gw-k-guard .gw-head { border-left-color: #E0954B; }
+  .gw-k-agent .gw-head { border-left-color: var(--accent-cyan, #9CDCFE); }
+  .gw-k-output .gw-head { border-left-color: var(--ok, #73C991); }
+  .gw-k-mcp .gw-head { border-left-color: var(--text-3, #6E6E6E); }
+  /* status */
+  .gw-s-running { border-color: var(--accent-blue, #4FC1FF); animation: gwpulse 1.4s ease-in-out infinite; }
+  .gw-s-passed { border-color: var(--ok, #73C991); }
+  .gw-s-failed { border-color: var(--fail, #f2b8b5); }
+  .gw-s-skipped { opacity: .55; }
+  .gw-s-stale { border-color: #E0954B; }
+  @keyframes gwpulse { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-blue,#4FC1FF) 50%, transparent); } 50% { box-shadow: 0 0 0 5px transparent; } }
+  /* edges */
+  #gw-edges { position: absolute; top: 0; left: 0; overflow: visible; pointer-events: none; }
+  .gw-edge { fill: none; stroke: var(--stroke-2, #4A4A4A); stroke-width: 1.5; }
+  .gw-edge.gw-e-label { stroke: var(--accent-blue, #4FC1FF); }
+  .gw-edge.gw-e-output { stroke: var(--ok, #73C991); }
+  .gw-edge.gw-active { stroke: var(--accent-blue, #4FC1FF); stroke-width: 2.5; stroke-dasharray: 6 5; animation: gwdash 0.6s linear infinite; }
+  @keyframes gwdash { to { stroke-dashoffset: -22; } }
+  .gw-elabel { font-size: 10.5px; fill: var(--text-2, #9D9D9D); }
+  /* inspector + minimap */
+  .gw-inspector { flex: 0 0 240px; min-width: 0; overflow: auto; border-left: 1px solid var(--stroke, #3C3C3C); padding: 12px; font-size: 12px; }
+  .gw-inspector .gw-i-label { font-weight: 600; font-size: 13px; }
+  .gw-inspector .gw-i-row { margin-top: 8px; color: var(--text-2, #9D9D9D); }
+  .gw-inspector .gw-i-k { color: var(--text-3, #6E6E6E); text-transform: uppercase; font-size: 10px; letter-spacing: .04em; }
+  .gw-minimap { position: absolute; right: 10px; bottom: 10px; width: 160px; height: 110px; background: color-mix(in srgb, var(--layer, #252526) 88%, transparent); border: 1px solid var(--stroke, #3C3C3C); border-radius: 6px; overflow: hidden; cursor: pointer; }
+  .gw-minimap .gw-mm-node { position: absolute; width: 6px; height: 4px; border-radius: 1px; background: var(--text-3, #6E6E6E); }
+  .gw-minimap .gw-mm-view { position: absolute; border: 1px solid var(--accent-blue, #4FC1FF); background: color-mix(in srgb, var(--accent-blue, #4FC1FF) 12%, transparent); }
   @media (max-width: 860px) { .me-body { flex-direction: column; } .me-handoff-panel { flex: none; border-left: none; border-top: 1px solid var(--stroke, #3C3C3C); padding-left: 0; padding-top: 12px; } }
 
   .team-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -622,6 +669,20 @@
       <div class="me-body">
         <div id="me-entries" class="me-entries"></div>
         <aside class="me-handoff-panel"><div class="sec">Handoffs</div><div id="me-handoffs"></div></aside>
+      </div>
+    </section>
+    <section id="flow-view" hidden>
+      <div class="rev-head">
+        <button type="button" id="gw-back" class="gw-back" hidden>&larr; Pipeline</button>
+        <span class="board-target" id="gw-title">Flow</span>
+      </div>
+      <div class="gw-stage">
+        <div class="gw-legend" id="gw-legend"></div>
+        <div class="gw-canvas" id="gw-canvas">
+          <div class="gw-world" id="gw-world"></div>
+          <div class="gw-minimap" id="gw-minimap" hidden></div>
+        </div>
+        <aside class="gw-inspector" id="gw-inspector" hidden></aside>
       </div>
     </section>
     <section id="team-view" hidden>

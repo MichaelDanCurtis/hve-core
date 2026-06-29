@@ -63,7 +63,7 @@ export interface ViewModel {
   started: boolean;
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | "promptlab" | "memory" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | "promptlab" | "memory" | "flow" | null;
   reviewTarget: string | null;
   findingGroups: { severity: Severity; items: { title: string; file?: string; line?: number; detail?: string }[] }[];
   board: { target: string | null; action: string | null; count: number; columns: { name: string; items: { id: string; title: string; kind?: string; tier?: string; depth: number; parentRef?: string }[] }[] };
@@ -73,6 +73,7 @@ export interface ViewModel {
   gallery: { title: string | null; size: "s" | "m" | "l"; items: { id: string; label: string; group: string | null; kind: "url" | "html" | "empty"; src: string | null; caption: string | null }[] };
   promptlab: { name: string | null; round: number; prompt: string | null; summary: { pass: number; warn: number; fail: number; pending: number; running: number; total: number }; cases: { id: string; scenario: string; output: string | null; verdict: string; note: string | null }[] };
   memory: { title: string | null; counts: { recalled: number; added: number; updated: number; total: number }; entries: { id: string; title: string | null; content: string; category: string; tag: string }[]; handoffs: { id: string; from: string; summary: string; action: string }[] };
+  flow: { title: string | null; focus: string | null; nodes: { id: string; scope: string; kind: string; label: string; sub: string | null; status: string }[]; edges: { id: string; from: string; to: string; scope: string; label: string | null; kind: string; status: string }[] };
   view: "home" | "loop";
   navigatorOpen: boolean;
   workflows: { id: string; name: string; hint: string; description: string }[];
@@ -198,6 +199,12 @@ export function toViewModel(s: SessionState): ViewModel {
       ),
       entries: s.memoryEntries.map((e) => ({ id: e.id, title: e.title ?? null, content: e.content, category: e.category, tag: e.tag })),
       handoffs: s.memoryHandoffs.map((h) => ({ id: h.id, from: h.from, summary: h.summary, action: h.action })),
+    },
+    flow: {
+      title: s.flowTitle,
+      focus: s.flowFocus,
+      nodes: s.flowNodes.map((n) => ({ id: n.id, scope: n.scope, kind: n.kind, label: n.label, sub: n.sub ?? null, status: n.status })),
+      edges: s.flowEdges.map((e) => ({ id: e.id, from: e.from, to: e.to, scope: e.scope, label: e.label ?? null, kind: e.kind, status: e.status })),
     },
     view: s.view,
     navigatorOpen: s.navigatorOpen,

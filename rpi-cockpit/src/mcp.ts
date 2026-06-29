@@ -289,6 +289,27 @@ export function buildMcpServer(bridge: Bridge): McpServer {
   );
 
   server.registerTool(
+    "flow_open",
+    { description: "Open the flow canvas (the gh-aw agentic-workflow pipeline as a node graph) and switch the cockpit to it. Optionally name the pipeline. Clears nodes/edges and the drill focus.", inputSchema: { title: z.string().optional() } },
+    async (a) => text(handlers.flow_open(bridge, a)),
+  );
+  server.registerTool(
+    "add_flow_node",
+    { description: "Add or update one FLOW NODE (a node in the pipeline graph, not a kanban item). kind is workflow (an orchestration-level workflow) or trigger/guard/agent/output/mcp (an anatomy element inside one workflow). For an anatomy node set scope to the workflow node's id; orchestration nodes leave scope default. status (idle/running/passed/failed/skipped/stale) drives the live-run look; sub is a short subtitle.", inputSchema: { id: z.string(), kind: z.enum(["workflow", "trigger", "guard", "agent", "output", "mcp"]), label: z.string(), scope: z.string().optional(), sub: z.string().optional(), status: z.enum(["idle", "running", "passed", "failed", "skipped", "stale"]).optional() } },
+    async (a) => text(handlers.add_flow_node(bridge, a)),
+  );
+  server.registerTool(
+    "add_flow_edge",
+    { description: "Add or update one FLOW EDGE between two node ids. kind: label or event or output (orchestration handoffs) or step (anatomy). label is the handoff (e.g. a label name like agent-ready). status active animates the edge during a live run. Set scope to a workflow id for an anatomy edge; orchestration edges leave scope default.", inputSchema: { id: z.string(), from: z.string(), to: z.string(), scope: z.string().optional(), label: z.string().optional(), kind: z.enum(["label", "event", "output", "step"]).optional(), status: z.enum(["idle", "active"]).optional() } },
+    async (a) => text(handlers.add_flow_edge(bridge, a)),
+  );
+  server.registerTool(
+    "flow_focus",
+    { description: "Drill the flow canvas to a workflow's anatomy by its node id, or omit / pass null to return to the orchestration pipeline. Use during a debug narration to pull the pane to a failing workflow.", inputSchema: { workflow: z.string().nullable().optional() } },
+    async (a) => text(handlers.flow_focus(bridge, a)),
+  );
+
+  server.registerTool(
     "present_workflows",
     { description: "Offer the user the HVE Core workflows as a native choice card and return the chosen workflow's launch instruction. Use to let the user pick what to do.", inputSchema: {} },
     async () =>

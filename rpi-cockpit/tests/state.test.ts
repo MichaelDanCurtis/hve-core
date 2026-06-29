@@ -503,6 +503,42 @@ describe("memory", () => {
   });
 });
 
+describe("flow", () => {
+  it("flow.open sets title, clears nodes/edges, resets focus", () => {
+    let s = applyBeat(initialState(), { type: "flownode.add", id: "x", kind: "workflow", label: "old" }, 1);
+    s = applyBeat(s, { type: "flow.focus", workflow: "x" }, 2);
+    s = applyBeat(s, { type: "flow.open", title: "hve-core pipeline" }, 3);
+    expect(s.domain).toBe("flow");
+    expect(s.view).toBe("loop");
+    expect(s.flowTitle).toBe("hve-core pipeline");
+    expect(s.flowNodes).toEqual([]);
+    expect(s.flowEdges).toEqual([]);
+    expect(s.flowFocus).toBeNull();
+  });
+  it("flownode.add appends, defaults scope/status, and a same-id add updates in place", () => {
+    let s = applyBeat(initialState(), { type: "flow.open" }, 1);
+    s = applyBeat(s, { type: "flownode.add", id: "triage", kind: "workflow", label: "Issue Triage" }, 2);
+    s = applyBeat(s, { type: "flownode.add", id: "impl", kind: "workflow", label: "Implement", status: "running" }, 3);
+    s = applyBeat(s, { type: "flownode.add", id: "triage", kind: "workflow", label: "Issue Triage", sub: "copilot", status: "passed" }, 4);
+    expect(s.flowNodes.map((n) => n.id)).toEqual(["triage", "impl"]);
+    expect(s.flowNodes[0]).toEqual({ id: "triage", scope: "orchestration", kind: "workflow", label: "Issue Triage", sub: "copilot", status: "passed" });
+    expect(s.flowNodes[1].status).toBe("running");
+  });
+  it("flowedge.add appends, defaults scope/kind/status, upserts by id", () => {
+    let s = applyBeat(initialState(), { type: "flow.open" }, 1);
+    s = applyBeat(s, { type: "flowedge.add", id: "e1", from: "triage", to: "impl", label: "agent-ready" }, 2);
+    s = applyBeat(s, { type: "flowedge.add", id: "e1", from: "triage", to: "impl", label: "agent-ready", status: "active" }, 3);
+    expect(s.flowEdges).toEqual([{ id: "e1", from: "triage", to: "impl", scope: "orchestration", label: "agent-ready", kind: "label", status: "active" }]);
+  });
+  it("flow.focus sets and clears the focus", () => {
+    let s = applyBeat(initialState(), { type: "flow.open" }, 1);
+    s = applyBeat(s, { type: "flow.focus", workflow: "triage" }, 2);
+    expect(s.flowFocus).toBe("triage");
+    s = applyBeat(s, { type: "flow.focus" }, 3);
+    expect(s.flowFocus).toBeNull();
+  });
+});
+
 describe("data profile", () => {
   it("profile.start sets the dataset and clears columns", () => {
     let s = applyBeat(initialState(), { type: "profile.start", name: "sales.csv", rows: 38201, columns: 12, source: "warehouse" }, 1);
