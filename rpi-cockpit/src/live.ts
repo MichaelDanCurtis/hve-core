@@ -7,7 +7,7 @@ import { mkdirSync, appendFileSync, readFileSync, readSync, openSync, closeSync,
 import { join } from "node:path";
 import { Bridge } from "./bridge.js";
 import { startServer } from "./server.js";
-import type { SessionState } from "./state.js";
+import { initialState, type SessionState } from "./state.js";
 import { parseInbound, applyInbound, type InboundFrame } from "./inbound.js";
 
 // Consumer: serve the cockpit UI in embed mode, mirror state.json into a holder
@@ -39,7 +39,10 @@ export async function runLiveConsumer(
   // and parse so a missing or half-written file is simply skipped.
   const load = (): void => {
     try {
-      const st = JSON.parse(readFileSync(stateFile, "utf8")) as SessionState;
+      // Merge over initialState so a snapshot written by an older producer (missing
+      // fields a newer view-model reads, e.g. galleryItems) is backfilled, not a crash.
+      const parsed = JSON.parse(readFileSync(stateFile, "utf8")) as Partial<SessionState>;
+      const st = { ...initialState(), ...parsed } as SessionState;
       bridge.state = st;
       bridge.emit("state", st);
     } catch { /* no snapshot yet, or mid-write; try again on the next tick */ }

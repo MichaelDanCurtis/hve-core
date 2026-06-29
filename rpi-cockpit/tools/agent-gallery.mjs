@@ -251,7 +251,10 @@ for (const { cat, agents } of CATS) {
 
 const bridge = new Bridge();
 const port = Number(process.env.PORT) || 4505;
-const stateDir = process.env.RPI_COCKPIT_STATE_DIR ?? liveStateDir(path.join(root, "rpi-cockpit"));
+// Match the consumer pane's dir exactly: src/index.js derives liveStateDir(repoRoot), and
+// `root` here is the repo root (tools/ -> rpi-cockpit -> repo root), so a separate
+// `rpi-cockpit live` pane mirrors this producer's snapshot.
+const stateDir = process.env.RPI_COCKPIT_STATE_DIR ?? liveStateDir(root);
 const srv = await startServer(bridge, port, { stateDir, writeStateSnapshot: true });
 handlers.gallery_open(bridge, { title: "HVE Core agents", size: "m", items });
 process.stderr.write(`agent gallery: ${srv.url}\n`);
