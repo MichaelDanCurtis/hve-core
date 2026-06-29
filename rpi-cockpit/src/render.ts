@@ -63,7 +63,7 @@ export interface ViewModel {
   started: boolean;
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | "promptlab" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | "promptlab" | "memory" | null;
   reviewTarget: string | null;
   findingGroups: { severity: Severity; items: { title: string; file?: string; line?: number; detail?: string }[] }[];
   board: { target: string | null; action: string | null; count: number; columns: { name: string; items: { id: string; title: string; kind?: string; tier?: string; depth: number; parentRef?: string }[] }[] };
@@ -72,6 +72,7 @@ export interface ViewModel {
   dataProfile: { dataset: { name: string; rows?: number; cols?: number; source?: string } | null; columns: { name: string; dtype: string; nullPct?: number; distinct?: number; stat?: string; quality?: string }[] };
   gallery: { title: string | null; size: "s" | "m" | "l"; items: { id: string; label: string; group: string | null; kind: "url" | "html" | "empty"; src: string | null; caption: string | null }[] };
   promptlab: { name: string | null; round: number; prompt: string | null; summary: { pass: number; warn: number; fail: number; pending: number; running: number; total: number }; cases: { id: string; scenario: string; output: string | null; verdict: string; note: string | null }[] };
+  memory: { title: string | null; counts: { recalled: number; added: number; updated: number; total: number }; entries: { id: string; title: string | null; content: string; category: string; tag: string }[]; handoffs: { id: string; from: string; summary: string; action: string }[] };
   view: "home" | "loop";
   navigatorOpen: boolean;
   workflows: { id: string; name: string; hint: string; description: string }[];
@@ -188,6 +189,15 @@ export function toViewModel(s: SessionState): ViewModel {
         { pass: 0, warn: 0, fail: 0, pending: 0, running: 0, total: 0 },
       ),
       cases: s.promptCases.map((c) => ({ id: c.id, scenario: c.scenario, output: c.output ?? null, verdict: c.verdict, note: c.note ?? null })),
+    },
+    memory: {
+      title: s.memoryTitle,
+      counts: s.memoryEntries.reduce(
+        (a, e) => { a[e.tag]++; a.total++; return a; },
+        { recalled: 0, added: 0, updated: 0, total: 0 },
+      ),
+      entries: s.memoryEntries.map((e) => ({ id: e.id, title: e.title ?? null, content: e.content, category: e.category, tag: e.tag })),
+      handoffs: s.memoryHandoffs.map((h) => ({ id: h.id, from: h.from, summary: h.summary, action: h.action })),
     },
     view: s.view,
     navigatorOpen: s.navigatorOpen,

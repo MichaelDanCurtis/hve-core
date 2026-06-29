@@ -13,13 +13,17 @@ export interface DecisionEntry { id: string; prompt: string; kind: DecisionKind;
 export interface GalleryItem { id: string; label: string; group?: string; url?: string; html?: string; caption?: string; }
 export type PromptVerdict = "pending" | "running" | "pass" | "warn" | "fail";
 export interface PromptCase { id: string; scenario: string; output?: string; verdict: PromptVerdict; note?: string; }
+export type MemoryTag = "recalled" | "added" | "updated";
+export interface MemoryEntry { id: string; title?: string; content: string; category: string; tag: MemoryTag; }
+export type HandoffAction = "stored" | "merged" | "recalled";
+export interface MemoryHandoff { id: string; from: string; summary: string; action: HandoffAction; }
 export interface LogEntry { t: number; kind: string; detail: string; }
 export interface SteerMenu { label: string; options: OptionItem[]; }
 
 export interface SessionState {
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | "promptlab" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | "promptlab" | "memory" | null;
   reviewTarget: string | null;
   orchestrator: string | null;
   teamAgents: TeamAgent[];
@@ -63,11 +67,14 @@ export interface SessionState {
   promptRound: number;
   promptArtifact: string | null;
   promptCases: PromptCase[];
+  memoryTitle: string | null;
+  memoryEntries: MemoryEntry[];
+  memoryHandoffs: MemoryHandoff[];
   log: LogEntry[];
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, interviewSteps: null, decisions: [], hostElicits: false, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, codemapNodes: [], codemapFocus: null, codemapTouches: {}, profileDataset: null, profileColumns: [], galleryTitle: null, gallerySize: "m", galleryItems: [], promptName: null, promptRound: 1, promptArtifact: null, promptCases: [], log: [] };
+  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, interviewSteps: null, decisions: [], hostElicits: false, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, codemapNodes: [], codemapFocus: null, codemapTouches: {}, profileDataset: null, profileColumns: [], galleryTitle: null, gallerySize: "m", galleryItems: [], promptName: null, promptRound: 1, promptArtifact: null, promptCases: [], memoryTitle: null, memoryEntries: [], memoryHandoffs: [], log: [] };
 }
 
 function normGalleryItem(it: { id?: string; label: string; group?: string; url?: string; html?: string; caption?: string }, idx: number): GalleryItem {
@@ -145,6 +152,18 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
       const exists = s.promptCases.some((x) => x.id === beat.id);
       return { ...s, promptCases: exists ? s.promptCases.map((x) => (x.id === beat.id ? c : x)) : [...s.promptCases, c], log };
     }
+    case "memory.open":
+      return { ...s, view: "loop", domain: "memory", memoryTitle: beat.title ?? null, memoryEntries: [], memoryHandoffs: [], log };
+    case "memory.add": {
+      const e = { id: beat.id, title: beat.title, content: beat.content, category: beat.category, tag: beat.tag ?? "recalled" };
+      const exists = s.memoryEntries.some((x) => x.id === beat.id);
+      return { ...s, memoryEntries: exists ? s.memoryEntries.map((x) => (x.id === beat.id ? e : x)) : [...s.memoryEntries, e], log };
+    }
+    case "handoff.add": {
+      const h = { id: beat.id, from: beat.from, summary: beat.summary, action: beat.action ?? "stored" };
+      const exists = s.memoryHandoffs.some((x) => x.id === beat.id);
+      return { ...s, memoryHandoffs: exists ? s.memoryHandoffs.map((x) => (x.id === beat.id ? h : x)) : [...s.memoryHandoffs, h], log };
+    }
     case "context.set":
       return { ...s, contextInstructions: beat.instructions, contextSkills: beat.skills, contextCollection: beat.collection, log };
     case "appframe.set":
@@ -208,6 +227,9 @@ function summarize(beat: Beat): string {
     case "gallery.clear": return "cleared";
     case "promptlab.start": return beat.name;
     case "case.add": return beat.scenario;
+    case "memory.open": return beat.title ?? "memory";
+    case "memory.add": return beat.id;
+    case "handoff.add": return beat.from;
   }
 }
 

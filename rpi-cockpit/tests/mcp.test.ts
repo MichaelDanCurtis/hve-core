@@ -51,9 +51,12 @@ describe("mcp face", () => {
     expect(names).toContain("gallery_open");
     expect(names).toContain("gallery_add");
     expect(names).toContain("gallery_clear");
-    expect(tools).toHaveLength(38);
+    expect(tools).toHaveLength(41);
     expect(names).toContain("promptlab_start");
     expect(names).toContain("add_case");
+    expect(names).toContain("memory_open");
+    expect(names).toContain("add_memory");
+    expect(names).toContain("add_handoff");
 
     await client.callTool({ name: "offer_approaches", arguments: { label: "Pick", options: [{ id: "a", title: "A" }] } });
     expect(bridge.state.steerMenu).toMatchObject({ label: "Pick" });
@@ -372,5 +375,27 @@ describe("mcp face", () => {
 
     const bad = await client.callTool({ name: "add_case", arguments: { id: "c2", scenario: "x", verdict: "bogus" } });
     expect(bad.isError).toBe(true);
+  });
+
+  it("memory tools drive the memory view and reject bad enums", async () => {
+    const bridge = new Bridge();
+    const server = buildMcpServer(bridge);
+    const [clientT, serverT] = InMemoryTransport.createLinkedPair();
+    await server.connect(serverT);
+    const client = new Client({ name: "test", version: "0" });
+    await client.connect(clientT);
+
+    await client.callTool({ name: "memory_open", arguments: { title: "hve-core" } });
+    await client.callTool({ name: "add_memory", arguments: { id: "e1", content: "likes terse output", category: "user", tag: "recalled" } });
+    await client.callTool({ name: "add_handoff", arguments: { id: "h1", from: "GitHub Backlog Manager", summary: "sprint state", action: "stored" } });
+    expect(bridge.state.domain).toBe("memory");
+    expect(bridge.state.memoryTitle).toBe("hve-core");
+    expect(bridge.state.memoryEntries[0]).toMatchObject({ id: "e1", category: "user", tag: "recalled" });
+    expect(bridge.state.memoryHandoffs[0]).toMatchObject({ id: "h1", from: "GitHub Backlog Manager", action: "stored" });
+
+    const badTag = await client.callTool({ name: "add_memory", arguments: { id: "e2", content: "x", category: "user", tag: "bogus" } });
+    expect(badTag.isError).toBe(true);
+    const badAction = await client.callTool({ name: "add_handoff", arguments: { id: "h2", from: "x", summary: "y", action: "bogus" } });
+    expect(badAction.isError).toBe(true);
   });
 });
