@@ -117,6 +117,7 @@ let gwFocusOverride = undefined; // undefined = follow server; string|null = loc
 let gwServerFocus = null;        // last server focus seen, to detect new narration
 let gwSel = null;                // selected node id
 let gwPos = {}, gwNodes = [];    // active layout positions + nodes (for inspector + minimap)
+let gwFitSig = null;             // active scope + node-set signature; re-fit the camera when it changes
 const GW_GLYPH = { workflow: "▦", trigger: "⊙", guard: "⚿", agent: "✦", output: "▣", mcp: "⚙" };
 
 // Last view-model rendered. The flow drill-in/select/clear handlers re-render the
@@ -834,6 +835,31 @@ function gwApplyCam() {
   if (world) world.style.transform = `translate(${gwCam.x}px, ${gwCam.y}px) scale(${gwCam.z})`;
 }
 
+// Fit the laid-out graph's bounding box into the live canvas, centered with padding and
+// zoom clamped to the same [0.3, 2] range the wheel uses. Called once per node-set/scope
+// change (see gwFitSig) so a live-run status update preserves the user's pan/zoom, but a
+// fresh pipeline or a drill-in re-frames. No-op when the canvas has no measured size yet
+// (e.g. the happy-dom test harness), leaving the default camera untouched.
+function gwFitToView(pos) {
+  const ids = Object.keys(pos);
+  const canvas = document.getElementById("gw-canvas");
+  if (!ids.length || !canvas) return;
+  const r = canvas.getBoundingClientRect();
+  if (!(r.width > 0 && r.height > 0)) return;
+  const NODE_W = 180, NODE_H = 76, PAD = 48;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const id of ids) {
+    const p = pos[id];
+    minX = Math.min(minX, p.x); minY = Math.min(minY, p.y);
+    maxX = Math.max(maxX, p.x + NODE_W); maxY = Math.max(maxY, p.y + NODE_H);
+  }
+  const gw = Math.max(1, maxX - minX), gh = Math.max(1, maxY - minY);
+  const z = Math.min(2, Math.max(0.3, Math.min((r.width - PAD * 2) / gw, (r.height - PAD * 2) / gh)));
+  gwCam.z = z;
+  gwCam.x = (r.width - gw * z) / 2 - minX * z;
+  gwCam.y = (r.height - gh * z) / 2 - minY * z;
+}
+
 function renderFlow(v) {
   const f = v.flow || { title: null, focus: null, nodes: [], edges: [] };
   const focus = gwActiveFocus(v);
@@ -880,6 +906,10 @@ function renderFlow(v) {
     </figure>`;
   }).join("");
   world.innerHTML = svg + nodesHtml;
+  // Re-fit the camera only when the active scope or node set changes, so live-run status
+  // updates (same nodes) keep the user's current pan/zoom.
+  const fitSig = scope + "::" + nodes.map((n) => n.id).join("|");
+  if (fitSig !== gwFitSig) { gwFitSig = fitSig; gwFitToView(pos); }
   gwApplyCam();
   // gwNodes is the full flow node set (every scope) so the inspector can resolve a
   // selection even after a drill-in changes the visible scope to the selected
