@@ -830,6 +830,75 @@ function renderInterview(v) {
   if (doc) doc.srcdoc = v.screen?.html ?? "";
 }
 
+// Pure layered layout for the flow canvas: longest-path layering on the DAG formed by
+// dropping back edges (so a feedback handoff such as needs-revision -> implement does not
+// change forward layering or loop), first-seen order within a layer. Returns world px.
+function computeFlowLayout(nodes, edges) {
+  const COL_W = 240, ROW_H = 120;
+  const ids = nodes.map((n) => n.id);
+  const idx = new Map(ids.map((id, i) => [id, i]));
+  const idSet = new Set(ids);
+  const adj = new Map(ids.map((id) => [id, []]));
+  for (const e of edges) if (idSet.has(e.from) && idSet.has(e.to) && e.from !== e.to) adj.get(e.from).push(e.to);
+  // 1. classify back edges via DFS gray-coloring
+  const color = new Map(); // 1 = on stack, 2 = done
+  const back = new Set();
+  const stack = [];
+  for (const root of ids) {
+    if (color.get(root)) continue;
+    stack.push([root, 0]);
+    while (stack.length) {
+      const frame = stack[stack.length - 1];
+      const [u, i] = frame;
+      if (i === 0) color.set(u, 1);
+      const kids = adj.get(u);
+      if (i < kids.length) {
+        frame[1]++;
+        const v = kids[i];
+        const c = color.get(v);
+        if (c === 1) back.add(u + ">" + v);
+        else if (!c) stack.push([v, 0]);
+      } else {
+        color.set(u, 2);
+        stack.pop();
+      }
+    }
+  }
+  // 2. DAG (non-back edges) + indegree
+  const dag = new Map(ids.map((id) => [id, []]));
+  const indeg = new Map(ids.map((id) => [id, 0]));
+  for (const u of ids) for (const v of adj.get(u)) {
+    if (back.has(u + ">" + v)) continue;
+    dag.get(u).push(v); indeg.set(v, indeg.get(v) + 1);
+  }
+  // 3. Kahn topo + longest-path layer
+  const layer = new Map(ids.map((id) => [id, 0]));
+  const din = new Map(indeg);
+  let q = ids.filter((id) => din.get(id) === 0).sort((a, b) => idx.get(a) - idx.get(b));
+  while (q.length) {
+    const u = q.shift();
+    for (const v of dag.get(u)) {
+      if (layer.get(u) + 1 > layer.get(v)) layer.set(v, layer.get(u) + 1);
+      din.set(v, din.get(v) - 1);
+      if (din.get(v) === 0) q.push(v);
+    }
+  }
+  // 4. position: column = layer, row = first-seen order within layer
+  const byLayer = new Map();
+  for (const id of ids) {
+    const L = layer.get(id);
+    if (!byLayer.has(L)) byLayer.set(L, []);
+    byLayer.get(L).push(id);
+  }
+  const pos = {};
+  for (const [L, members] of byLayer) {
+    members.sort((a, b) => idx.get(a) - idx.get(b));
+    members.forEach((id, i) => { pos[id] = { x: L * COL_W, y: i * ROW_H }; });
+  }
+  return pos;
+}
+
 connect();
 
 if (typeof window !== "undefined") window.render = render;
+if (typeof window !== "undefined") window.computeFlowLayout = computeFlowLayout;
