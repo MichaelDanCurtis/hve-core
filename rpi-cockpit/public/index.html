@@ -350,6 +350,30 @@
   .pc-note { margin-top: 8px; font-size: 11.5px; color: #E0954B; }
   @media (max-width: 860px) { .pl-body { flex-direction: column; } .pl-prompt-panel { flex: none; border-left: none; border-top: 1px solid var(--stroke, #3C3C3C); padding-left: 0; padding-top: 12px; } }
 
+  #memory-view { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .me-c-recalled { color: var(--accent-cyan, #9CDCFE); } .me-c-added { color: var(--ok, #73C991); } .me-c-updated { color: #E0954B; }
+  .me-body { flex: 1; min-height: 0; display: flex; gap: 16px; overflow: hidden; padding: 12px 18px; }
+  .me-entries { flex: 1 1 0; min-width: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
+  .me-group { display: flex; flex-direction: column; gap: 6px; }
+  .me-group-head { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3, #6E6E6E); font-weight: 600; padding-bottom: 3px; border-bottom: 1px solid var(--stroke, #3C3C3C); }
+  .me-handoff-panel { flex: 0 0 300px; min-width: 0; overflow: auto; border-left: 1px solid var(--stroke, #3C3C3C); padding-left: 14px; }
+  .me-entry { border: 1px solid var(--stroke, #3C3C3C); border-radius: 7px; background: var(--layer, #252526); overflow: hidden; }
+  .me-head { display: flex; align-items: center; gap: 12px; padding: 9px 12px; cursor: pointer; }
+  .me-name { font-weight: 600; font-size: 12.5px; flex: 0 0 32%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .me-preview { flex: 1 1 0; min-width: 0; color: var(--text-3, #6E6E6E); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .me-tag { flex: none; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 9px; border-radius: 10px; }
+  .me-t-recalled { background: var(--brand-2, #094771); color: var(--accent-cyan, #9CDCFE); }
+  .me-t-added { background: var(--ok-bg, #16301F); color: var(--ok, #73C991); }
+  .me-t-updated { background: #2a1d11; color: #E0954B; }
+  .me-entry-body { display: none; border-top: 1px solid var(--stroke, #3C3C3C); padding: 10px 12px; white-space: pre-wrap; word-break: break-word; font-size: 12px; color: var(--text, #CCCCCC); }
+  .me-entry.open .me-entry-body { display: block; }
+  .mh-card { border: 1px solid var(--stroke, #3C3C3C); border-radius: 7px; background: var(--layer, #252526); padding: 9px 11px; margin-top: 8px; }
+  .mh-from { font-weight: 600; font-size: 12px; }
+  .mh-summary { color: var(--text-2, #9D9D9D); font-size: 11.5px; margin: 3px 0 6px; }
+  .mh-action { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 1px 8px; border-radius: 9px; background: var(--layer-alt, #2D2D2D); color: var(--text-2, #9D9D9D); }
+  .mh-a-recalled { color: var(--accent-cyan, #9CDCFE); } .mh-a-merged { color: #E0954B; } .mh-a-stored { color: var(--ok, #73C991); }
+  @media (max-width: 860px) { .me-body { flex-direction: column; } .me-handoff-panel { flex: none; border-left: none; border-top: 1px solid var(--stroke, #3C3C3C); padding-left: 0; padding-top: 12px; } }
+
   .team-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
   .team-orch { font-weight: 500; }
   .team-count { font-size: 12px; opacity: .6; }
@@ -588,6 +612,16 @@
       <div class="pl-body">
         <div id="pl-cases" class="pl-cases"></div>
         <aside class="pl-prompt-panel"><div class="sec">Prompt</div><pre id="pl-prompt" class="pl-prompt"></pre></aside>
+      </div>
+    </section>
+    <section id="memory-view" hidden>
+      <div class="rev-head">
+        <span class="board-target" id="me-title">Memory</span>
+        <span class="pl-summary" id="me-counts"></span>
+      </div>
+      <div class="me-body">
+        <div id="me-entries" class="me-entries"></div>
+        <aside class="me-handoff-panel"><div class="sec">Handoffs</div><div id="me-handoffs"></div></aside>
       </div>
     </section>
     <section id="team-view" hidden>

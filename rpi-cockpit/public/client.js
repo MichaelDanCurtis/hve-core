@@ -105,6 +105,10 @@ let glResizeRaf = 0;
 // stable case id). The expanded state lives here (not read back from the DOM) so a
 // click flips it and writes the row's class in one shot. (promptlab)
 const plOpen = new Set();
+// Memory: which entry rows are expanded, keyed by the entry's data-me id (the same
+// id-keyed Set + per-render reconcile + document re-scan pattern the promptlab case
+// rows use, because happy-dom's eval harness does not reflect parentElement mutations).
+const meOpen = new Set();
 
 function connect() {
   setConn("connecting");
@@ -169,6 +173,7 @@ function render(v) {
   const dataprofileView = document.getElementById("dataprofile-view");
   const galleryView = document.getElementById("gallery-view");
   const promptlabView = document.getElementById("promptlab-view");
+  const memoryView = document.getElementById("memory-view");
   if (rpiView && findingsView) {
     if (v.domain === "codemap") {
       rpiView.hidden = true; findingsView.hidden = true;
@@ -179,6 +184,7 @@ function render(v) {
       if (dataprofileView) dataprofileView.hidden = true;
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = true;
+      if (memoryView) memoryView.hidden = true;
       renderCodemap(v);
       return;
     }
@@ -191,6 +197,7 @@ function render(v) {
       if (dataprofileView) dataprofileView.hidden = true;
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = true;
+      if (memoryView) memoryView.hidden = true;
       renderTeam(v);
       return;
     }
@@ -203,6 +210,7 @@ function render(v) {
       if (dataprofileView) dataprofileView.hidden = true;
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = true;
+      if (memoryView) memoryView.hidden = true;
       renderBoard(v);
       return;
     }
@@ -215,6 +223,7 @@ function render(v) {
       if (dataprofileView) dataprofileView.hidden = false;
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = true;
+      if (memoryView) memoryView.hidden = true;
       renderDataProfile(v);
       return;
     }
@@ -227,6 +236,7 @@ function render(v) {
       if (dataprofileView) dataprofileView.hidden = true;
       if (galleryView) galleryView.hidden = false;
       if (promptlabView) promptlabView.hidden = true;
+      if (memoryView) memoryView.hidden = true;
       renderGallery(v);
       return;
     }
@@ -239,7 +249,21 @@ function render(v) {
       if (dataprofileView) dataprofileView.hidden = true;
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = false;
+      if (memoryView) memoryView.hidden = true;
       renderPromptlab(v);
+      return;
+    }
+    if (v.domain === "memory") {
+      rpiView.hidden = true; findingsView.hidden = true;
+      if (interviewView) interviewView.hidden = true;
+      if (backlogView) backlogView.hidden = true;
+      if (teamView) teamView.hidden = true;
+      if (codemapView) codemapView.hidden = true;
+      if (dataprofileView) dataprofileView.hidden = true;
+      if (galleryView) galleryView.hidden = true;
+      if (promptlabView) promptlabView.hidden = true;
+      if (memoryView) memoryView.hidden = false;
+      renderMemory(v);
       return;
     }
     if (v.domain === "interview") {
@@ -251,6 +275,7 @@ function render(v) {
       if (dataprofileView) dataprofileView.hidden = true;
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = true;
+      if (memoryView) memoryView.hidden = true;
       renderInterview(v);
       return;
     }
@@ -264,6 +289,7 @@ function render(v) {
     if (dataprofileView) dataprofileView.hidden = true;
     if (galleryView) galleryView.hidden = true;
     if (promptlabView) promptlabView.hidden = true;
+    if (memoryView) memoryView.hidden = true;
     if (review) { renderFindings(v); return; }
   }
 
@@ -395,6 +421,16 @@ document.addEventListener("click", (e) => {
       if (plOpen.has(k)) plOpen.delete(k); else plOpen.add(k);
       const cls = plOpen.has(k) ? "pc-case open" : "pc-case";
       document.querySelectorAll(".pc-case").forEach((el) => { if (el.getAttribute("data-pc") === k) el.className = cls; });
+    }
+    return;
+  }
+  const meHead = e.target.closest(".me-head");
+  if (meHead && meHead.parentElement) {
+    const k = meHead.parentElement.getAttribute("data-me");
+    if (k != null) {
+      if (meOpen.has(k)) meOpen.delete(k); else meOpen.add(k);
+      const cls = meOpen.has(k) ? "me-entry open" : "me-entry";
+      document.querySelectorAll(".me-entry").forEach((el) => { if (el.getAttribute("data-me") === k) el.className = cls; });
     }
     return;
   }
@@ -666,6 +702,37 @@ function renderPromptlab(v) {
   }).join("") || `<div class="meta" style="padding:8px">No cases yet.</div>`);
   const pre = document.getElementById("pl-prompt");
   if (pre) pre.textContent = p.prompt || "";
+}
+
+function renderMemory(v) {
+  const m = v.memory || { title: null, counts: { recalled: 0, added: 0, updated: 0, total: 0 }, entries: [], handoffs: [] };
+  setText("me-title", m.title || "Memory");
+  const ct = m.counts;
+  const chip = (n, cls, label) => n > 0 ? `<span class="pl-chip ${cls}">${n} ${label}</span>` : "";
+  setHtml("me-counts", ct.total
+    ? chip(ct.recalled, "me-c-recalled", "recalled") + chip(ct.added, "me-c-added", "added") + chip(ct.updated, "me-c-updated", "updated")
+    : "");
+  // Reconcile expand state: drop ids no longer present so nothing carries across sessions.
+  const ids = new Set((m.entries || []).map((e) => e.id));
+  for (const id of meOpen) if (!ids.has(id)) meOpen.delete(id);
+  // Group entries by category in first-seen order.
+  const order = [];
+  const byCat = new Map();
+  (m.entries || []).forEach((e) => {
+    if (!byCat.has(e.category)) { byCat.set(e.category, []); order.push(e.category); }
+    byCat.get(e.category).push(e);
+  });
+  setHtml("me-entries", order.map((cat) => {
+    const rows = byCat.get(cat).map((e) => {
+      const name = e.title ? esc(e.title) : esc(e.content.replace(/\s+/g, " ").slice(0, 60));
+      const preview = esc(e.content.replace(/\s+/g, " ").slice(0, 120));
+      return `<div class="me-entry${meOpen.has(e.id) ? " open" : ""}" data-me="${esc(e.id)}"><div class="me-head"><span class="me-name">${name}</span><span class="me-preview">${preview}</span><span class="me-tag me-t-${esc(e.tag)}">${esc(e.tag)}</span></div><div class="me-entry-body">${esc(e.content)}</div></div>`;
+    }).join("");
+    return `<div class="me-group"><div class="me-group-head">${esc(cat)}</div>${rows}</div>`;
+  }).join("") || `<div class="meta" style="padding:8px">No memory yet.</div>`);
+  setHtml("me-handoffs", (m.handoffs || []).map((h) =>
+    `<div class="mh-card"><div class="mh-from">${esc(h.from)}</div><div class="mh-summary">${esc(h.summary)}</div><span class="mh-action mh-a-${esc(h.action)}">${esc(h.action)}</span></div>`).join("")
+    || `<div class="meta">No handoffs.</div>`);
 }
 
 function renderTeam(v) {
