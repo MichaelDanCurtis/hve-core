@@ -110,6 +110,14 @@ const plOpen = new Set();
 // rows use, because happy-dom's eval harness does not reflect parentElement mutations).
 const meOpen = new Set();
 
+// Flow canvas camera + interaction state. The agent narrates topology (v.flow); the client
+// lays it out (computeFlowLayout), renders cards into #gw-world, and applies a 2D camera.
+let gwCam = { x: 40, y: 40, z: 1 };
+let gwFocusOverride = undefined; // undefined = follow server; string|null = local drill
+let gwServerFocus = null;        // last server focus seen, to detect new narration
+let gwSel = null;                // selected node id
+const GW_GLYPH = { workflow: "▦", trigger: "⊙", guard: "⚿", agent: "✦", output: "▣", mcp: "⚙" };
+
 function connect() {
   setConn("connecting");
   // The per-session token usually rides the same-origin cookie set when this page
@@ -174,6 +182,7 @@ function render(v) {
   const galleryView = document.getElementById("gallery-view");
   const promptlabView = document.getElementById("promptlab-view");
   const memoryView = document.getElementById("memory-view");
+  const flowView = document.getElementById("flow-view");
   if (rpiView && findingsView) {
     if (v.domain === "codemap") {
       rpiView.hidden = true; findingsView.hidden = true;
@@ -185,6 +194,7 @@ function render(v) {
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = true;
       if (memoryView) memoryView.hidden = true;
+      if (flowView) flowView.hidden = true;
       renderCodemap(v);
       return;
     }
@@ -198,6 +208,7 @@ function render(v) {
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = true;
       if (memoryView) memoryView.hidden = true;
+      if (flowView) flowView.hidden = true;
       renderTeam(v);
       return;
     }
@@ -211,6 +222,7 @@ function render(v) {
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = true;
       if (memoryView) memoryView.hidden = true;
+      if (flowView) flowView.hidden = true;
       renderBoard(v);
       return;
     }
@@ -224,6 +236,7 @@ function render(v) {
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = true;
       if (memoryView) memoryView.hidden = true;
+      if (flowView) flowView.hidden = true;
       renderDataProfile(v);
       return;
     }
@@ -237,6 +250,7 @@ function render(v) {
       if (galleryView) galleryView.hidden = false;
       if (promptlabView) promptlabView.hidden = true;
       if (memoryView) memoryView.hidden = true;
+      if (flowView) flowView.hidden = true;
       renderGallery(v);
       return;
     }
@@ -250,7 +264,22 @@ function render(v) {
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = false;
       if (memoryView) memoryView.hidden = true;
+      if (flowView) flowView.hidden = true;
       renderPromptlab(v);
+      return;
+    }
+    if (v.domain === "flow") {
+      rpiView.hidden = true; findingsView.hidden = true;
+      if (interviewView) interviewView.hidden = true;
+      if (backlogView) backlogView.hidden = true;
+      if (teamView) teamView.hidden = true;
+      if (codemapView) codemapView.hidden = true;
+      if (dataprofileView) dataprofileView.hidden = true;
+      if (galleryView) galleryView.hidden = true;
+      if (promptlabView) promptlabView.hidden = true;
+      if (memoryView) memoryView.hidden = true;
+      if (flowView) flowView.hidden = false;
+      renderFlow(v);
       return;
     }
     if (v.domain === "memory") {
@@ -263,6 +292,7 @@ function render(v) {
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = true;
       if (memoryView) memoryView.hidden = false;
+      if (flowView) flowView.hidden = true;
       renderMemory(v);
       return;
     }
@@ -276,6 +306,7 @@ function render(v) {
       if (galleryView) galleryView.hidden = true;
       if (promptlabView) promptlabView.hidden = true;
       if (memoryView) memoryView.hidden = true;
+      if (flowView) flowView.hidden = true;
       renderInterview(v);
       return;
     }
@@ -290,6 +321,7 @@ function render(v) {
     if (galleryView) galleryView.hidden = true;
     if (promptlabView) promptlabView.hidden = true;
     if (memoryView) memoryView.hidden = true;
+    if (flowView) flowView.hidden = true;
     if (review) { renderFindings(v); return; }
   }
 
@@ -495,6 +527,34 @@ window.addEventListener("resize", () => {
   if (glResizeRaf) return;
   glResizeRaf = requestAnimationFrame(() => { glResizeRaf = 0; sizeGalleryThumbs(); });
 });
+
+// Flow canvas camera: pan by dragging the canvas background, wheel to zoom around the
+// cursor. Delegated document listeners wired once; the world transform lives in gwCam.
+(function gwCameraWiring() {
+  let dragging = false, lx = 0, ly = 0;
+  document.addEventListener("pointerdown", (e) => {
+    const canvas = e.target.closest && e.target.closest("#gw-canvas");
+    if (!canvas || e.target.closest(".gw-node") || e.target.closest("#gw-minimap")) return;
+    dragging = true; lx = e.clientX; ly = e.clientY; canvas.classList.add("grabbing");
+  });
+  document.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    gwCam.x += e.clientX - lx; gwCam.y += e.clientY - ly; lx = e.clientX; ly = e.clientY; gwApplyCam();
+  });
+  document.addEventListener("pointerup", () => { dragging = false; const c = document.getElementById("gw-canvas"); if (c) c.classList.remove("grabbing"); });
+  document.addEventListener("wheel", (e) => {
+    const canvas = e.target.closest && e.target.closest("#gw-canvas");
+    if (!canvas) return;
+    e.preventDefault();
+    const r = canvas.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    const nz = Math.min(2, Math.max(0.3, gwCam.z * (e.deltaY < 0 ? 1.1 : 1 / 1.1)));
+    // zoom around cursor: keep the world point under the cursor fixed
+    gwCam.x = mx - (mx - gwCam.x) * (nz / gwCam.z);
+    gwCam.y = my - (my - gwCam.y) * (nz / gwCam.z);
+    gwCam.z = nz; gwApplyCam();
+  }, { passive: false });
+})();
 
 // Launch a workflow and close the Navigator: tell the server to clear
 // navigatorOpen (startLaunch already does, but the explicit frame is belt-and-
@@ -733,6 +793,46 @@ function renderMemory(v) {
   setHtml("me-handoffs", (m.handoffs || []).map((h) =>
     `<div class="mh-card"><div class="mh-from">${esc(h.from)}</div><div class="mh-summary">${esc(h.summary)}</div><span class="mh-action mh-a-${esc(h.action)}">${esc(h.action)}</span></div>`).join("")
     || `<div class="meta">No handoffs.</div>`);
+}
+
+function gwActiveFocus(v) {
+  // server narration wins when it changes; otherwise the local drill override holds.
+  if (v.flow.focus !== gwServerFocus) { gwServerFocus = v.flow.focus; gwFocusOverride = undefined; }
+  return gwFocusOverride !== undefined ? gwFocusOverride : v.flow.focus;
+}
+
+function gwApplyCam() {
+  const world = document.getElementById("gw-world");
+  if (world) world.style.transform = `translate(${gwCam.x}px, ${gwCam.y}px) scale(${gwCam.z})`;
+}
+
+function renderFlow(v) {
+  const f = v.flow || { title: null, focus: null, nodes: [], edges: [] };
+  const focus = gwActiveFocus(v);
+  setText("gw-title", focus ? `${f.title || "Flow"}  ·  ${focus}` : (f.title || "Flow"));
+  const back = document.getElementById("gw-back");
+  if (back) back.hidden = !focus;
+  const scope = focus || "orchestration";
+  const nodes = f.nodes.filter((n) => n.scope === scope);
+  const edges = f.edges.filter((e) => e.scope === scope);
+  // legend
+  setHtml("gw-legend", ["workflow", "trigger", "guard", "agent", "output", "mcp"].map((k) =>
+    `<div class="gw-leg"><span class="gw-dot gw-k-${k}" style="background:currentColor"></span>${k}</div>`).join(""));
+  // layout + node cards
+  const pos = computeFlowLayout(nodes, edges);
+  const world = document.getElementById("gw-world");
+  if (!world) return;
+  world.innerHTML = nodes.map((n) => {
+    const p = pos[n.id] || { x: 0, y: 0 };
+    return `<figure class="gw-node gw-k-${esc(n.kind)} gw-s-${esc(n.status)}${n.id === gwSel ? " gw-sel" : ""}" data-gw="${esc(n.id)}" data-kind="${esc(n.kind)}" style="left:${p.x}px;top:${p.y}px">
+      <span class="gw-port gw-in"></span>
+      <figcaption class="gw-head"><span class="gw-glyph">${GW_GLYPH[n.kind] || "•"}</span>${esc(n.label)}</figcaption>
+      ${n.sub ? `<div class="gw-body">${esc(n.sub)}</div>` : ""}
+      <span class="gw-port gw-out"></span>
+    </figure>`;
+  }).join("");
+  gwApplyCam();
+  // (edges + minimap + inspector are rendered in Tasks 5-6)
 }
 
 function renderTeam(v) {
