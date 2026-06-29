@@ -63,7 +63,7 @@ export interface ViewModel {
   started: boolean;
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | "promptlab" | null;
   reviewTarget: string | null;
   findingGroups: { severity: Severity; items: { title: string; file?: string; line?: number; detail?: string }[] }[];
   board: { target: string | null; action: string | null; count: number; columns: { name: string; items: { id: string; title: string; kind?: string; tier?: string; depth: number; parentRef?: string }[] }[] };
@@ -71,6 +71,7 @@ export interface ViewModel {
   codemap: { nodes: { id: string; path: string; kind: string; group: string }[]; focus: string | null; touches: Record<string, string> };
   dataProfile: { dataset: { name: string; rows?: number; cols?: number; source?: string } | null; columns: { name: string; dtype: string; nullPct?: number; distinct?: number; stat?: string; quality?: string }[] };
   gallery: { title: string | null; size: "s" | "m" | "l"; items: { id: string; label: string; group: string | null; kind: "url" | "html" | "empty"; src: string | null; caption: string | null }[] };
+  promptlab: { name: string | null; round: number; prompt: string | null; summary: { pass: number; warn: number; fail: number; pending: number; running: number; total: number }; cases: { id: string; scenario: string; output: string | null; verdict: string; note: string | null }[] };
   view: "home" | "loop";
   navigatorOpen: boolean;
   workflows: { id: string; name: string; hint: string; description: string }[];
@@ -177,6 +178,16 @@ export function toViewModel(s: SessionState): ViewModel {
         src: it.url ?? it.html ?? null,
         caption: it.caption ?? null,
       })),
+    },
+    promptlab: {
+      name: s.promptName,
+      round: s.promptRound,
+      prompt: s.promptArtifact,
+      summary: s.promptCases.reduce(
+        (a, c) => { a[c.verdict]++; a.total++; return a; },
+        { pass: 0, warn: 0, fail: 0, pending: 0, running: 0, total: 0 },
+      ),
+      cases: s.promptCases.map((c) => ({ id: c.id, scenario: c.scenario, output: c.output ?? null, verdict: c.verdict, note: c.note ?? null })),
     },
     view: s.view,
     navigatorOpen: s.navigatorOpen,

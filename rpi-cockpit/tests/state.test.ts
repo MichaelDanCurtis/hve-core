@@ -444,6 +444,33 @@ describe("gallery", () => {
   });
 });
 
+describe("promptlab", () => {
+  it("promptlab.start sets name/round/prompt and clears cases", () => {
+    let s = applyBeat(initialState(), { type: "case.add", id: "x", scenario: "old", verdict: "pass" }, 1);
+    s = applyBeat(s, { type: "promptlab.start", name: "summarizer.prompt", prompt: "You are…", round: 2 }, 2);
+    expect(s.domain).toBe("promptlab");
+    expect(s.view).toBe("loop");
+    expect(s.promptName).toBe("summarizer.prompt");
+    expect(s.promptArtifact).toBe("You are…");
+    expect(s.promptRound).toBe(2);
+    expect(s.promptCases).toEqual([]);
+  });
+  it("promptlab.start defaults round to 1 and prompt to null", () => {
+    const s = applyBeat(initialState(), { type: "promptlab.start", name: "p" }, 1);
+    expect(s.promptRound).toBe(1);
+    expect(s.promptArtifact).toBeNull();
+  });
+  it("case.add appends, defaults verdict to pending, and a same-id add updates in place (order preserved)", () => {
+    let s = applyBeat(initialState(), { type: "promptlab.start", name: "p" }, 1);
+    s = applyBeat(s, { type: "case.add", id: "c1", scenario: "empty input" }, 2);
+    s = applyBeat(s, { type: "case.add", id: "c2", scenario: "long input" }, 3);
+    s = applyBeat(s, { type: "case.add", id: "c1", scenario: "empty input", output: "(nothing)", verdict: "fail", note: "no guard" }, 4);
+    expect(s.promptCases.map((c) => c.id)).toEqual(["c1", "c2"]);
+    expect(s.promptCases[0]).toEqual({ id: "c1", scenario: "empty input", output: "(nothing)", verdict: "fail", note: "no guard" });
+    expect(s.promptCases[1].verdict).toBe("pending");
+  });
+});
+
 describe("data profile", () => {
   it("profile.start sets the dataset and clears columns", () => {
     let s = applyBeat(initialState(), { type: "profile.start", name: "sales.csv", rows: 38201, columns: 12, source: "warehouse" }, 1);
