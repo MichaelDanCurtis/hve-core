@@ -116,7 +116,13 @@ let gwCam = { x: 40, y: 40, z: 1 };
 let gwFocusOverride = undefined; // undefined = follow server; string|null = local drill
 let gwServerFocus = null;        // last server focus seen, to detect new narration
 let gwSel = null;                // selected node id
+let gwPos = {}, gwNodes = [];    // active layout positions + nodes (for inspector + minimap)
 const GW_GLYPH = { workflow: "▦", trigger: "⊙", guard: "⚿", agent: "✦", output: "▣", mcp: "⚙" };
+
+// Last view-model rendered. The flow drill-in/select/clear handlers re-render the
+// flow scope by calling renderFlow(lastView); without a retained view-model they
+// would have nothing to rebuild from. Set at the top of render(v).
+let lastView = null;
 
 function connect() {
   setConn("connecting");
@@ -155,6 +161,7 @@ function renderHome(v) {
 }
 
 function render(v) {
+  lastView = v;
   renderContext(v);
   renderAppFrame(v);
   renderNavTiles(v);
@@ -466,6 +473,27 @@ document.addEventListener("click", (e) => {
     }
     return;
   }
+  const gwBack = e.target.closest("#gw-back");
+  if (gwBack) { gwFocusOverride = null; const w = lastView; if (w) renderFlow(w); return; }
+  const gwNode = e.target.closest(".gw-node[data-gw]");
+  if (gwNode) {
+    const id = gwNode.getAttribute("data-gw");
+    gwSel = id;
+    if (gwNode.getAttribute("data-kind") === "workflow") gwFocusOverride = id; // drill in
+    if (lastView) renderFlow(lastView);
+    return;
+  }
+  const gwMini = e.target.closest("#gw-minimap");
+  if (gwMini) {
+    const r = gwMini.getBoundingClientRect();
+    const s = parseFloat(gwMini.dataset.scale || "1"), pad = parseFloat(gwMini.dataset.pad || "8");
+    const wx = (e.clientX - r.left - pad) / s, wy = (e.clientY - r.top - pad) / s;
+    const c = document.getElementById("gw-canvas").getBoundingClientRect();
+    gwCam.x = c.width / 2 - wx * gwCam.z; gwCam.y = c.height / 2 - wy * gwCam.z; gwApplyCam(); gwRenderMinimap();
+    return;
+  }
+  const gwBg = e.target.closest("#gw-canvas");
+  if (gwBg && !e.target.closest(".gw-node")) { if (gwSel !== null) { gwSel = null; if (lastView) renderFlow(lastView); } /* fallthrough to allow pan */ }
   if (e.target.closest("#to-home")) { sendMsg({ type: "navigate", screen: "home" }); return; }
   if (e.target.closest("#to-loop")) { sendMsg({ type: "navigate", screen: "loop" }); return; }
   if (e.target.closest("#help-btn")) { const w = document.getElementById("welcome"); if (w) w.hidden = false; return; }
@@ -853,7 +881,47 @@ function renderFlow(v) {
   }).join("");
   world.innerHTML = svg + nodesHtml;
   gwApplyCam();
-  // (edges + minimap + inspector are rendered in Tasks 5-6)
+  // gwNodes is the full flow node set (every scope) so the inspector can resolve a
+  // selection even after a drill-in changes the visible scope to the selected
+  // workflow's (possibly empty) anatomy. gwPos holds only the active-scope layout,
+  // which is what the minimap renders.
+  gwPos = pos; gwNodes = f.nodes;
+  gwRenderInspector();
+  gwRenderMinimap();
+}
+
+function gwRenderInspector() {
+  const insp = document.getElementById("gw-inspector");
+  if (!insp) return;
+  const n = gwNodes.find((x) => x.id === gwSel);
+  if (!n) { insp.hidden = true; insp.innerHTML = ""; return; }
+  insp.hidden = false;
+  insp.innerHTML = `<div class="gw-i-label">${esc(n.label)}</div>
+    <div class="gw-i-row"><span class="gw-i-k">kind</span><br>${esc(n.kind)}</div>
+    <div class="gw-i-row"><span class="gw-i-k">status</span><br>${esc(n.status)}</div>
+    ${n.sub ? `<div class="gw-i-row"><span class="gw-i-k">detail</span><br>${esc(n.sub)}</div>` : ""}`;
+}
+
+function gwRenderMinimap() {
+  const mm = document.getElementById("gw-minimap");
+  const canvas = document.getElementById("gw-canvas");
+  if (!mm || !canvas) return;
+  const ids = Object.keys(gwPos);
+  if (ids.length === 0) { mm.hidden = true; return; }
+  mm.hidden = false;
+  const NODE_W = 180, NODE_H = 64;
+  let maxX = 0, maxY = 0;
+  for (const id of ids) { maxX = Math.max(maxX, gwPos[id].x + NODE_W); maxY = Math.max(maxY, gwPos[id].y + NODE_H); }
+  const pad = 8, mw = 160 - pad * 2, mh = 110 - pad * 2;
+  const s = Math.min(mw / (maxX || 1), mh / (maxY || 1));
+  const dots = ids.map((id) => `<span class="gw-mm-node" style="left:${pad + gwPos[id].x * s}px;top:${pad + gwPos[id].y * s}px"></span>`).join("");
+  // viewport rect: the canvas-visible world region under the current camera
+  const r = canvas.getBoundingClientRect();
+  const vx = -gwCam.x / gwCam.z, vy = -gwCam.y / gwCam.z;
+  const vw = r.width / gwCam.z, vh = r.height / gwCam.z;
+  const view = `<span class="gw-mm-view" style="left:${pad + vx * s}px;top:${pad + vy * s}px;width:${vw * s}px;height:${vh * s}px"></span>`;
+  mm.innerHTML = dots + view;
+  mm.dataset.scale = String(s); mm.dataset.pad = String(pad);
 }
 
 function renderTeam(v) {

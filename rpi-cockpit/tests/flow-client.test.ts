@@ -56,4 +56,25 @@ describe("flow client", () => {
     // edge label rendered
     expect((win.document.getElementById("gw-edges") as any).textContent).toContain("agent-ready");
   });
+
+  it("drills into a workflow's anatomy on click and back returns to orchestration", () => {
+    (win as any).render(flowVm());
+    (win.document.querySelector('#gw-world .gw-node[data-kind="workflow"][data-gw="triage"]') as any)
+      .dispatchEvent(new win.Event("click", { bubbles: true }));
+    // now showing triage anatomy: trigger + agent nodes, no workflow nodes
+    expect(win.document.querySelector('#gw-world .gw-k-workflow')).toBeNull();
+    expect(win.document.querySelectorAll('#gw-world .gw-node').length).toBe(2);
+    expect((win.document.getElementById("gw-back") as any).hidden).toBe(false);
+    (win.document.getElementById("gw-back") as any).dispatchEvent(new win.Event("click", { bubbles: true }));
+    expect(win.document.querySelectorAll('#gw-world .gw-k-workflow').length).toBe(2);
+  });
+
+  it("selects a node and shows it in the inspector", () => {
+    (win as any).render(flowVm());
+    (win.document.querySelector('#gw-world .gw-node[data-gw="impl"]') as any)
+      .dispatchEvent(new win.Event("click", { bubbles: true }));
+    const insp = win.document.getElementById("gw-inspector") as any;
+    expect(insp.hidden).toBe(false);
+    expect(insp.textContent).toContain("Implement");
+  });
 });

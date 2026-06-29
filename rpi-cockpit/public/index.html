@@ -411,6 +411,14 @@
   .gw-edge.gw-active { stroke: var(--accent-blue, #4FC1FF); stroke-width: 2.5; stroke-dasharray: 6 5; animation: gwdash 0.6s linear infinite; }
   @keyframes gwdash { to { stroke-dashoffset: -22; } }
   .gw-elabel { font-size: 10.5px; fill: var(--text-2, #9D9D9D); }
+  /* inspector + minimap */
+  .gw-inspector { flex: 0 0 240px; min-width: 0; overflow: auto; border-left: 1px solid var(--stroke, #3C3C3C); padding: 12px; font-size: 12px; }
+  .gw-inspector .gw-i-label { font-weight: 600; font-size: 13px; }
+  .gw-inspector .gw-i-row { margin-top: 8px; color: var(--text-2, #9D9D9D); }
+  .gw-inspector .gw-i-k { color: var(--text-3, #6E6E6E); text-transform: uppercase; font-size: 10px; letter-spacing: .04em; }
+  .gw-minimap { position: absolute; right: 10px; bottom: 10px; width: 160px; height: 110px; background: color-mix(in srgb, var(--layer, #252526) 88%, transparent); border: 1px solid var(--stroke, #3C3C3C); border-radius: 6px; overflow: hidden; cursor: pointer; }
+  .gw-minimap .gw-mm-node { position: absolute; width: 6px; height: 4px; border-radius: 1px; background: var(--text-3, #6E6E6E); }
+  .gw-minimap .gw-mm-view { position: absolute; border: 1px solid var(--accent-blue, #4FC1FF); background: color-mix(in srgb, var(--accent-blue, #4FC1FF) 12%, transparent); }
   @media (max-width: 860px) { .me-body { flex-direction: column; } .me-handoff-panel { flex: none; border-left: none; border-top: 1px solid var(--stroke, #3C3C3C); padding-left: 0; padding-top: 12px; } }
 
   .team-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
