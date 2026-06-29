@@ -78,6 +78,8 @@ export const Beat = z.discriminatedUnion("type", [
   z.object({ type: z.literal("gallery.open"), title: z.string(), size: z.enum(["s", "m", "l"]).optional(), items: z.array(GalleryItem) }),
   z.object({ type: z.literal("gallery.add"), item: GalleryItem }),
   z.object({ type: z.literal("gallery.clear") }),
+  z.object({ type: z.literal("promptlab.start"), name: z.string(), prompt: z.string().optional(), round: z.number().int().optional() }),
+  z.object({ type: z.literal("case.add"), id: z.string(), scenario: z.string(), output: z.string().optional(), verdict: z.enum(["pending", "running", "pass", "warn", "fail"]).optional(), note: z.string().optional() }),
 ]);
 export type Beat = z.infer<typeof Beat>;
 

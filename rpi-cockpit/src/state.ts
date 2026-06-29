@@ -11,13 +11,15 @@ export type DecisionKind = "choice" | "text";
 export type DecisionStatus = "pending" | "answered" | "superseded";
 export interface DecisionEntry { id: string; prompt: string; kind: DecisionKind; options?: OptionItem[]; answer?: string; status: DecisionStatus; }
 export interface GalleryItem { id: string; label: string; group?: string; url?: string; html?: string; caption?: string; }
+export type PromptVerdict = "pending" | "running" | "pass" | "warn" | "fail";
+export interface PromptCase { id: string; scenario: string; output?: string; verdict: PromptVerdict; note?: string; }
 export interface LogEntry { t: number; kind: string; detail: string; }
 export interface SteerMenu { label: string; options: OptionItem[]; }
 
 export interface SessionState {
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | "promptlab" | null;
   reviewTarget: string | null;
   orchestrator: string | null;
   teamAgents: TeamAgent[];
@@ -57,11 +59,15 @@ export interface SessionState {
   galleryTitle: string | null;
   gallerySize: "s" | "m" | "l";
   galleryItems: GalleryItem[];
+  promptName: string | null;
+  promptRound: number;
+  promptArtifact: string | null;
+  promptCases: PromptCase[];
   log: LogEntry[];
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, interviewSteps: null, decisions: [], hostElicits: false, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, codemapNodes: [], codemapFocus: null, codemapTouches: {}, profileDataset: null, profileColumns: [], galleryTitle: null, gallerySize: "m", galleryItems: [], log: [] };
+  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, interviewSteps: null, decisions: [], hostElicits: false, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, codemapNodes: [], codemapFocus: null, codemapTouches: {}, profileDataset: null, profileColumns: [], galleryTitle: null, gallerySize: "m", galleryItems: [], promptName: null, promptRound: 1, promptArtifact: null, promptCases: [], log: [] };
 }
 
 function normGalleryItem(it: { id?: string; label: string; group?: string; url?: string; html?: string; caption?: string }, idx: number): GalleryItem {
@@ -132,6 +138,13 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
     }
     case "gallery.clear":
       return { ...s, galleryItems: [], log };
+    case "promptlab.start":
+      return { ...s, view: "loop", domain: "promptlab", promptName: beat.name, promptArtifact: beat.prompt ?? null, promptRound: beat.round ?? 1, promptCases: [], log };
+    case "case.add": {
+      const c = { id: beat.id, scenario: beat.scenario, output: beat.output, verdict: beat.verdict ?? "pending", note: beat.note };
+      const exists = s.promptCases.some((x) => x.id === beat.id);
+      return { ...s, promptCases: exists ? s.promptCases.map((x) => (x.id === beat.id ? c : x)) : [...s.promptCases, c], log };
+    }
     case "context.set":
       return { ...s, contextInstructions: beat.instructions, contextSkills: beat.skills, contextCollection: beat.collection, log };
     case "appframe.set":
@@ -193,6 +206,8 @@ function summarize(beat: Beat): string {
     case "gallery.open": return beat.title;
     case "gallery.add": return beat.item.label;
     case "gallery.clear": return "cleared";
+    case "promptlab.start": return beat.name;
+    case "case.add": return beat.scenario;
   }
 }
 

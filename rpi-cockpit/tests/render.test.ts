@@ -270,6 +270,21 @@ describe("toViewModel", () => {
     expect(toViewModel(initialState()).gallery.size).toBe("m");
   });
 
+  it("projects the promptlab bench with a derived verdict summary", () => {
+    let s = applyBeat(initialState(), { type: "promptlab.start", name: "p", prompt: "txt", round: 3 }, 1);
+    s = applyBeat(s, { type: "case.add", id: "a", scenario: "s1", output: "o1", verdict: "pass" }, 2);
+    s = applyBeat(s, { type: "case.add", id: "b", scenario: "s2", verdict: "fail", note: "bad" }, 3);
+    s = applyBeat(s, { type: "case.add", id: "c", scenario: "s3" }, 4);
+    const vm = toViewModel(s);
+    expect(vm.domain).toBe("promptlab");
+    expect(vm.promptlab.name).toBe("p");
+    expect(vm.promptlab.round).toBe(3);
+    expect(vm.promptlab.prompt).toBe("txt");
+    expect(vm.promptlab.summary).toEqual({ pass: 1, warn: 0, fail: 1, pending: 1, running: 0, total: 3 });
+    expect(vm.promptlab.cases[1]).toEqual({ id: "b", scenario: "s2", output: null, verdict: "fail", note: "bad" });
+    expect(toViewModel(initialState()).promptlab.name).toBeNull();
+  });
+
   it("projects the data profile dataset and columns", () => {
     let s = applyBeat(initialState(), { type: "profile.start", name: "sales.csv", rows: 100, columns: 3, source: "warehouse" }, 1);
     s = applyBeat(s, { type: "column.add", name: "id", dtype: "int", nullPct: 0, distinct: 100, quality: "ok" }, 2);

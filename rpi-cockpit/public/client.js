@@ -101,6 +101,10 @@ let cmSig = null;
 let glItems = [];
 let glSizeOverride = null;
 let glResizeRaf = 0;
+// Promptlab: which case rows are expanded, keyed by the case's data-pc value (its
+// stable case id). The expanded state lives here (not read back from the DOM) so a
+// click flips it and writes the row's class in one shot. (promptlab)
+const plOpen = new Set();
 
 function connect() {
   setConn("connecting");
@@ -164,6 +168,7 @@ function render(v) {
   const codemapView = document.getElementById("codemap-view");
   const dataprofileView = document.getElementById("dataprofile-view");
   const galleryView = document.getElementById("gallery-view");
+  const promptlabView = document.getElementById("promptlab-view");
   if (rpiView && findingsView) {
     if (v.domain === "codemap") {
       rpiView.hidden = true; findingsView.hidden = true;
@@ -173,6 +178,7 @@ function render(v) {
       if (codemapView) codemapView.hidden = false;
       if (dataprofileView) dataprofileView.hidden = true;
       if (galleryView) galleryView.hidden = true;
+      if (promptlabView) promptlabView.hidden = true;
       renderCodemap(v);
       return;
     }
@@ -184,6 +190,7 @@ function render(v) {
       if (codemapView) codemapView.hidden = true;
       if (dataprofileView) dataprofileView.hidden = true;
       if (galleryView) galleryView.hidden = true;
+      if (promptlabView) promptlabView.hidden = true;
       renderTeam(v);
       return;
     }
@@ -195,6 +202,7 @@ function render(v) {
       if (codemapView) codemapView.hidden = true;
       if (dataprofileView) dataprofileView.hidden = true;
       if (galleryView) galleryView.hidden = true;
+      if (promptlabView) promptlabView.hidden = true;
       renderBoard(v);
       return;
     }
@@ -206,6 +214,7 @@ function render(v) {
       if (codemapView) codemapView.hidden = true;
       if (dataprofileView) dataprofileView.hidden = false;
       if (galleryView) galleryView.hidden = true;
+      if (promptlabView) promptlabView.hidden = true;
       renderDataProfile(v);
       return;
     }
@@ -217,7 +226,20 @@ function render(v) {
       if (codemapView) codemapView.hidden = true;
       if (dataprofileView) dataprofileView.hidden = true;
       if (galleryView) galleryView.hidden = false;
+      if (promptlabView) promptlabView.hidden = true;
       renderGallery(v);
+      return;
+    }
+    if (v.domain === "promptlab") {
+      rpiView.hidden = true; findingsView.hidden = true;
+      if (interviewView) interviewView.hidden = true;
+      if (backlogView) backlogView.hidden = true;
+      if (teamView) teamView.hidden = true;
+      if (codemapView) codemapView.hidden = true;
+      if (dataprofileView) dataprofileView.hidden = true;
+      if (galleryView) galleryView.hidden = true;
+      if (promptlabView) promptlabView.hidden = false;
+      renderPromptlab(v);
       return;
     }
     if (v.domain === "interview") {
@@ -228,6 +250,7 @@ function render(v) {
       if (codemapView) codemapView.hidden = true;
       if (dataprofileView) dataprofileView.hidden = true;
       if (galleryView) galleryView.hidden = true;
+      if (promptlabView) promptlabView.hidden = true;
       renderInterview(v);
       return;
     }
@@ -240,6 +263,7 @@ function render(v) {
     if (codemapView) codemapView.hidden = true;
     if (dataprofileView) dataprofileView.hidden = true;
     if (galleryView) galleryView.hidden = true;
+    if (promptlabView) promptlabView.hidden = true;
     if (review) { renderFindings(v); return; }
   }
 
@@ -356,6 +380,24 @@ document.addEventListener("click", (e) => {
   if (e.target.closest("[data-noexpand]")) return; // let open-in-tab work
   const glCardEl = e.target.closest(".gl-card[data-gl]");
   if (glCardEl) { openLightbox(+glCardEl.dataset.gl); return; }
+  const pcHead = e.target.closest(".pc-head");
+  if (pcHead && pcHead.parentElement) {
+    // Toggle the case row's expanded state. We resolve the live .pc-case from a fresh
+    // document scan (matching its stable data-pc id) and write its class in a single
+    // assignment from plOpen, rather than mutating pcHead.parentElement / calling
+    // classList.toggle: in a real browser both resolve to the same node and either
+    // works, but under the happy-dom test harness the event-target node is a separate
+    // object graph (mutations don't reflect) and DOMTokenList.toggle on a queried node
+    // is unreliable, so a single className write from our own state is the robust path.
+    // We match by getAttribute (not a built selector) so an exotic id cannot malform it.
+    const k = pcHead.parentElement.getAttribute("data-pc");
+    if (k != null) {
+      if (plOpen.has(k)) plOpen.delete(k); else plOpen.add(k);
+      const cls = plOpen.has(k) ? "pc-case open" : "pc-case";
+      document.querySelectorAll(".pc-case").forEach((el) => { if (el.getAttribute("data-pc") === k) el.className = cls; });
+    }
+    return;
+  }
   if (e.target.closest("#to-home")) { sendMsg({ type: "navigate", screen: "home" }); return; }
   if (e.target.closest("#to-loop")) { sendMsg({ type: "navigate", screen: "loop" }); return; }
   if (e.target.closest("#help-btn")) { const w = document.getElementById("welcome"); if (w) w.hidden = false; return; }
@@ -603,6 +645,27 @@ function renderDataProfile(v) {
        <td>${c.quality ? `<span class="dp-q dp-q-${esc(c.quality)}" title="${esc(c.quality)}"></span>` : ""}</td></tr>`).join("")
     || `<tr><td colspan="6" class="meta">No columns profiled yet.</td></tr>`;
   setHtml("dp-table", head + `<tbody>${body}</tbody>`);
+}
+
+function renderPromptlab(v) {
+  const p = v.promptlab || { name: null, round: 1, prompt: null, summary: { pass: 0, warn: 0, fail: 0, pending: 0, running: 0, total: 0 }, cases: [] };
+  // Reconcile plOpen: drop any case id that no longer exists in this session's cases.
+  const currentIds = new Set((p.cases || []).map(c => c.id));
+  for (const id of plOpen) if (!currentIds.has(id)) plOpen.delete(id);
+  setText("pl-name", `${p.name || "Prompt workbench"}  ·  Round ${p.round}`);
+  const sm = p.summary;
+  const chip = (n, cls, label) => n > 0 ? `<span class="pl-chip ${cls}">${n} ${label}</span>` : "";
+  setHtml("pl-summary", sm.total
+    ? chip(sm.pass, "pl-c-pass", "pass") + chip(sm.warn, "pl-c-warn", "warn") + chip(sm.fail, "pl-c-fail", "fail")
+      + chip(sm.running, "", "running") + chip(sm.pending, "", "pending")
+    : "");
+  setHtml("pl-cases", (p.cases || []).map((c) => {
+    const preview = c.output ? esc(c.output.replace(/\s+/g, " ").slice(0, 120)) : "<span class=\"meta\">awaiting output…</span>";
+    const body = `<div class="pc-body"><div class="pc-out">${c.output ? esc(c.output) : "No output yet."}</div>${c.note ? `<div class="pc-note">${esc(c.note)}</div>` : ""}</div>`;
+    return `<div class="pc-case${plOpen.has(c.id) ? " open" : ""}" data-pc="${esc(c.id)}"><div class="pc-head"><span class="pc-scenario">${esc(c.scenario)}</span><span class="pc-preview">${preview}</span><span class="pc-verdict pc-v-${esc(c.verdict)}">${esc(c.verdict)}</span></div>${body}</div>`;
+  }).join("") || `<div class="meta" style="padding:8px">No cases yet.</div>`);
+  const pre = document.getElementById("pl-prompt");
+  if (pre) pre.textContent = p.prompt || "";
 }
 
 function renderTeam(v) {
