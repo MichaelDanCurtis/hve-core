@@ -648,6 +648,9 @@ function renderDataProfile(v) {
 
 function renderPromptlab(v) {
   const p = v.promptlab || { name: null, round: 1, prompt: null, summary: { pass: 0, warn: 0, fail: 0, pending: 0, running: 0, total: 0 }, cases: [] };
+  // Reconcile plOpen: drop any case id that no longer exists in this session's cases.
+  const currentIds = new Set((p.cases || []).map(c => c.id));
+  for (const id of plOpen) if (!currentIds.has(id)) plOpen.delete(id);
   setText("pl-name", `${p.name || "Prompt workbench"}  ·  Round ${p.round}`);
   const sm = p.summary;
   const chip = (n, cls, label) => n > 0 ? `<span class="pl-chip ${cls}">${n} ${label}</span>` : "";
@@ -655,10 +658,10 @@ function renderPromptlab(v) {
     ? chip(sm.pass, "pl-c-pass", "pass") + chip(sm.warn, "pl-c-warn", "warn") + chip(sm.fail, "pl-c-fail", "fail")
       + chip(sm.running, "", "running") + chip(sm.pending, "", "pending")
     : "");
-  setHtml("pl-cases", (p.cases || []).map((c, i) => {
+  setHtml("pl-cases", (p.cases || []).map((c) => {
     const preview = c.output ? esc(c.output.replace(/\s+/g, " ").slice(0, 120)) : "<span class=\"meta\">awaiting output…</span>";
     const body = `<div class="pc-body"><div class="pc-out">${c.output ? esc(c.output) : "No output yet."}</div>${c.note ? `<div class="pc-note">${esc(c.note)}</div>` : ""}</div>`;
-    return `<div class="pc-case" data-pc="${i}"><div class="pc-head"><span class="pc-scenario">${esc(c.scenario)}</span><span class="pc-preview">${preview}</span><span class="pc-verdict pc-v-${esc(c.verdict)}">${esc(c.verdict)}</span></div>${body}</div>`;
+    return `<div class="pc-case${plOpen.has(c.id) ? " open" : ""}" data-pc="${esc(c.id)}"><div class="pc-head"><span class="pc-scenario">${esc(c.scenario)}</span><span class="pc-preview">${preview}</span><span class="pc-verdict pc-v-${esc(c.verdict)}">${esc(c.verdict)}</span></div>${body}</div>`;
   }).join("") || `<div class="meta" style="padding:8px">No cases yet.</div>`);
   const pre = document.getElementById("pl-prompt");
   if (pre) pre.textContent = p.prompt || "";
