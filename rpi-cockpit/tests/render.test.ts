@@ -300,6 +300,22 @@ describe("toViewModel", () => {
     expect(toViewModel(initialState()).memory.title).toBeNull();
   });
 
+  it("projects the flow graph as pure data", () => {
+    let s = applyBeat(initialState(), { type: "flow.open", title: "p" }, 1);
+    s = applyBeat(s, { type: "flownode.add", id: "a", kind: "workflow", label: "Triage" }, 2);
+    s = applyBeat(s, { type: "flownode.add", id: "t", kind: "trigger", label: "issue", scope: "a" }, 3);
+    s = applyBeat(s, { type: "flowedge.add", id: "e", from: "a", to: "a", label: "self", kind: "event", status: "active" }, 4);
+    s = applyBeat(s, { type: "flow.focus", workflow: "a" }, 5);
+    const vm = toViewModel(s);
+    expect(vm.domain).toBe("flow");
+    expect(vm.flow.title).toBe("p");
+    expect(vm.flow.focus).toBe("a");
+    expect(vm.flow.nodes[0]).toEqual({ id: "a", scope: "orchestration", kind: "workflow", label: "Triage", sub: null, status: "idle" });
+    expect(vm.flow.nodes[1]).toMatchObject({ id: "t", scope: "a", kind: "trigger" });
+    expect(vm.flow.edges[0]).toEqual({ id: "e", from: "a", to: "a", scope: "orchestration", label: "self", kind: "event", status: "active" });
+    expect(toViewModel(initialState()).flow.title).toBeNull();
+  });
+
   it("projects the data profile dataset and columns", () => {
     let s = applyBeat(initialState(), { type: "profile.start", name: "sales.csv", rows: 100, columns: 3, source: "warehouse" }, 1);
     s = applyBeat(s, { type: "column.add", name: "id", dtype: "int", nullPct: 0, distinct: 100, quality: "ok" }, 2);

@@ -17,13 +17,19 @@ export type MemoryTag = "recalled" | "added" | "updated";
 export interface MemoryEntry { id: string; title?: string; content: string; category: string; tag: MemoryTag; }
 export type HandoffAction = "stored" | "merged" | "recalled";
 export interface MemoryHandoff { id: string; from: string; summary: string; action: HandoffAction; }
+export type FlowNodeKind = "workflow" | "trigger" | "guard" | "agent" | "output" | "mcp";
+export type FlowStatus = "idle" | "running" | "passed" | "failed" | "skipped" | "stale";
+export interface FlowNode { id: string; scope: string; kind: FlowNodeKind; label: string; sub?: string; status: FlowStatus; }
+export type FlowEdgeKind = "label" | "event" | "output" | "step";
+export type FlowEdgeStatus = "idle" | "active";
+export interface FlowEdge { id: string; from: string; to: string; scope: string; label?: string; kind: FlowEdgeKind; status: FlowEdgeStatus; }
 export interface LogEntry { t: number; kind: string; detail: string; }
 export interface SteerMenu { label: string; options: OptionItem[]; }
 
 export interface SessionState {
   task: string;
   host: string;
-  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | "promptlab" | "memory" | null;
+  domain: "rpi" | "review" | "interview" | "backlog" | "team" | "codemap" | "dataprofile" | "gallery" | "promptlab" | "memory" | "flow" | null;
   reviewTarget: string | null;
   orchestrator: string | null;
   teamAgents: TeamAgent[];
@@ -70,11 +76,15 @@ export interface SessionState {
   memoryTitle: string | null;
   memoryEntries: MemoryEntry[];
   memoryHandoffs: MemoryHandoff[];
+  flowTitle: string | null;
+  flowNodes: FlowNode[];
+  flowEdges: FlowEdge[];
+  flowFocus: string | null;
   log: LogEntry[];
 }
 
 export function initialState(): SessionState {
-  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, interviewSteps: null, decisions: [], hostElicits: false, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, codemapNodes: [], codemapFocus: null, codemapTouches: {}, profileDataset: null, profileColumns: [], galleryTitle: null, gallerySize: "m", galleryItems: [], promptName: null, promptRound: 1, promptArtifact: null, promptCases: [], memoryTitle: null, memoryEntries: [], memoryHandoffs: [], log: [] };
+  return { task: "", host: "", domain: null, reviewTarget: null, orchestrator: null, teamAgents: [], findings: [], boardTarget: null, boardColumns: [], boardItems: [], boardAction: null, view: "home", navigatorOpen: false, activeWorkflow: null, phase: null, phasesDone: [], subagents: [], validations: {}, artifacts: [], docType: null, interviewSteps: null, decisions: [], hostElicits: false, directives: [], steerMenu: null, screen: null, contextInstructions: [], contextSkills: [], contextCollection: null, appFrameUrl: null, codemapNodes: [], codemapFocus: null, codemapTouches: {}, profileDataset: null, profileColumns: [], galleryTitle: null, gallerySize: "m", galleryItems: [], promptName: null, promptRound: 1, promptArtifact: null, promptCases: [], memoryTitle: null, memoryEntries: [], memoryHandoffs: [], flowTitle: null, flowNodes: [], flowEdges: [], flowFocus: null, log: [] };
 }
 
 function normGalleryItem(it: { id?: string; label: string; group?: string; url?: string; html?: string; caption?: string }, idx: number): GalleryItem {
@@ -164,6 +174,20 @@ export function applyBeat(s: SessionState, beat: Beat, now: number): SessionStat
       const exists = s.memoryHandoffs.some((x) => x.id === beat.id);
       return { ...s, memoryHandoffs: exists ? s.memoryHandoffs.map((x) => (x.id === beat.id ? h : x)) : [...s.memoryHandoffs, h], log };
     }
+    case "flow.open":
+      return { ...s, view: "loop", domain: "flow", flowTitle: beat.title ?? null, flowNodes: [], flowEdges: [], flowFocus: null, log };
+    case "flownode.add": {
+      const n = { id: beat.id, scope: beat.scope ?? "orchestration", kind: beat.kind, label: beat.label, sub: beat.sub, status: beat.status ?? "idle" };
+      const exists = s.flowNodes.some((x) => x.id === beat.id);
+      return { ...s, flowNodes: exists ? s.flowNodes.map((x) => (x.id === beat.id ? n : x)) : [...s.flowNodes, n], log };
+    }
+    case "flowedge.add": {
+      const e = { id: beat.id, from: beat.from, to: beat.to, scope: beat.scope ?? "orchestration", label: beat.label, kind: beat.kind ?? "label", status: beat.status ?? "idle" };
+      const exists = s.flowEdges.some((x) => x.id === beat.id);
+      return { ...s, flowEdges: exists ? s.flowEdges.map((x) => (x.id === beat.id ? e : x)) : [...s.flowEdges, e], log };
+    }
+    case "flow.focus":
+      return { ...s, flowFocus: beat.workflow ?? null, log };
     case "context.set":
       return { ...s, contextInstructions: beat.instructions, contextSkills: beat.skills, contextCollection: beat.collection, log };
     case "appframe.set":
@@ -230,6 +254,10 @@ function summarize(beat: Beat): string {
     case "memory.open": return beat.title ?? "memory";
     case "memory.add": return beat.id;
     case "handoff.add": return beat.from;
+    case "flow.open": return beat.title ?? "flow";
+    case "flownode.add": return beat.label;
+    case "flowedge.add": return beat.id;
+    case "flow.focus": return beat.workflow ?? "(orchestration)";
   }
 }
 

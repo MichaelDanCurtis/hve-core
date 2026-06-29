@@ -83,6 +83,10 @@ export const Beat = z.discriminatedUnion("type", [
   z.object({ type: z.literal("memory.open"), title: z.string().optional() }),
   z.object({ type: z.literal("memory.add"), id: z.string(), content: z.string(), category: z.string(), tag: z.enum(["recalled", "added", "updated"]).optional(), title: z.string().optional() }),
   z.object({ type: z.literal("handoff.add"), id: z.string(), from: z.string(), summary: z.string(), action: z.enum(["stored", "merged", "recalled"]).optional() }),
+  z.object({ type: z.literal("flow.open"), title: z.string().optional() }),
+  z.object({ type: z.literal("flownode.add"), id: z.string(), kind: z.enum(["workflow", "trigger", "guard", "agent", "output", "mcp"]), label: z.string(), scope: z.string().optional(), sub: z.string().optional(), status: z.enum(["idle", "running", "passed", "failed", "skipped", "stale"]).optional() }),
+  z.object({ type: z.literal("flowedge.add"), id: z.string(), from: z.string(), to: z.string(), scope: z.string().optional(), label: z.string().optional(), kind: z.enum(["label", "event", "output", "step"]).optional(), status: z.enum(["idle", "active"]).optional() }),
+  z.object({ type: z.literal("flow.focus"), workflow: z.string().nullable().optional() }),
 ]);
 export type Beat = z.infer<typeof Beat>;
 
