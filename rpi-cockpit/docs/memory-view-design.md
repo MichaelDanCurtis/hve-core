@@ -54,7 +54,7 @@ A new `#memory-view`, a sibling of the other loop views, shown when `v.domain ==
 
 * A header line: `{title}` (or "Memory") with a derived count strip of tag chips (recalled / added / updated, each colored to its tag, shown only when nonzero).
 * The centerpiece, the entries grouped by `category`: a small category heading per group, then one row per `MemoryEntry` showing its title (or the start of its content), a color-coded tag pill (recalled cyan / added green / updated amber), and a one-line content preview. Clicking a row expands it inline to show the full content. An empty store (no entries) shows an empty-state row.
-* A secondary handoff strip (beside the entries on a wide viewport, stacked below on a narrow one): one card per `MemoryHandoff` showing `from`, the `summary`, and an action pill (stored / merged / recalled). Hidden when there are no handoffs.
+* A secondary handoff strip (beside the entries on a wide viewport, stacked below on a narrow one): one card per `MemoryHandoff` showing `from`, the `summary`, and an action pill (stored / merged / recalled). When there are no handoffs it shows an empty-state, consistent with the entries empty-state (rather than hiding the panel).
 
 Every interpolated field goes through the existing `esc()` helper. The expand/collapse is local view state (a delegated click toggling an `open` class), consistent with how the other client interactions are wired; the open state is keyed by the entry `id` and reconciled against the current entries each render (the pattern the promptlab case rows use).
 
