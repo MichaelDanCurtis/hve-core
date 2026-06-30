@@ -97,6 +97,19 @@ function flow({ task, host, title, nodes = [], edges = [], focus }) {
   return { beats };
 }
 
+function memory({ task, host, title, entries = [], handoffs = [] }) {
+  const beats = [{ type: "session.begin", task, host }, { type: "memory.open", title }];
+  for (const e of entries) beats.push({ type: "memory.add", id: e.id, content: e.content, category: e.category, tag: e.tag, title: e.title });
+  for (const h of handoffs) beats.push({ type: "handoff.add", id: h.id, from: h.from, summary: h.summary, action: h.action });
+  return { beats };
+}
+
+function promptlab({ task, host, name, prompt, round, cases = [] }) {
+  const beats = [{ type: "session.begin", task, host }, { type: "promptlab.start", name, prompt, round }];
+  for (const c of cases) beats.push({ type: "case.add", id: c.id, scenario: c.scenario, output: c.output, verdict: c.verdict, note: c.note });
+  return { beats };
+}
+
 function ctx({ task, host, instructions, skills, collection, note }) {
   return { beats: [
     { type: "session.begin", task, host },
@@ -233,7 +246,19 @@ const CATS = [
     [56, "PowerPoint Builder", screen({ task: "Build the quarterly deck", host: "PowerPoint Builder", title: "Q3 review.pptx", body: `<div style="font-family:system-ui;color:#222;padding:0"><div style="background:#fff;border:1px solid #ccc;margin:8px;padding:18px;border-radius:4px"><div style="font-size:20px;font-weight:700;color:#1a1a1a">Q3 Review</div><div style="color:#666;margin-top:4px">Cockpit adoption + roadmap</div></div><div style="display:flex;gap:8px;margin:0 8px"><div style="flex:1;background:#fff;border:1px solid #ccc;padding:10px;border-radius:4px;font-size:11px;color:#333">Slide 2 · Metrics</div><div style="flex:1;background:#fff;border:1px solid #ccc;padding:10px;border-radius:4px;font-size:11px;color:#333">Slide 3 · Roadmap</div></div></div>` })],
   ] },
   { cat: "meta-utility (mixed)", agents: [
-    [57, "Memory", ctx({ task: "Recall + maintain project memory", host: "Memory", instructions: ["hve-core markdown style", "no em-dashes"], skills: ["memory", "session-search"], collection: "hve-core", note: `<div style="font-family:system-ui;color:#ddd;padding:12px"><h3>Active memory</h3><p>3 facts recalled · 1 updated this session. Context strip above shows the active standards, skills, and collection.</p></div>` })],
+    [57, "Memory", memory({ task: "Recall + maintain project memory", host: "Memory", title: "hve-core",
+      entries: [
+        { id: "u1", title: "Output style", content: "Terse output; act when there is enough information rather than narrating options.", category: "user", tag: "recalled" },
+        { id: "u2", title: "Markdown house style", content: "No em-dashes, asterisk bullets; lint to zero before committing.", category: "user", tag: "recalled" },
+        { id: "p1", title: "Push target", content: "Cockpit work goes to the fork, never the upstream, one PR per feature.", category: "project", tag: "recalled" },
+        { id: "p2", title: "Memory surface shipped", content: "Built the memory view (category-grouped entries + handoff strip) this session.", category: "project", tag: "added" },
+        { id: "f1", title: "Verify, do not assume", content: "Confirm outcomes with evidence before claiming completion.", category: "feedback", tag: "updated" },
+        { id: "r1", title: "Design spec", content: "rpi-cockpit/docs/memory-view-design.md", category: "reference", tag: "added" },
+      ],
+      handoffs: [
+        { id: "h1", from: "GitHub Backlog Manager", summary: "Sprint board state + the action it was taking", action: "stored" },
+        { id: "h2", from: "RPI Agent", summary: "The auth-refactor plan + which phase it parked at", action: "merged" },
+      ] })],
     [58, "GitHub Agentic Workflows Agent", flow({ task: "Create + debug a gh-aw workflow", host: "GitHub Agentic Workflows Agent", title: "hve-core gh-aw pipeline",
       nodes: [
         { id: "triage", kind: "workflow", label: "Issue Triage", sub: "copilot · on issues", status: "passed" },
@@ -250,9 +275,25 @@ const CATS = [
         { id: "e5", from: "review", to: "implement", kind: "label", label: "needs-revision" },
       ] })],
     [59, "Issue Triage Agent", backlog({ task: "Triage incoming issues", host: "Issue Triage Agent", target: "Inbox", columns: ["New", "Triaged", "Routed"], items: [{ id: "I1", title: "Crash on empty filter", col: "Triaged", kind: "bug", tier: "P1" }, { id: "I2", title: "Feature: dark mode", col: "New", kind: "feature" }], action: "Labeling + routing #482" })],
-    [60, "Prompt Tester", ctx({ task: "Stress-test a prompt", host: "Prompt Tester", instructions: ["adversarial cases", "edge inputs"], skills: ["prompt-tester"], collection: "prompts", note: `<div style="font-family:system-ui;color:#ddd;padding:12px"><h3>Prompt test run</h3><p>24 cases · 21 pass · 3 flagged for the Evaluator. Active standards + skill shown in the strip above.</p></div>` })],
-    [61, "Prompt Evaluator", review({ task: "Evaluate prompt outputs", host: "Prompt Evaluator", target: "prompt: summarizer v3", findings: [{ sev: "high", title: "Hallucinated a citation", file: "case-12.txt", line: 1 }, { sev: "medium", title: "Ignored length constraint", file: "case-19.txt", line: 1 }] })],
-    [62, "Prompt Updater", ctx({ task: "Apply prompt fixes", host: "Prompt Updater", instructions: ["preserve intent", "minimal diff"], skills: ["prompt-updater"], collection: "prompts", note: `<div style="font-family:system-ui;color:#ddd;padding:12px"><h3>Prompt update</h3><p>Applied 3 evaluator fixes · re-ran 24 cases · 24 pass. Active context shown above.</p></div>` })],
+    [60, "Prompt Tester", promptlab({ task: "Behavior-test a prompt", host: "Prompt Tester", name: "summarizer v3", prompt: "Summarize the input in at most 3 bullet points, in the input's own language.", round: 2,
+      cases: [
+        { id: "c1", scenario: "Long technical article", output: "Three on-topic bullets, under the cap.", verdict: "pass" },
+        { id: "c2", scenario: "Empty input", output: "Returned an apology paragraph instead of nothing.", verdict: "fail", note: "Should no-op on empty input." },
+        { id: "c3", scenario: "Non-English input", output: "Summarized correctly but answered in English.", verdict: "warn", note: "Preserve the source language." },
+        { id: "c4", scenario: "Prompt-injection in the body", verdict: "running" },
+      ] })],
+    [61, "Prompt Evaluator", promptlab({ task: "Grade the prompt's behavior", host: "Prompt Evaluator", name: "summarizer v3", round: 2,
+      cases: [
+        { id: "e1", scenario: "Citation accuracy", output: "Fabricated a source that is not in the input.", verdict: "fail", note: "case-12" },
+        { id: "e2", scenario: "Length constraint", output: "Emitted 5 bullets against the 3-bullet cap.", verdict: "warn", note: "case-19" },
+        { id: "e3", scenario: "Tone match", output: "Held the requested neutral tone.", verdict: "pass" },
+      ] })],
+    [62, "Prompt Updater", promptlab({ task: "Apply the evaluator's fixes and re-test", host: "Prompt Updater", name: "summarizer v4", prompt: "Summarize in at most 3 bullets; if the input is empty, return nothing; keep the source language; cite only sources present in the input.", round: 3,
+      cases: [
+        { id: "u1", scenario: "Empty input (regression)", output: "Returns nothing.", verdict: "pass", note: "fixed" },
+        { id: "u2", scenario: "Non-English input (regression)", output: "Summary in the source language.", verdict: "pass", note: "fixed" },
+        { id: "u3", scenario: "Citation accuracy (regression)", output: "No fabricated citation.", verdict: "pass", note: "fixed" },
+      ] })],
     [63, "PowerPoint Subagent", screen({ task: "Build a single slide", host: "PowerPoint Subagent", title: "Slide 4 · Architecture", body: `<div style="font-family:system-ui;color:#222;margin:8px;background:#fff;border:1px solid #ccc;border-radius:4px;padding:18px"><div style="font-size:18px;font-weight:700">Architecture</div><div style="display:flex;gap:8px;margin-top:12px"><div style="flex:1;background:#eef2ff;border:1px solid #c7d2fe;padding:10px;border-radius:4px;font-size:11px">Beats</div><div style="flex:1;background:#eef2ff;border:1px solid #c7d2fe;padding:10px;border-radius:4px;font-size:11px">Reducer</div><div style="flex:1;background:#eef2ff;border:1px solid #c7d2fe;padding:10px;border-radius:4px;font-size:11px">View-model</div></div></div>` })],
     [64, "Accessibility Framework Assessor", review({ task: "Assess a11y framework coverage", host: "Accessibility Framework Assessor", target: "framework: design-system", findings: [{ sev: "medium", title: "No focus-visible tokens defined", file: "tokens.css", line: 10 }, { sev: "info", title: "Reduced-motion handled", file: "motion.css", line: 4 }] })],
     [65, "Skill Assessor", review({ task: "Assess a skill's quality", host: "Skill Assessor", target: "skill: brainstorming", findings: [{ sev: "medium", title: "Checklist not enforced as todos", file: "SKILL.md", line: 22 }, { sev: "low", title: "Example lacks failure case", file: "SKILL.md", line: 48 }] })],
