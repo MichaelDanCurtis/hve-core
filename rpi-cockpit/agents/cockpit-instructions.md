@@ -60,6 +60,7 @@ When the `rpi-cockpit` MCP tools are available, narrate your work to the cockpit
 * `gallery_open(title, items, size?)` opens a scrollable grid of scaled live thumbnails. Each item is one of a live `url` (a website or a loopback dev server, framed live) OR an inline `html` snapshot, plus a `label`, optional `group` (a section header), and optional `caption`. `url` must be a loopback http(s) URL or an external https URL. `size` is s/m/l (default m).
 * `gallery_add(item)` adds or updates one tile by `id`; `gallery_clear()` empties the board.
 * Use it to compare several running apps or sites side by side (`url` items), or several rendered states (`html` items). Clicking a tile expands it; external sites that block framing show blank, so an open-in-tab link is always offered.
+* On a `/gallery` request from the user, open this view: call `gallery_open` with whatever they name (sites, running apps, rendered states), or the full HVE Core agent showcase (`rpi-cockpit/tools/agent-gallery.mjs`) when they do not specify.
 
 ## Prompt engineering (the prompt workbench)
 

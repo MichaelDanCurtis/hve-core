@@ -44,6 +44,7 @@ When the `rpi-cockpit` MCP tools are available, narrate your work to the cockpit
 
 * `gallery_open(title, items, size?)`, `gallery_add(item)`, `gallery_clear()` to open a scrollable grid, add/update a tile, and clear the board. Each item is one of a live `url` (loopback http(s) or external https) OR an inline `html` snapshot, plus a `label`, optional `group`, and optional `caption`.
 * Use it to compare running apps or sites side by side, or rendered states. Clicking a tile expands it; external sites that block framing show blank with an open-in-tab link.
+* On a `/gallery` request from the user, open this view: call `gallery_open` with whatever they name, or the full HVE Core agent showcase (`rpi-cockpit/tools/agent-gallery.mjs`) when they do not specify.
 
 ## Team orchestration (an orchestrator running subagents)
 
